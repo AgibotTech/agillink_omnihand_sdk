@@ -1,2 +1,0 @@
-include VERSION README.md LICENSE
-recursive-include omnihand_2025 *
