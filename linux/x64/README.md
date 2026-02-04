@@ -190,9 +190,9 @@ from omnihand import OmniHand2025, OmniHandPro2025, EHandType
 # OmniHand 2025 (10 DOF)
 hand_o10 = OmniHand2025.create_hand_by_zlgcan(
     hand_type=EHandType.RIGHT,
-    device_id=1,
-    canfd_id=0,
-    channel_id=0
+    hand_device_id=1,
+    canfd_device_id=0,
+    canfd_channel_id=0
 )
 
 if not hand_o10.init():
@@ -202,9 +202,9 @@ if not hand_o10.init():
 # OmniHand Pro 2025 (12 DOF)
 hand_o12 = OmniHandPro2025.create_hand_by_zlgcan(
     hand_type=EHandType.LEFT,
-    device_id=1,
-    canfd_id=0,
-    channel_id=0
+    hand_device_id=1,
+    canfd_device_id=0,
+    canfd_channel_id=0
 )
 
 # Advanced: SocketCAN (Linux only, requires driver setup)

@@ -1,0 +1,261 @@
+// Copyright (c) 2025, Agibot Co., Ltd.
+// OmniHand 2025 SDK is licensed under Mulan PSL v2.
+
+/**
+ * @file UMI_demo_canfd_id.cc
+ * @brief OmniHand Dex UMI 控制示例 - CANFD 通信（通过 canfd_id）
+ * 
+ * 此示例演示如何使用 canfd_id 创建和读取 OmniHand Dex UMI 灵巧手数据
+ * 支持单手（left/right）和双手（both）控制
+ * 
+ * 注意：UMI 协议是只读的，不支持位置/速度/力矩控制
+ * 
+ * 编译: cmake .. && make
+ * 运行: 
+ *   ./demo_omnihand_dex_umi_canfd_id left    # 读取左手数据
+ *   ./demo_omnihand_dex_umi_canfd_id right   # 读取右手数据
+ *   ./demo_omnihand_dex_umi_canfd_id both    # 同时读取左右手数据
+ */
+
+#include <iostream>
+#include <iomanip>
+#include <vector>
+#include <thread>
+#include <chrono>
+#include <string>
+#include <algorithm>
+#include "omnihand/omnihand_dex_umi.h"
+
+void printUsage(const char* program_name) {
+  std::cout << "Usage: " << program_name << " [left|right|both]" << std::endl;
+  std::cout << "  left   - Read left hand data only" << std::endl;
+  std::cout << "  right  - Read right hand data only" << std::endl;
+  std::cout << "  both   - Read both hands data simultaneously" << std::endl;
+  std::cout << std::endl;
+  std::cout << "Note: UMI protocol is read-only, position/velocity/torque control is not supported" << std::endl;
+}
+
+void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& hand_name) {
+  std::cout << "\n=== " << hand_name << " Hand Data Reading ===" << std::endl;
+
+  // ============ 获取设备信息 ============
+  auto vendor_info = hand->GetVendorInfo();
+  std::cout << "\nVendor Info:" << std::endl;
+  std::cout << "  Model: " << vendor_info.productModel << std::endl;
+  std::cout << "  Serial: " << vendor_info.productSeqNum << std::endl;
+  std::cout << "  Hardware Version: " << static_cast<int>(vendor_info.hardwareVersion.major_)
+            << "." << static_cast<int>(vendor_info.hardwareVersion.minor_)
+            << "." << static_cast<int>(vendor_info.hardwareVersion.patch_) << std::endl;
+  std::cout << "  Software Version: " << static_cast<int>(vendor_info.softwareVersion.major_)
+            << "." << static_cast<int>(vendor_info.softwareVersion.minor_)
+            << "." << static_cast<int>(vendor_info.softwareVersion.patch_) << std::endl;
+  std::cout << "  Voltage: " << vendor_info.voltage << " mV" << std::endl;
+  std::cout << "  DOF: " << static_cast<int>(vendor_info.dof) << std::endl;
+
+  auto device_info = hand->GetDeviceInfo();
+  std::cout << "\nDevice Info:" << std::endl;
+  std::cout << "  Device ID: " << static_cast<int>(device_info.hand_device_id) << std::endl;
+  std::cout << "  Communication Parameters:" << std::endl;
+  std::cout << "    Bitrate: " << static_cast<int>(device_info.commu_params.bitrate_) << std::endl;
+  std::cout << "    Sample Point: " << static_cast<int>(device_info.commu_params.sample_point_) << std::endl;
+  std::cout << "    D-Bitrate: " << static_cast<int>(device_info.commu_params.dbitrate_) << std::endl;
+  std::cout << "    D-Sample Point: " << static_cast<int>(device_info.commu_params.dsample_point_) << std::endl;
+  
+  // UMI 特有信息
+  if (device_info.position_report_frequency.has_value()) {
+    std::cout << "  Position Report Frequency: " << device_info.position_report_frequency.value() << " Hz" << std::endl;
+  }
+  if (device_info.tactile_sensor_report_frequency.has_value()) {
+    std::cout << "  Tactile Sensor Report Frequency: " << device_info.tactile_sensor_report_frequency.value() << " Hz" << std::endl;
+  }
+  if (device_info.adc_channel_count.has_value()) {
+    std::cout << "  ADC Channel Count: " << device_info.adc_channel_count.value() << std::endl;
+  }
+
+  // ============ 读取传感器数据 ============
+  std::cout << "\n=== Reading Sensor Data ===" << std::endl;
+  
+  // 注意：UMI 协议不支持直接查询关节角度
+  // 位置数据只能通过周期性位置报告获取
+  // 使用 SetPositionReportCallback() 注册回调函数来接收位置数据
+  std::cout << "\nNote: UMI protocol does not support direct joint angle queries." << std::endl;
+  std::cout << "      Position data can only be obtained through periodic position reports." << std::endl;
+  std::cout << "      Use SetPositionReportCallback() to register a callback for receiving position data." << std::endl;
+
+  // 读取触觉传感器数据（1D，使用 Raw API）
+  std::cout << "\n1D Tactile Sensor Data (Raw):" << std::endl;
+  try {
+    auto thumb_sensor = hand->GetTactileSensorDataRaw(EFinger::eThumb);
+    std::cout << "  Thumb: [";
+    for (size_t i = 0; i < thumb_sensor.data_.size(); ++i) {
+      std::cout << static_cast<int>(thumb_sensor.data_[i]);
+      if (i < thumb_sensor.data_.size() - 1) std::cout << ", ";
+    }
+    std::cout << "] (unit: 1g, max: 255g)" << std::endl;
+    
+    auto index_sensor = hand->GetTactileSensorDataRaw(EFinger::eIndex);
+    std::cout << "  Index: [";
+    for (size_t i = 0; i < index_sensor.data_.size(); ++i) {
+      std::cout << static_cast<int>(index_sensor.data_[i]);
+      if (i < index_sensor.data_.size() - 1) std::cout << ", ";
+    }
+    std::cout << "] (unit: 1g, max: 255g)" << std::endl;
+    
+    auto middle_sensor = hand->GetTactileSensorDataRaw(EFinger::eMiddle);
+    std::cout << "  Middle: [";
+    for (size_t i = 0; i < middle_sensor.data_.size(); ++i) {
+      std::cout << static_cast<int>(middle_sensor.data_[i]);
+      if (i < middle_sensor.data_.size() - 1) std::cout << ", ";
+    }
+    std::cout << "] (unit: 1g, max: 255g)" << std::endl;
+    
+    // 读取所有传感器数据
+    std::cout << "\nAll Tactile Sensor Data:" << std::endl;
+    auto all_sensors = hand->GetAllTactileSensorDataRaw();
+    for (const auto& sensor : all_sensors) {
+      std::string finger_name;
+      switch (sensor.sensor_id_) {
+        case EFinger::eThumb: finger_name = "Thumb"; break;
+        case EFinger::eIndex: finger_name = "Index"; break;
+        case EFinger::eMiddle: finger_name = "Middle"; break;
+        case EFinger::eRing: finger_name = "Ring"; break;
+        case EFinger::eLittle: finger_name = "Little"; break;
+        case EFinger::ePalm: finger_name = "Palm"; break;
+        case EFinger::eDorsum: finger_name = "Dorsum"; break;
+        default: finger_name = "Unknown"; break;
+      }
+      std::cout << "  " << finger_name << ": " << sensor.data_.size() << " points" << std::endl;
+    }
+  } catch (const std::exception& e) {
+    std::cout << "  Warning: " << e.what() << std::endl;
+  }
+}
+
+int main(int argc, char** argv) {
+  // 解析命令行参数
+  std::string mode = "left";  // 默认左手
+  if (argc > 1) {
+    std::string arg = argv[1];
+    if (arg == "--help" || arg == "-h") {
+      printUsage(argv[0]);
+      return 0;
+    } else if (arg == "left" || arg == "right" || arg == "both") {
+      mode = arg;
+    } else {
+      std::cerr << "[Error]: Invalid argument: " << arg << std::endl;
+      printUsage(argv[0]);
+      return 1;
+    }
+  }
+
+  std::cout << "============================================" << std::endl;
+  std::cout << "OmniHand Dex UMI - CANFD Control (by canfd_id)" << std::endl;
+  std::cout << "Mode: " << mode << std::endl;
+  std::cout << "============================================" << std::endl;
+
+  unsigned char device_id = 1;
+  unsigned char canfd_id = 0;
+
+  if (mode == "left") {
+    // 创建左手实例
+    auto left_hand = OmniHandDexUMI::createHandByZlgcan(
+        EHandType::eLeft,
+        device_id,
+        canfd_id,
+        0  // channel_id (第一个通道)
+    );
+
+    if (!left_hand) {
+      std::cerr << "[Error]: Failed to create left hand instance" << std::endl;
+      return 1;
+    }
+
+    if (!left_hand->Init()) {
+      std::cerr << "[Error]: Failed to initialize left hand" << std::endl;
+      return 1;
+    }
+
+    std::cout << "[OK]: Left hand initialized successfully" << std::endl;
+    readSingleHand(left_hand, "Left");
+  } else if (mode == "right") {
+    // 创建右手实例
+    auto right_hand = OmniHandDexUMI::createHandByZlgcan(
+        EHandType::eRight,
+        device_id,
+        canfd_id,
+        0  // channel_id (第一个通道)
+    );
+
+    if (!right_hand) {
+      std::cerr << "[Error]: Failed to create right hand instance" << std::endl;
+      return 1;
+    }
+
+    if (!right_hand->Init()) {
+      std::cerr << "[Error]: Failed to initialize right hand" << std::endl;
+      return 1;
+    }
+
+    std::cout << "[OK]: Right hand initialized successfully" << std::endl;
+    readSingleHand(right_hand, "Right");
+  } else if (mode == "both") {
+    // both 模式：同时读取两个手
+    auto left_hand = OmniHandDexUMI::createHandByZlgcan(
+        EHandType::eLeft,
+        device_id,
+        canfd_id,
+        0  // channel_id (第一个通道)
+    );
+
+    auto right_hand = OmniHandDexUMI::createHandByZlgcan(
+        EHandType::eRight,
+        device_id,
+        canfd_id,
+        1  // channel_id (第二个通道)
+    );
+
+    if (!left_hand || !right_hand) {
+      std::cerr << "[Error]: Failed to create hand instances" << std::endl;
+      return 1;
+    }
+
+    if (!left_hand->Init()) {
+      std::cerr << "[Error]: Failed to initialize left hand" << std::endl;
+      return 1;
+    }
+
+    if (!right_hand->Init()) {
+      std::cerr << "[Error]: Failed to initialize right hand" << std::endl;
+      return 1;
+    }
+
+    std::cout << "[OK]: Both hands initialized successfully" << std::endl;
+
+    // 同时读取两个手的数据
+    std::cout << "\n=== Dual Hand Data Reading ===" << std::endl;
+    
+    // 获取设备信息
+    auto left_vendor = left_hand->GetVendorInfo();
+    auto right_vendor = right_hand->GetVendorInfo();
+    
+    std::cout << "\nLeft Hand Info:" << std::endl;
+    std::cout << "  Model: " << left_vendor.productModel << std::endl;
+    std::cout << "  Serial: " << left_vendor.productSeqNum << std::endl;
+    
+    std::cout << "\nRight Hand Info:" << std::endl;
+    std::cout << "  Model: " << right_vendor.productModel << std::endl;
+    std::cout << "  Serial: " << right_vendor.productSeqNum << std::endl;
+
+    // 读取两个手的角度
+    std::cout << "\nReading joint angles from both hands..." << std::endl;
+    // 注意：UMI 协议不支持 GetAllJointAngles()
+    // 位置数据只能通过周期性位置报告获取
+    // 使用 SetPositionReportCallback() 注册回调函数来接收位置数据
+    std::cout << "\nNote: UMI protocol does not support direct joint angle queries." << std::endl;
+    std::cout << "      Position data can only be obtained through periodic position reports." << std::endl;
+    std::cout << "      Use SetPositionReportCallback() to register a callback for receiving position data." << std::endl;
+  }
+
+  std::cout << "\n[Done]: Example completed successfully!" << std::endl;
+  return 0;
+}
