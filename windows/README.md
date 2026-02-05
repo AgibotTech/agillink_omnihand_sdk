@@ -1,18 +1,18 @@
-﻿# OmniHand 2025 SDK v1.0.0 - Windows
+# OmniHand 2025 SDK v1.0.0 - Windows
 
 Supported architecture: x64
 
-**Platform note**: This is the Windows release. The **ROS2 interface and SocketCAN** are not supported on Windows; they are available only on Linux. The API documentation in this package (e.g. doc/en/, doc/zh_cn/) excludes ROS2-related topics for Windows.
+**Platform note**: This is the Windows release. The **ROS2 interface and SocketCAN** are not supported on Windows; they are available only on Linux. The API documentation in this package (e.g. `doc/en/`, `doc/zh_cn/`) excludes ROS2-related topics for Windows.
 
 ## Overview
 
 The OmniHand 2025 SDK supports three product models:
 
-**OmniHand 2025 鐏靛姩娆?(O10)**: A compact, high-DOF interactive dexterous hand featuring 10 active + 6 passive degrees of freedom. Weighing only 500g, it utilizes CANFD communication interfaces and is equipped with 400+ tactile points and 0.1N array resolution, with maximum fingertip force of 5N. It's suitable for various humanoid robots and robotic arms. Its compact, lightweight design and rich tactile interaction capabilities make it valuable for interactive services, research, education, and light-duty operations.
+**OmniHand 2025 灵动款 (O10)**: A compact, high-DOF interactive dexterous hand featuring `10 active + 6 passive degrees of freedom`. Weighing only 500g, it utilizes CANFD communication interfaces and is equipped with `400+ tactile points and 0.1N array resolution, with maximum fingertip force of 5N`. It's suitable for various humanoid robots and robotic arms. Its compact, lightweight design and rich tactile interaction capabilities make it valuable for interactive services, research, education, and light-duty operations.
 
 ![](doc/pic/hand_o10.jpg)
 
-**OmniHand Pro 2025 涓撲笟娆?(O12)**: A 12-degree-of-freedom professional dexterous hand featuring precise operation and flexible control capabilities. It is equipped with tactile sensors and multiple control modes (position control, torque control, hybrid control), making it suitable for a wide range of applications including research and education, entertainment and commercial performances, exhibition guidance, and industrial scenarios.
+**OmniHand Pro 2025 专业款 (O12)**: A 12-degree-of-freedom professional dexterous hand featuring precise operation and flexible control capabilities. It is equipped with tactile sensors and multiple control modes (position control, torque control, hybrid control), making it suitable for a wide range of applications including research and education, entertainment and commercial performances, exhibition guidance, and industrial scenarios.
 
 ![](doc/pic/hand_o12.jpg)
 
@@ -20,11 +20,11 @@ The OmniHand 2025 SDK supports three product models:
 
 ## Dexterous Hand Motor Index
 
-**OmniHand 2025 鐏靛姩娆?(O10)**: Has 10 degrees of freedom, indexed from 1 to 10. The corresponding control motors are shown in the following image:
+**OmniHand 2025 灵动款 (O10)**: Has 10 degrees of freedom, indexed from 1 to 10. The corresponding control motors are shown in the following image:
 
 ![](doc/pic/hand_o10_motors.jpg)
 
-**OmniHand Pro 2025 涓撲笟娆?(O12)**: Has 12 degrees of freedom, indexed from 1 to 12. The corresponding control motors are shown in the following image:
+**OmniHand Pro 2025 专业款 (O12)**: Has 12 degrees of freedom, indexed from 1 to 12. The corresponding control motors are shown in the following image:
 
 ![](doc/pic/hand_o12_motors.jpg)
 
@@ -35,9 +35,9 @@ The OmniHand 2025 SDK supports three product models:
 Supports the following communication interfaces:
 
 - **CANFD (USB adapter) - Recommended**: ZLG USBCANFD series (USBCANFD-100U-mini/USBCANFD-100U/USBCANFD-200U)
-  - 鉁?**Zero configuration**: SDK includes libraries, ready to use out of the box
-  - 鉁?**No administrator privileges required**: User-space library
-  - 鉁?**Simple API**: OmniHand2025.create_hand_by_zlgcan(...) / OmniHandPro2025.create_hand_by_zlgcan(...) / OmniHandDexUMI.create_hand_by_zlgcan(...)
+  - ✅ **Zero configuration**: SDK includes libraries, ready to use out of the box
+  - ✅ **No administrator privileges required**: User-space library
+  - ✅ **Simple API**: `OmniHand2025.create_hand_by_zlgcan(...)` / `OmniHandPro2025.create_hand_by_zlgcan(...)` / `OmniHandDexUMI.create_hand_by_zlgcan(...)`
 - **RS485 (OmniHand 2025 only)**: Serial port communication
 - **Not supported on Windows**: ROS2 interface and SocketCAN are Linux-only; the bundled API documentation excludes ROS2.
 
@@ -51,66 +51,66 @@ Supports the following communication interfaces:
 ## Quick Install
 
 Run as Administrator:
-```
+``````
 install.bat
-```
+``````
 
 Or specify path:
-```
-install.bat "D:\omnihand2025"
-```
+``````
+install.bat `"D:\omnihand2025`"
+``````
 
 ## Uninstall
 
 Run as Administrator:
-```
+``````
 uninstall.bat
-```
+``````
 
 ## Directory Structure
 
-```
+``````
 windows/
-鈹溾攢鈹€ cpp/
-鈹?  鈹溾攢鈹€ share/
-鈹?  鈹?  鈹斺攢鈹€ cmake/
-鈹?  鈹?      鈹斺攢鈹€ omnihand/        # CMake config
-鈹?  鈹溾攢鈹€ include/omnihand/         # Header files
-鈹?  鈹溾攢鈹€ lib/                      # C++ libraries
-鈹?  鈹溾攢鈹€ demo/                      # C++ demo source code (not installed)
-鈹?  鈹?  鈹溾攢鈹€ omnihand_2025/
-鈹?  鈹?  鈹溾攢鈹€ omnihand_pro_2025/
-鈹?  鈹?  鈹斺攢鈹€ omnihand_dex_umi/
-鈹?  鈹溾攢鈹€ test/                      # C++ test source code (not installed)
-鈹?  鈹斺攢鈹€ bin/omnihand/
-鈹?      鈹溾攢鈹€ demo/                  # Demo executables
-鈹?      鈹斺攢鈹€ test/                   # Test executables
-鈹溾攢鈹€ python/
-鈹?  鈹溾攢鈹€ *.whl                     # Python wheel
-鈹?  鈹溾攢鈹€ demo/                     # Python demos (not installed)
-鈹?  鈹?  鈹溾攢鈹€ omnihand_2025/
-鈹?  鈹?  鈹溾攢鈹€ omnihand_pro_2025/
-鈹?  鈹?  鈹斺攢鈹€ omnihand_dex_umi/
-鈹?  鈹斺攢鈹€ test/                      # Python tests (not installed)
-鈹溾攢鈹€ doc/                          # Documentation
-鈹溾攢鈹€ install.bat                   # Install script
-鈹溾攢鈹€ uninstall.bat                 # Uninstall script
-鈹溾攢鈹€ README.md                     # This file (English)
-鈹斺攢鈹€ README_zh_cn.md               # [涓枃鏂囨。](README_zh_cn.md)
-```
+├── cpp/
+│   ├── share/
+│   │   └── cmake/
+│   │   └── omnihand/        # CMake config
+│   ├── include/omnihand/         # Header files
+│   ├── lib/                      # C++ libraries
+│   ├── demo/                      # C++ demo source code (not installed)
+│   │   ├── omnihand_2025/
+│   │   ├── omnihand_pro_2025/
+│   │   └── omnihand_dex_umi/
+│   ├── test/                      # C++ test source code (not installed)
+│   └── bin/omnihand/
+│       ├── demo/                  # Demo executables
+│       └── test/                   # Test executables
+├── python/
+│   ├── *.whl                     # Python wheel
+│   ├── demo/                     # Python demos (not installed)
+│   │   ├── omnihand_2025/
+│   │   ├── omnihand_pro_2025/
+│   │   └── omnihand_dex_umi/
+│   └── test/                      # Python tests (not installed)
+├── doc/                          # Documentation
+├── install.bat                   # Install script
+├── uninstall.bat                 # Uninstall script
+├── README.md                     # This file (English)
+└── README_zh_cn.md               # [中文文档](README_zh_cn.md)
+``````
 
 ## C++ Usage
 
-```cmake
+``````cmake
 set(OMNIHAND_ROOT "C:/Program Files/omnihand2025")
-list(APPEND CMAKE_MODULE_PATH "${OMNIHAND_ROOT}/share/cmake/omnihand")
+list(APPEND CMAKE_MODULE_PATH `"`${OMNIHAND_ROOT}/share/cmake/omnihand`")
 find_package(omnihand REQUIRED)
 target_link_libraries(your_target omnihand)  # unified library supports OmniHand 2025 (O10), OmniHand Pro 2025 (O12), and OmniHand Dex UMI (O10 UMI)
-```
+``````
 
 Example C++ code (Recommended: ZLG USB CANFD - Zero configuration):
 
-```cpp
+``````cpp
 #include "omnihand/omnihand_2025.h"  // For OmniHand 2025 (O10)
 // #include "omnihand/omnihand_pro_2025.h"  // For OmniHand Pro 2025 (O12)
 
@@ -133,7 +133,7 @@ int main() {
 
     return 0;
 }
-```
+``````
 
 For more demos, see [cpp/demo/](cpp/demo/) directory with product-specific subdirectories.
 
@@ -144,7 +144,7 @@ For detailed C++ API description, see [doc/en/API_CPP.md](doc/en/API_CPP.md) - I
 
 ## Python Usage
 
-```python
+``````python
 # Recommended: ZLG USB CANFD (Zero configuration)
 from omnihand import OmniHand2025, OmniHandPro2025, EHandType
 
@@ -167,7 +167,7 @@ hand_o12 = OmniHandPro2025.create_hand_by_zlgcan(
     canfd_device_id=0,
     canfd_channel_id=0
 )
-```
+``````
 
 For more examples, see [python/demo/README.md](python/demo/README.md).
 
