@@ -31,6 +31,10 @@ class OmniHand2025RsImpl;
  */
 class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandSensorBase {
  public:
+  // Constants
+  static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // O10 has 10 active degrees of freedom (DoA)
+  static constexpr unsigned char kDegreesOfPassiveFreedom = 6;  // O10 has 6 passive degrees of freedom (DoP)
+
   virtual ~OmniHand2025() = default;
 
   // ============ Factory Methods ============
@@ -71,6 +75,20 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @return A unique pointer to OmniHand2025 instance
    */
   static std::unique_ptr<OmniHand2025> createHandByRs485(
+      EHandType hand_type,
+      unsigned char hand_device_id,
+      const std::string& uart_port,
+      int32_t baudrate = 460800);
+
+  /**
+   * @brief Factory method - USB communication (OmniHand 2025 only)
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param uart_port Serial port path (e.g., "/dev/ttyUSB0")
+   * @param baudrate Baud rate (default 460800)
+   * @return A unique pointer to OmniHand2025 instance
+   */
+  static std::unique_ptr<OmniHand2025> createHandByUsb(
       EHandType hand_type,
       unsigned char hand_device_id,
       const std::string& uart_port,

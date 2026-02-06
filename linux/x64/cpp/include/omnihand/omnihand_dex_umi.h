@@ -45,6 +45,9 @@ using TactileSensorReportCallback = std::function<void(const TactileSensorData& 
  */
 class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
  public:
+  // Constants
+  static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // O10 UMI has 10 active degrees of freedom (DoA)
+
   virtual ~OmniHandDexUMI() = default;
 
   // ============ Factory Methods ============

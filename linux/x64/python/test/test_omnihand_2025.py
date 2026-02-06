@@ -14,7 +14,11 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir in sys.path:
     sys.path.remove(parent_dir)
 
-import pytest
+try:
+    import pytest
+except ImportError:
+    print("Python tests require pytest. Install with: pip install pytest")
+    sys.exit(1)
 from omnihand import OmniHand2025, EHandType, EFinger, EControlMode
 
 # Global variable to store request interval from command line argument
@@ -209,10 +213,33 @@ def test_tactile_sensor(hand):
     if not hand.init():
         pytest.skip("Device not initialized")
     
-    # Test GetTactileSensorData (downsampled data)
-    tactile_data = hand.get_tactile_sensor_data(EFinger.THUMB)
-    print(f"\n[get_tactile_sensor_data] Thumb Tactile Data ({len(tactile_data)} values): {tactile_data[:10]}...")
-    assert len(tactile_data) >= 0
+    # Test GetTactileSensorData (downsampled data) for all fingers
+    fingers = [
+        EFinger.THUMB, EFinger.INDEX, EFinger.MIDDLE,
+        EFinger.RING, EFinger.LITTLE, EFinger.PALM, EFinger.DORSUM
+    ]
+    
+    finger_names = {
+        EFinger.THUMB: "Thumb",
+        EFinger.INDEX: "Index",
+        EFinger.MIDDLE: "Middle",
+        EFinger.RING: "Ring",
+        EFinger.LITTLE: "Little",
+        EFinger.PALM: "Palm",
+        EFinger.DORSUM: "Dorsum",
+    }
+    
+    print(f"\n[get_all_tactile_sensor_data] Getting all sensor data by iterating through fingers:")
+    for finger in fingers:
+        tactile_data = hand.get_tactile_sensor_data(finger)
+        if not tactile_data:
+            print(f"  {finger_names[finger]}: No data available")
+            print(f"[Warning]: get_tactile_sensor_data({finger_names[finger]}) returned empty data. "
+                  "This may indicate: (1) device doesn't support tactile sensor, "
+                  "(2) sensor is not connected, or (3) communication timeout.")
+        else:
+            print(f"  {finger_names[finger]} ({len(tactile_data)} values): {tactile_data[:10]}...")
+        assert len(tactile_data) >= 0
 
 
 def test_tactile_sensor_raw(hand):

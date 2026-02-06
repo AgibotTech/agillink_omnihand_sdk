@@ -104,23 +104,6 @@ class AGIBOT_EXPORT OmniHand {
    */
   virtual int GetFrameRecvTimeout() const = 0;
 
-  // ============ Request Frequency Control (Deprecated, for backward compatibility) ============
-  /**
-   * @brief Set request frequency to control CAN bus communication rate (deprecated)
-   * @param hz Request frequency in Hz (range: 10-200Hz, default: 33Hz)
-   * @deprecated Use SetRequestInterval() instead. This method converts Hz to milliseconds.
-   * @note Only applies to CAN communication. RS485 communication is not affected.
-   */
-  virtual void SetRequestFrequency(int hz) = 0;
-
-  /**
-   * @brief Get current request frequency setting (deprecated)
-   * @return Request frequency in Hz
-   * @deprecated Use GetRequestInterval() instead. This method converts milliseconds to Hz.
-   * @note Serial port communication (RS485) always returns 0 (not applicable).
-   */
-  virtual int GetRequestFrequency() const = 0;
-
  protected:
   /**
    * @brief Constructor - protected to prevent direct instantiation

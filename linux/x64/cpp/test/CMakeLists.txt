@@ -51,7 +51,7 @@ else()
   set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/omnihand/test")
 endif()
 
-# OmniHand 2025 (O10) Tests
+# OmniHand 2025 (O10) Tests - Combined USB/CANFD (legacy)
 add_executable(test_omnihand_2025 test_omnihand_2025.cc)
 target_link_libraries(
   test_omnihand_2025
@@ -63,6 +63,32 @@ set_target_properties(test_omnihand_2025 PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${TEST_OUTPUT_DIR}"
 )
 add_test(NAME OmniHand2025Test COMMAND test_omnihand_2025)
+
+# OmniHand 2025 USB-specific Tests
+add_executable(test_omnihand_2025_usb test_omnihand_2025_usb.cc)
+target_link_libraries(
+  test_omnihand_2025_usb
+  PRIVATE
+  ${OMNIHAND_TARGET}
+  GTest::gtest
+)
+set_target_properties(test_omnihand_2025_usb PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${TEST_OUTPUT_DIR}"
+)
+add_test(NAME OmniHand2025UsbTest COMMAND test_omnihand_2025_usb)
+
+# OmniHand 2025 CANFD-specific Tests
+add_executable(test_omnihand_2025_canfd test_omnihand_2025_canfd.cc)
+target_link_libraries(
+  test_omnihand_2025_canfd
+  PRIVATE
+  ${OMNIHAND_TARGET}
+  GTest::gtest
+)
+set_target_properties(test_omnihand_2025_canfd PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${TEST_OUTPUT_DIR}"
+)
+add_test(NAME OmniHand2025CanfdTest COMMAND test_omnihand_2025_canfd)
 
 # OmniHand Pro 2025 (O12) Tests
 add_executable(test_omnihand_pro_2025 test_omnihand_pro_2025.cc)

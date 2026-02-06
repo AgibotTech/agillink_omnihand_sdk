@@ -27,6 +27,10 @@ class OmniHandPro2025CanImpl;
  */
 class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
  public:
+  // Constants
+  static constexpr unsigned char kDegreesOfActiveFreedom = 12;  // O12 has 12 active degrees of freedom (DoA)
+  static constexpr unsigned char kDegreesOfPassiveFreedom = 11;  // O12 has 11 passive degrees of freedom (DoP)
+
   virtual ~OmniHandPro2025() = default;
 
   // ============ Factory Methods ============

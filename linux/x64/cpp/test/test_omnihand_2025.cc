@@ -218,17 +218,23 @@ TEST_F(OmniHand2025Test, ControlMode) {
 // Test tactile sensor (requires hardware)
 TEST_F(OmniHand2025Test, TactileSensor) {
   if (hand_->Init()) {
-    // Test GetTactileSensorData (downsampled data)
-    auto tactile_data = hand_->GetTactileSensorData(EFinger::eThumb);
-    std::cout << "[GetTactileSensorData] Thumb Tactile Data (" << tactile_data.size() << " values): ";
-    for (size_t i = 0; i < std::min(tactile_data.size(), size_t(10)); ++i) {
-      std::cout << static_cast<int>(tactile_data[i]);
-      if (i < std::min(tactile_data.size(), size_t(10)) - 1) std::cout << ", ";
+    // Test GetTactileSensorData (downsampled data) for all fingers
+    std::vector<EFinger> fingers = {
+      EFinger::eThumb, EFinger::eIndex, EFinger::eMiddle,
+      EFinger::eRing, EFinger::eLittle, EFinger::ePalm, EFinger::eDorsum
+    };
+    
+    std::cout << "[GetTactileSensorData] Getting all sensor data:" << std::endl;
+    for (const auto& finger : fingers) {
+      auto tactile_data = hand_->GetTactileSensorData(finger);
+      std::cout << "  " << ToString(finger) << " (" << tactile_data.size() << " values): ";
+      for (size_t i = 0; i < tactile_data.size(); ++i) {
+        std::cout << static_cast<int>(tactile_data[i]);
+        if (i < tactile_data.size() - 1) std::cout << ", ";
+      }
+      std::cout << std::endl;
+      EXPECT_GE(tactile_data.size(), 0);
     }
-    if (tactile_data.size() > 10) std::cout << " ...";
-    std::cout << std::endl;
-    // O10 tactile sensor returns a list of values
-    EXPECT_GE(tactile_data.size(), 0);
   }
 }
 
