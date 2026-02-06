@@ -16,7 +16,7 @@ set(_omnihand_node_CONFIG_INCLUDED TRUE)
 
 # output package information
 if(NOT omnihand_node_FIND_QUIETLY)
-  message(STATUS "Found omnihand_node: 0.0.0 (${omnihand_node_DIR})")
+  message(STATUS "Found omnihand_node: 1.0.0 (${omnihand_node_DIR})")
 endif()
 
 # warn when using a deprecated package
