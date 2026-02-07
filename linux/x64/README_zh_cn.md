@@ -4,32 +4,7 @@
 
 📖 **[快速入门](../../doc/zh_cn/QUICK_START.md)** | 🔧 **[故障排除](../../doc/zh_cn/TROUBLESHOOTING.md)**
 
-## 系统要求
-
-### 硬件要求
-
-支持以下通信接口：
-
-- **CANFD (USB 适配器) - 推荐**：ZLG USBCANFD 系列（USBCANFD-100U-mini/USBCANFD-100U/USBCANFD-200U）
-  - ✅ **零配置**：SDK 包含库文件，开箱即用
-  - ✅ **无需 root 权限**：用户空间库
-  - ✅ **简单 API**：`OmniHand2025.create_hand_by_zlgcan(...)` / `OmniHandPro2025.create_hand_by_zlgcan(...)` / `OmniHandDexUMI.create_hand_by_zlgcan(...)`
-- **SocketCAN (Linux 原生) - 高级**：Linux SocketCAN 支持的任何 CAN 接口（例如 can0, can1）
-  - ⚠️ **需要驱动配置**：对于 USB CANFD 设备，需要编译和加载内核模块
-  - ⚠️ **需要 root 权限**：用于加载驱动和配置接口
-  - 💡 **使用场景**：适合已有 SocketCAN 环境（板载 CAN、其他 SocketCAN 设备）
-- **RS485（仅 OmniHand 2025）**：串口通信
-- **USB（仅 OmniHand 2025）**：USB 串口通信
-
-### 软件要求
-
-- **操作系统**：Ubuntu 22.04 (x86_64/aarch64) 或兼容的 Linux 发行版
-- **编译器**：gcc 11.4+ 或兼容版本
-- **构建工具**：CMake 3.24 或更高版本（用于构建示例）
-- **Python**：3.10 或更高版本（用于 Python SDK）
-- **ROS2**（可选）：Humble 或兼容发行版（用于 ROS2 支持）
-
-## 快速安装
+## 安装
 
 ```bash
 ./install.sh                  # 安装 SDK

@@ -4,6 +4,28 @@
 
 本指南帮助您在 5 分钟内开始使用 OmniHand 2025 SDK。
 
+## 环境要求
+
+### 硬件
+
+| 接口 | 支持型号 | 说明 |
+|------|----------|------|
+| **ZLG USBCANFD**（推荐） | 全部 | 100U-mini, 100U, 200U |
+| **HCAN** | 全部 | 用法与 ZLG 类似 |
+| **SocketCAN**（Linux） | 全部 | 参见 [SocketCAN 配置](SOCKETCAN_SETUP.md) |
+| **USB** | 仅 O10 | USB 直连 |
+| **RS485** | 仅 O10 | 串口 |
+
+### 软件
+
+| | Linux | Windows |
+|---|-------|---------|
+| **操作系统** | Ubuntu 22.04+ | Windows 10/11 |
+| **Python** | 3.10+ | 3.10+ |
+| **C++ 编译器** | gcc 11.4+ | MSVC 2019+ |
+| **CMake** | 3.24+ | 3.24+ |
+| **ROS2**（可选） | Humble | ❌ 不支持 |
+
 ## 步骤 1：硬件连接
 
 ### 推荐：ZLG USBCANFD 适配器
@@ -118,7 +140,11 @@ target_link_libraries(my_app PRIVATE omnihand)
 #include <iostream>
 
 int main() {
-    // 创建灵巧手实例
+    // createHandByZlgcan(hand_type, hand_device_id, canfd_device_id, canfd_channel_id)
+    //   hand_type: eLeft 或 eRight
+    //   hand_device_id: 灵巧手 CAN ID（1-254，通常为 1）
+    //   canfd_device_id: ZLG 适配器索引（0 = 第一个适配器）
+    //   canfd_channel_id: 通道（双通道适配器为 0 或 1）
     auto hand = OmniHand2025::createHandByZlgcan(EHandType::eLeft, 1, 0, 0);
     
     if (!hand || !hand->Init()) {
@@ -171,21 +197,11 @@ ros2 topic echo /omnihand/omnihand_2025/left/motor_angle
 
 ## 步骤 5：探索示例
 
-| 示例 | 描述 | 路径 |
-|------|------|------|
-| 基础控制 | 电机位置控制 | `python/demo/omnihand_2025/` |
-| 触觉传感器 | 读取触觉数据 | `python/demo/omnihand_2025/` |
-| 运动学 | 关节角度控制 | `python/demo/omnihand_2025/` |
-| ROS2 节点 | ROS2 集成 | `ros2/`（仅限 Linux） |
-
-## 常用参数
-
-| 参数 | 描述 | 默认值 | 备注 |
-|------|------|--------|------|
-| `hand_type` | 左手或右手 | - | `EHandType.LEFT` 或 `EHandType.RIGHT` |
-| `hand_device_id` | 灵巧手 CAN ID | 1 | 范围：1-254 |
-| `canfd_device_id` | ZLG 适配器索引 | 0 | 第一个适配器 = 0 |
-| `canfd_channel_id` | CANFD 通道 | 0 | 0 或 1（双通道适配器） |
+| 语言 | 路径 |
+|------|------|
+| Python | `python/demo/omnihand_2025/`, `python/demo/omnihand_pro_2025/` |
+| C++ | `cpp/demo/omnihand_2025/`, `cpp/demo/omnihand_pro_2025/` |
+| ROS2 | `ros2/`（仅限 Linux） |
 
 ## 下一步
 

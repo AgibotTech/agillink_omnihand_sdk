@@ -4,29 +4,9 @@
 
 📖 **[Quick Start](../doc/en/QUICK_START.md)** | 🔧 **[Troubleshooting](../doc/en/TROUBLESHOOTING.md)**
 
-> **Platform note**: ROS2 interface and SocketCAN are **Linux only** and not available on Windows.
+> **Note**: ROS2 and SocketCAN are **Linux only**.
 
-## System Requirements
-
-### Hardware Requirements
-
-Supports the following communication interfaces:
-
-- **CANFD (USB adapter) - Recommended**: ZLG USBCANFD series (USBCANFD-100U-mini/USBCANFD-100U/USBCANFD-200U)
-  - ✅ **Zero configuration**: SDK includes libraries, ready to use out of the box
-  - ✅ **No administrator privileges required**: User-space library
-  - ✅ **Simple API**: `OmniHand2025.create_hand_by_zlgcan(...)` / `OmniHandPro2025.create_hand_by_zlgcan(...)` / `OmniHandDexUMI.create_hand_by_zlgcan(...)`
-- **RS485 (OmniHand 2025 only)**: Serial port communication
-- **USB (OmniHand 2025 only)**: USB serial communication
-
-### Software Requirements
-
-- **Operating System**: Windows 10/11 (x64)
-- **Compiler**: MSVC 2019+ or compatible
-- **Build Tool**: CMake 3.24 or higher (for building examples)
-- **Python**: 3.10 or higher (for Python SDK)
-
-## Quick Install
+## Install
 
 Run as Administrator:
 ```

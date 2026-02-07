@@ -4,32 +4,7 @@
 
 📖 **[Quick Start](../../doc/en/QUICK_START.md)** | 🔧 **[Troubleshooting](../../doc/en/TROUBLESHOOTING.md)**
 
-## System Requirements
-
-### Hardware Requirements
-
-Supports the following communication interfaces:
-
-- **CANFD (USB adapter) - Recommended**: ZLG USBCANFD series (USBCANFD-100U-mini/USBCANFD-100U/USBCANFD-200U)
-  - ✅ **Zero configuration**: SDK includes libraries, ready to use out of the box
-  - ✅ **No root privileges required**: User-space library
-  - ✅ **Simple API**: `OmniHand2025.create_hand_by_zlgcan(...)` / `OmniHandPro2025.create_hand_by_zlgcan(...)` / `OmniHandDexUMI.create_hand_by_zlgcan(...)`
-- **SocketCAN (Linux native) - Advanced**: Any CAN interface supported by Linux SocketCAN (e.g., can0, can1)
-  - ⚠️ **Requires driver setup**: For USB CANFD devices, you need to compile and load kernel modules
-  - ⚠️ **Requires root privileges**: For loading drivers and configuring interfaces
-  - 💡 **Use case**: Suitable if you already have SocketCAN environment (onboard CAN, other SocketCAN devices)
-- **RS485 (OmniHand 2025 only)**: Serial port communication
-- **USB (OmniHand 2025 only)**: USB serial communication
-
-### Software Requirements
-
-- **Operating System**: Ubuntu 22.04 (x86_64/aarch64) or compatible Linux distributions
-- **Compiler**: gcc 11.4+ or compatible
-- **Build Tool**: CMake 3.24 or higher (for building examples)
-- **Python**: 3.10 or higher (for Python SDK)
-- **ROS2** (optional): Humble or compatible distribution (for ROS2 support)
-
-## Quick Install
+## Install
 
 ```bash
 ./install.sh                  # Install SDK

@@ -4,29 +4,9 @@
 
 📖 **[快速入门](../doc/zh_cn/QUICK_START.md)** | 🔧 **[故障排除](../doc/zh_cn/TROUBLESHOOTING.md)**
 
-> **平台说明**：ROS2 接口与 SocketCAN **仅 Linux 支持**，Windows 不可用。
+> **说明**：ROS2 和 SocketCAN **仅 Linux 支持**。
 
-## 系统要求
-
-### 硬件要求
-
-支持以下通信接口：
-
-- **CANFD (USB 适配器) - 推荐**：ZLG USBCANFD 系列（USBCANFD-100U-mini/USBCANFD-100U/USBCANFD-200U）
-  - ✅ **零配置**：SDK 包含库文件，开箱即用
-  - ✅ **无需管理员权限**：用户空间库
-  - ✅ **简单 API**：`OmniHand2025.create_hand_by_zlgcan(...)` / `OmniHandPro2025.create_hand_by_zlgcan(...)` / `OmniHandDexUMI.create_hand_by_zlgcan(...)`
-- **RS485（仅 OmniHand 2025）**：串口通信
-- **USB（仅 OmniHand 2025）**：USB 串口通信
-
-### 软件要求
-
-- **操作系统**：Windows 10/11 (x64)
-- **编译器**：MSVC 2019+ 或兼容版本
-- **构建工具**：CMake 3.24 或更高版本（用于构建示例）
-- **Python**：3.10 或更高版本（用于 Python SDK）
-
-## 快速安装
+## 安装
 
 以管理员身份运行：
 ```

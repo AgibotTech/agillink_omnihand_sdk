@@ -4,6 +4,28 @@
 
 This guide helps you get started with the OmniHand 2025 SDK in 5 minutes.
 
+## Requirements
+
+### Hardware
+
+| Interface | Supported Models | Notes |
+|-----------|------------------|-------|
+| **ZLG USBCANFD** (Recommended) | All | 100U-mini, 100U, 200U |
+| **HCAN** | All | Similar to ZLG |
+| **SocketCAN** (Linux) | All | See [SocketCAN Setup](SOCKETCAN_SETUP.md) |
+| **USB** | O10 only | Direct connection |
+| **RS485** | O10 only | Serial port |
+
+### Software
+
+| | Linux | Windows |
+|---|-------|---------|
+| **OS** | Ubuntu 22.04+ | Windows 10/11 |
+| **Python** | 3.10+ | 3.10+ |
+| **C++ Compiler** | gcc 11.4+ | MSVC 2019+ |
+| **CMake** | 3.24+ | 3.24+ |
+| **ROS2** (optional) | Humble | ❌ Not supported |
+
 ## Step 1: Hardware Connection
 
 ### Recommended: ZLG USBCANFD Adapter
@@ -118,7 +140,11 @@ target_link_libraries(my_app PRIVATE omnihand)
 #include <iostream>
 
 int main() {
-    // Create hand instance
+    // createHandByZlgcan(hand_type, hand_device_id, canfd_device_id, canfd_channel_id)
+    //   hand_type: eLeft or eRight
+    //   hand_device_id: Hand CAN ID (1-254, usually 1)
+    //   canfd_device_id: ZLG adapter index (0 = first adapter)
+    //   canfd_channel_id: Channel (0 or 1 for dual-channel adapters)
     auto hand = OmniHand2025::createHandByZlgcan(EHandType::eLeft, 1, 0, 0);
     
     if (!hand || !hand->Init()) {
@@ -171,21 +197,11 @@ ros2 topic echo /omnihand/omnihand_2025/left/motor_angle
 
 ## Step 5: Explore Demos
 
-| Demo | Description | Path |
-|------|-------------|------|
-| Basic Control | Motor position control | `python/demo/omnihand_2025/` |
-| Tactile Sensor | Read tactile data | `python/demo/omnihand_2025/` |
-| Kinematics | Joint angle control | `python/demo/omnihand_2025/` |
-| ROS2 Node | ROS2 integration | `ros2/` (Linux only) |
-
-## Common Parameters
-
-| Parameter | Description | Default | Notes |
-|-----------|-------------|---------|-------|
-| `hand_type` | Left or Right hand | - | `EHandType.LEFT` or `EHandType.RIGHT` |
-| `hand_device_id` | Hand CAN ID | 1 | Range: 1-254 |
-| `canfd_device_id` | ZLG adapter index | 0 | First adapter = 0 |
-| `canfd_channel_id` | CANFD channel | 0 | 0 or 1 (dual-channel adapters) |
+| Language | Path |
+|----------|------|
+| Python | `python/demo/omnihand_2025/`, `python/demo/omnihand_pro_2025/` |
+| C++ | `cpp/demo/omnihand_2025/`, `cpp/demo/omnihand_pro_2025/` |
+| ROS2 | `ros2/` (Linux only) |
 
 ## Next Steps
 
