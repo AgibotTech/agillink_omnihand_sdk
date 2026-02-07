@@ -32,34 +32,14 @@
 ## 快速安装
 
 ```bash
-# 自动检测架构并安装
-./install.sh
-
-# 或指定安装路径
-./install.sh /opt/omnihand
+./install.sh                  # 安装 SDK
+sudo ./setup_udev.sh          # 配置 USB 权限（首次需要，然后注销重新登录）
 ```
-
-## USB 权限配置（推荐）
-
-为了在不使用 `sudo` 的情况下访问 USB CANFD 适配器：
-
-1. 连接您的 OmniHand 或 USB CANFD 适配器
-2. 运行配置脚本：
-   ```bash
-   sudo ./setup_udev.sh
-   ```
-3. **注销并重新登录**以使更改生效
-
-脚本会检测您连接的设备，根据其 VID:PID 生成 udev 规则，并将用户添加到所需的用户组。
 
 ## 卸载
 
 ```bash
-# 卸载（使用默认路径 /usr/local）
 ./uninstall.sh
-
-# 或指定安装路径
-./uninstall.sh /opt/omnihand
 ```
 
 ## 目录结构
@@ -88,86 +68,16 @@ x64/
 └── README_zh_cn.md              # 本文档（中文）
 ```
 
-## ROS2 使用
+## 使用方法
 
-ROS2 包不会自动安装，需要手动 source：
+- **[快速入门指南](../../doc/zh_cn/QUICK_START.md)** - 5 分钟上手
+- 示例代码：[cpp/demo/](cpp/demo/)、[python/demo/](python/demo/)
+- 测试代码：[cpp/test/](cpp/test/)、[python/test/](python/test/)
 
-```bash
-# 首先 source 系统 ROS2
-source /opt/ros/humble/setup.bash
-
-# 然后 source omnihand
-source ros2/setup.bash
-
-# 运行节点
-ros2 run omnihand_node omnihand_2025_node  # 或 omnihand_pro_2025_node 用于 OmniHand Pro 2025
-
-# 检查和管理 ROS2 节点
-python3 ros2/humble/share/omnihand_node/scripts/check_ros2_nodes.py          # 列出活动节点
-python3 ros2/humble/share/omnihand_node/scripts/check_ros2_nodes.py --kill  # 终止 omnihand 节点
-python3 ros2/humble/share/omnihand_node/scripts/check_ros2_nodes.py --kill-all  # 终止所有 ROS2 节点
-```
-
-## C++ 使用
-
-```cmake
-# 库安装到 /usr/local/lib，头文件安装到 /usr/local/include
-list(APPEND CMAKE_MODULE_PATH "/usr/local/share/cmake/omnihand")
-find_package(omnihand REQUIRED)
-
-add_executable(my_app main.cc)
-target_link_libraries(my_app PRIVATE omnihand)
-```
-
-C++ 示例代码（推荐：ZLG USB CANFD - 零配置）：
-
-```cpp
-#include "omnihand/omnihand_2025.h"  // 用于 OmniHand 2025 (O10)
-// #include "omnihand/omnihand_pro_2025.h"  // 用于 OmniHand Pro 2025 (O12)
-
-int main() {
-    // OmniHand 2025 (O10, 10 DOF) - 推荐：ZLG USB CANFD
-    auto hand_o10 = OmniHand2025::createHandByZlgcan(EHandType::eLeft, 1, 0, 0);
-
-    if (!hand_o10 || !hand_o10->Init()) {
-        std::cerr << "初始化失败" << std::endl;
-        return -1;
-    }
-
-    // 设置所有关节角度（推荐：求解器自动转换为电机位置）
-    std::vector<double> angles_o10(10, 0.0);
-    hand_o10->SetAllActiveJointAngles(angles_o10);
-    return 0;
-}
-
-// 高级：SocketCAN（仅 Linux，需要驱动配置）
-// auto hand = OmniHand2025::createHandSocketCan(EHandType::eLeft, 1, "can0");
-```
-
-更多示例，请参阅 [cpp/demo/](cpp/demo/) 目录。
-
-## Python 使用
-
-```python
-from omnihand import OmniHand2025, OmniHandPro2025, EHandType
-
-# OmniHand 2025 (10 DOF) - 推荐：ZLG USB CANFD
-hand_o10 = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.RIGHT,
-    hand_device_id=1,
-    canfd_device_id=0,
-    canfd_channel_id=0
-)
-
-if not hand_o10.init():
-    print("初始化失败")
-    exit(1)
-
-# 高级：SocketCAN（仅 Linux，需要驱动配置）
-# hand = OmniHand2025.create_hand_socketcan(EHandType.LEFT, 1, "can0")
-```
-
-更多示例，请参阅 [python/demo/](python/demo/) 目录。
+详细 API 参考：
+- [C++ API](../../doc/zh_cn/API_CPP.md)
+- [Python API](../../doc/zh_cn/API_PYTHON.md)
+- [ROS2 API](../../doc/zh_cn/API_ROS2.md)（仅限 Linux）
 
 ## 许可证
 

@@ -189,6 +189,8 @@ ros2 topic echo /omnihand/omnihand_2025/left/motor_angle
 
 ## 下一步
 
-- [API 文档](API_CPP.md) - 详细 API 参考
+- **API 文档**
+  - [C++ API](API_CPP.md)
+  - [Python API](API_PYTHON.md)
+  - [ROS2 API](API_ROS2.md)（仅限 Linux）
 - [故障排除](TROUBLESHOOTING.md) - 常见问题和解决方案
-- [SocketCAN 配置](SOCKETCAN_SETUP.md) - 高级 Linux 配置（可选）

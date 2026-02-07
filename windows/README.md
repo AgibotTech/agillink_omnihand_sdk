@@ -33,14 +33,8 @@ Run as Administrator:
 install.bat
 ```
 
-Or specify path:
-```
-install.bat "D:\omnihand2025"
-```
-
 ## Uninstall
 
-Run as Administrator:
 ```
 uninstall.bat
 ```
@@ -68,59 +62,15 @@ windows/
 └── README_zh_cn.md              # Chinese documentation
 ```
 
-## C++ Usage
+## Usage
 
-```cmake
-set(OMNIHAND_ROOT "C:/Program Files/omnihand2025")
-list(APPEND CMAKE_MODULE_PATH "${OMNIHAND_ROOT}/share/cmake/omnihand")
-find_package(omnihand REQUIRED)
-target_link_libraries(your_target omnihand)
-```
+- **[Quick Start Guide](../doc/en/QUICK_START.md)** - Get started in 5 minutes
+- Demo code: [cpp/demo/](cpp/demo/), [python/demo/](python/demo/)
+- Test code: [cpp/test/](cpp/test/), [python/test/](python/test/)
 
-Example C++ code (Recommended: ZLG USB CANFD - Zero configuration):
-
-```cpp
-#include "omnihand/omnihand_2025.h"  // For OmniHand 2025 (O10)
-// #include "omnihand/omnihand_pro_2025.h"  // For OmniHand Pro 2025 (O12)
-
-int main() {
-    // OmniHand 2025 (O10, 10 DOF) - Recommended: ZLG USB CANFD
-    auto hand = OmniHand2025::createHandByZlgcan(EHandType::eLeft, 1, 0, 0);
-
-    if (!hand || !hand->Init()) {
-        std::cerr << "Failed to initialize" << std::endl;
-        return -1;
-    }
-
-    // Set all joint angles (recommended: solver automatically converts to motor positions)
-    std::vector<double> angles(10, 0.0);
-    hand->SetAllActiveJointAngles(angles);
-
-    return 0;
-}
-```
-
-For more demos, see [cpp/demo/](cpp/demo/) directory.
-
-## Python Usage
-
-```python
-from omnihand import OmniHand2025, OmniHandPro2025, EHandType
-
-# OmniHand 2025 (10 DOF) - Recommended: ZLG USB CANFD
-hand_o10 = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.RIGHT,
-    hand_device_id=1,
-    canfd_device_id=0,
-    canfd_channel_id=0
-)
-
-if not hand_o10.init():
-    print("Failed to initialize")
-    exit(1)
-```
-
-For more examples, see [python/demo/](python/demo/) directory.
+For detailed API reference:
+- [C++ API](../doc/en/API_CPP.md)
+- [Python API](../doc/en/API_PYTHON.md)
 
 ## License
 

@@ -32,34 +32,14 @@ Supports the following communication interfaces:
 ## Quick Install
 
 ```bash
-# Auto-detect architecture and install
-./install.sh
-
-# Or specify install path
-./install.sh /opt/omnihand
+./install.sh                  # Install SDK
+sudo ./setup_udev.sh          # Configure USB permissions (first time only, then log out/in)
 ```
-
-## USB Permission Setup (Recommended)
-
-To use USB CANFD adapters without `sudo`:
-
-1. Connect your OmniHand or USB CANFD adapter
-2. Run the setup script:
-   ```bash
-   sudo ./setup_udev.sh
-   ```
-3. **Log out and log back in** for changes to take effect
-
-The script detects your connected devices, generates udev rules based on their VID:PID, and adds your user to the required groups.
 
 ## Uninstall
 
 ```bash
-# Uninstall (using default path /usr/local)
 ./uninstall.sh
-
-# Or specify install path
-./uninstall.sh /opt/omnihand
 ```
 
 ## Directory Structure
@@ -88,86 +68,16 @@ x64/
 └── README_zh_cn.md              # Chinese documentation
 ```
 
-## ROS2 Usage
+## Usage
 
-ROS2 packages are not auto-installed, source manually:
+- **[Quick Start Guide](../../doc/en/QUICK_START.md)** - Get started in 5 minutes
+- Demo code: [cpp/demo/](cpp/demo/), [python/demo/](python/demo/)
+- Test code: [cpp/test/](cpp/test/), [python/test/](python/test/)
 
-```bash
-# First source system ROS2
-source /opt/ros/humble/setup.bash
-
-# Then source omnihand
-source ros2/setup.bash
-
-# Run node
-ros2 run omnihand_node omnihand_2025_node  # or omnihand_pro_2025_node for OmniHand Pro 2025
-
-# Check and manage ROS2 nodes
-python3 ros2/humble/share/omnihand_node/scripts/check_ros2_nodes.py          # List active nodes
-python3 ros2/humble/share/omnihand_node/scripts/check_ros2_nodes.py --kill  # Kill omnihand nodes
-python3 ros2/humble/share/omnihand_node/scripts/check_ros2_nodes.py --kill-all  # Kill all ROS2 nodes
-```
-
-## C++ Usage
-
-```cmake
-# Libraries installed to /usr/local/lib, headers to /usr/local/include
-list(APPEND CMAKE_MODULE_PATH "/usr/local/share/cmake/omnihand")
-find_package(omnihand REQUIRED)
-
-add_executable(my_app main.cc)
-target_link_libraries(my_app PRIVATE omnihand)
-```
-
-Example C++ code (Recommended: ZLG USB CANFD - Zero configuration):
-
-```cpp
-#include "omnihand/omnihand_2025.h"  // For OmniHand 2025 (O10)
-// #include "omnihand/omnihand_pro_2025.h"  // For OmniHand Pro 2025 (O12)
-
-int main() {
-    // OmniHand 2025 (O10, 10 DOF) - Recommended: ZLG USB CANFD
-    auto hand_o10 = OmniHand2025::createHandByZlgcan(EHandType::eLeft, 1, 0, 0);
-
-    if (!hand_o10 || !hand_o10->Init()) {
-        std::cerr << "Failed to initialize" << std::endl;
-        return -1;
-    }
-
-    // Set all joint angles (recommended: solver automatically converts to motor positions)
-    std::vector<double> angles_o10(10, 0.0);
-    hand_o10->SetAllActiveJointAngles(angles_o10);
-    return 0;
-}
-
-// Advanced: SocketCAN (Linux only, requires driver setup)
-// auto hand = OmniHand2025::createHandSocketCan(EHandType::eLeft, 1, "can0");
-```
-
-For more demos, see [cpp/demo/](cpp/demo/) directory.
-
-## Python Usage
-
-```python
-from omnihand import OmniHand2025, OmniHandPro2025, EHandType
-
-# OmniHand 2025 (10 DOF) - Recommended: ZLG USB CANFD
-hand_o10 = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.RIGHT,
-    hand_device_id=1,
-    canfd_device_id=0,
-    canfd_channel_id=0
-)
-
-if not hand_o10.init():
-    print("Failed to initialize")
-    exit(1)
-
-# Advanced: SocketCAN (Linux only, requires driver setup)
-# hand = OmniHand2025.create_hand_socketcan(EHandType.LEFT, 1, "can0")
-```
-
-For more examples, see [python/demo/](python/demo/) directory.
+For detailed API reference:
+- [C++ API](../../doc/en/API_CPP.md)
+- [Python API](../../doc/en/API_PYTHON.md)
+- [ROS2 API](../../doc/en/API_ROS2.md) (Linux only)
 
 ## License
 

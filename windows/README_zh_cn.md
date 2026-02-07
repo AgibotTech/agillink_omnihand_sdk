@@ -33,14 +33,8 @@
 install.bat
 ```
 
-或指定路径：
-```
-install.bat "D:\omnihand2025"
-```
-
 ## 卸载
 
-以管理员身份运行：
 ```
 uninstall.bat
 ```
@@ -68,57 +62,15 @@ windows/
 └── README_zh_cn.md              # 本文档（中文）
 ```
 
-## C++ 使用
+## 使用方法
 
-```cmake
-set(OMNIHAND_ROOT "C:/Program Files/omnihand2025")
-list(APPEND CMAKE_MODULE_PATH "${OMNIHAND_ROOT}/share/cmake/omnihand")
-find_package(omnihand REQUIRED)
-target_link_libraries(your_target omnihand)
-```
+- **[快速入门指南](../doc/zh_cn/QUICK_START.md)** - 5 分钟上手
+- 示例代码：[cpp/demo/](cpp/demo/)、[python/demo/](python/demo/)
+- 测试代码：[cpp/test/](cpp/test/)、[python/test/](python/test/)
 
-C++ 示例代码（推荐：ZLG USB CANFD - 零配置）：
-
-```cpp
-#include "omnihand/omnihand_2025.h"  // 用于 OmniHand 2025 (O10)
-// #include "omnihand/omnihand_pro_2025.h"  // 用于 OmniHand Pro 2025 (O12)
-
-int main() {
-    // OmniHand 2025 (O10, 10 DOF) - 推荐：ZLG USB CANFD
-    auto hand = OmniHand2025::createHandByZlgcan(EHandType::eLeft, 1, 0, 0);
-
-    if (!hand || !hand->Init()) {
-        std::cerr << "初始化失败" << std::endl;
-        return -1;
-    }
-
-    // 设置所有关节角度（推荐：求解器自动转换为电机位置）
-    std::vector<double> angles(10, 0.0);
-    hand->SetAllActiveJointAngles(angles);
-
-    return 0;
-}
-```
-
-更多示例，请参阅 [cpp/demo/](cpp/demo/) 目录。
-
-## Python 使用
-
-```python
-from omnihand import OmniHand2025, OmniHandPro2025, EHandType
-
-# OmniHand 2025 (10 DOF) - 推荐：ZLG USB CANFD
-hand_o10 = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.RIGHT,
-    hand_device_id=1,
-    canfd_device_id=0,
-    canfd_channel_id=0
-)
-
-if not hand_o10.init():
-    print("初始化失败")
-    exit(1)
-```
+详细 API 参考：
+- [C++ API](../doc/zh_cn/API_CPP.md)
+- [Python API](../doc/zh_cn/API_PYTHON.md)
 
 更多示例，请参阅 [python/demo/](python/demo/) 目录。
 
