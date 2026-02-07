@@ -2,6 +2,8 @@
 
 [English Documentation](README.md) | [产品概述 & API 文档](../../README_zh_cn.md)
 
+📖 **[快速入门](../../doc/zh_cn/QUICK_START.md)** | 🔧 **[故障排除](../../doc/zh_cn/TROUBLESHOOTING.md)**
+
 ## 系统要求
 
 ### 硬件要求
@@ -36,6 +38,19 @@
 # 或指定安装路径
 ./install.sh /opt/omnihand
 ```
+
+## USB 权限配置（推荐）
+
+为了在不使用 `sudo` 的情况下访问 USB CANFD 适配器：
+
+1. 连接您的 OmniHand 或 USB CANFD 适配器
+2. 运行配置脚本：
+   ```bash
+   sudo ./setup_udev.sh
+   ```
+3. **注销并重新登录**以使更改生效
+
+脚本会检测您连接的设备，根据其 VID:PID 生成 udev 规则，并将用户添加到所需的用户组。
 
 ## 卸载
 

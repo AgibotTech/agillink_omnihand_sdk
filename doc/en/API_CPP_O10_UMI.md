@@ -147,7 +147,7 @@ auto hand = OmniHandDexUMI::createHandByZlgcan(
  * @param hand_type Hand type (left/right)
  * @param hand_device_id Hand device ID
  * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
- * @param canfd_channel_id CAN channel index (default: 0)
+ * @param canfd_channel_id CAN channel index (default: 0). For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0
  * @return A unique pointer to OmniHandDexUMI instance, or nullptr if device not found
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
@@ -165,7 +165,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
  * @param hand_type Hand type (left/right)
  * @param hand_device_id Hand device ID
  * @param canfd_device_id HCAN device index
- * @param canfd_channel_id CAN channel index (default: 0)
+ * @param canfd_channel_id CAN channel index (default: 0). For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0
  * @return A unique pointer to OmniHandDexUMI instance
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
@@ -193,7 +193,7 @@ auto hand = OmniHandDexUMI::createHandByHcan(
  * @param hand_type Hand type (left/right)
  * @param hand_device_id Hand device ID
  * @param hcan_serial_number HCAN device serial number (supports partial matching)
- * @param canfd_channel_id CAN channel index (default: 0)
+ * @param canfd_channel_id CAN channel index (default: 0). For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0
  * @return A unique pointer to OmniHandDexUMI instance, or nullptr if device not found
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(

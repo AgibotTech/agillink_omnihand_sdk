@@ -2,6 +2,8 @@
 
 [English Documentation](README.md) | [产品概述 & API 文档](../README_zh_cn.md)
 
+📖 **[快速入门](../doc/zh_cn/QUICK_START.md)** | 🔧 **[故障排除](../doc/zh_cn/TROUBLESHOOTING.md)**
+
 > **平台说明**：ROS2 接口与 SocketCAN **仅 Linux 支持**，Windows 不可用。
 
 ## 系统要求

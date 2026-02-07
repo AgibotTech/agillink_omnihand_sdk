@@ -2,6 +2,11 @@
 
 [中文文档](README_zh_cn.md)
 
+## Quick Links
+
+- 📖 **[Quick Start Guide](doc/en/QUICK_START.md)** - Get started in 5 minutes
+- 🔧 **[Troubleshooting](doc/en/TROUBLESHOOTING.md)** - Common issues and solutions
+
 ## Overview
 
 The OmniHand 2025 SDK supports three product models:
@@ -28,8 +33,8 @@ The OmniHand 2025 SDK supports three product models:
 
 ## Platform-Specific Documentation
 
-- **[Linux (x64)](linux/x64/README.md)** 
-- **[Windows (x64)](windows/README.md)**
+- **[Linux (x64)](linux/x64/README.md)** - Installation, USB setup, ROS2
+- **[Windows (x64)](windows/README.md)** - Installation, driver setup
 
 ## API Documentation
 

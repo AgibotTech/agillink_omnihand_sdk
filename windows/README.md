@@ -2,6 +2,8 @@
 
 [中文文档](README_zh_cn.md) | [Overview & API Docs](../README.md)
 
+📖 **[Quick Start](../doc/en/QUICK_START.md)** | 🔧 **[Troubleshooting](../doc/en/TROUBLESHOOTING.md)**
+
 > **Platform note**: ROS2 interface and SocketCAN are **Linux only** and not available on Windows.
 
 ## System Requirements

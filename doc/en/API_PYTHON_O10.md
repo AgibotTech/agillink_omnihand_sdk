@@ -110,7 +110,7 @@ def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
         hand_type: The hand type, defaults to the left hand.
         hand_device_id: The hand device ID, defaults to 1.
         canfd_device_id: USB CANFD adapter device index, defaults to 0.
-        canfd_canfd_channel_id: CAN channel index, defaults to 0 (USBCANFD-200U has 2 channels).
+        canfd_channel_id: CAN channel index, defaults to 0. For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0. For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0.
     
     Returns:
         OmniHand2025: Dexterous hand instance.
@@ -145,7 +145,7 @@ def create_hand_by_zlgcan(hand_type: EHandType,
         hand_type: The hand type.
         hand_device_id: The hand device ID.
         usbcanfd_serial_number: USB CANFD device serial number (supports partial matching).
-        canfd_channel_id: CAN channel index, defaults to 0.
+        canfd_channel_id: CAN channel index, defaults to 0. For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0.
     
     Returns:
         OmniHand2025: Dexterous hand instance, or None if device not found.
@@ -166,7 +166,7 @@ def create_hand_by_hcan(hand_type: EHandType = EHandType.LEFT,
         hand_type: The hand type, defaults to the left hand.
         hand_hand_device_id: Hand device ID, defaults to 1.
         canfd_device_id: HCAN device index, defaults to 0.
-        canfd_canfd_channel_id: CAN channel index, defaults to 0.
+        canfd_channel_id: CAN channel index, defaults to 0. For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0.
     
     Returns:
         OmniHand2025: Dexterous hand instance.
@@ -197,7 +197,7 @@ def create_hand_by_hcan(hand_type: EHandType,
         hand_type: The hand type.
         hand_hand_device_id: Hand device ID.
         hcan_serial_number: HCAN device serial number (supports partial matching).
-        canfd_canfd_channel_id: CAN channel index, defaults to 0.
+        canfd_channel_id: CAN channel index, defaults to 0. For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0.
     
     Returns:
         OmniHand2025: Dexterous hand instance, or None if device not found.

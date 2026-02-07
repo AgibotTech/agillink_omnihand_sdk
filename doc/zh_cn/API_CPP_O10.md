@@ -109,7 +109,7 @@ struct TactileSensorData {
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 设备 ID（默认：1）
  * @param canfd_device_id USB CANFD 适配器设备索引（默认：0）
- * @param canfd_channel_id CAN 通道索引（默认：0，USBCANFD-200U 有 2 个通道：0 和 1）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHand2025 实例的唯一指针
  * @note 设备类型（200U/100U/MINI）会自动检测，无需手动指定
  * @note ✅ 推荐：零配置，开箱即用。无需 root 权限。
@@ -139,7 +139,7 @@ auto hand = OmniHand2025::createHandByZlgcan(
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 设备 ID
  * @param usbcanfd_serial_number USB CANFD 设备序列号（支持部分匹配）
- * @param canfd_channel_id CAN 通道索引（默认：0）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHand2025 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHand2025> createHandByZlgcan(
@@ -157,7 +157,7 @@ static std::unique_ptr<OmniHand2025> createHandByZlgcan(
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 手部设备 ID
  * @param canfd_device_id HCAN 设备索引
- * @param canfd_channel_id CAN 通道索引（默认：0）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHand2025 实例的唯一指针
  */
 static std::unique_ptr<OmniHand2025> createHandByHcan(
@@ -185,7 +185,7 @@ auto hand = OmniHand2025::createHandByHcan(
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 手部设备 ID
  * @param hcan_serial_number HCAN 设备序列号（支持部分匹配）
- * @param canfd_channel_id CAN 通道索引（默认：0）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHand2025 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHand2025> createHandByHcan(
@@ -274,7 +274,7 @@ void SetDeviceId(unsigned char hand_device_id);
 /**
  * @brief 从广播地址（hand_device_id = 0x00）获取设备信息
  * @param canfd_device_id USB CANFD 适配器设备索引
- * @param canfd_channel_id CAN 通道索引（默认：0）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return DeviceInfo 结构，如果请求失败则返回空的 DeviceInfo
  * @note 此函数发送广播请求以发现 CAN 总线上的设备
  * @note 仅适用于 CAN 通信，RS485 不支持
@@ -286,7 +286,7 @@ static DeviceInfo GetDeviceInfoFromBroadcast(
 /**
  * @brief 从广播地址（hand_device_id = 0x00）通过序列号获取设备信息
  * @param usbcanfd_serial_number USB CANFD 设备序列号（支持部分匹配）
- * @param canfd_channel_id CAN 通道索引（默认：0）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return DeviceInfo 结构，如果找不到设备或请求失败则返回空的 DeviceInfo
  * @note 此函数发送广播请求以发现 CAN 总线上的设备
  * @note 仅适用于 CAN 通信，RS485 不支持

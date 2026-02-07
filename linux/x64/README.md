@@ -2,6 +2,8 @@
 
 [中文文档](README_zh_cn.md) | [Overview & API Docs](../../README.md)
 
+📖 **[Quick Start](../../doc/en/QUICK_START.md)** | 🔧 **[Troubleshooting](../../doc/en/TROUBLESHOOTING.md)**
+
 ## System Requirements
 
 ### Hardware Requirements
@@ -36,6 +38,19 @@ Supports the following communication interfaces:
 # Or specify install path
 ./install.sh /opt/omnihand
 ```
+
+## USB Permission Setup (Recommended)
+
+To use USB CANFD adapters without `sudo`:
+
+1. Connect your OmniHand or USB CANFD adapter
+2. Run the setup script:
+   ```bash
+   sudo ./setup_udev.sh
+   ```
+3. **Log out and log back in** for changes to take effect
+
+The script detects your connected devices, generates udev rules based on their VID:PID, and adds your user to the required groups.
 
 ## Uninstall
 

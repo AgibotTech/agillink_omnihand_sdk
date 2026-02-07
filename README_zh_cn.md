@@ -2,6 +2,11 @@
 
 [English Documentation](README.md)
 
+## 快速链接
+
+- 📖 **[快速入门指南](doc/zh_cn/QUICK_START.md)** - 5 分钟上手
+- 🔧 **[故障排除](doc/zh_cn/TROUBLESHOOTING.md)** - 常见问题和解决方案
+
 ## 产品概述
 
 OmniHand 2025 SDK 支持三种产品型号：
@@ -28,8 +33,8 @@ OmniHand 2025 SDK 支持三种产品型号：
 
 ## 平台文档
 
-- **[Linux (x64)](linux/x64/README_zh_cn.md)** - Ubuntu 22.04+，支持 SocketCAN、ROS2
-- **[Windows (x64)](windows/README_zh_cn.md)** - Windows 10/11，支持 ZLG CANFD
+- **[Linux (x64)](linux/x64/README_zh_cn.md)** - 安装、USB 配置、ROS2
+- **[Windows (x64)](windows/README_zh_cn.md)** - 安装、驱动配置
 
 ## API 文档
 

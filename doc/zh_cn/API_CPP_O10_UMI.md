@@ -29,7 +29,7 @@
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 设备 ID（默认：1）
  * @param canfd_device_id USB CANFD 适配器设备索引（默认：0）
- * @param canfd_channel_id CAN 通道索引（默认：0，USBCANFD-200U 有 2 个通道：0 和 1）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHandDexUMI 实例的唯一指针
  * @note 设备类型（200U/100U/MINI）会自动检测，无需手动指定
  * @note ✅ 推荐：零配置，开箱即用。无需 root 权限。
@@ -59,7 +59,7 @@ auto hand = OmniHandDexUMI::createHandByZlgcan(
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 设备 ID
  * @param usbcanfd_serial_number USB CANFD 设备序列号（支持部分匹配）
- * @param canfd_channel_id CAN 通道索引（默认：0）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHandDexUMI 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
@@ -77,7 +77,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 手部设备 ID
  * @param canfd_device_id HCAN 设备索引
- * @param canfd_channel_id CAN 通道索引（默认：0）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHandDexUMI 实例的唯一指针
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
@@ -105,7 +105,7 @@ auto hand = OmniHandDexUMI::createHandByHcan(
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 手部设备 ID
  * @param hcan_serial_number HCAN 设备序列号（支持部分匹配）
- * @param canfd_channel_id CAN 通道索引（默认：0）
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHandDexUMI 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(

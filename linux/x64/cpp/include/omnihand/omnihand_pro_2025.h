@@ -40,6 +40,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @param hand_device_id Hand device ID
    * @param canfd_device_id USB CANFD adapter device index
    * @param canfd_channel_id CAN channel index (default 0)
+   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
+   *        - Single-channel (USBCANFD-100U): always 0
    * @return A unique pointer to OmniHandPro2025 instance
    */
   static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
@@ -54,6 +56,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @param hand_device_id Hand device ID
    * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
    * @param canfd_channel_id CAN channel index (default 0)
+   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
+   *        - Single-channel (USBCANFD-100U): always 0
    * @return A unique pointer to OmniHandPro2025 instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
@@ -82,6 +86,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @param hand_device_id Hand device ID
    * @param canfd_device_id HCAN device index
    * @param canfd_channel_id CAN channel index (default 0)
+   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
+   *        - Single-channel (USBCANFD-100U): always 0
    * @return A unique pointer to OmniHandPro2025 instance
    */
   static std::unique_ptr<OmniHandPro2025> createHandByHcan(
@@ -96,6 +102,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @param hand_device_id Hand device ID
    * @param hcan_serial_number HCAN device serial number (supports partial matching)
    * @param canfd_channel_id CAN channel index (default 0)
+   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
+   *        - Single-channel (USBCANFD-100U): always 0
    * @return A unique pointer to OmniHandPro2025 instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHandPro2025> createHandByHcan(
@@ -108,6 +116,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
    * @param canfd_device_id USB CANFD adapter device index
    * @param canfd_channel_id CAN channel index (default 0)
+   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
+   *        - Single-channel (USBCANFD-100U): always 0
    * @return DeviceInfo structure, or empty DeviceInfo if request failed
    * @note This function sends a broadcast request to discover devices on the CAN bus
    * @note Only works with CAN communication
@@ -120,6 +130,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @brief Get device information from broadcast address (hand_device_id = 0x00) by serial number
    * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
    * @param canfd_channel_id CAN channel index (default 0)
+   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
+   *        - Single-channel (USBCANFD-100U): always 0
    * @return DeviceInfo structure, or empty DeviceInfo if device not found or request failed
    * @note This function sends a broadcast request to discover devices on the CAN bus
    * @note Only works with CAN communication
