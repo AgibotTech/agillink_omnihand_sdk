@@ -39,6 +39,7 @@ def main():
     # 读取各个手指的触觉传感器数据
     print("Reading tactile sensor data for each finger...\n")
     
+    # UMI has 6 sensors (no Dorsum/back of hand)
     fingers = [
         (EFinger.THUMB, "Thumb"),
         (EFinger.INDEX, "Index"),
@@ -46,7 +47,6 @@ def main():
         (EFinger.RING, "Ring"),
         (EFinger.LITTLE, "Little"),
         (EFinger.PALM, "Palm"),
-        (EFinger.DORSUM, "Dorsum"),
     ]
     
     for finger_enum, finger_name in fingers:

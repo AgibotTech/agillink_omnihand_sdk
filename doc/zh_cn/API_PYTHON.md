@@ -35,9 +35,9 @@ if not hand.init():
     print("初始化失败")
     exit(1)
 
-# 设置电机位置（O10 范围：0-4096）
-positions = [500, 2081, 4094, 2029, 4094, 4094, 2048, 4094, 4000, 4094]
-hand.set_all_joint_positions(positions)
+# 设置关节角度（单位：弧度，O10 有 10 个关节）
+angles = [0.0] * 10  # 所有关节归零
+hand.set_all_active_joint_angles(angles)
 ```
 
 ### OmniHand Pro 2025 (O12)
@@ -57,9 +57,9 @@ if not hand.init():
     print("初始化失败")
     exit(1)
 
-# 设置电机位置（O12 范围：0-2000）
-positions = [500, 1000, 1500, 2000, 1000, 1500, 500, 1000, 1500, 2000, 1000, 1500]
-hand.set_all_joint_positions(positions)
+# 设置关节角度（单位：弧度，O12 有 12 个关节）
+angles = [0.0] * 12  # 所有关节归零
+hand.set_all_active_joint_angles(angles)
 ```
 
 ### OmniHand Dex UMI

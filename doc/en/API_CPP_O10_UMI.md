@@ -6,9 +6,9 @@
 
 **Key Features:**
 - 10 active degrees of freedom
-- 1D tactile sensors (fingers, palm, dorsum)
-- UMI protocol (Pn1-Pn7 registers)
-- Periodic position and tactile sensor reports via callbacks
+- 1D tactile sensors (fingers and palm, no dorsum)
+- UMI protocol (Pn1-Pn8 registers)
+- Active position query (no periodic reports)
 - Supports CAN (ZLG USB CANFD) communication only
 - Supports SocketCAN (Linux only)
 - **Read-only position information** (no position/velocity/torque control)
@@ -41,7 +41,7 @@ enum class EFinger : unsigned char {
     eRing    = 0x04,    // Ring finger
     eLittle  = 0x05,    // Little (pinky) finger
     ePalm    = 0x06,    // Palm
-    eDorsum  = 0x07,    // Dorsum (back of hand)
+    // Note: UMI does not have Dorsum (back of hand) sensor
     eUnknown = 0xff     // Unknown
 };
 ```
@@ -70,13 +70,6 @@ struct DeviceInfo {
     unsigned char hand_device_id; // Hand device ID
     CommuParams commu_params;     // Communication parameters
     
-    // UMI-specific fields (optional, only populated for OmniHand Dex UMI)
-    std::optional<uint16_t> position_report_frequency;        // Pn2.03: Position report frequency (Hz, default 100)
-    std::optional<uint16_t> tactile_sensor_report_frequency; // Pn2.04: Tactile sensor report frequency (Hz, default 100)
-    std::optional<unsigned char> adc_channel_count;          // Pn2.05: ADC channel count (read-only)
-    std::optional<std::vector<unsigned char>> tactile_sensor_info; // Pn2.06: Tactile sensor information (read-only)
-                                                                     // byte0: sensor count, byte1-N: point count per channel
-    
     std::string toString() const;
 };
 ```
@@ -85,7 +78,7 @@ struct DeviceInfo {
 
 ```cpp
 struct TactileSensorData {
-    EFinger sensor_id_;           // Sensor ID (finger/palm/dorsum)
+    EFinger sensor_id_;           // Sensor ID (finger/palm, UMI has no dorsum)
     std::vector<uint8_t> data_;   // Sensor data (unit: 1g, max: 255g)
 };
 ```
@@ -95,14 +88,14 @@ struct TactileSensorData {
 ```cpp
 /**
  * @brief Callback function type for position periodic report
- * @param positions Position data vector (voltage values in mV)
+ * @param positions Position data vector (range 0-4096)
  */
 using PositionReportCallback = std::function<void(const std::vector<int16_t>& positions)>;
 
 /**
  * @brief Callback function type for tactile sensor periodic report
  * @param sensor_data Tactile sensor data
- * @param sensor_id Sensor ID (sub-register address, 0x01~0x07)
+ * @param sensor_id Sensor ID (sub-register address, 0x01~0x06, UMI has no Dorsum)
  */
 using TactileSensorReportCallback = std::function<void(const TactileSensorData& sensor_data, unsigned char sensor_id)>;
 ```
@@ -249,11 +242,7 @@ VendorInfo GetVendorInfo() const;
 
 /**
  * @brief Gets device information.
- * @return DeviceInfo structure containing device ID, communication parameters, and UMI-specific fields:
- *         - position_report_frequency (Pn2.03): Position report frequency in Hz (default: 100)
- *         - tactile_sensor_report_frequency (Pn2.04): Tactile sensor report frequency in Hz (default: 100)
- *         - adc_channel_count (Pn2.05): ADC channel count (read-only)
- *         - tactile_sensor_info (Pn2.06): Tactile sensor information (read-only)
+ * @return DeviceInfo structure containing device ID and communication parameters.
  */
 DeviceInfo GetDeviceInfo() const;
 
@@ -264,24 +253,57 @@ DeviceInfo GetDeviceInfo() const;
 void SetDeviceId(unsigned char hand_device_id);
 ```
 
-## Position Calibration
+## Position Query
 
-**Note**: UMI protocol supports position calibration via Pn7 register. This is a write-only operation.
+**Note**: UMI protocol supports active position query via Pn3 (0x13) register.
 
 ```cpp
 /**
- * @brief Set minimum position calibration (UMI Protocol Pn7, sub-register 0x00).
+ * @brief Get single joint motor position (UMI Protocol Pn3=0x13, sub-register 0x01-0x0A)
+ * @param joint_motor_index Joint motor index (1-10)
+ * @return Joint position value (0-4096), -1 if error
+ */
+int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
+
+/**
+ * @brief Get all joint motor positions (UMI Protocol Pn3=0x13, sub-register 0x00)
+ * @return Vector of all joint positions (10 values, range 0-4096), empty if error
+ */
+std::vector<int16_t> GetAllJointMotorPosi() const;
+```
+
+## Position Calibration
+
+**Note**: UMI protocol supports position calibration via Pn7/Pn8 register. This is a write-only operation.
+
+```cpp
+/**
+ * @brief Set minimum position calibration for all 10 joints (UMI Protocol Pn8=0x08, sub-register 0x00).
  * @note This is a write-only operation for position calibration.
  *       The device should be in minimum position when calling this function.
  */
 void SetMinPositionCalibration();
 
 /**
- * @brief Set maximum position calibration (UMI Protocol Pn7, sub-register 0x01).
+ * @brief Set minimum position calibration for a single joint (UMI Protocol Pn8=0x08, sub-register 0x01-0x0A).
+ * @param joint_index Joint index (1-10, where 1 is the first joint)
+ * @note This is a write-only operation for position calibration.
+ */
+void SetMinPositionCalibration(unsigned char joint_index);
+
+/**
+ * @brief Set maximum position calibration for all 10 joints (UMI Protocol Pn7=0x07, sub-register 0x00).
  * @note This is a write-only operation for position calibration.
  *       The device should be in maximum position when calling this function.
  */
 void SetMaxPositionCalibration();
+
+/**
+ * @brief Set maximum position calibration for a single joint (UMI Protocol Pn7=0x07, sub-register 0x01-0x0A).
+ * @param joint_index Joint index (1-10, where 1 is the first joint)
+ * @note This is a write-only operation for position calibration.
+ */
+void SetMaxPositionCalibration(unsigned char joint_index);
 ```
 
 ## Periodic Report Frequency Settings
@@ -313,7 +335,7 @@ void SetTactileSensorReportFrequency(uint16_t frequency);
  * @param frequency Optional frequency in Hz (if provided, sets Pn2.03 before registering callback, default: 100)
  * @note The callback will be called in the RecvFrame thread, so it should be thread-safe
  * @note If callback is nullptr, the callback will be unregistered
- * @note Position data is in voltage values (mV)
+ * @note Position data range is 0-4096
  */
 void SetPositionReportCallback(PositionReportCallback callback, std::optional<uint16_t> frequency = std::nullopt);
 
@@ -333,8 +355,8 @@ void SetTactileSensorReportCallback(TactileSensorReportCallback callback, std::o
 OmniHand Dex UMI (O10 UMI) uses **1D tactile sensors** similar to OmniHand 2025 (O10):
 - **Data unit**: 1g
 - **Max value**: 255g
-- **Sensor locations**: Fingers, Palm, Dorsum
-- **Protocol**: UMI Protocol Pn6 (read-only, sub-register 0x01~0x07)
+- **Sensor locations**: Fingers (Thumb, Index, Middle, Ring, Little), Palm (Note: UMI has no Dorsum sensor)
+- **Protocol**: UMI Protocol Pn6 (read-only, sub-register 0x01~0x06)
 
 ```cpp
 /**
@@ -471,7 +493,7 @@ int main() {
   - **Pn2.05**: ADC channel count (read-only, 1 byte)
   - **Pn2.06**: Tactile sensor information (read-only, variable length)
 - **Pn3**: Position information (read-only, periodic report)
-- **Pn6**: Tactile sensor data (read-only, periodic report, sub-register 0x01~0x07)
+- **Pn6**: Tactile sensor data (read-only, sub-register 0x01~0x06, UMI has no Dorsum)
 - **Pn7**: Position calibration (write-only)
   - **Pn7.00**: Minimum position calibration
   - **Pn7.01**: Maximum position calibration

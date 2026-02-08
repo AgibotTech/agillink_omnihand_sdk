@@ -6,9 +6,9 @@
 
 **主要特性：**
 - 10 个主动自由度
-- 1D 触觉传感器（手指、手心、手背）
-- UMI 协议（Pn1-Pn7 寄存器）
-- 通过回调函数进行位置和触觉传感器周期上报
+- 1D 触觉传感器（手指、手心，无手背）
+- UMI 协议（Pn1-Pn8 寄存器）
+- 主动查询位置信息（无周期上报）
 - 仅支持 CAN（ZLG USB CANFD）通信
 - 支持 SocketCAN（仅 Linux）
 - **只读位置信息**（不支持位置/速度/力矩控制）
@@ -114,31 +114,28 @@ def set_max_position_calibration(self) -> None:
     """
 ```
 
-### 周期上报频率设置
+### 位置查询
 
 ```python
-def set_position_report_frequency(self, frequency: int) -> None:
-    """设置位置上报频率（UMI 协议 Pn2.03）。
+def get_joint_position(self, joint_motor_index: int) -> int:
+    """获取单个关节电机位置（UMI 协议 Pn3，子寄存器 0x01-0x0A）。
     
     Args:
-        frequency: 上报频率（Hz，默认：100）。
+        joint_motor_index: 关节电机索引（0-9）。
     
-    Note:
-        将频率设置为 0 将禁用周期上报。
+    Returns:
+        int: 关节位置（0-4096）。
     """
 
-def set_tactile_sensor_report_frequency(self, frequency: int) -> None:
-    """设置触觉传感器上报频率（UMI 协议 Pn2.04）。
+def get_all_joint_positions(self) -> List[int]:
+    """获取所有关节电机位置（UMI 协议 Pn3，子寄存器 0x00）。
     
-    Args:
-        frequency: 上报频率（Hz，默认：100）。
-    
-    Note:
-        将频率设置为 0 将禁用周期上报。
+    Returns:
+        List[int]: 10 个关节位置（0-4096）。
     """
 ```
 
-### 周期上报回调
+### 位置校准
 
 ```python
 def set_position_report_callback(self, callback: Optional[Callable[[List[int]], None]], 
@@ -163,7 +160,7 @@ def set_tactile_sensor_report_callback(self,
     Args:
         callback: 接收到触觉传感器数据时调用的回调函数。
                  回调函数接收 (sensor_data: TactileSensorData, sensor_id: int)。
-                 sensor_id 是子寄存器地址（0x01~0x07）。
+                 sensor_id 是子寄存器地址（0x01~0x06，UMI 无手背传感器）。
                  如果为 None，将取消注册回调。
         frequency: 可选频率（Hz，如果提供，在注册回调前设置 Pn2.04，默认：100）。
     

@@ -24,19 +24,6 @@
 class OmniHandDexUmiCanImpl;
 
 /**
- * @brief Callback function type for position periodic report
- * @param positions Position data vector (voltage values in mV)
- */
-using PositionReportCallback = std::function<void(const std::vector<int16_t>& positions)>;
-
-/**
- * @brief Callback function type for tactile sensor periodic report
- * @param sensor_data Tactile sensor data
- * @param sensor_id Sensor ID (sub-register address, 0x01~0x07)
- */
-using TactileSensorReportCallback = std::function<void(const TactileSensorData& sensor_data, unsigned char sensor_id)>;
-
-/**
  * @brief OmniHand Dex UMI interface class - 10 DOF, UMI Protocol
  * 
  * This class provides the public interface for OmniHand Dex UMI product.
@@ -132,50 +119,46 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
   // ============ Sensor Utilities (from OmniHandSensorBase) ============
   // GetSensorDataLength and GetSensorOrder are inherited from OmniHandSensorBase
 
+  // ============ Position Query (UMI Protocol Pn3=0x13) ============
+  /**
+   * @brief Get single joint motor position (UMI Protocol Pn3=0x13, sub-register 0x01-0x0A)
+   * @param joint_motor_index Joint motor index (1-10)
+   * @return Joint position value (0-4096), -1 if error
+   */
+  virtual int16_t GetJointMotorPosi(unsigned char joint_motor_index) const = 0;
+
+  /**
+   * @brief Get all joint motor positions (UMI Protocol Pn3=0x13, sub-register 0x00)
+   * @return Vector of all joint positions (10 values, range 0-4096), empty if error
+   */
+  virtual std::vector<int16_t> GetAllJointMotorPosi() const = 0;
+
   // ============ UMI-Specific Interfaces ============
   /**
-   * @brief Set minimum position calibration (UMI Protocol Pn7, sub-register 0x00).
+   * @brief Set minimum position calibration for all 10 joints (UMI Protocol Pn8=0x08, sub-register 0x00).
    * @note This is a write-only operation for position calibration.
    */
   virtual void SetMinPositionCalibration() = 0;
 
   /**
-   * @brief Set maximum position calibration (UMI Protocol Pn7, sub-register 0x01).
+   * @brief Set minimum position calibration for a single joint (UMI Protocol Pn8=0x08, sub-register 0x01-0x0A).
+   * @param joint_index Joint index (1-10, where 1 is the first joint)
+   * @note This is a write-only operation for position calibration.
+   */
+  virtual void SetMinPositionCalibration(unsigned char joint_index) = 0;
+
+  /**
+   * @brief Set maximum position calibration for all 10 joints (UMI Protocol Pn7=0x07, sub-register 0x00).
    * @note This is a write-only operation for position calibration.
    */
   virtual void SetMaxPositionCalibration() = 0;
 
   /**
-   * @brief Set position report frequency (UMI Protocol Pn2.03)
-   * @param frequency Report frequency in Hz (default: 100)
-   * @note Setting frequency to 0 will disable periodic reports
+   * @brief Set maximum position calibration for a single joint (UMI Protocol Pn7=0x07, sub-register 0x01-0x0A).
+   * @param joint_index Joint index (1-10, where 1 is the first joint)
+   * @note This is a write-only operation for position calibration.
    */
-  virtual void SetPositionReportFrequency(uint16_t frequency) = 0;
-
-  /**
-   * @brief Set tactile sensor report frequency (UMI Protocol Pn2.04)
-   * @param frequency Report frequency in Hz (default: 100)
-   * @note Setting frequency to 0 will disable periodic reports
-   */
-  virtual void SetTactileSensorReportFrequency(uint16_t frequency) = 0;
-
-  /**
-   * @brief Register callback function for position periodic report (UMI Protocol Pn3, Pn2.03 sets frequency)
-   * @param callback Callback function to be called when position data is received
-   * @param frequency Optional frequency in Hz (if provided, sets Pn2.03 before registering callback, default: 100)
-   * @note The callback will be called in the RecvFrame thread, so it should be thread-safe
-   * @note If callback is nullptr, the callback will be unregistered
-   */
-  virtual void SetPositionReportCallback(PositionReportCallback callback, std::optional<uint16_t> frequency = std::nullopt) = 0;
-
-  /**
-   * @brief Register callback function for tactile sensor periodic report (UMI Protocol Pn6, Pn2.04 sets frequency)
-   * @param callback Callback function to be called when tactile sensor data is received
-   * @param frequency Optional frequency in Hz (if provided, sets Pn2.04 before registering callback, default: 100)
-   * @note The callback will be called in the RecvFrame thread, so it should be thread-safe
-   * @note If callback is nullptr, the callback will be unregistered
-   */
-  virtual void SetTactileSensorReportCallback(TactileSensorReportCallback callback, std::optional<uint16_t> frequency = std::nullopt) = 0;
+  virtual void SetMaxPositionCalibration(unsigned char joint_index) = 0;
 
   // GetAllTactileSensorDataRaw and GetTactileSensorDataRaw are inherited from OmniHandSensorBase
 

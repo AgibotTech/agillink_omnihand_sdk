@@ -6,9 +6,9 @@
 
 **主要特性：**
 - 10 个主动自由度
-- 1D 触觉传感器（手指、手心、手背）
-- UMI 协议（Pn1-Pn7 寄存器）
-- 通过回调函数进行位置和触觉传感器周期上报
+- 1D 触觉传感器（手指、手心，无手背）
+- UMI 协议（Pn1-Pn8 寄存器）
+- 主动查询位置信息（无周期上报）
 - 仅支持 CAN（ZLG USB CANFD）通信
 - 支持 SocketCAN（仅 Linux）
 - **只读位置信息**（不支持位置/速度/力矩控制）
@@ -128,20 +128,51 @@ static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
 
 ## UMI 特有接口
 
+### 位置查询
+
+```cpp
+/**
+ * @brief 获取单个关节电机位置（UMI 协议 Pn3=0x13，子寄存器 0x01-0x0A）
+ * @param joint_motor_index 关节电机索引（1-10）
+ * @return 关节位置值（0-4096），错误时返回-1
+ */
+int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
+
+/**
+ * @brief 获取所有关节电机位置（UMI 协议 Pn3=0x13，子寄存器 0x00）
+ * @return 所有关节位置向量（10个值，范围0-4096），错误时返回空向量
+ */
+std::vector<int16_t> GetAllJointMotorPosi() const;
+```
+
 ### 位置校准
 
 ```cpp
 /**
- * @brief 设置最小位置校准（UMI 协议 Pn7，子寄存器 0x00）
+ * @brief 设置所有10个关节的最小位置校准（UMI 协议 Pn8=0x08，子寄存器 0x00）
  * @note 这是位置校准的只写操作。设备应处于最小位置时调用此函数。
  */
 void SetMinPositionCalibration();
 
 /**
- * @brief 设置最大位置校准（UMI 协议 Pn7，子寄存器 0x01）
+ * @brief 设置单个关节的最小位置校准（UMI 协议 Pn8=0x08，子寄存器 0x01-0x0A）
+ * @param joint_index 关节索引（1-10，其中1为第一个关节）
+ * @note 这是位置校准的只写操作。
+ */
+void SetMinPositionCalibration(unsigned char joint_index);
+
+/**
+ * @brief 设置所有10个关节的最大位置校准（UMI 协议 Pn7=0x07，子寄存器 0x00）
  * @note 这是位置校准的只写操作。设备应处于最大位置时调用此函数。
  */
 void SetMaxPositionCalibration();
+
+/**
+ * @brief 设置单个关节的最大位置校准（UMI 协议 Pn7=0x07，子寄存器 0x01-0x0A）
+ * @param joint_index 关节索引（1-10，其中1为第一个关节）
+ * @note 这是位置校准的只写操作。
+ */
+void SetMaxPositionCalibration(unsigned char joint_index);
 ```
 
 ### 周期上报频率设置
@@ -199,24 +230,16 @@ static const std::vector<EFinger>& GetSensorOrder();
 struct DeviceInfo {
     unsigned char hand_device_id; // 手部设备 ID
     CommuParams commu_params;     // 通信参数
-    
-    // UMI 特定字段（可选，仅 OmniHand Dex UMI 填充）
-    std::optional<uint16_t> position_report_frequency;        // Pn2.03: 位置上报频率（Hz，默认 100）
-    std::optional<uint16_t> tactile_sensor_report_frequency; // Pn2.04: 触觉传感器上报频率（Hz，默认 100）
-    std::optional<unsigned char> adc_channel_count;          // Pn2.05: ADC 通道数（只读）
-    std::optional<std::vector<unsigned char>> tactile_sensor_info; // Pn2.06: 触觉传感器信息（只读）
 };
 ```
 
 ## 重要注意事项
 
-1. **无位置/速度/力矩控制**：OmniHand Dex UMI (O10 UMI) 是**只读**设备。它不支持位置、速度或力矩控制。它仅通过周期上报提供位置信息。
+1. **无位置/速度/力矩控制**：OmniHand Dex UMI (O10 UMI) 是**只读**设备。它不支持位置、速度或力矩控制。它通过主动查询提供位置信息。
 
-2. **周期上报**：UMI 协议支持位置和触觉传感器数据的周期上报。使用回调函数异步接收此数据。
+2. **主动查询位置**：UMI 协议支持通过 `GetJointMotorPosi()` 和 `GetAllJointMotorPosi()` 主动查询关节位置。
 
-3. **线程安全**：回调函数在 `RecvFrame` 线程中执行。确保您的回调是线程安全的。
-
-4. **位置校准**：位置校准（最小/最大）是只写操作。调用校准函数时，设备应处于适当的位置。
+3. **位置校准**：位置校准（最小/最大）是只写操作。调用校准函数时，设备应处于适当的位置。
 
 ## 完整示例
 
@@ -276,7 +299,7 @@ int main() {
   - **Pn2.05**: ADC 通道数（只读，1 字节）
   - **Pn2.06**: 触觉传感器信息（只读，可变长度）
 - **Pn3**: 位置信息（只读，周期上报）
-- **Pn6**: 触觉传感器数据（只读，周期上报，子寄存器 0x01~0x07）
+- **Pn6**: 触觉传感器数据（只读，子寄存器 0x01~0x06，UMI 无手背传感器）
 - **Pn7**: 位置校准（只写）
   - **Pn7.00**: 最小位置校准
   - **Pn7.01**: 最大位置校准

@@ -6,9 +6,9 @@
 
 **Key Features:**
 - 10 active degrees of freedom
-- 1D tactile sensors (fingers, palm, dorsum)
-- UMI protocol (Pn1-Pn7 registers)
-- Periodic position and tactile sensor reports via callbacks
+- 1D tactile sensors (fingers and palm, no dorsum)
+- UMI protocol (Pn1-Pn8 registers)
+- Active position query (no periodic reports)
 - Supports CAN (ZLG USB CANFD) communication only
 - Supports SocketCAN (Linux only)
 - **Read-only position information** (no position/velocity/torque control)
@@ -40,7 +40,7 @@ class EFinger(IntEnum):
     RING = 4
     LITTLE = 5
     PALM = 6
-    DORSUM = 7
+    # Note: UMI does not have DORSUM sensor
     UNKNOWN = 255
 ```
 
@@ -66,11 +66,6 @@ class VendorInfo:
 class DeviceInfo:
     hand_device_id: int
     commu_params: CommuParams
-    # UMI-specific fields (optional)
-    position_report_frequency: Optional[int]  # Pn2.03: Position report frequency (Hz, default 100)
-    tactile_sensor_report_frequency: Optional[int]  # Pn2.04: Tactile sensor report frequency (Hz, default 100)
-    adc_channel_count: Optional[int]  # Pn2.05: ADC channel count (read-only)
-    tactile_sensor_info: Optional[List[int]]  # Pn2.06: Tactile sensor information (read-only)
 
     def __str__(self) -> str: ...
 ```
@@ -303,9 +298,7 @@ def get_device_info(self) -> DeviceInfo:
     """Gets device information.
     
     Returns:
-        DeviceInfo: Device info structure containing device ID, communication parameters,
-                    and UMI-specific fields (position_report_frequency, tactile_sensor_report_frequency,
-                    adc_channel_count, tactile_sensor_info).
+        DeviceInfo: Device info structure containing device ID and communication parameters.
     """
 
 def set_device_id(self, device_id: int) -> None:
@@ -330,7 +323,7 @@ def set_min_position_calibration(self) -> None:
     """
 
 def set_max_position_calibration(self) -> None:
-    """Set maximum position calibration (UMI Protocol Pn7, sub-register 0x01).
+    """Set maximum position calibration (UMI Protocol Pn8, sub-register 0x00).
     
     Note:
         This is a write-only operation for position calibration.
@@ -338,63 +331,26 @@ def set_max_position_calibration(self) -> None:
     """
 ```
 
-## Periodic Report Frequency Settings
+## Position Query
+
+**Note**: UMI protocol supports active position query. Use `get_joint_position()` or `get_all_joint_positions()` to query joint positions.
 
 ```python
-def set_position_report_frequency(self, frequency: int) -> None:
-    """Set position report frequency (UMI Protocol Pn2.03).
+def get_joint_position(self, joint_motor_index: int) -> int:
+    """Get single joint motor position (UMI Protocol Pn3, sub-register 0x01-0x0A).
     
     Args:
-        frequency: Report frequency in Hz (default: 100).
+        joint_motor_index: Joint motor index (0-9).
     
-    Note:
-        Setting frequency to 0 will disable periodic reports.
+    Returns:
+        int: Joint position (0-4096).
     """
 
-def set_tactile_sensor_report_frequency(self, frequency: int) -> None:
-    """Set tactile sensor report frequency (UMI Protocol Pn2.04).
+def get_all_joint_positions(self) -> List[int]:
+    """Get all joint motor positions (UMI Protocol Pn3, sub-register 0x00).
     
-    Args:
-        frequency: Report frequency in Hz (default: 100).
-    
-    Note:
-        Setting frequency to 0 will disable periodic reports.
-    """
-```
-
-## Periodic Report Callbacks
-
-**Note**: UMI protocol supports periodic reports via callbacks. The callbacks are executed in a background thread, so they should be thread-safe.
-
-```python
-def set_position_report_callback(self, callback: Optional[Callable[[List[int]], None]], 
-                                 frequency: Optional[int] = None) -> None:
-    """Register callback function for position periodic report (UMI Protocol Pn3, Pn2.03 sets frequency).
-    
-    Args:
-        callback: Callback function to be called when position data is received.
-                 The callback receives a list of position values (voltage values in mV).
-                 If None, the callback will be unregistered.
-        frequency: Optional frequency in Hz (if provided, sets Pn2.03 before registering callback, default: 100).
-    
-    Note:
-        The callback will be called in a background thread, so it should be thread-safe.
-    """
-
-def set_tactile_sensor_report_callback(self, 
-                                       callback: Optional[Callable[[TactileSensorData, int], None]], 
-                                       frequency: Optional[int] = None) -> None:
-    """Register callback function for tactile sensor periodic report (UMI Protocol Pn6, Pn2.04 sets frequency).
-    
-    Args:
-        callback: Callback function to be called when tactile sensor data is received.
-                 The callback receives (sensor_data: TactileSensorData, sensor_id: int).
-                 sensor_id is the sub-register address (0x01~0x07).
-                 If None, the callback will be unregistered.
-        frequency: Optional frequency in Hz (if provided, sets Pn2.04 before registering callback, default: 100).
-    
-    Note:
-        The callback will be called in a background thread, so it should be thread-safe.
+    Returns:
+        List[int]: List of 10 joint positions (0-4096).
     """
 ```
 
@@ -403,8 +359,8 @@ def set_tactile_sensor_report_callback(self,
 OmniHand Dex UMI (O10 UMI) uses **1D tactile sensors** similar to OmniHand 2025 (O10):
 - **Data unit**: 1g
 - **Max value**: 255g
-- **Sensor locations**: Fingers, Palm, Dorsum
-- **Protocol**: UMI Protocol Pn6 (read-only, sub-register 0x01~0x07)
+- **Sensor locations**: Fingers (Thumb, Index, Middle, Ring, Little), Palm (Note: UMI has no Dorsum sensor)
+- **Protocol**: UMI Protocol Pn6 (read-only, sub-register 0x01~0x06)
 
 ```python
 def get_all_tactile_sensor_data_raw(self) -> List[TactileSensorData]:
@@ -527,7 +483,7 @@ hand.set_tactile_sensor_report_callback(None)
   - **Pn2.05**: ADC channel count (read-only, 1 byte)
   - **Pn2.06**: Tactile sensor information (read-only, variable length)
 - **Pn3**: Position information (read-only, periodic report)
-- **Pn6**: Tactile sensor data (read-only, periodic report, sub-register 0x01~0x07)
+- **Pn6**: Tactile sensor data (read-only, sub-register 0x01~0x06, UMI has no Dorsum)
 - **Pn7**: Position calibration (write-only)
   - **Pn7.00**: Minimum position calibration
   - **Pn7.01**: Maximum position calibration

@@ -86,9 +86,9 @@ if not hand.init():
     print("Failed to initialize")
     exit(1)
 
-# Set motor positions (range: 0-4096 for O10)
-positions = [500, 2081, 4094, 2029, 4094, 4094, 2048, 4094, 4000, 4094]
-hand.set_all_joint_positions(positions)
+# Set joint angles (unit: radians, 10 joints for O10)
+angles = [0.0] * 10  # All joints to zero position
+hand.set_all_active_joint_angles(angles)
 ```
 
 ### OmniHand Pro 2025 (O12)
@@ -108,9 +108,9 @@ if not hand.init():
     print("Failed to initialize")
     exit(1)
 
-# Set motor positions (range: 0-2000 for O12)
-positions = [500, 1000, 1500, 2000, 1000, 1500, 500, 1000, 1500, 2000, 1000, 1500]
-hand.set_all_joint_positions(positions)
+# Set joint angles (unit: radians, 12 joints for O12)
+angles = [0.0] * 12  # All joints to zero position
+hand.set_all_active_joint_angles(angles)
 ```
 
 ### OmniHand Dex UMI
@@ -136,37 +136,6 @@ def position_callback(positions):
 
 hand.set_position_report_callback(position_callback, frequency=100)  # 100 Hz
 ```
-
-## Migration from Unified Interface
-
-If you were using the old unified `OmniHand.create_hand_by_zlgcan(ProductType, ...)` interface:
-
-**Old code:**
-```python
-from omnihand import OmniHand, ProductType, EHandType
-
-hand = OmniHand.create_hand_by_zlgcan(
-    ProductType.OMNIHAND_2025,
-    hand_type=EHandType.LEFT,
-    device_id=1,
-    canfd_id=0,
-    channel_id=0
-)
-```
-
-**New code:**
-```python
-from omnihand import OmniHand2025, EHandType
-
-hand = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
-    device_id=1,
-    canfd_id=0,
-    channel_id=0
-)
-```
-
-The product type is now determined by the class you use, providing better type safety and compile-time checks.
 
 ## Related Documentation
 

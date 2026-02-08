@@ -93,9 +93,9 @@ if (!hand || !hand->Init()) {
     return -1;
 }
 
-// Set motor positions (range: 0-4096 for O10)
-std::vector<int16_t> positions{500, 2081, 4094, 2029, 4094, 4094, 2048, 4094, 4000, 4094};
-hand->SetAllJointMotorPosi(positions);
+// Set joint angles (unit: radians, 10 joints for O10)
+std::vector<double> angles(10, 0.0);  // All joints to zero position
+hand->SetAllActiveJointAngles(angles);
 ```
 
 ### OmniHand Pro 2025 (O12)
@@ -116,9 +116,9 @@ if (!hand || !hand->Init()) {
     return -1;
 }
 
-// Set motor positions (range: 0-2000 for O12)
-std::vector<int16_t> positions{500, 1000, 1500, 2000, 1000, 1500, 500, 1000, 1500, 2000, 1000, 1500};
-hand->SetAllJointMotorPosi(positions);
+// Set joint angles (unit: radians, 12 joints for O12)
+std::vector<double> angles(12, 0.0);  // All joints to zero position
+hand->SetAllActiveJointAngles(angles);
 ```
 
 ### OmniHand Dex UMI
@@ -144,29 +144,6 @@ hand->SetPositionReportCallback([](const std::vector<int16_t>& positions) {
     std::cout << "Position report received: " << positions.size() << " values" << std::endl;
 }, 100);  // 100 Hz frequency
 ```
-
-## Migration from Unified Interface
-
-If you were using the old unified `OmniHand::createHandByZlgcan(ProductType, ...)` interface:
-
-**Old code:**
-```cpp
-auto hand = OmniHand::createHandByZlgcan(
-    ProductType::OMNIHAND_2025,
-    EHandType::eLeft,
-    1, 0, 0
-);
-```
-
-**New code:**
-```cpp
-auto hand = OmniHand2025::createHandByZlgcan(
-    EHandType::eLeft,
-    1, 0, 0
-);
-```
-
-The product type is now determined by the class you use, providing better type safety and compile-time checks.
 
 ## Related Documentation
 

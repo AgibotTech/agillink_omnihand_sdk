@@ -52,7 +52,7 @@ def position_report_callback(positions, hand_name="Unknown"):
         count = position_report_count[hand_name]
         if count % 100 == 0:  # 每100次打印一次
             print(f"\n[{hand_name} Position Report #{count}]")
-            print(f"  Position data (voltage in mV): {positions[:5]}..." if len(positions) > 5 else f"  Position data: {positions}")
+            print(f"  Position data (0-4096): {positions[:5]}..." if len(positions) > 5 else f"  Position data: {positions}")
 
 
 def tactile_report_callback(sensor_data, hand_name="Unknown"):
@@ -95,22 +95,12 @@ def read_single_hand(hand, hand_name):
     print(f"    D-Bitrate: {device_info.commu_params.dbitrate_}")
     print(f"    D-Sample Point: {device_info.commu_params.dsample_point_}")
 
-    # UMI 特有信息
-    print("\n--- UMI-Specific Device Info ---")
-    if device_info.position_report_frequency is not None:
-        print(f"  Position Report Frequency: {device_info.position_report_frequency} Hz")
-    if device_info.tactile_sensor_report_frequency is not None:
-        print(f"  Tactile Sensor Report Frequency: {device_info.tactile_sensor_report_frequency} Hz")
-    if device_info.adc_channel_count is not None:
-        print(f"  ADC Channel Count: {device_info.adc_channel_count}")
-
     # ============ 读取传感器数据 ============
     print("\n=== Reading Sensor Data ===")
 
-    # 注意：UMI 协议不支持直接查询关节角度
-    print("\nNote: UMI protocol does not support direct joint angle queries.")
-    print("      Position data can only be obtained through periodic position reports.")
-    print("      Use set_position_report_callback() to register a callback for receiving position data.")
+    # 注意：UMI 协议支持主动查询关节位置
+    print("\nNote: UMI protocol supports active position query.")
+    print("      Use get_joint_position() or get_all_joint_positions() to get position data.")
 
     # 读取触觉传感器数据（1D，使用 Raw API）
     print("\n--- 1D Tactile Sensor Data (Raw) ---")
@@ -147,25 +137,23 @@ def read_single_hand(hand, hand_name):
     except Exception as e:
         print(f"  Warning: {e}")
 
-    # ============ 注册周期上报回调 ============
-    print("\n=== Registering Periodic Report Callbacks ===")
+    # ============ 主动查询位置数据 ============
+    print("\n=== Active Position Query ===")
     
-    # 注册位置周期上报回调
-    def pos_callback(positions):
-        position_report_callback(positions, hand_name)
+    # 主动查询所有关节位置
+    try:
+        positions = hand.get_all_joint_positions()
+        print(f"  All joint positions: {positions}")
+    except Exception as e:
+        print(f"  Warning: Failed to get all joint positions - {e}")
     
-    hand.set_position_report_callback(pos_callback)
-    print(f"  Position report callback registered (default frequency: 100Hz)")
-    
-    # 注册触觉传感器周期上报回调
-    def tactile_callback(sensor_data):
-        tactile_report_callback(sensor_data, hand_name)
-    
-    hand.set_tactile_sensor_report_callback(tactile_callback)
-    print(f"  Tactile sensor report callback registered (default frequency: 100Hz)")
-    
-    print(f"\n  Receiving periodic reports for {hand_name} hand...")
-    print(f"  (Reports will be printed every 100 samples)")
+    # 主动查询单个关节位置
+    try:
+        for i in range(1, 4):  # 查询前3个关节
+            pos = hand.get_joint_position(i)
+            print(f"  Joint {i} position: {pos}")
+    except Exception as e:
+        print(f"  Warning: Failed to get single joint position - {e}")
 
 
 def main():
@@ -268,35 +256,19 @@ def main():
             print(f"  Model: {right_vendor.product_model}")
             print(f"  Serial: {right_vendor.product_seq_num}")
 
-            # 注册两个手的回调
-            def left_pos_callback(positions):
-                position_report_callback(positions, "Left")
+            # 主动查询两个手的位置数据
+            print("\n--- Active Position Query ---")
+            try:
+                left_positions = left_hand.get_all_joint_positions()
+                print(f"  Left hand positions: {left_positions[:5]}...")
+            except Exception as e:
+                print(f"  Left hand: Failed to get positions - {e}")
             
-            def right_pos_callback(positions):
-                position_report_callback(positions, "Right")
-            
-            def left_tactile_callback(sensor_data):
-                tactile_report_callback(sensor_data, "Left")
-            
-            def right_tactile_callback(sensor_data):
-                tactile_report_callback(sensor_data, "Right")
-
-            left_hand.set_position_report_callback(left_pos_callback)
-            right_hand.set_position_report_callback(right_pos_callback)
-            left_hand.set_tactile_sensor_report_callback(left_tactile_callback)
-            right_hand.set_tactile_sensor_report_callback(right_tactile_callback)
-
-            print("\nCallbacks registered for both hands.")
-            print("Waiting for periodic reports (5 seconds)...")
-            time.sleep(5)
-
-    # 打印统计信息
-    print("\n=== Statistics ===")
-    with lock:
-        for hand_name, count in position_report_count.items():
-            print(f"  {hand_name} position reports: {count}")
-        for hand_name, count in tactile_report_count.items():
-            print(f"  {hand_name} tactile reports: {count}")
+            try:
+                right_positions = right_hand.get_all_joint_positions()
+                print(f"  Right hand positions: {right_positions[:5]}...")
+            except Exception as e:
+                print(f"  Right hand: Failed to get positions - {e}")
 
     print("\n[Done]: Example completed successfully!")
     return 0

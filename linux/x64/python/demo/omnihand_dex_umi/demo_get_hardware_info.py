@@ -54,30 +54,6 @@ def main():
     print(f"  CAN FD Data Bitrate: {device_info.commu_params.dbitrate_}")
     print(f"  CAN FD Data Sample Point: {device_info.commu_params.dsample_point_}")
     
-    # UMI-specific fields (Pn2.03, Pn2.04, Pn2.05, Pn2.06)
-    print("\nUMI-Specific Device Info:")
-    if device_info.position_report_frequency is not None:
-        print(f"  Position Report Frequency (Pn2.03): {device_info.position_report_frequency} Hz")
-    else:
-        print(f"  Position Report Frequency (Pn2.03): Not available")
-    
-    if device_info.tactile_sensor_report_frequency is not None:
-        print(f"  Tactile Sensor Report Frequency (Pn2.04): {device_info.tactile_sensor_report_frequency} Hz")
-    else:
-        print(f"  Tactile Sensor Report Frequency (Pn2.04): Not available")
-    
-    if device_info.adc_channel_count is not None:
-        print(f"  ADC Channel Count (Pn2.05): {device_info.adc_channel_count}")
-    else:
-        print(f"  ADC Channel Count (Pn2.05): Not available")
-    
-    if device_info.tactile_sensor_info is not None:
-        print(f"  Tactile Sensor Info (Pn2.06): {len(device_info.tactile_sensor_info)} bytes")
-        if len(device_info.tactile_sensor_info) > 0:
-            print(f"    First 20 bytes: {device_info.tactile_sensor_info[:20]}")
-    else:
-        print(f"  Tactile Sensor Info (Pn2.06): Not available")
-    
     # 使用 toString() 方法显示完整信息
     print("\n" + "=" * 50)
     print("Full Device Info (toString):")

@@ -60,27 +60,14 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
   std::cout << "    Sample Point: " << static_cast<int>(device_info.commu_params.sample_point_) << std::endl;
   std::cout << "    D-Bitrate: " << static_cast<int>(device_info.commu_params.dbitrate_) << std::endl;
   std::cout << "    D-Sample Point: " << static_cast<int>(device_info.commu_params.dsample_point_) << std::endl;
-  
-  // UMI 特有信息
-  if (device_info.position_report_frequency.has_value()) {
-    std::cout << "  Position Report Frequency: " << device_info.position_report_frequency.value() << " Hz" << std::endl;
-  }
-  if (device_info.tactile_sensor_report_frequency.has_value()) {
-    std::cout << "  Tactile Sensor Report Frequency: " << device_info.tactile_sensor_report_frequency.value() << " Hz" << std::endl;
-  }
-  if (device_info.adc_channel_count.has_value()) {
-    std::cout << "  ADC Channel Count: " << device_info.adc_channel_count.value() << std::endl;
-  }
 
   // ============ 读取传感器数据 ============
   std::cout << "\n=== Reading Sensor Data ===" << std::endl;
   
-  // 注意：UMI 协议不支持直接查询关节角度
-  // 位置数据只能通过周期性位置报告获取
-  // 使用 SetPositionReportCallback() 注册回调函数来接收位置数据
-  std::cout << "\nNote: UMI protocol does not support direct joint angle queries." << std::endl;
-  std::cout << "      Position data can only be obtained through periodic position reports." << std::endl;
-  std::cout << "      Use SetPositionReportCallback() to register a callback for receiving position data." << std::endl;
+  // 注意：UMI 协议支持主动查询关节位置
+  // 使用 GetJointMotorPosi() 或 GetAllJointMotorPosi() 来获取位置数据
+  std::cout << "\nNote: UMI protocol supports active position query." << std::endl;
+  std::cout << "      Use GetJointMotorPosi() or GetAllJointMotorPosi() to get position data." << std::endl;
 
   // 读取触觉传感器数据（1D，使用 Raw API）
   std::cout << "\n1D Tactile Sensor Data (Raw):" << std::endl;
@@ -121,7 +108,7 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
         case EFinger::eRing: finger_name = "Ring"; break;
         case EFinger::eLittle: finger_name = "Little"; break;
         case EFinger::ePalm: finger_name = "Palm"; break;
-        case EFinger::eDorsum: finger_name = "Dorsum"; break;
+        // Note: UMI does not have Dorsum sensor
         default: finger_name = "Unknown"; break;
       }
       std::cout << "  " << finger_name << ": " << sensor.data_.size() << " points" << std::endl;
@@ -246,14 +233,11 @@ int main(int argc, char** argv) {
     std::cout << "  Model: " << right_vendor.productModel << std::endl;
     std::cout << "  Serial: " << right_vendor.productSeqNum << std::endl;
 
-    // 读取两个手的角度
-    std::cout << "\nReading joint angles from both hands..." << std::endl;
-    // 注意：UMI 协议不支持 GetAllJointAngles()
-    // 位置数据只能通过周期性位置报告获取
-    // 使用 SetPositionReportCallback() 注册回调函数来接收位置数据
-    std::cout << "\nNote: UMI protocol does not support direct joint angle queries." << std::endl;
-    std::cout << "      Position data can only be obtained through periodic position reports." << std::endl;
-    std::cout << "      Use SetPositionReportCallback() to register a callback for receiving position data." << std::endl;
+    // 读取两个手的位置
+    std::cout << "\nReading joint positions from both hands..." << std::endl;
+    // UMI 协议支持主动查询位置
+    std::cout << "\nNote: UMI protocol supports active position query." << std::endl;
+    std::cout << "      Use GetJointMotorPosi() or GetAllJointMotorPosi() to get position data." << std::endl;
   }
 
   std::cout << "\n[Done]: Example completed successfully!" << std::endl;

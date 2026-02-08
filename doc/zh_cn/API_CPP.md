@@ -93,9 +93,9 @@ if (!hand || !hand->Init()) {
     return -1;
 }
 
-// 设置电机位置（O10 范围：0-4096）
-std::vector<int16_t> positions{500, 2081, 4094, 2029, 4094, 4094, 2048, 4094, 4000, 4094};
-hand->SetAllJointMotorPosi(positions);
+// 设置关节角度（单位：弧度，O10 有 10 个关节）
+std::vector<double> angles(10, 0.0);  // 所有关节归零
+hand->SetAllActiveJointAngles(angles);
 ```
 
 ### OmniHand Pro 2025 (O12)
@@ -116,9 +116,9 @@ if (!hand || !hand->Init()) {
     return -1;
 }
 
-// 设置电机位置（O12 范围：0-2000）
-std::vector<int16_t> positions{500, 1000, 1500, 2000, 1000, 1500, 500, 1000, 1500, 2000, 1000, 1500};
-hand->SetAllJointMotorPosi(positions);
+// 设置关节角度（单位：弧度，O12 有 12 个关节）
+std::vector<double> angles(12, 0.0);  // 所有关节归零
+hand->SetAllActiveJointAngles(angles);
 ```
 
 ### OmniHand Dex UMI
