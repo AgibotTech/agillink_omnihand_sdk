@@ -45,7 +45,7 @@ def test_get_vendor_info(hand):
     assert hand.init(), "Failed to initialize device"
     vendor_info = hand.get_vendor_info()
     print(f"\n[get_vendor_info] Vendor Info:")
-    print(vendor_info.to_string())
+    print(str(vendor_info))
     assert vendor_info.dof == 10  # UMI has 10 DOF
 
 
@@ -54,7 +54,7 @@ def test_get_device_info(hand):
     assert hand.init(), "Failed to initialize device"
     device_info = hand.get_device_info()
     print(f"\n[get_device_info] Device Info:")
-    print(device_info.to_string())
+    print(str(device_info))
     assert device_info.hand_device_id == 1
 
 
