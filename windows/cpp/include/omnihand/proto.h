@@ -169,7 +169,8 @@ enum class AGIBOT_EXPORT EMsgType : unsigned char {
   eCurrentThreshold = 0x03,
   eTactileSensor = 0x05,
   eAllTactileSensor = 0x06,  // All tactile sensor data (1D sensors, O10 only)
-  ePositionCalibration = 0x07,
+  eMaxPositionCalibration = 0x07,  // UMI: Maximum position calibration (Pn7), sub-register 0x00=all 10 joints, 0x01-0x0A=individual joints
+  eMinPositionCalibration = 0x08,  // UMI: Minimum position calibration (Pn8), sub-register 0x00=all 10 joints, 0x01-0x0A=individual joints
   eCtrlMode = 0x10,
   eTorqueCtrl = 0x11,
   eVeloCtrl = 0x12,
@@ -229,23 +230,10 @@ struct AGIBOT_EXPORT CommuParams {
 
 /**
  * @brief 设备信息
- * @note For OmniHand Dex UMI, this structure may also contain:
- *       - Pn2.03: Position report frequency (2 bytes, Hz, default 100)
- *       - Pn2.04: Tactile sensor report frequency (2 bytes, Hz, default 100)
- *       - Pn2.05: ADC channel count (1 byte, read-only)
- *       - Pn2.06: Tactile sensor information (variable length, read-only)
- *                 byte0: sensor count, byte1-N: point count per channel
  */
 struct AGIBOT_EXPORT DeviceInfo {
   unsigned char hand_device_id;   // 手部设备ID
   CommuParams commu_params;  // 通信参数
-
-  // UMI-specific fields (optional, only populated for OmniHand Dex UMI)
-  std::optional<uint16_t> position_report_frequency;        // Pn2.03: Position report frequency (Hz, default 100, 2 bytes)
-  std::optional<uint16_t> tactile_sensor_report_frequency; // Pn2.04: Tactile sensor report frequency (Hz, default 100, 2 bytes)
-  std::optional<unsigned char> adc_channel_count;          // Pn2.05: ADC channel count (1 byte, read-only)
-  std::optional<std::vector<unsigned char>> tactile_sensor_info; // Pn2.06: Tactile sensor information (variable length, read-only)
-                                                                  // byte0: sensor count, byte1-N: point count per channel
 
   std::string toString() const {
     std::vector<std::string> vecBitrate = {"125Kbps", "500Kbps", "1Mbps", "5Mbps"};
@@ -257,32 +245,6 @@ struct AGIBOT_EXPORT DeviceInfo {
             << "\nArbitration Sample Point: " << vecSamplePoint[commu_params.sample_point_]
             << "\nData Bitrate: " << vecBitrate[commu_params.dbitrate_]
             << "\nData Sample Point: " << vecSamplePoint[commu_params.dsample_point_];
-
-    // Add UMI-specific fields if present
-    if (position_report_frequency.has_value()) {
-      sstream << "\nPosition Report Frequency: " << position_report_frequency.value() << " Hz";
-    }
-    if (tactile_sensor_report_frequency.has_value()) {
-      sstream << "\nTactile Sensor Report Frequency: " << tactile_sensor_report_frequency.value() << " Hz";
-    }
-    if (adc_channel_count.has_value()) {
-      sstream << "\nADC Channel Count: " << static_cast<unsigned int>(adc_channel_count.value());
-    }
-    if (tactile_sensor_info.has_value() && !tactile_sensor_info.value().empty()) {
-      sstream << "\nTactile Sensor Info: ";
-      const auto& info = tactile_sensor_info.value();
-      if (info.size() > 0) {
-        sstream << "Sensor Count: " << static_cast<unsigned int>(info[0]);
-        if (info.size() > 1) {
-          sstream << ", Point Counts: [";
-          for (size_t i = 1; i < info.size(); ++i) {
-            if (i > 1) sstream << ", ";
-            sstream << static_cast<unsigned int>(info[i]);
-          }
-          sstream << "]";
-        }
-      }
-    }
 
     return sstream.str();
   }
