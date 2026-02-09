@@ -14,7 +14,7 @@ Each product has its own interface class (`OmniHand2025`, `OmniHandPro2025`, `Om
 
 - **[OmniHand 2025 (O10) Python API](API_PYTHON_O10.md)** - 10 DOF, 1D tactile sensors, supports CAN and RS485
 - **[OmniHand Pro 2025 (O12) Python API](API_PYTHON_O12.md)** - 12 DOF, 3D tactile sensors, CAN only
-- **[OmniHand Dex UMI (O10 UMI) Python API](API_PYTHON_UMI.md)** - 10 DOF, UMI protocol, periodic reports, CAN only
+- **[OmniHand Dex UMI (O10 UMI) Python API](API_PYTHON_UMI.md)** - 10 DOF, UMI protocol, active query, CAN only
 
 ## Common Enumerations
 

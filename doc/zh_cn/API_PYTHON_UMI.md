@@ -135,39 +135,6 @@ def get_all_joint_positions(self) -> List[int]:
     """
 ```
 
-### 位置校准
-
-```python
-def set_position_report_callback(self, callback: Optional[Callable[[List[int]], None]], 
-                                 frequency: Optional[int] = None) -> None:
-    """注册位置周期上报回调函数（UMI 协议 Pn3，Pn2.03 设置频率）。
-    
-    Args:
-        callback: 接收到位置数据时调用的回调函数。
-                 回调函数接收位置值列表（电压值，单位：mV）。
-                 如果为 None，将取消注册回调。
-        frequency: 可选频率（Hz，如果提供，在注册回调前设置 Pn2.03，默认：100）。
-    
-    Note:
-        回调在后台线程中执行，因此应该是线程安全的。
-    """
-
-def set_tactile_sensor_report_callback(self, 
-                                       callback: Optional[Callable[[TactileSensorData, int], None]], 
-                                       frequency: Optional[int] = None) -> None:
-    """注册触觉传感器周期上报回调函数（UMI 协议 Pn6，Pn2.04 设置频率）。
-    
-    Args:
-        callback: 接收到触觉传感器数据时调用的回调函数。
-                 回调函数接收 (sensor_data: TactileSensorData, sensor_id: int)。
-                 sensor_id 是子寄存器地址（0x01~0x06，UMI 无手背传感器）。
-                 如果为 None，将取消注册回调。
-        frequency: 可选频率（Hz，如果提供，在注册回调前设置 Pn2.04，默认：100）。
-    
-    Note:
-        回调在后台线程中执行，因此应该是线程安全的。
-    """
-```
 
 ### 触觉传感器数据
 
@@ -198,13 +165,11 @@ def get_tactile_sensor_data_raw(self, eFinger: EFinger) -> TactileSensorData:
 
 ## 重要注意事项
 
-1. **无位置/速度/力矩控制**：OmniHand Dex UMI (O10 UMI) 是**只读**设备。它不支持位置、速度或力矩控制。它仅通过周期上报提供位置信息。
+1. **无位置/速度/力矩控制**：OmniHand Dex UMI (O10 UMI) 是**只读**设备。它不支持位置、速度或力矩控制。它仅通过主动查询提供位置信息。
 
-2. **周期上报**：UMI 协议支持位置和触觉传感器数据的周期上报。使用回调函数异步接收此数据。
+2. **主动查询位置**：UMI 协议支持通过 `get_joint_position()` 或 `get_all_joint_positions()` 主动查询关节位置。位置值范围为 0-4096。
 
-3. **线程安全**：回调函数在后台线程中执行。确保您的回调是线程安全的。
-
-4. **位置校准**：位置校准（最小/最大）是只写操作。调用校准函数时，设备应处于适当的位置。
+3. **位置校准**：位置校准（最小/最大）是只写操作。调用校准函数时，设备应处于适当的位置。
 
 ## 完整示例
 
@@ -224,24 +189,13 @@ if not hand.init():
     print("初始化 OmniHand Dex UMI (O10 UMI) 失败")
     exit(1)
 
-# 注册位置上报回调
-def position_callback(positions):
-    print(f"位置上报: {len(positions)} 个值")
+# 查询关节位置（主动查询）
+positions = hand.get_all_joint_positions()
+print(f"所有关节位置 ({len(positions)} 个值): {positions}")
 
-hand.set_position_report_callback(position_callback, frequency=100)  # 100 Hz
-
-# 注册触觉传感器上报回调
-def tactile_callback(sensor_data, sensor_id):
-    print(f"触觉传感器上报: sensor_id={sensor_id}, data_size={len(sensor_data.data)}")
-
-hand.set_tactile_sensor_report_callback(tactile_callback, frequency=100)  # 100 Hz
-
-# 保持运行以接收周期上报
-time.sleep(10)
-
-# 取消注册回调
-hand.set_position_report_callback(None)
-hand.set_tactile_sensor_report_callback(None)
+# 获取触觉传感器数据
+tactile_data = hand.get_all_tactile_sensor_data_raw()
+print(f"触觉传感器: {len(tactile_data)} 个传感器")
 ```
 
 ## 相关文档

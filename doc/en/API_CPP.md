@@ -14,7 +14,7 @@ Each product has its own interface class (`OmniHand2025`, `OmniHandPro2025`, `Om
 
 - **[OmniHand 2025 (O10) C++ API](API_CPP_O10.md)** - 10 DOF, 1D tactile sensors, supports CAN and RS485
 - **[OmniHand Pro 2025 (O12) C++ API](API_CPP_O12.md)** - 12 DOF, 3D tactile sensors, CAN only
-- **[OmniHand Dex UMI (O10 UMI) C++ API](API_CPP_O10_UMI.md)** - 10 DOF, UMI protocol, periodic reports, CAN only
+- **[OmniHand Dex UMI (O10 UMI) C++ API](API_CPP_O10_UMI.md)** - 10 DOF, UMI protocol, active query, CAN only
 
 ## Common Enums and Data Structures
 

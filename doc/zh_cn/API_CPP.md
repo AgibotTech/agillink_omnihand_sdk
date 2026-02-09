@@ -14,7 +14,7 @@ OmniHand 2025 SDK 为三种不同的产品提供了**产品特定的接口**：
 
 - **[OmniHand 2025 (O10) C++ API](API_CPP_O10.md)** - 10 自由度，1D 触觉传感器，支持 CAN 和 RS485
 - **[OmniHand Pro 2025 (O12) C++ API](API_CPP_O12.md)** - 12 自由度，3D 触觉传感器，仅支持 CAN
-- **[OmniHand Dex UMI (O10 UMI) C++ API](API_CPP_O10_UMI.md)** - 10 自由度，UMI 协议，周期上报，仅支持 CAN
+- **[OmniHand Dex UMI (O10 UMI) C++ API](API_CPP_O10_UMI.md)** - 10 自由度，UMI 协议，主动查询，仅支持 CAN
 
 ## 通用枚举和数据结构
 
@@ -145,28 +145,6 @@ hand->SetPositionReportCallback([](const std::vector<int16_t>& positions) {
 }, 100);  // 100 Hz 频率
 ```
 
-## 从统一接口迁移
-
-如果您之前使用的是旧的统一 `OmniHand::createHandByZlgcan(ProductType, ...)` 接口：
-
-**旧代码：**
-```cpp
-auto hand = OmniHand::createHandByZlgcan(
-    ProductType::OMNIHAND_2025,
-    EHandType::eLeft,
-    1, 0, 0
-);
-```
-
-**新代码：**
-```cpp
-auto hand = OmniHand2025::createHandByZlgcan(
-    EHandType::eLeft,
-    1, 0, 0
-);
-```
-
-产品类型现在由您使用的类确定，提供了更好的类型安全性和编译时检查。
 
 ## 相关文档
 

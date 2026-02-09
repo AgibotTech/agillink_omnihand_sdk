@@ -360,7 +360,9 @@ OmniHand Dex UMI (O10 UMI) uses **1D tactile sensors** similar to OmniHand 2025 
 - **Data unit**: 1g
 - **Max value**: 255g
 - **Sensor locations**: Fingers (Thumb, Index, Middle, Ring, Little), Palm (Note: UMI has no Dorsum sensor)
-- **Protocol**: UMI Protocol Pn6 (read-only, sub-register 0x01~0x06)
+- **Protocol**: UMI Protocol Pn6 (read-only)
+  - **Pn6.00**: Read all sensor data (6 sensors)
+  - **Pn6.01~Pn6.06**: Read individual sensor data (sensor 1-6)
 
 ```python
 def get_all_tactile_sensor_data_raw(self) -> List[TactileSensorData]:
@@ -396,6 +398,9 @@ def get_sensor_data_length(finger_index: int) -> int:
     
     Returns:
         int: Sensor data length in bytes.
+    
+    Note:
+        For UMI: Returns 0 for EFinger.DORSUM (UMI does not have dorsum sensor).
     """
 
 @staticmethod
@@ -404,6 +409,11 @@ def get_sensor_order() -> List[int]:
     
     Returns:
         List[int]: Reference to sensor order vector.
+    
+    Note:
+        For UMI: The returned list includes EFinger.DORSUM, but UMI devices do not have dorsum sensor.
+        When using get_all_tactile_sensor_data_raw(), only sensors available on UMI 
+        (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM) are returned.
     """
 ```
 
@@ -420,13 +430,11 @@ def show_data_details(self, show: bool) -> None:
 
 ## Important Notes
 
-1. **No Position/Velocity/Torque Control**: OmniHand Dex UMI (O10 UMI) is a **read-only** device. It does not support position, velocity, or torque control. It only provides position information via periodic reports.
+1. **No Position/Velocity/Torque Control**: OmniHand Dex UMI (O10 UMI) is a **read-only** device. It does not support position, velocity, or torque control. It only provides position information via active query.
 
-2. **Periodic Reports**: UMI protocol supports periodic reports for position and tactile sensor data. Use callbacks to receive this data asynchronously.
+2. **Active Position Query**: UMI protocol supports actively querying joint positions using `get_joint_position()` or `get_all_joint_positions()`. Position values range from 0-4096.
 
-3. **Thread Safety**: Callback functions are executed in a background thread. Ensure your callbacks are thread-safe.
-
-4. **Position Calibration**: Position calibration (min/max) is a write-only operation. The device should be in the appropriate position when calling calibration functions.
+3. **Position Calibration**: Position calibration (min/max) is a write-only operation. The device should be in the appropriate position when calling calibration functions.
 
 ## Complete Example
 
@@ -450,43 +458,35 @@ if not hand.init():
 vendor = hand.get_vendor_info()
 print(vendor)
 
-# Get device information (includes UMI-specific fields)
+# Get device information
 device_info = hand.get_device_info()
 print(device_info)
 
-# Register position report callback
-def position_callback(positions):
-    print(f"Position report: {len(positions)} values")
+# Query joint positions (active query)
+positions = hand.get_all_joint_positions()
+print(f"All joint positions ({len(positions)} values): {positions}")
 
-hand.set_position_report_callback(position_callback, frequency=100)  # 100 Hz
-
-# Register tactile sensor report callback
-def tactile_callback(sensor_data, sensor_id):
-    print(f"Tactile sensor report: sensor_id={sensor_id}, data_size={len(sensor_data.data)}")
-
-hand.set_tactile_sensor_report_callback(tactile_callback, frequency=100)  # 100 Hz
-
-# Keep running to receive periodic reports
-time.sleep(10)
-
-# Unregister callbacks
-hand.set_position_report_callback(None)
-hand.set_tactile_sensor_report_callback(None)
+# Get tactile sensor data
+tactile_data = hand.get_all_tactile_sensor_data_raw()
+print(f"Tactile sensors: {len(tactile_data)} sensors")
 ```
 
 ## UMI Protocol Register Reference
 
 - **Pn1**: Vendor information (read-only)
 - **Pn2**: Device information (read-only)
-  - **Pn2.03**: Position report frequency (read-write, 2 bytes, Hz, default 100)
-  - **Pn2.04**: Tactile sensor report frequency (read-write, 2 bytes, Hz, default 100)
-  - **Pn2.05**: ADC channel count (read-only, 1 byte)
-  - **Pn2.06**: Tactile sensor information (read-only, variable length)
-- **Pn3**: Position information (read-only, periodic report)
-- **Pn6**: Tactile sensor data (read-only, sub-register 0x01~0x06, UMI has no Dorsum)
-- **Pn7**: Position calibration (write-only)
-  - **Pn7.00**: Minimum position calibration
-  - **Pn7.01**: Maximum position calibration
+- **Pn3**: Position information (read-only, active query)
+  - **Pn3.00**: Read all joint positions (10 values)
+  - **Pn3.01~Pn3.0A**: Read individual joint position (joint 1-10)
+- **Pn6**: Tactile sensor data (read-only)
+  - **Pn6.00**: Read all sensor data (6 sensors: Thumb, Index, Middle, Ring, Little, Palm, UMI has no Dorsum)
+  - **Pn6.01~Pn6.06**: Read individual sensor data (sensor 1-6)
+- **Pn7**: Maximum position calibration (write-only)
+  - **Pn7.00**: Set all joints max position at once
+  - **Pn7.01~Pn7.0A**: Set individual joint max position (joint 1-10)
+- **Pn8**: Minimum position calibration (write-only)
+  - **Pn8.00**: Set all joints min position at once
+  - **Pn8.01~Pn8.0A**: Set individual joint min position (joint 1-10)
 
 ## Related Documentation
 

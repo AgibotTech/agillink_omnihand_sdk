@@ -175,52 +175,41 @@ void SetMaxPositionCalibration();
 void SetMaxPositionCalibration(unsigned char joint_index);
 ```
 
-### 周期上报频率设置
-
-```cpp
-/**
- * @brief 设置位置上报频率（UMI 协议 Pn2.03）
- * @param frequency 上报频率（Hz，默认：100）
- * @note 将频率设置为 0 将禁用周期上报
- */
-void SetPositionReportFrequency(uint16_t frequency);
-
-/**
- * @brief 设置触觉传感器上报频率（UMI 协议 Pn2.04）
- * @param frequency 上报频率（Hz，默认：100）
- * @note 将频率设置为 0 将禁用周期上报
- */
-void SetTactileSensorReportFrequency(uint16_t frequency);
-```
-
-### 周期上报回调
-
-```cpp
-/**
- * @brief 注册位置周期上报回调函数（UMI 协议 Pn3，Pn2.03 设置频率）
- * @param callback 接收到位置数据时调用的回调函数
- * @param frequency 可选频率（Hz，如果提供，在注册回调前设置 Pn2.03，默认：100）
- * @note 回调在 RecvFrame 线程中执行，因此应该是线程安全的
- * @note 如果 callback 为 nullptr，将取消注册回调
- */
-void SetPositionReportCallback(PositionReportCallback callback, std::optional<uint16_t> frequency = std::nullopt);
-
-/**
- * @brief 注册触觉传感器周期上报回调函数（UMI 协议 Pn6，Pn2.04 设置频率）
- * @param callback 接收到触觉传感器数据时调用的回调函数
- * @param frequency 可选频率（Hz，如果提供，在注册回调前设置 Pn2.04，默认：100）
- * @note 回调在 RecvFrame 线程中执行，因此应该是线程安全的
- * @note 如果 callback 为 nullptr，将取消注册回调
- */
-void SetTactileSensorReportCallback(TactileSensorReportCallback callback, std::optional<uint16_t> frequency = std::nullopt);
-```
 
 ### 触觉传感器数据
 
 ```cpp
+/**
+ * @brief 一次性获取所有 1D 触觉传感器原始数据
+ * @return TactileSensorData 结构向量
+ * @note 返回完整分辨率数据。使用 UMI 协议 Pn6。
+ * @note UMI 设备只有 6 个传感器：Thumb, Index, Middle, Ring, Little, Palm（无手背传感器）
+ */
 std::vector<TactileSensorData> GetAllTactileSensorDataRaw() const;
+
+/**
+ * @brief 获取单个传感器的 1D 触觉传感器原始数据
+ * @param eFinger 手指/手心枚举值
+ * @return 包含完整分辨率数据的 TactileSensorData 结构
+ * @note 使用 UMI 协议 Pn6。
+ * @note UMI 不支持 eDorsum（手背传感器）
+ */
 TactileSensorData GetTactileSensorDataRaw(EFinger eFinger) const;
+
+/**
+ * @brief 获取特定手指的传感器数据长度（静态方法）
+ * @param eFinger 手指枚举值
+ * @return 传感器数据长度（字节）
+ * @note 对于 UMI：eDorsum 返回 0（UMI 没有手背传感器）
+ */
 static size_t GetSensorDataLength(EFinger eFinger);
+
+/**
+ * @brief 获取传感器顺序向量（静态方法）
+ * @return 传感器顺序向量的引用
+ * @note 对于 UMI：返回的向量包含 eDorsum，但 UMI 设备没有手背传感器。
+ *       使用 GetAllTactileSensorDataRaw() 时，只返回 UMI 上可用的传感器（Thumb, Index, Middle, Ring, Little, Palm）。
+ */
 static const std::vector<EFinger>& GetSensorOrder();
 ```
 
@@ -262,29 +251,18 @@ int main() {
         return -1;
     }
 
-    // 注册位置上报回调
-    hand->SetPositionReportCallback(
-        [](const std::vector<int16_t>& positions) {
-            std::cout << "位置上报: " << positions.size() << " 个值" << std::endl;
-        },
-        100  // 100 Hz 频率
-    );
+    // 查询关节位置（主动查询）
+    auto positions = hand->GetAllJointMotorPosi();
+    std::cout << "所有关节位置 (" << positions.size() << " 个值): ";
+    for (size_t i = 0; i < positions.size(); ++i) {
+        std::cout << positions[i];
+        if (i < positions.size() - 1) std::cout << ", ";
+    }
+    std::cout << std::endl;
 
-    // 注册触觉传感器上报回调
-    hand->SetTactileSensorReportCallback(
-        [](const TactileSensorData& sensor_data, unsigned char sensor_id) {
-            std::cout << "触觉传感器上报: sensor_id=" << static_cast<int>(sensor_id)
-                      << ", data_size=" << sensor_data.data_.size() << std::endl;
-        },
-        100  // 100 Hz 频率
-    );
-
-    // 保持运行以接收周期上报
-    std::this_thread::sleep_for(std::chrono::seconds(10));
-
-    // 取消注册回调
-    hand->SetPositionReportCallback(nullptr);
-    hand->SetTactileSensorReportCallback(nullptr);
+    // 获取触觉传感器数据
+    auto tactile_data = hand->GetAllTactileSensorDataRaw();
+    std::cout << "触觉传感器: " << tactile_data.size() << " 个传感器" << std::endl;
 
     return 0;
 }
@@ -294,15 +272,18 @@ int main() {
 
 - **Pn1**: 厂商信息（只读）
 - **Pn2**: 设备信息（只读）
-  - **Pn2.03**: 位置上报频率（读写，2 字节，Hz，默认 100）
-  - **Pn2.04**: 触觉传感器上报频率（读写，2 字节，Hz，默认 100）
-  - **Pn2.05**: ADC 通道数（只读，1 字节）
-  - **Pn2.06**: 触觉传感器信息（只读，可变长度）
-- **Pn3**: 位置信息（只读，周期上报）
-- **Pn6**: 触觉传感器数据（只读，子寄存器 0x01~0x06，UMI 无手背传感器）
-- **Pn7**: 位置校准（只写）
-  - **Pn7.00**: 最小位置校准
-  - **Pn7.01**: 最大位置校准
+- **Pn3**: 位置信息（只读，主动查询）
+  - **Pn3.00**: 读取所有关节位置（10个值）
+  - **Pn3.01~Pn3.0A**: 读取单个关节位置（关节1-10）
+- **Pn6**: 触觉传感器数据（只读）
+  - **Pn6.00**: 读取所有传感器数据（6个传感器：Thumb, Index, Middle, Ring, Little, Palm，UMI无手背传感器）
+  - **Pn6.01~Pn6.06**: 读取单个传感器数据（传感器1-6）
+- **Pn7**: 最大位置校准（只写）
+  - **Pn7.00**: 一次性设置所有关节的最大位置
+  - **Pn7.01~Pn7.0A**: 设置单个关节的最大位置（关节 1-10）
+- **Pn8**: 最小位置校准（只写）
+  - **Pn8.00**: 一次性设置所有关节的最小位置
+  - **Pn8.01~Pn8.0A**: 设置单个关节的最小位置（关节 1-10）
 
 ## 相关文档
 
