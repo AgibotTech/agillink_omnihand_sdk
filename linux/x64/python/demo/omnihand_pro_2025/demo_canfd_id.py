@@ -16,7 +16,7 @@ OmniHand Pro 2025 综合控制示例 - CANFD 通信（通过 canfd_id）
 
 import sys
 import time
-from omnihand import OmniHandPro2025, EHandType, EFinger
+from omnihand import OmniHandPro2025, HandType, Finger
 
 
 def print_usage(program_name):
@@ -64,7 +64,7 @@ def control_single_hand(hand, hand_name):
     # 读取 3D 触觉传感器数据（O12 特有）
     print("\n--- 3D Tactile Sensor Data (O12 only) ---")
     try:
-        thumb_sensor = hand.get_tactile_sensor_3d_data(EFinger.THUMB)
+        thumb_sensor = hand.get_tactile_sensor_3d_data(Finger.THUMB)
         print(f"  Thumb:")
         print(f"    Online State: {'Online' if thumb_sensor.online_state else 'Offline'}")
         print(f"    Normal Force: {thumb_sensor.normal_force} (0.1N, max: 3000)")
@@ -72,7 +72,7 @@ def control_single_hand(hand, hand_name):
         print(f"    Tangent Force Angle: {thumb_sensor.tangent_force_angle}°")
         print(f"    Channel Values: {thumb_sensor.channel_values}")
 
-        index_sensor = hand.get_tactile_sensor_3d_data(EFinger.INDEX)
+        index_sensor = hand.get_tactile_sensor_3d_data(Finger.INDEX)
         print(f"  Index:")
         print(f"    Online State: {'Online' if index_sensor.online_state else 'Offline'}")
         print(f"    Normal Force: {index_sensor.normal_force} (0.1N, max: 3000)")
@@ -186,7 +186,7 @@ def main():
     if mode == "left":
         # 创建左手实例
         left_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=0  # 第一个通道
@@ -206,7 +206,7 @@ def main():
     elif mode == "right":
         # 创建右手实例
         right_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=EHandType.RIGHT,
+            hand_type=HandType.RIGHT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=0  # 第一个通道
@@ -226,14 +226,14 @@ def main():
     elif mode == "both":
         # both 模式：同时创建两个手
         left_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=0  # 第一个通道
         )
 
         right_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=EHandType.RIGHT,
+            hand_type=HandType.RIGHT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=1  # 第二个通道（需要多通道适配器）

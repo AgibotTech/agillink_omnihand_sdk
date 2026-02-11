@@ -27,7 +27,7 @@ class OmniHandDexUmiCanImpl;
  * @brief OmniHand Dex UMI interface class - 10 DOF, UMI Protocol
  * 
  * This class provides the public interface for OmniHand Dex UMI product.
- * UMI uses a different protocol (Pn1-Pn7) and supports periodic reports via callbacks.
+ * UMI uses a different protocol (Pn1-Pn8) and supports active position query.
  * Note: UMI does not support position/velocity/torque control (read-only position information).
  */
 class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
@@ -49,7 +49,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
    * @return A unique pointer to OmniHandDexUMI instance
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
       unsigned char canfd_channel_id = 0);
@@ -65,7 +65,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
    * @return A unique pointer to OmniHandDexUMI instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& usbcanfd_serial_number,
       unsigned char canfd_channel_id = 0);
@@ -79,7 +79,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
    * @return A unique pointer to OmniHandDexUMI instance
    */
   static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& can_interface = "can0");
 #endif
@@ -95,7 +95,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
    * @return A unique pointer to OmniHandDexUMI instance
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
       unsigned char canfd_channel_id = 0);
@@ -111,13 +111,17 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
    * @return A unique pointer to OmniHandDexUMI instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& hcan_serial_number,
       unsigned char canfd_channel_id = 0);
 
   // ============ Sensor Utilities (from OmniHandSensorBase) ============
   // GetSensorDataLength and GetSensorOrder are inherited from OmniHandSensorBase
+  // Note: For UMI, GetSensorDataLength returns 0 for DORSUM (UMI does not have dorsum sensor)
+  //       GetSensorOrder includes DORSUM, but UMI cannot retrieve dorsum sensor data.
+  //       Calling GetTactileSensorDataRaw(DORSUM) will fail and return empty data.
+  //       GetAllTactileSensorDataRaw() only returns sensors available on UMI (Thumb, Index, Middle, Ring, Little, Palm)
 
   // ============ Position Query (UMI Protocol Pn3=0x13) ============
   /**
@@ -169,7 +173,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
    * @param hand_type Hand type (left/right)
    * @note Product type is fixed to ProductType::OMNIHAND_DEX_UMI for this class
    */
-  void Reset(unsigned char device_id, EHandType hand_type) {
+  void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_DEX_UMI, device_id, hand_type);
   }
 };

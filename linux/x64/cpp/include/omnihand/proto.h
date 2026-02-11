@@ -20,105 +20,127 @@
 #pragma pack(push, 1)
 
 /**
- * @brief 报文CanId
+ * @brief Hand type enumeration
  */
-struct AGIBOT_EXPORT CanId {
-  unsigned char device_id_ : 7;
-  unsigned char rw_flag_ : 1;
-  unsigned char product_id_ : 7;
-  unsigned char res1 : 1;
-  unsigned char msg_type_;
-  unsigned char msg_id_;
+enum class AGIBOT_EXPORT HandType : unsigned char {
+  LEFT = 0,      // Left hand
+  RIGHT = 1,     // Right hand
+  UNKNOWN = 255  // Unknown hand type
 };
 
 /**
- * @brief 联合体CanId
+ * @brief Convert HandType enum to string
+ * @param hand_type Hand type enum value
+ * @return String representation of the hand type
  */
-union AGIBOT_EXPORT UnCanId {
-  CanId st_can_Id_;
-  unsigned int ui_can_id_;
-
-  UnCanId() {
-    ui_can_id_ = 0;
+inline std::string ToString(HandType hand_type) {
+  switch (hand_type) {
+    case HandType::LEFT: return "Left";
+    case HandType::RIGHT: return "Right";
+    default: return "Unknown";
   }
-};
+}
 
 /**
- * @brief 手型枚举
- */
-enum class AGIBOT_EXPORT EHandType : unsigned char {
-  eLeft = 0,
-  eRight = 1,
-  eUnknown = 10
-};
-
-/**
- * @brief 产品类型枚举
+ * @brief Product type enumeration
  */
 enum class AGIBOT_EXPORT ProductType : unsigned char {
   OMNIHAND_2025 = 0,        // OmniHand 2025 (10 DOF)
   OMNIHAND_PRO_2025 = 1,    // OmniHand Pro 2025 (12 DOF)
   OMNIHAND_DEX_UMI = 2,     // OmniHand Dex UMI (10 DOF, UMI protocol)
-  UNKNOWN_PRODUCT_TYPE = 255
+  OMNIHAND_3_LITE = 3,      // OmniHand 3 Lite S (4 DOF)
+  UNKNOWN = 255             // Unknown product type
 };
 
 /**
- * @brief Finger enumeration (Unified for O10 and O12)
- * @note O12 does not support ePalm and eDorsum sensors, using these will result in runtime error
+ * @brief Convert ProductType enum to string
+ * @param product_type Product type enum value
+ * @return String representation of the product type
  */
-enum class AGIBOT_EXPORT EFinger : unsigned char {
-  eThumb = 0x01,   // 拇指
-  eIndex = 0x02,   // 食指
-  eMiddle = 0x03,  // 中指
-  eRing = 0x04,    // 无名指
-  eLittle = 0x05,  // 小指
-  ePalm = 0x06,    // 手心 (O10 only, not supported by O12)
-  eDorsum = 0x07,  // 手背 (O10 only, not supported by O12)
-  eUnknown = 0xff
-};
-
-/**
- * @brief Convert EFinger enum to string
- * @param finger Finger enum value
- * @return String representation of the finger
- */
-inline std::string ToString(EFinger finger) {
-  switch (finger) {
-    case EFinger::eThumb: return "Thumb";
-    case EFinger::eIndex: return "Index";
-    case EFinger::eMiddle: return "Middle";
-    case EFinger::eRing: return "Ring";
-    case EFinger::eLittle: return "Little";
-    case EFinger::ePalm: return "Palm";
-    case EFinger::eDorsum: return "Dorsum";
-    case EFinger::eUnknown: return "Unknown";
-    default: return "Invalid";
+inline std::string ToString(ProductType product_type) {
+  switch (product_type) {
+    case ProductType::OMNIHAND_2025: return "OmniHand 2025";
+    case ProductType::OMNIHAND_PRO_2025: return "OmniHand Pro 2025";
+    case ProductType::OMNIHAND_DEX_UMI: return "OmniHand Dex UMI";
+    case ProductType::OMNIHAND_3_LITE: return "OmniHand 3 Lite";
+    default: return "Unknown";
   }
 }
 
 /**
- * @brief 控制模式枚举 (Unified for O10 and O12)
- * @note O10 and O12 use the same control mode protocol (Pn16):
- *       ePosi=0, eServo=1, eVelo=2, eTorque=3, ePosiTorque=4, eVeloTorque=5, ePosiVeloTorque=6
- * @note According to protocol specification:
- *       - ePosi (0): Position control mode - supported
- *       - eServo (1): Servo control mode - supported
- *       - eVelo (2): Velocity control mode - marked as "暂不支持" (not yet supported) in protocol
- *       - eTorque (3): Torque control mode - defined in protocol but may not be fully supported
- *       - ePosiTorque (4): Position-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
- *       - eVeloTorque (5): Velocity-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
- *       - ePosiVeloTorque (6): Position-Velocity-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
+ * @brief Finger enumeration (Unified for O10 and O12)
+ * @note O12 does not support PALM and DORSUM sensors, using these will result in runtime error
  */
-enum class AGIBOT_EXPORT EControlMode : unsigned char {
-  ePosi = 0,            // 位置模式
-  eServo = 1,          // 伺服模式
-  eVelo = 2,            // 速度模式 (协议标记为暂不支持)
-  eTorque = 3,          // 力控模式
-  ePosiTorque = 4,      // 位置力控模式 (混合控制：位置+力矩，协议标记为暂不支持)
-  eVeloTorque = 5,      // 速度力控模式 (混合控制：速度+力矩，协议标记为暂不支持)
-  ePosiVeloTorque = 6,  // 位置速度力控模式 (混合控制：位置+速度+力矩，协议标记为暂不支持)
-  eUnknown = 10         // 未知模式
+enum class AGIBOT_EXPORT Finger : unsigned char {
+  THUMB = 0x01,    // Thumb
+  INDEX = 0x02,    // Index finger
+  MIDDLE = 0x03,   // Middle finger
+  RING = 0x04,     // Ring finger
+  LITTLE = 0x05,   // Little finger
+  PALM = 0x06,     // Palm (O10 only, not supported by O12)
+  DORSUM = 0x07,   // Dorsum (O10 only, not supported by O12)
+  UNKNOWN = 0xff   // Unknown finger
 };
+
+/**
+ * @brief Convert Finger enum to string
+ * @param finger Finger enum value
+ * @return String representation of the finger
+ */
+inline std::string ToString(Finger finger) {
+  switch (finger) {
+    case Finger::THUMB: return "Thumb";
+    case Finger::INDEX: return "Index";
+    case Finger::MIDDLE: return "Middle";
+    case Finger::RING: return "Ring";
+    case Finger::LITTLE: return "Little";
+    case Finger::PALM: return "Palm";
+    case Finger::DORSUM: return "Dorsum";
+    default: return "Unknown";
+  }
+}
+
+/**
+ * @brief Control mode enumeration (Unified for O10 and O12)
+ * @note O10 and O12 use the same control mode protocol (Pn16):
+ *       POSITION=0, SERVO=1, VELOCITY=2, TORQUE=3, POSITION_TORQUE=4, VELOCITY_TORQUE=5, POSITION_VELOCITY_TORQUE=6
+ * @note According to protocol specification:
+ *       - POSITION (0): Position control mode - supported
+ *       - SERVO (1): Servo control mode - supported
+ *       - VELOCITY (2): Velocity control mode - marked as "暂不支持" (not yet supported) in protocol
+ *       - TORQUE (3): Torque control mode - defined in protocol but may not be fully supported
+ *       - POSITION_TORQUE (4): Position-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
+ *       - VELOCITY_TORQUE (5): Velocity-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
+ *       - POSITION_VELOCITY_TORQUE (6): Position-Velocity-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
+ */
+enum class AGIBOT_EXPORT ControlMode : unsigned char {
+  POSITION = 0,                    // Position control mode
+  SERVO = 1,                       // Servo control mode
+  VELOCITY = 2,                    // Velocity control mode (not yet supported)
+  TORQUE = 3,                      // Torque control mode
+  POSITION_TORQUE = 4,             // Position-Torque mixed control (not yet supported)
+  VELOCITY_TORQUE = 5,             // Velocity-Torque mixed control (not yet supported)
+  POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mixed control (not yet supported)
+  UNKNOWN = 10                     // Unknown control mode
+};
+
+/**
+ * @brief Convert ControlMode enum to string
+ * @param mode Control mode enum value
+ * @return String representation of the control mode
+ */
+inline std::string ToString(ControlMode mode) {
+  switch (mode) {
+    case ControlMode::POSITION: return "Position";
+    case ControlMode::SERVO: return "Servo";
+    case ControlMode::VELOCITY: return "Velocity";
+    case ControlMode::TORQUE: return "Torque";
+    case ControlMode::POSITION_TORQUE: return "Position-Torque";
+    case ControlMode::VELOCITY_TORQUE: return "Velocity-Torque";
+    case ControlMode::POSITION_VELOCITY_TORQUE: return "Position-Velocity-Torque";
+    default: return "Unknown";
+  }
+}
 
 /**
  * @brief 关节电机错误上报
@@ -156,29 +178,8 @@ struct AGIBOT_EXPORT TactileSensor3DData {
  * @brief 单个传感器的1D触觉数据 (O10专用)
  */
 struct AGIBOT_EXPORT TactileSensorData {
-  EFinger sensor_id_;                   // 传感器ID (手指/手心/手背)
+  Finger sensor_id_;                   // 传感器ID (手指/手心/手背)
   std::vector<uint8_t> data_;           // 传感器数据，单位: 1g, 最大值: 255g
-};
-
-/**
- * @brief 消息类型枚举
- */
-enum class AGIBOT_EXPORT EMsgType : unsigned char {
-  eVendorInfo = 0x01,
-  eDeviceInfo = 0x02,
-  eCurrentThreshold = 0x03,
-  eTactileSensor = 0x05,
-  eAllTactileSensor = 0x06,  // All tactile sensor data (1D sensors, O10 only)
-  eMaxPositionCalibration = 0x07,  // UMI: Maximum position calibration (Pn7), sub-register 0x00=all 10 joints, 0x01-0x0A=individual joints
-  eMinPositionCalibration = 0x08,  // UMI: Minimum position calibration (Pn8), sub-register 0x00=all 10 joints, 0x01-0x0A=individual joints
-  eCtrlMode = 0x10,
-  eTorqueCtrl = 0x11,
-  eVeloCtrl = 0x12,
-  ePosiCtrl = 0x13,
-  eMixCtrl = 0x14,
-  eErrorReport = 0x20,
-  eTemperatureReport = 0x21,
-  eCurrentReport = 0x22,
 };
 
 /**
@@ -248,61 +249,6 @@ struct AGIBOT_EXPORT DeviceInfo {
 
     return sstream.str();
   }
-};
-
-// ============ OTA 相关结构体 ============
-
-struct AGIBOT_EXPORT OTAUpgradeReq {
-  unsigned int firmware_length_;
-  unsigned short package_num_;
-  unsigned short res1_;
-  unsigned int res2_;
-  unsigned int res3_;
-};
-
-struct AGIBOT_EXPORT OTAUpgradeRep {
-  unsigned int result_;
-};
-
-struct AGIBOT_EXPORT OTATransmitReq {
-  unsigned short package_index_;
-  unsigned short crc_;
-};
-
-struct AGIBOT_EXPORT OTATransmitRep {
-  unsigned int result_;
-};
-
-struct AGIBOT_EXPORT OTAFinishReq {
-  unsigned int res_{};
-};
-
-struct AGIBOT_EXPORT OTAFinishRep {
-  unsigned int result_{};
-};
-
-struct AGIBOT_EXPORT OTARestartReq {
-  unsigned int delay_{};
-};
-
-struct AGIBOT_EXPORT OTARestartRep {
-  unsigned int result_{};
-};
-
-struct AGIBOT_EXPORT OTAResultReq {
-  unsigned int result_;
-};
-
-struct AGIBOT_EXPORT OTAResultRep {
-  unsigned int result_;
-};
-
-struct AGIBOT_EXPORT OTAExitReq {
-  unsigned int code_;
-};
-
-struct AGIBOT_EXPORT OTAExitRep {
-  unsigned int result_;
 };
 
 #pragma pack(pop)

@@ -20,47 +20,47 @@ Each product has its own interface class (`OmniHand2025`, `OmniHandPro2025`, `Om
 
 All products share common enumerations. These are documented in each product-specific API document, but here's a quick reference:
 
-### EHandType
+### HandType
 
 ```python
-from omnihand import EHandType
+from omnihand import HandType
 
 # Values
-EHandType.LEFT = 0      # Left hand
-EHandType.RIGHT = 1     # Right hand
-EHandType.UNKNOWN = 10
+HandType.LEFT = 0              # Left hand
+HandType.RIGHT = 1             # Right hand
+HandType.UNKNOWN = 255  # Unknown hand type
 ```
 
-### EFinger
+### Finger
 
 ```python
-from omnihand import EFinger
+from omnihand import Finger
 
 # Values
-EFinger.THUMB = 1
-EFinger.INDEX = 2
-EFinger.MIDDLE = 3
-EFinger.RING = 4
-EFinger.LITTLE = 5
-EFinger.PALM = 6
-EFinger.DORSUM = 7
-EFinger.UNKNOWN = 255
+Finger.THUMB = 1
+Finger.INDEX = 2
+Finger.MIDDLE = 3
+Finger.RING = 4
+Finger.LITTLE = 5
+Finger.PALM = 6
+Finger.DORSUM = 7
+Finger.UNKNOWN = 255
 ```
 
-### EControlMode
+### ControlMode
 
 ```python
-from omnihand import EControlMode
+from omnihand import ControlMode
 
 # Values
-EControlMode.POSITION = 0
-EControlMode.SERVO = 1            # Servo mode
-EControlMode.VELOCITY = 2
-EControlMode.TORQUE = 3           # Not supported (use mixed modes instead)
-EControlMode.POSITION_TORQUE = 4  # Mixed control
-EControlMode.VELOCITY_TORQUE = 5  # Mixed control
-EControlMode.POSITION_VELOCITY_TORQUE = 6  # Mixed control
-EControlMode.UNKNOWN = 10
+ControlMode.POSITIONTION = 0
+ControlMode.SERVO = 1            # Servo mode
+ControlMode.VELOCITYCITY = 2
+ControlMode.TORQUE = 3           # Not supported (use mixed modes instead)
+ControlMode.POSITIONTION_TORQUE = 4  # Mixed control
+ControlMode.VELOCITYCITY_TORQUE = 5  # Mixed control
+ControlMode.POSITIONTION_VELOCITYCITY_TORQUE = 6  # Mixed control
+ControlMode.UNKNOWN = 10
 ```
 
 **Note**: 
@@ -72,11 +72,11 @@ EControlMode.UNKNOWN = 10
 ### OmniHand 2025 (O10)
 
 ```python
-from omnihand import OmniHand2025, EHandType
+from omnihand import OmniHand2025, HandType
 
 # Create hand instance
 hand = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     device_id=1,
     canfd_id=0,
     channel_id=0
@@ -94,11 +94,11 @@ hand.set_all_active_joint_angles(angles)
 ### OmniHand Pro 2025 (O12)
 
 ```python
-from omnihand import OmniHandPro2025, EHandType
+from omnihand import OmniHandPro2025, HandType
 
 # Create hand instance
 hand = OmniHandPro2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     device_id=1,
     canfd_id=0,
     channel_id=0
@@ -116,11 +116,11 @@ hand.set_all_active_joint_angles(angles)
 ### OmniHand Dex UMI
 
 ```python
-from omnihand import OmniHandDexUMI, EHandType
+from omnihand import OmniHandDexUMI, HandType
 
 # Create hand instance
 hand = OmniHandDexUMI.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     device_id=1,
     canfd_id=0,
     channel_id=0

@@ -102,11 +102,11 @@ OmniHand 2025 (O10) 示例：
 
 int main() {
     // SocketCAN 示例：使用 can0 接口（OmniHand 2025 O10）
-    // hand_type    : EHandType::eLeft / EHandType::eRight
+    // hand_type    : HandType::LEFT / HandType::RIGHT
     // device_id    : 手上固件中配置的设备 ID（通常为 1）
     // can0         : Linux SocketCAN 接口名
     auto hand = OmniHand2025::createHandSocketCan(
-        EHandType::eLeft,
+        HandType::LEFT,
         1,
         "can0"
     );
@@ -140,7 +140,7 @@ OmniHand Pro 2025 (O12) 示例：
 int main() {
     // SocketCAN 示例：使用 can0 接口（OmniHand Pro 2025 O12）
     auto hand = OmniHandPro2025::createHandSocketCan(
-        EHandType::eLeft,
+        HandType::LEFT,
         1,
         "can0"
     );
@@ -165,12 +165,12 @@ int main() {
 OmniHand 2025 (O10) 示例：
 
 ```python
-from omnihand import OmniHand2025, EHandType
+from omnihand import OmniHand2025, HandType
 
 def main():
     # SocketCAN 示例（OmniHand 2025 O10）
     hand = OmniHand2025.create_hand_socketcan(
-        hand_type=EHandType.LEFT,
+        hand_type=HandType.LEFT,
         device_id=1,       # 手固件中的设备 ID
         can_interface="can0"
     )
@@ -197,12 +197,12 @@ if __name__ == "__main__":
 OmniHand Pro 2025 (O12) 示例：
 
 ```python
-from omnihand import OmniHandPro2025, EHandType
+from omnihand import OmniHandPro2025, HandType
 
 def main():
     # SocketCAN 示例（OmniHand Pro 2025 O12）
     hand = OmniHandPro2025.create_hand_socketcan(
-        hand_type=EHandType.LEFT,
+        hand_type=HandType.LEFT,
         device_id=1,
         can_interface="can0"
     )

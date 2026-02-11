@@ -16,7 +16,7 @@
 ## 导入
 
 ```python
-from omnihand import OmniHandDexUMI, EHandType, EFinger
+from omnihand import OmniHandDexUMI, HandType, Finger
 ```
 
 ## 工厂方法
@@ -25,7 +25,7 @@ from omnihand import OmniHandDexUMI, EHandType, EFinger
 
 ```python
 @staticmethod
-def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_by_zlgcan(hand_type: HandType = HandType.LEFT,
                 hand_device_id: int = 1,
                 canfd_id: int = 0,
                 canfd_channel_id: int = 0) -> 'OmniHandDexUMI':
@@ -46,7 +46,7 @@ def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
 
 ```python
 @staticmethod
-def create_hand_by_hcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_by_hcan(hand_type: HandType = HandType.LEFT,
                 hand_device_id: int = 1,
                 canfd_device_id: int = 0,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHandDexUMI':
@@ -66,7 +66,7 @@ def create_hand_by_hcan(hand_type: EHandType = EHandType.LEFT,
 **示例：**
 ```python
 hand = OmniHandDexUMI.create_hand_by_hcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_canfd_channel_id=0
@@ -77,7 +77,7 @@ hand = OmniHandDexUMI.create_hand_by_hcan(
 
 ```python
 @staticmethod
-def create_hand_by_hcan(hand_type: EHandType,
+def create_hand_by_hcan(hand_type: HandType,
                 hand_device_id: int,
                 hcan_usbcanfd_serial_number: str,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHandDexUMI':
@@ -149,7 +149,7 @@ def get_all_tactile_sensor_data_raw(self) -> List[TactileSensorData]:
         这返回完整分辨率数据。使用 UMI 协议 Pn6。
     """
 
-def get_tactile_sensor_data_raw(self, eFinger: EFinger) -> TactileSensorData:
+def get_tactile_sensor_data_raw(self, eFinger: Finger) -> TactileSensorData:
     """获取单个传感器的 1D 触觉传感器原始数据。
     
     Args:
@@ -174,12 +174,12 @@ def get_tactile_sensor_data_raw(self, eFinger: EFinger) -> TactileSensorData:
 ## 完整示例
 
 ```python
-from omnihand import OmniHandDexUMI, EHandType, EFinger
+from omnihand import OmniHandDexUMI, HandType, Finger
 import time
 
 # 创建手部实例
 hand = OmniHandDexUMI.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_channel_id=0

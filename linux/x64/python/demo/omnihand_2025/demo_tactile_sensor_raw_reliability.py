@@ -13,15 +13,15 @@ This demo tests the reliability of raw tactile sensor data acquisition by:
 This helps identify communication stability and data integrity issues.
 """
 
-from omnihand import OmniHand2025, EFinger, EHandType
+from omnihand import OmniHand2025, Finger, HandType
 import time
 from collections import defaultdict
 
 def main():
     # Configuration parameters
     total_iterations = 10000
-    interval_ms = 3  # Request interval in milliseconds (controls CAN bus communication rate)
-    frame_recv_timeout_ms = 150
+    interval_ms = 2  # Request interval in milliseconds (controls CAN bus communication rate)
+    frame_recv_timeout_ms = 30
 
     print("=" * 60)
     print("OmniHand 2025 Tactile Sensor Raw Data Reliability Test")
@@ -32,7 +32,7 @@ def main():
     print("Creating hand instance (Left hand, channel 0)...")
     try:
         hand = OmniHand2025.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=1,
             canfd_device_id=0,
             canfd_channel_id=0
@@ -51,6 +51,8 @@ def main():
     # This ensures minimum interval between requests at the C++ level
     hand.set_request_interval(interval_ms)
     hand.set_frame_recv_timeout(frame_recv_timeout_ms)
+
+    # hand.show_data_details(True)
     
     print("Hand initialized successfully")
     print()
@@ -58,13 +60,13 @@ def main():
     # Define all 7 sensor positions with expected data lengths
     # Expected lengths: Thumb=16, Index=18, Middle=18, Ring=18, Little=18, Palm=78, Dorsum=102
     sensor_positions = [
-        (EFinger.THUMB, "Thumb", 16),
-        (EFinger.INDEX, "Index", 18),
-        (EFinger.MIDDLE, "Middle", 18),
-        (EFinger.RING, "Ring", 18),
-        (EFinger.LITTLE, "Little", 18),
-        (EFinger.PALM, "Palm", 78),
-        (EFinger.DORSUM, "Dorsum", 102),
+        (Finger.THUMB, "Thumb", 16),
+        (Finger.INDEX, "Index", 18),
+        (Finger.MIDDLE, "Middle", 18),
+        (Finger.RING, "Ring", 18),
+        (Finger.LITTLE, "Little", 18),
+        (Finger.PALM, "Palm", 78),
+        (Finger.DORSUM, "Dorsum", 102),
     ]
     
     # Counters for failures per sensor

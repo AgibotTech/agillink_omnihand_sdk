@@ -20,51 +20,51 @@
 
 ## Enums
 
-### EHandType
+### HandType
 
 ```cpp
-enum class EHandType : unsigned char {
-    eLeft    = 0,    // Left hand
-    eRight   = 1,    // Right hand
-    eUnknown = 10    // Unknown
+enum class HandType : unsigned char {
+    LEFT = 0,      // Left hand
+    RIGHT = 1,     // Right hand
+    UNKNOWN = 255  // Unknown hand type
 };
 ```
 
-### EFinger
+### Finger
 
 ```cpp
-enum class EFinger : unsigned char {
-    eThumb   = 0x01,    // Thumb
-    eIndex   = 0x02,    // Index finger
-    eMiddle  = 0x03,    // Middle finger
-    eRing    = 0x04,    // Ring finger
-    eLittle  = 0x05,    // Little (pinky) finger
-    ePalm    = 0x06,    // Palm (not supported by O12)
-    eDorsum  = 0x07,    // Dorsum (not supported by O12)
-    eUnknown = 0xff     // Unknown
+enum class Finger : unsigned char {
+    THUMB = 0x01,    // Thumb
+    INDEX = 0x02,    // Index finger
+    MIDDLE = 0x03,   // Middle finger
+    RING = 0x04,     // Ring finger
+    LITTLE = 0x05,   // Little (pinky) finger
+    PALM = 0x06,     // Palm (not supported by O12)
+    DORSUM = 0x07,   // Dorsum (not supported by O12)
+    UNKNOWN = 0xff   // Unknown
 };
 ```
 
-**Note**: O12 only supports fingers (eThumb, eIndex, eMiddle, eRing, eLittle), not palm or dorsum.
+**Note**: O12 only supports fingers (THUMB, INDEX, MIDDLE, RING, LITTLE), not palm or dorsum.
 
-### EControlMode
+### ControlMode
 
 ```cpp
-enum class EControlMode : unsigned char {
-  ePosi           = 0,    // Position mode
-  eServo          = 1,    // Servo mode
-  eVelo           = 2,    // Velocity mode
-  eTorque         = 3,    // Torque mode (Not supported: pure torque control not available)
-  ePosiTorque     = 4,    // Position-Torque mode (Mixed control: position + torque)
-  eVeloTorque     = 5,    // Velocity-Torque mode (Mixed control: velocity + torque)
-  ePosiVeloTorque = 6,    // Position-Velocity-Torque mode (Mixed control: position + velocity + torque)
-  eUnknown        = 10    // Unknown mode
+enum class ControlMode : unsigned char {
+    POSITION           = 0,    // Position mode
+    SERVO          = 1,    // Servo mode
+    VELOCITY           = 2,    // Velocity mode
+    TORQUE         = 3,    // Torque mode (Not supported: pure torque control not available)
+    POSITION_TORQUE     = 4,    // Position-Torque mode (Mixed control: position + torque)
+    VELOCITY_TORQUE     = 5,    // Velocity-Torque mode (Mixed control: velocity + torque)
+    POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mode (Mixed control: position + velocity + torque)
+    UNKNOWN        = 10    // Unknown mode
 };
 ```
 
 **Note**: 
-- **eServo mode (1)**: Servo control mode
-- **Pure torque control (eTorque) is not supported**: Use mixed control modes (ePosiTorque, eVeloTorque, ePosiVeloTorque) instead
+- **SERVO mode (1)**: Servo control mode
+- **Pure torque control (TORQUE) is not supported**: Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead
 
 ## Data Structures
 
@@ -122,7 +122,7 @@ struct TactileSensor3DData {
  * @note ✅ Recommended: Zero configuration, ready to use out of the box. No root privileges required.
  */
 static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id = 1,
     unsigned char canfd_device_id = 0,
     unsigned char canfd_channel_id = 0);
@@ -131,7 +131,7 @@ static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
 **Example:**
 ```cpp
 auto hand = OmniHandPro2025::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -150,7 +150,7 @@ auto hand = OmniHandPro2025::createHandByZlgcan(
  * @return A unique pointer to OmniHandPro2025 instance, or nullptr if device not found
  */
 static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& usbcanfd_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -168,7 +168,7 @@ static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
  * @return A unique pointer to OmniHandPro2025 instance
  */
 static std::unique_ptr<OmniHandPro2025> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     unsigned char canfd_device_id,
     unsigned char canfd_channel_id = 0);
@@ -177,7 +177,7 @@ static std::unique_ptr<OmniHandPro2025> createHandByHcan(
 **Example:**
 ```cpp
 auto hand = OmniHandPro2025::createHandByHcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -196,7 +196,7 @@ auto hand = OmniHandPro2025::createHandByHcan(
  * @return A unique pointer to OmniHandPro2025 instance, or nullptr if device not found
  */
 static std::unique_ptr<OmniHandPro2025> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& hcan_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -215,7 +215,7 @@ static std::unique_ptr<OmniHandPro2025> createHandByHcan(
  * @warning ⚠️ Advanced Usage: Requires driver setup and root privileges.
  */
 static std::unique_ptr<OmniHandPro2025> createHandSocketCan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& can_interface = "can0");
 #endif
@@ -283,8 +283,11 @@ int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
 /**
  * @brief Sets the positions of all joint motors in batch.
  * @param vec_posi A vector of target positions. Must have 12 values, each in range 0-2000.
+ * @param sync If true (default), waits for device response. If false, sends without waiting (faster).
+ * @return true if command was sent successfully, false otherwise.
+ * @note Use sync=false for high-frequency control loops.
  */
-void SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi);
+bool SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi, bool sync = true);
 
 /**
  * @brief Gets the positions of all joint motors in batch.
@@ -395,7 +398,7 @@ std::vector<int16_t> GetAllJointMotorVelo() const;
 ## Tactile Sensor Data
 
 OmniHand Pro 2025 (O12) uses **3D tactile sensors** with the following characteristics:
-- **Sensor locations**: Fingers only (eThumb, eIndex, eMiddle, eRing, eLittle)
+- **Sensor locations**: Fingers only (THUMB, INDEX, MIDDLE, RING, LITTLE)
 - **Not supported**: Palm and dorsum sensors
 - **Data structure**: TactileSensor3DData with normal force, tangent force, tangent force angle, etc.
 
@@ -410,32 +413,32 @@ OmniHand Pro 2025 (O12) uses **3D tactile sensors** with the following character
  *         - tangent_force: Tangent force
  *         - tangent_force_angle: Tangent force angle (0-359 degrees, fingertip up = 0°, clockwise)
  *         - capa_approach[4]: Capacitive approach values
- * @note O12 only supports fingers (eThumb, eIndex, eMiddle, eRing, eLittle), not palm or dorsum.
+ * @note O12 only supports fingers (THUMB, INDEX, MIDDLE, RING, LITTLE), not palm or dorsum.
  */
-TactileSensor3DData GetTactileSensor3DData(EFinger eFinger) const;
+TactileSensor3DData GetTactileSensor3DData(Finger eFinger) const;
 ```
 
 ## Control Mode
 
 **Note**: 
-- **eServo mode (1)**: Servo control mode
-- **Pure torque control (eTorque) is not supported**: Use mixed control modes (ePosiTorque, eVeloTorque, ePosiVeloTorque) instead
+- **SERVO mode (1)**: Servo control mode
+- **Pure torque control (TORQUE) is not supported**: Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead
 
 ```cpp
 /**
  * @brief Sets the control mode of a single joint motor.
  * @param joint_motor_index The index of the joint motor (1-12).
  * @param mode The control mode enum value.
- * @note Pure torque control (eTorque) is not supported. Use mixed control modes (ePosiTorque, eVeloTorque, ePosiVeloTorque) instead.
+ * @note Pure torque control (TORQUE) is not supported. Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead.
  */
-void SetControlMode(unsigned char joint_motor_index, EControlMode mode);
+void SetControlMode(unsigned char joint_motor_index, ControlMode mode);
 
 /**
  * @brief Gets the control mode of a single joint motor.
  * @param joint_motor_index The index of the joint motor (1-12).
  * @return The current control mode.
  */
-EControlMode GetControlMode(unsigned char joint_motor_index) const;
+ControlMode GetControlMode(unsigned char joint_motor_index) const;
 
 /**
  * @brief Sets the control modes of all joint motors in batch.
@@ -482,21 +485,21 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 
 ## Mixed Control
 
-**Note**: Pure torque control (eTorque) is not supported. Only mixed control modes are supported:
-- **ePosiTorque**: Position + Torque control
-- **eVeloTorque**: Velocity + Torque control
-- **ePosiVeloTorque**: Position + Velocity + Torque control
+**Note**: Pure torque control (TORQUE) is not supported. Only mixed control modes are supported:
+- **POSITION_TORQUE**: Position + Torque control
+- **VELOCITY_TORQUE**: Velocity + Torque control
+- **POSITION_VELOCITY_TORQUE**: Position + Velocity + Torque control
 
 ```cpp
 /**
  * @brief Controls joint motors in mixed mode.
  * @param mix_ctrls A vector of mixed control parameters. Each element contains:
  *                   - joint_index_: Joint index (1-12)
- *                   - ctrl_mode_: Control mode (only mixed control modes: ePosiTorque, eVeloTorque, ePosiVeloTorque)
- *                   - tgt_posi_: Target position (optional, required for ePosiTorque and ePosiVeloTorque modes)
- *                   - tgt_velo_: Target velocity (optional, required for eVeloTorque and ePosiVeloTorque modes)
+ *                   - ctrl_mode_: Control mode (only mixed control modes: POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE)
+ *                   - tgt_posi_: Target position (optional, required for POSITION_TORQUE and POSITION_VELOCITY_TORQUE modes)
+ *                   - tgt_velo_: Target velocity (optional, required for VELOCITY_TORQUE and POSITION_VELOCITY_TORQUE modes)
  *                   - tgt_torque_: Target torque (required for all mixed control modes)
- * @note Pure torque control (eTorque) is not supported. Use mixed control modes instead.
+ * @note Pure torque control (TORQUE) is not supported. Use mixed control modes instead.
  */
 void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);
 ```
@@ -610,7 +613,7 @@ void ShowDataDetails(bool show) const;
 int main() {
     // Create hand instance
     auto hand = OmniHandPro2025::createHandByZlgcan(
-        EHandType::eLeft,
+        HandType::LEFT,
         1,      // hand_device_id
         0,      // canfd_device_id
         0       // canfd_channel_id
@@ -636,7 +639,7 @@ int main() {
     std::cout << " (rad)" << std::endl;
 
     // Get 3D tactile sensor data
-    auto thumb_data = hand->GetTactileSensor3DData(EFinger::eThumb);
+    auto thumb_data = hand->GetTactileSensor3DData(Finger::THUMB);
     std::cout << "Thumb normal force: " << thumb_data.normal_force_ << " (0.1N)" << std::endl;
 
     return 0;

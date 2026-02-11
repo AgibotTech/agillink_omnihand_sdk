@@ -38,8 +38,8 @@ ls -la /dev/ttyACM0  # 应显示 rw-rw-rw-
 如果有多个 CANFD 适配器：
 ```python
 # 尝试不同的设备索引
-hand = OmniHand2025.create_hand_by_zlgcan(EHandType.LEFT, 1, 0, 0)  # 第一个适配器
-hand = OmniHand2025.create_hand_by_zlgcan(EHandType.LEFT, 1, 1, 0)  # 第二个适配器
+hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, 0, 0)  # 第一个适配器
+hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, 1, 0)  # 第二个适配器
 ```
 
 ---
@@ -90,10 +90,10 @@ info = hand.get_device_info()
 print(f"实际设备 ID: {info.hand_device_id}")
 
 # 如果不匹配，使用正确的 ID 创建
-hand = OmniHand2025.create_hand_by_zlgcan(EHandType.LEFT, actual_id, 0, 0)
+hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, actual_id, 0, 0)
 
 # 如果不知道 canfd_device_id，可以使用 SN（序列号）接口：
-hand = OmniHand2025.create_hand_by_zlgcan_sn(EHandType.LEFT, 1, "YOUR_DEVICE_SN", 0)
+hand = OmniHand2025.create_hand_by_zlgcan_sn(HandType.LEFT, 1, "YOUR_DEVICE_SN", 0)
 ```
 
 > **关于 `canfd_channel_id` 说明**：
@@ -127,13 +127,13 @@ hand.set_request_timeout(500)  # 每次请求超时 500ms
 #### 检查控制模式
 ```python
 # 使用伺服模式（推荐）或位置模式
-from omnihand import EControlMode
+from omnihand import ControlMode
 
 # 伺服模式 - 带速度/力矩限制的平滑运动
-hand.set_all_control_mode(EControlMode.SERVO)
+hand.set_all_control_mode(ControlMode.SERVO)
 
 # 或位置模式 - 直接位置控制
-hand.set_all_control_mode(EControlMode.POSITION)
+hand.set_all_control_mode(ControlMode.POSITIONTION)
 ```
 
 #### 检查位置范围

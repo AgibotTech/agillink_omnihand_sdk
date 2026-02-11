@@ -85,11 +85,11 @@ python3 -c "from omnihand import OmniHand2025; print('SDK installed successfully
 ### Python Example
 
 ```python
-from omnihand import OmniHand2025, EHandType
+from omnihand import OmniHand2025, HandType
 
 # Create hand instance (ZLG USBCANFD)
 hand = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,    # or EHandType.RIGHT
+    hand_type=HandType.LEFT,    # or HandType.RIGHT
     hand_device_id=1,            # Hand ID (usually 1)
     canfd_device_id=0,           # CANFD adapter index
     canfd_channel_id=0           # Channel (0 or 1)
@@ -145,7 +145,7 @@ int main() {
     //   hand_device_id: Hand CAN ID (1-254, usually 1)
     //   canfd_device_id: ZLG adapter index (0 = first adapter)
     //   canfd_channel_id: Channel (0 or 1 for dual-channel adapters)
-    auto hand = OmniHand2025::createHandByZlgcan(EHandType::eLeft, 1, 0, 0);
+    auto hand = OmniHand2025::createHandByZlgcan(HandType::LEFT, 1, 0, 0);
     
     if (!hand || !hand->Init()) {
         std::cerr << "Failed to initialize hand" << std::endl;

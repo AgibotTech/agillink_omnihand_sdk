@@ -16,7 +16,7 @@ if parent_dir in sys.path:
     sys.path.remove(parent_dir)
 
 import pytest
-from omnihand import OmniHandPro2025, EHandType, EFinger, EControlMode
+from omnihand import OmniHandPro2025, HandType, Finger, ControlMode
 
 # Global variable to store request interval from command line argument
 # Can be set via environment variable OMNIHAND_REQUEST_INTERVAL or -f when running directly
@@ -86,7 +86,7 @@ def hand():
     # Create hand instance based on device type
     if DEVICE_TYPE == "hcan":
         hand = OmniHandPro2025.create_hand_by_hcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=1,
             canfd_device_id=0,
             canfd_channel_id=0
@@ -95,7 +95,7 @@ def hand():
     else:
         # Default: ZLG CAN
         hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=1,
             canfd_device_id=0,
             canfd_channel_id=0
@@ -256,7 +256,7 @@ def test_tactile_sensor_3d(hand):
     assert hand.init(), "Device not initialized"
     
     # Test single sensor
-    thumb_tactile = hand.get_tactile_sensor_3d_data(EFinger.THUMB)
+    thumb_tactile = hand.get_tactile_sensor_3d_data(Finger.THUMB)
     print(f"\n[get_tactile_sensor_3d_data] Thumb 3D Tactile Data:")
     print(f"  Online State: {thumb_tactile.online_state}")
     print(f"  Normal Force: {thumb_tactile.normal_force}")
@@ -265,7 +265,7 @@ def test_tactile_sensor_3d(hand):
     assert thumb_tactile.normal_force >= 0
     
     # Test multiple sensors
-    fingers = [EFinger.INDEX, EFinger.MIDDLE, EFinger.RING, EFinger.LITTLE]
+    fingers = [Finger.INDEX, Finger.MIDDLE, Finger.RING, Finger.LITTLE]
     for finger in fingers:
         tactile_data = hand.get_tactile_sensor_3d_data(finger)
         print(f"\n[get_tactile_sensor_3d_data] {finger} 3D Tactile Data:")

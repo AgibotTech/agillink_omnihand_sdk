@@ -49,8 +49,12 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param vec_posi Target position vector. Length and range depend on product type:
    *                 - OmniHand 2025 (O10): 10 values, each in range 0-4096
    *                 - OmniHand Pro 2025 (O12): 12 values, each in range 0-2000
+   * @param sync If true (default), waits for device response (synchronous mode).
+   *             If false, sends command without waiting (asynchronous mode, faster).
+   * @return true if command was sent successfully, false otherwise.
+   * @note Asynchronous mode (sync=false) is recommended for high-frequency control loops.
    */
-  virtual void SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi) = 0;
+  virtual bool SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi, bool sync = true) = 0;
   
   /**
    * @brief Gets positions of all joint motors in batch.
@@ -138,10 +142,10 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @brief Sets the control mode of a single joint motor.
    * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
    * @param mode Control mode enum value
-   * @note eServo mode (1) is available for servo control
-   * @note Pure torque control (eTorque) is not supported: Both O10 and O12 do not support pure torque mode, only mixed control modes
+   * @note SERVO mode (1) is available for servo control
+   * @note Pure torque control (TORQUE) is not supported: Both O10 and O12 do not support pure torque mode, only mixed control modes
    */
-  virtual void SetControlMode(unsigned char joint_motor_index, EControlMode mode) = 0;
+  virtual void SetControlMode(unsigned char joint_motor_index, ControlMode mode) = 0;
   
   /**
    * @brief Gets the control mode of a single joint motor.
@@ -149,7 +153,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @return Current control mode
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual EControlMode GetControlMode(unsigned char joint_motor_index) const = 0;
+  virtual ControlMode GetControlMode(unsigned char joint_motor_index) const = 0;
   
   /**
    * @brief Sets control modes of all joint motors in batch.
@@ -208,7 +212,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
   /**
    * @brief Mixed control for joint motors.
    * @param mix_ctrls Mixed control parameter vector
-   * @note Pure torque control (eTorque) is not supported: Both O10 and O12 do not support pure torque mode, only mixed control modes
+   * @note Pure torque control (TORQUE) is not supported: Both O10 and O12 do not support pure torque mode, only mixed control modes
    */
   virtual void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls) = 0;
 

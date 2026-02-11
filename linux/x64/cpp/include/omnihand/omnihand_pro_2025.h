@@ -45,7 +45,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @return A unique pointer to OmniHandPro2025 instance
    */
   static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
       unsigned char canfd_channel_id = 0);
@@ -61,7 +61,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @return A unique pointer to OmniHandPro2025 instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& usbcanfd_serial_number,
       unsigned char canfd_channel_id = 0);
@@ -75,7 +75,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @return A unique pointer to OmniHandPro2025 instance
    */
   static std::unique_ptr<OmniHandPro2025> createHandSocketCan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& can_interface = "can0");
 #endif
@@ -91,7 +91,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @return A unique pointer to OmniHandPro2025 instance
    */
   static std::unique_ptr<OmniHandPro2025> createHandByHcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
       unsigned char canfd_channel_id = 0);
@@ -107,7 +107,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @return A unique pointer to OmniHandPro2025 instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHandPro2025> createHandByHcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& hcan_serial_number,
       unsigned char canfd_channel_id = 0);
@@ -158,7 +158,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @param eFinger Finger enum value (O12 supports fingers only, not palm/dorsum)
    * @return 3D tactile sensor data structure
    */
-  virtual TactileSensor3DData GetTactileSensor3DData(EFinger eFinger) const = 0;
+  virtual TactileSensor3DData GetTactileSensor3DData(Finger eFinger) const = 0;
 
   // ============ Gesture Control ============
   /**
@@ -175,7 +175,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @note This method automatically initializes the kinematics solver after calling base class Reset()
    * @note Product type is fixed to ProductType::OMNIHAND_PRO_2025 for this class
    */
-  void Reset(unsigned char device_id, EHandType hand_type);
+  void Reset(unsigned char device_id, HandType hand_type);
 
   /**
    * @brief Kinematics solver for OmniHand Pro 2025 (O12)

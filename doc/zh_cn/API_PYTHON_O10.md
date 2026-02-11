@@ -14,7 +14,7 @@
 ## 导入
 
 ```python
-from omnihand import OmniHand2025, EHandType, EFinger, EControlMode
+from omnihand import OmniHand2025, HandType, Finger, ControlMode
 ```
 
 ## 工厂方法
@@ -23,7 +23,7 @@ from omnihand import OmniHand2025, EHandType, EFinger, EControlMode
 
 ```python
 @staticmethod
-def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_by_zlgcan(hand_type: HandType = HandType.LEFT,
                 hand_device_id: int = 1,
                 canfd_id: int = 0,
                 canfd_channel_id: int = 0) -> 'OmniHand2025':
@@ -47,7 +47,7 @@ def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
 
 ```python
 @staticmethod
-def create_hand_by_hcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_by_hcan(hand_type: HandType = HandType.LEFT,
                 hand_device_id: int = 1,
                 canfd_device_id: int = 0,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
@@ -67,7 +67,7 @@ def create_hand_by_hcan(hand_type: EHandType = EHandType.LEFT,
 **示例：**
 ```python
 hand = OmniHand2025.create_hand_by_hcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_canfd_channel_id=0
@@ -78,7 +78,7 @@ hand = OmniHand2025.create_hand_by_hcan(
 
 ```python
 @staticmethod
-def create_hand_by_hcan(hand_type: EHandType,
+def create_hand_by_hcan(hand_type: HandType,
                 hand_device_id: int,
                 hcan_usbcanfd_serial_number: str,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
@@ -99,7 +99,7 @@ def create_hand_by_hcan(hand_type: EHandType,
 
 ```python
 @staticmethod
-def create_hand_by_rs485(hand_type: EHandType,
+def create_hand_by_rs485(hand_type: HandType,
                       hand_device_id: int,
                       uart_port: str,
                       baudrate: int = 460800) -> 'OmniHand2025':
@@ -208,11 +208,18 @@ def get_joint_position(self, joint_motor_index: int) -> int:
         int: 当前位置（范围：0-4096）。
     """
 
-def set_all_joint_positions(self, positions: List[int]) -> None:
+def set_all_joint_positions(self, positions: List[int], sync: bool = True) -> bool:
     """批量设置所有关节电机的位置。
     
     Args:
         positions: 目标位置列表。必须包含 10 个值，每个值在 0-4096 范围内。
+        sync: 如果为 True（默认），等待设备响应。如果为 False，发送后不等待（更快）。
+    
+    Returns:
+        如果命令发送成功返回 True，否则返回 False。
+    
+    Note:
+        高频控制循环建议使用 sync=False。
     """
 
 def get_all_joint_positions(self) -> List[int]:
@@ -226,7 +233,7 @@ def get_all_joint_positions(self) -> List[int]:
 ### 触觉传感器数据
 
 ```python
-def get_tactile_sensor_data(self, eFinger: EFinger) -> List[int]:
+def get_tactile_sensor_data(self, eFinger: Finger) -> List[int]:
     """获取指定部位的触觉传感器数据（仅 O10）。
     
     Args:
@@ -252,7 +259,7 @@ def get_all_tactile_sensor_data_raw(self) -> List[TactileSensorData]:
         这返回完整分辨率数据，与返回降采样数据的 get_tactile_sensor_data() 不同。
     """
 
-def get_tactile_sensor_data_raw(self, eFinger: EFinger) -> TactileSensorData:
+def get_tactile_sensor_data_raw(self, eFinger: Finger) -> TactileSensorData:
     """获取单个传感器的 1D 触觉传感器原始数据。
     
     Args:
@@ -284,7 +291,7 @@ def get_sensor_data_length(finger_index: int) -> int:
     """获取特定手指的传感器数据长度（静态方法）。
     
     Args:
-        finger_index: 手指枚举值（EFinger）。
+        finger_index: 手指枚举值（Finger）。
     
     Returns:
         int: 传感器数据长度（字节）。
@@ -349,7 +356,7 @@ def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
     
     Args:
         joint_motor_index: 关节电机索引（1-10）。
-        mode: 控制模式（参见 EControlMode）。
+        mode: 控制模式（参见 ControlMode）。
     
     Note:
         - SERVO 模式仅 O10 支持
@@ -363,7 +370,7 @@ def get_control_mode(self, joint_motor_index: int) -> int:
         joint_motor_index: 关节电机索引（1-10）。
     
     Returns:
-        int: 当前控制模式（参见 EControlMode）。
+        int: 当前控制模式（参见 ControlMode）。
     
     Note:
         串口通信（RS485）不支持此接口。
@@ -549,11 +556,11 @@ def show_data_details(self, show: bool) -> None:
 ## 完整示例
 
 ```python
-from omnihand import OmniHand2025, EHandType, EFinger
+from omnihand import OmniHand2025, HandType, Finger
 
 # 创建手部实例
 hand = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_channel_id=0
@@ -573,7 +580,7 @@ hand.set_all_active_joint_angles(angles)
 print(f"已设置关节角度: {angles} (rad)")
 
 # 获取触觉传感器数据
-thumb_data = hand.get_tactile_sensor_data(EFinger.THUMB)
+thumb_data = hand.get_tactile_sensor_data(Finger.THUMB)
 print(f"拇指传感器数据: {len(thumb_data)} 个点")
 ```
 

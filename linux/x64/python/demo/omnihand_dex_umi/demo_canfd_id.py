@@ -20,7 +20,7 @@ OmniHand Dex UMI 综合控制示例 - CANFD 通信（通过 canfd_id）
 import sys
 import time
 import threading
-from omnihand import OmniHandDexUMI, EHandType, EFinger
+from omnihand import OmniHandDexUMI, HandType, Finger
 
 
 def print_usage(program_name):
@@ -103,9 +103,9 @@ def read_single_hand(hand, hand_name):
     print("\n--- 1D Tactile Sensor Data (Raw) ---")
     try:
         fingers = [
-            (EFinger.THUMB, "Thumb"),
-            (EFinger.INDEX, "Index"),
-            (EFinger.MIDDLE, "Middle"),
+            (Finger.THUMB, "Thumb"),
+            (Finger.INDEX, "Index"),
+            (Finger.MIDDLE, "Middle"),
         ]
         
         for finger_enum, finger_name in fingers:
@@ -180,7 +180,7 @@ def main():
     if mode == "left":
         # 创建左手实例
         left_hand = OmniHandDexUMI.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=0  # 第一个通道
@@ -200,7 +200,7 @@ def main():
     elif mode == "right":
         # 创建右手实例
         right_hand = OmniHandDexUMI.create_hand_by_zlgcan(
-            hand_type=EHandType.RIGHT,
+            hand_type=HandType.RIGHT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=0  # 第一个通道
@@ -220,14 +220,14 @@ def main():
     elif mode == "both":
         # both 模式：同时读取两个手
         left_hand = OmniHandDexUMI.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=0  # 第一个通道
         )
 
         right_hand = OmniHandDexUMI.create_hand_by_zlgcan(
-            hand_type=EHandType.RIGHT,
+            hand_type=HandType.RIGHT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=1  # 第二个通道（需要多通道适配器）

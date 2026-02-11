@@ -27,49 +27,49 @@ enum class ProductType : unsigned char {
     OMNIHAND_2025        = 0,    // OmniHand 2025 (10 DOF)
     OMNIHAND_PRO_2025    = 1,    // OmniHand Pro 2025 (12 DOF)
     OMNIHAND_DEX_UMI     = 2,    // OmniHand Dex UMI (O10 UMI) (10 DOF, UMI protocol)
-    UNKNOWN_PRODUCT_TYPE = 255   // Unknown
+    UNKNOWN = 255   // Unknown
 };
 ```
 
 **Note**: The new product-specific interfaces do not require `ProductType` - each class is already typed for its product.
 
-### EHandType
+### HandType
 
 ```cpp
-enum class EHandType : unsigned char {
-    eLeft    = 0,    // Left hand
-    eRight   = 1,    // Right hand
-    eUnknown = 10    // Unknown
+enum class HandType : unsigned char {
+    LEFT = 0,      // Left hand
+    RIGHT = 1,     // Right hand
+    UNKNOWN = 255  // Unknown hand type
 };
 ```
 
-### EFinger
+### Finger
 
 ```cpp
-enum class EFinger : unsigned char {
-    eThumb   = 0x01,    // Thumb
-    eIndex   = 0x02,    // Index finger
-    eMiddle  = 0x03,    // Middle finger
-    eRing    = 0x04,    // Ring finger
-    eLittle  = 0x05,    // Little (pinky) finger
-    ePalm    = 0x06,    // Palm
-    eDorsum  = 0x07,    // Dorsum (back of hand)
-    eUnknown = 0xff     // Unknown
+enum class Finger : unsigned char {
+    THUMB = 0x01,    // Thumb
+    INDEX = 0x02,    // Index finger
+    MIDDLE = 0x03,   // Middle finger
+    RING = 0x04,     // Ring finger
+    LITTLE = 0x05,   // Little (pinky) finger
+    PALM = 0x06,     // Palm
+    DORSUM = 0x07,   // Dorsum (back of hand)
+    UNKNOWN = 0xff   // Unknown
 };
 ```
 
-### EControlMode
+### ControlMode
 
 ```cpp
-enum class EControlMode : unsigned char {
-  ePosi           = 0,    // Position mode
-  eServo          = 1,    // Servo mode
-  eVelo           = 2,    // Velocity mode
-  eTorque         = 3,    // Torque mode (Not supported: pure torque control not available)
-  ePosiTorque     = 4,    // Position-Torque mode (Mixed control: position + torque)
-  eVeloTorque     = 5,    // Velocity-Torque mode (Mixed control: velocity + torque)
-  ePosiVeloTorque = 6,    // Position-Velocity-Torque mode (Mixed control: position + velocity + torque)
-  eUnknown        = 10    // Unknown mode
+enum class ControlMode : unsigned char {
+    POSITION           = 0,    // Position mode
+    SERVO          = 1,    // Servo mode
+    VELOCITY           = 2,    // Velocity mode
+    TORQUE         = 3,    // Torque mode (Not supported: pure torque control not available)
+    POSITION_TORQUE     = 4,    // Position-Torque mode (Mixed control: position + torque)
+    VELOCITY_TORQUE     = 5,    // Velocity-Torque mode (Mixed control: velocity + torque)
+    POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mode (Mixed control: position + velocity + torque)
+    UNKNOWN        = 10    // Unknown mode
 };
 ```
 
@@ -82,7 +82,7 @@ enum class EControlMode : unsigned char {
 
 // Create hand instance
 auto hand = OmniHand2025::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -105,7 +105,7 @@ hand->SetAllActiveJointAngles(angles);
 
 // Create hand instance
 auto hand = OmniHandPro2025::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -128,7 +128,7 @@ hand->SetAllActiveJointAngles(angles);
 
 // Create hand instance
 auto hand = OmniHandDexUMI::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id

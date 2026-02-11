@@ -56,21 +56,21 @@ cd build/install/bin/
 ```python
 std_msgs/Header header
 
-# ePosi = 0,                    // 位置控制
-# eServo = 1,                   // 伺服模式
-# eVelo = 2,                    // 速度控制
-# eTorque = 3,                  // 力矩控制（不支持，使用混合模式）
-# ePosiTorque = 4,              // 位置-力矩混合控制
-# eVeloTorque = 5,              // 速度-力矩混合控制
-# ePosiVeloTorque = 6,          // 位置-速度-力矩混合控制
-# eUnknown = 10                 // 未知模式
+# POSITION = 0,                    // 位置控制
+# SERVO = 1,                       // 伺服模式
+# VELOCITY = 2,                    // 速度控制
+# TORQUE = 3,                      // 力矩控制（不支持，使用混合模式）
+# POSITION_TORQUE = 4,             // 位置-力矩混合控制
+# VELOCITY_TORQUE = 5,             // 速度-力矩混合控制
+# POSITION_VELOCITY_TORQUE = 6,    // 位置-速度-力矩混合控制
+# UNKNOWN = 10                     // 未知模式
 
 int8[] modes  # O10 为 10 个值
 ```
 
 **注意**：
-- **eServo 模式（1）**：伺服控制模式
-- **纯力矩控制（eTorque）不支持**：请使用混合控制模式（ePosiTorque、eVeloTorque、ePosiVeloTorque）
+- **SERVO 模式（1）**：伺服控制模式
+- **纯力矩控制（TORQUE）不支持**：请使用混合控制模式（POSITION_TORQUE、VELOCITY_TORQUE、POSITION_VELOCITY_TORQUE）
 
 ### `omnihand_2025_node_msgs.msg.CurrentReport`
 

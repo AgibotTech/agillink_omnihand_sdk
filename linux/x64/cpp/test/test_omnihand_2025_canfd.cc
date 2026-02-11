@@ -33,10 +33,10 @@ class OmniHand2025CanfdTest : public ::testing::Test {
  protected:
   void SetUp() override {
     hand_ = OmniHand2025::createHandByZlgcan(
-        EHandType::eLeft,
-        1,              // device_id
-        g_canfd_id,
-        g_channel_id
+        HandType::LEFT,        // hand_type: left hand
+        1,                       // hand_device_id: hand device ID
+        g_canfd_id,              // canfd_device_id: USB CANFD adapter device index
+        g_channel_id             // canfd_channel_id: CAN channel index (0=can0, 1=can1)
     );
     
     if (hand_) {
@@ -260,8 +260,8 @@ TEST_F(OmniHand2025CanfdTest, GetTactileSensorData) {
   std::cout << "[GetTactileSensorData] Testing all tactile sensors:" << std::endl;
   
   // Test finger sensors (Thumb, Index, Middle, Ring, Little) - 16 values each
-  std::vector<EFinger> fingers = {
-    EFinger::eThumb, EFinger::eIndex, EFinger::eMiddle, EFinger::eRing, EFinger::eLittle
+  std::vector<Finger> fingers = {
+    Finger::THUMB, Finger::INDEX, Finger::MIDDLE, Finger::RING, Finger::LITTLE
   };
   
   std::cout << "  Fingers (16 values each):" << std::endl;
@@ -277,7 +277,7 @@ TEST_F(OmniHand2025CanfdTest, GetTactileSensorData) {
   }
   
   // Test palm/dorsum sensors - 25 values each
-  std::vector<EFinger> palm_dorsum = {EFinger::ePalm, EFinger::eDorsum};
+  std::vector<Finger> palm_dorsum = {Finger::PALM, Finger::DORSUM};
   
   std::cout << "  Palm/Dorsum (25 values each):" << std::endl;
   for (auto sensor : palm_dorsum) {
@@ -296,7 +296,7 @@ TEST_F(OmniHand2025CanfdTest, GetTactileSensorDataRaw) {
   RequireDevice();
   
   // CANFD supports raw tactile sensor data (multi-frame protocol)
-  auto data = hand_->GetTactileSensorDataRaw(EFinger::eThumb);
+  auto data = hand_->GetTactileSensorDataRaw(Finger::THUMB);
   
   if (data.data_.empty()) {
     std::cout << "[GetTactileSensorDataRaw] Not supported by this firmware" << std::endl;
@@ -421,12 +421,12 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor) {
   // Safe positions from Python demo (per joint)
   const int16_t safe_pos[10] = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
   
-  // ePosiVeloTorque mode: max 8 joints
+  // POSITION_VELOCITY_TORQUE mode: max 8 joints
   std::vector<MixCtrl> mix_ctrls;
   for (int i = 1; i <= 8; ++i) {
     MixCtrl ctrl;
     ctrl.joint_index_ = static_cast<unsigned char>(i);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(EControlMode::ePosiVeloTorque);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::POSITION_VELOCITY_TORQUE);
     ctrl.tgt_posi_ = safe_pos[i - 1];
     ctrl.tgt_velo_ = 50;
     ctrl.tgt_torque_ = 0;
@@ -434,7 +434,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor) {
   }
   
   hand_->MixCtrlJointMotor(mix_ctrls);
-  std::cout << "[MixCtrlJointMotor] ePosiVeloTorque mode for 8 joints" << std::endl;
+  std::cout << "[MixCtrlJointMotor] POSITION_VELOCITY_TORQUE mode for 8 joints" << std::endl;
   
   auto positions = hand_->GetAllJointMotorPosi();
   std::cout << "[GetAllJointMotorPosi] ";
@@ -450,12 +450,12 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor) {
 TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_VeloTorque) {
   RequireDevice();
   
-  std::cout << "[MixCtrlJointMotor] eVeloTorque mode for all 10 joints:" << std::endl;
+  std::cout << "[MixCtrlJointMotor] VELOCITY_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
     std::vector<MixCtrl> mix_ctrls;
     MixCtrl ctrl;
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(EControlMode::eVeloTorque);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::VELOCITY_TORQUE);
     ctrl.tgt_posi_ = std::nullopt;
     ctrl.tgt_velo_ = 100;
     ctrl.tgt_torque_ = 0;
@@ -474,12 +474,12 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_PosiTorque) {
   // Safe positions from Python demo (per joint)
   const int16_t safe_pos[10] = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
   
-  std::cout << "[MixCtrlJointMotor] ePosiTorque mode for all 10 joints:" << std::endl;
+  std::cout << "[MixCtrlJointMotor] POSITION_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
     std::vector<MixCtrl> mix_ctrls;
     MixCtrl ctrl;
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(EControlMode::ePosiTorque);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::POSITION_TORQUE);
     ctrl.tgt_posi_ = safe_pos[joint - 1];
     ctrl.tgt_velo_ = std::nullopt;
     ctrl.tgt_torque_ = 0;

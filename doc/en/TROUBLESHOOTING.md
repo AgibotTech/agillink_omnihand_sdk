@@ -38,8 +38,8 @@ ls -la /dev/ttyACM0  # Should show rw-rw-rw-
 If you have multiple CANFD adapters:
 ```python
 # Try different device indices
-hand = OmniHand2025.create_hand_by_zlgcan(EHandType.LEFT, 1, 0, 0)  # First adapter
-hand = OmniHand2025.create_hand_by_zlgcan(EHandType.LEFT, 1, 1, 0)  # Second adapter
+hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, 0, 0)  # First adapter
+hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, 1, 0)  # Second adapter
 ```
 
 ---
@@ -90,10 +90,10 @@ info = hand.get_device_info()
 print(f"Actual device ID: {info.hand_device_id}")
 
 # If mismatch, create with correct ID
-hand = OmniHand2025.create_hand_by_zlgcan(EHandType.LEFT, actual_id, 0, 0)
+hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, actual_id, 0, 0)
 
 # If you don't know canfd_device_id, use SN (serial number) interface:
-hand = OmniHand2025.create_hand_by_zlgcan_sn(EHandType.LEFT, 1, "YOUR_DEVICE_SN", 0)
+hand = OmniHand2025.create_hand_by_zlgcan_sn(HandType.LEFT, 1, "YOUR_DEVICE_SN", 0)
 ```
 
 > **Note on `canfd_channel_id`**:
@@ -127,13 +127,13 @@ hand.set_request_timeout(500)  # 500ms timeout for each request
 #### Check Control Mode
 ```python
 # Use servo mode (recommended) or position mode
-from omnihand import EControlMode
+from omnihand import ControlMode
 
 # Servo mode - smooth motion with velocity/torque limits
-hand.set_all_control_mode(EControlMode.SERVO)
+hand.set_all_control_mode(ControlMode.SERVO)
 
 # Or position mode - direct position control
-hand.set_all_control_mode(EControlMode.POSITION)
+hand.set_all_control_mode(ControlMode.POSITIONTION)
 ```
 
 #### Check Position Range

@@ -74,7 +74,7 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
   // 读取触觉传感器数据（1D，使用 Raw API）
   std::cout << "\n1D Tactile Sensor Data (Raw):" << std::endl;
   try {
-    auto thumb_sensor = hand->GetTactileSensorDataRaw(EFinger::eThumb);
+    auto thumb_sensor = hand->GetTactileSensorDataRaw(Finger::THUMB);
     std::cout << "  Thumb: [";
     for (size_t i = 0; i < thumb_sensor.data_.size(); ++i) {
       std::cout << static_cast<int>(thumb_sensor.data_[i]);
@@ -82,7 +82,7 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
     }
     std::cout << "] (unit: 1g, max: 255g)" << std::endl;
     
-    auto index_sensor = hand->GetTactileSensorDataRaw(EFinger::eIndex);
+    auto index_sensor = hand->GetTactileSensorDataRaw(Finger::INDEX);
     std::cout << "  Index: [";
     for (size_t i = 0; i < index_sensor.data_.size(); ++i) {
       std::cout << static_cast<int>(index_sensor.data_[i]);
@@ -90,7 +90,7 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
     }
     std::cout << "] (unit: 1g, max: 255g)" << std::endl;
     
-    auto middle_sensor = hand->GetTactileSensorDataRaw(EFinger::eMiddle);
+    auto middle_sensor = hand->GetTactileSensorDataRaw(Finger::MIDDLE);
     std::cout << "  Middle: [";
     for (size_t i = 0; i < middle_sensor.data_.size(); ++i) {
       std::cout << static_cast<int>(middle_sensor.data_[i]);
@@ -104,12 +104,12 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
     for (const auto& sensor : all_sensors) {
       std::string finger_name;
       switch (sensor.sensor_id_) {
-        case EFinger::eThumb: finger_name = "Thumb"; break;
-        case EFinger::eIndex: finger_name = "Index"; break;
-        case EFinger::eMiddle: finger_name = "Middle"; break;
-        case EFinger::eRing: finger_name = "Ring"; break;
-        case EFinger::eLittle: finger_name = "Little"; break;
-        case EFinger::ePalm: finger_name = "Palm"; break;
+        case Finger::THUMB: finger_name = "Thumb"; break;
+        case Finger::INDEX: finger_name = "Index"; break;
+        case Finger::MIDDLE: finger_name = "Middle"; break;
+        case Finger::RING: finger_name = "Ring"; break;
+        case Finger::LITTLE: finger_name = "Little"; break;
+        case Finger::PALM: finger_name = "Palm"; break;
         // Note: UMI does not have Dorsum sensor
         default: finger_name = "Unknown"; break;
       }
@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
 
   if (mode == "left" || mode == "both") {
     auto left_hand = OmniHandDexUMI::createHandByZlgcan(
-        EHandType::eLeft,
+        HandType::LEFT,
         device_id,
         left_serial,
         0
@@ -171,7 +171,7 @@ int main(int argc, char** argv) {
 
   if (mode == "right" || mode == "both") {
     auto right_hand = OmniHandDexUMI::createHandByZlgcan(
-        EHandType::eRight,
+        HandType::RIGHT,
         device_id,
         right_serial,
         0
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
       std::cout << "\n=== Dual Hand Data Reading ===" << std::endl;
       
       auto left_hand = OmniHandDexUMI::createHandByZlgcan(
-          EHandType::eLeft,
+          HandType::LEFT,
           device_id,
           left_serial,
           0

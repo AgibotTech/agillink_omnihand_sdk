@@ -19,6 +19,54 @@
 #include "omnihand/omnihand_dex_umi.h"
 ```
 
+## 枚举类型
+
+### HandType
+
+```cpp
+enum class HandType : unsigned char {
+    LEFT = 0,      // 左手
+    RIGHT = 1,     // 右手
+    UNKNOWN = 255  // 未知手型
+};
+```
+
+### Finger
+
+```cpp
+enum class Finger : unsigned char {
+    THUMB = 0x01,    // 拇指
+    INDEX = 0x02,    // 食指
+    MIDDLE = 0x03,   // 中指
+    RING = 0x04,     // 无名指
+    LITTLE = 0x05,   // 小指
+    PALM = 0x06,     // 手心
+    DORSUM = 0x07,   // 手背（UMI 不支持）
+    UNKNOWN = 0xff   // 未知
+};
+```
+
+**注意**：UMI 支持手指和手心传感器（THUMB, INDEX, MIDDLE, RING, LITTLE, PALM），但不支持手背（DORSUM）传感器。
+
+### ControlMode
+
+```cpp
+enum class ControlMode : unsigned char {
+    POSITION                  = 0,    // 位置模式
+    SERVO                     = 1,    // 伺服模式
+    VELOCITY                  = 2,    // 速度模式
+    TORQUE                    = 3,    // 力控模式（不支持：纯力控不可用）
+    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 力矩）
+    VELOCITY_TORQUE           = 5,    // 速度-力控模式（混合控制：速度 + 力矩）
+    POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
+    UNKNOWN                   = 10    // 未知模式
+};
+```
+
+**注意**： 
+- **UMI 是只读设备**：OmniHand Dex UMI (O10 UMI) 不支持位置、速度或力矩控制，因此控制模式枚举ControlMode在 UMI 设备上不可用。
+- UMI 仅支持主动查询位置信息，不支持任何控制模式。
+
 ## 工厂方法
 
 ### 推荐：ZLG USB CANFD（零配置）
@@ -35,7 +83,7 @@
  * @note ✅ 推荐：零配置，开箱即用。无需 root 权限。
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id = 1,
     unsigned char canfd_device_id = 0,
     unsigned char canfd_channel_id = 0);
@@ -44,7 +92,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
 **示例：**
 ```cpp
 auto hand = OmniHandDexUMI::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -63,7 +111,7 @@ auto hand = OmniHandDexUMI::createHandByZlgcan(
  * @return OmniHandDexUMI 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& usbcanfd_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -81,7 +129,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
  * @return OmniHandDexUMI 实例的唯一指针
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     unsigned char canfd_device_id,
     unsigned char canfd_channel_id = 0);
@@ -90,7 +138,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
 **示例：**
 ```cpp
 auto hand = OmniHandDexUMI::createHandByHcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -109,7 +157,7 @@ auto hand = OmniHandDexUMI::createHandByHcan(
  * @return OmniHandDexUMI 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& hcan_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -120,7 +168,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
 ```cpp
 #ifdef __linux__
 static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& can_interface = "can0");
 #endif
@@ -192,25 +240,25 @@ std::vector<TactileSensorData> GetAllTactileSensorDataRaw() const;
  * @param eFinger 手指/手心枚举值
  * @return 包含完整分辨率数据的 TactileSensorData 结构
  * @note 使用 UMI 协议 Pn6。
- * @note UMI 不支持 eDorsum（手背传感器）
+ * @note UMI 不支持 DORSUM（手背传感器）
  */
-TactileSensorData GetTactileSensorDataRaw(EFinger eFinger) const;
+TactileSensorData GetTactileSensorDataRaw(Finger eFinger) const;
 
 /**
  * @brief 获取特定手指的传感器数据长度（静态方法）
  * @param eFinger 手指枚举值
  * @return 传感器数据长度（字节）
- * @note 对于 UMI：eDorsum 返回 0（UMI 没有手背传感器）
+ * @note 对于 UMI：DORSUM 返回 0（UMI 没有手背传感器）
  */
-static size_t GetSensorDataLength(EFinger eFinger);
+static size_t GetSensorDataLength(Finger eFinger);
 
 /**
  * @brief 获取传感器顺序向量（静态方法）
  * @return 传感器顺序向量的引用
- * @note 对于 UMI：返回的向量包含 eDorsum，但 UMI 设备没有手背传感器。
+ * @note 对于 UMI：返回的向量包含 DORSUM，但 UMI 设备没有手背传感器。
  *       使用 GetAllTactileSensorDataRaw() 时，只返回 UMI 上可用的传感器（Thumb, Index, Middle, Ring, Little, Palm）。
  */
-static const std::vector<EFinger>& GetSensorOrder();
+static const std::vector<Finger>& GetSensorOrder();
 ```
 
 ## DeviceInfo 的 UMI 特定字段
@@ -240,7 +288,7 @@ struct DeviceInfo {
 
 int main() {
     auto hand = OmniHandDexUMI::createHandByZlgcan(
-        EHandType::eLeft,
+        HandType::LEFT,
         1,      // hand_device_id
         0,      // canfd_device_id
         0       // canfd_channel_id

@@ -1,12 +1,12 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
 # OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
-from omnihand import OmniHand2025, EFinger, EControlMode, EHandType
+from omnihand import OmniHand2025, Finger, ControlMode, HandType
 import time
 
 def main():
-    left_hand = OmniHand2025.create_hand_socketcan(hand_type=EHandType.LEFT, can_interface="can0")
-    right_hand = OmniHand2025.create_hand_socketcan(hand_type=EHandType.RIGHT, can_interface="can1")
+    left_hand = OmniHand2025.create_hand_socketcan(hand_type=HandType.LEFT, can_interface="can0")
+    right_hand = OmniHand2025.create_hand_socketcan(hand_type=HandType.RIGHT, can_interface="can1")
 
     # 启用详细日志查看 CAN 通信
     left_hand.show_data_details(True)

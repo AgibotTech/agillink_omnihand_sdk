@@ -16,24 +16,24 @@
 ## Import
 
 ```python
-from omnihand import OmniHandDexUMI, EHandType, EFinger
+from omnihand import OmniHandDexUMI, HandType, Finger
 ```
 
 ## Enumerations
 
-### EHandType
+### HandType
 
 ```python
-class EHandType(IntEnum):
-    LEFT = 0      # Left hand
-    RIGHT = 1     # Right hand
-    UNKNOWN = 10
+class HandType(IntEnum):
+    LEFT = 0              # Left hand
+    RIGHT = 1             # Right hand
+    UNKNOWN = 255  # Unknown hand type
 ```
 
-### EFinger
+### Finger
 
 ```python
-class EFinger(IntEnum):
+class Finger(IntEnum):
     THUMB = 1
     INDEX = 2
     MIDDLE = 3
@@ -74,7 +74,7 @@ class DeviceInfo:
 
 ```python
 class TactileSensorData:
-    sensor_id: int  # EFinger enum value
+    sensor_id: int  # Finger enum value
     data: List[int]  # Raw sensor data (unit: 1g, max: 255g)
 ```
 
@@ -84,7 +84,7 @@ class TactileSensorData:
 
 ```python
 @staticmethod
-def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_by_zlgcan(hand_type: HandType = HandType.LEFT,
                 hand_device_id: int = 1,
                 canfd_id: int = 0,
                 canfd_channel_id: int = 0) -> 'OmniHandDexUMI':
@@ -104,7 +104,7 @@ def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
 **Example:**
 ```python
 hand = OmniHandDexUMI.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_channel_id=0
@@ -115,7 +115,7 @@ hand = OmniHandDexUMI.create_hand_by_zlgcan(
 
 ```python
 @staticmethod
-def create_hand_by_zlgcan(hand_type: EHandType,
+def create_hand_by_zlgcan(hand_type: HandType,
                 hand_device_id: int,
                 usbcanfd_serial_number: str,
                 canfd_channel_id: int = 0) -> 'OmniHandDexUMI':
@@ -136,7 +136,7 @@ def create_hand_by_zlgcan(hand_type: EHandType,
 
 ```python
 @staticmethod
-def create_hand_by_hcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_by_hcan(hand_type: HandType = HandType.LEFT,
                 hand_device_id: int = 1,
                 canfd_device_id: int = 0,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHandDexUMI':
@@ -156,7 +156,7 @@ def create_hand_by_hcan(hand_type: EHandType = EHandType.LEFT,
 **Example:**
 ```python
 hand = OmniHandDexUMI.create_hand_by_hcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_canfd_channel_id=0
@@ -167,7 +167,7 @@ hand = OmniHandDexUMI.create_hand_by_hcan(
 
 ```python
 @staticmethod
-def create_hand_by_hcan(hand_type: EHandType,
+def create_hand_by_hcan(hand_type: HandType,
                 hand_device_id: int,
                 hcan_usbcanfd_serial_number: str,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHandDexUMI':
@@ -188,7 +188,7 @@ def create_hand_by_hcan(hand_type: EHandType,
 
 ```python
 @staticmethod
-def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_by_zlgcan(hand_type: HandType = HandType.LEFT,
                 hand_device_id: int = 1,
                 canfd_id: int = 0,
                 canfd_channel_id: int = 0) -> 'OmniHandDexUMI':
@@ -212,7 +212,7 @@ def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
 **Example:**
 ```python
 hand = OmniHandDexUMI.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_channel_id=0
@@ -223,7 +223,7 @@ hand = OmniHandDexUMI.create_hand_by_zlgcan(
 
 ```python
 @staticmethod
-def create_hand_by_zlgcan(hand_type: EHandType,
+def create_hand_by_zlgcan(hand_type: HandType,
                 hand_device_id: int,
                 usbcanfd_serial_number: str,
                 canfd_channel_id: int = 0) -> 'OmniHandDexUMI':
@@ -244,7 +244,7 @@ def create_hand_by_zlgcan(hand_type: EHandType,
 
 ```python
 @staticmethod
-def create_hand_socketcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_socketcan(hand_type: HandType = HandType.LEFT,
                           hand_device_id: int = 1,
                           can_interface: str = "can0") -> 'OmniHandDexUMI':
     """Creates a dexterous hand object using SocketCAN (Linux only, advanced usage).
@@ -376,7 +376,7 @@ def get_all_tactile_sensor_data_raw(self) -> List[TactileSensorData]:
         Uses UMI Protocol Pn6.
     """
 
-def get_tactile_sensor_data_raw(self, eFinger: EFinger) -> TactileSensorData:
+def get_tactile_sensor_data_raw(self, eFinger: Finger) -> TactileSensorData:
     """Gets 1D tactile sensor raw data for a single sensor.
     
     Args:
@@ -394,13 +394,13 @@ def get_sensor_data_length(finger_index: int) -> int:
     """Get sensor data length for a specific finger (static method).
     
     Args:
-        finger_index: Finger enum value (EFinger).
+        finger_index: Finger enum value (Finger).
     
     Returns:
         int: Sensor data length in bytes.
     
     Note:
-        For UMI: Returns 0 for EFinger.DORSUM (UMI does not have dorsum sensor).
+        For UMI: Returns 0 for Finger.DORSUM (UMI does not have dorsum sensor).
     """
 
 @staticmethod
@@ -411,7 +411,7 @@ def get_sensor_order() -> List[int]:
         List[int]: Reference to sensor order vector.
     
     Note:
-        For UMI: The returned list includes EFinger.DORSUM, but UMI devices do not have dorsum sensor.
+        For UMI: The returned list includes Finger.DORSUM, but UMI devices do not have dorsum sensor.
         When using get_all_tactile_sensor_data_raw(), only sensors available on UMI 
         (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM) are returned.
     """
@@ -439,12 +439,12 @@ def show_data_details(self, show: bool) -> None:
 ## Complete Example
 
 ```python
-from omnihand import OmniHandDexUMI, EHandType, EFinger
+from omnihand import OmniHandDexUMI, HandType, Finger
 import time
 
 # Create hand instance
 hand = OmniHandDexUMI.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_channel_id=0

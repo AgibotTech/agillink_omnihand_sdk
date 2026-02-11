@@ -16,7 +16,7 @@ OmniHand 2025 综合控制示例 - CANFD 通信（通过 canfd_id）
 
 import sys
 import time
-from omnihand import OmniHand2025, EHandType, EFinger
+from omnihand import OmniHand2025, HandType, Finger
 
 
 def print_usage(program_name):
@@ -64,10 +64,10 @@ def control_single_hand(hand, hand_name):
     # 读取触觉传感器数据（1D）
     print("\n--- Tactile Sensor Data (1D) ---")
     try:
-        thumb_tactile = hand.get_tactile_sensor_data(EFinger.THUMB)
+        thumb_tactile = hand.get_tactile_sensor_data(Finger.THUMB)
         print(f"  Thumb: {thumb_tactile} (unit: 1g, max: 255g)")
 
-        index_tactile = hand.get_tactile_sensor_data(EFinger.INDEX)
+        index_tactile = hand.get_tactile_sensor_data(Finger.INDEX)
         print(f"  Index: {index_tactile} (unit: 1g, max: 255g)")
     except Exception as e:
         print(f"  Warning: {e}")
@@ -177,7 +177,7 @@ def main():
     if mode == "left":
         # 创建左手实例
         left_hand = OmniHand2025.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=0  # 第一个通道
@@ -197,7 +197,7 @@ def main():
     elif mode == "right":
         # 创建右手实例
         right_hand = OmniHand2025.create_hand_by_zlgcan(
-            hand_type=EHandType.RIGHT,
+            hand_type=HandType.RIGHT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=0  # 第一个通道
@@ -217,14 +217,14 @@ def main():
     elif mode == "both":
         # both 模式：同时创建两个手
         left_hand = OmniHand2025.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=0  # 第一个通道
         )
 
         right_hand = OmniHand2025.create_hand_by_zlgcan(
-            hand_type=EHandType.RIGHT,
+            hand_type=HandType.RIGHT,
             hand_device_id=hand_device_id,
             canfd_device_id=canfd_device_id,
             canfd_channel_id=1  # 第二个通道（需要多通道适配器）

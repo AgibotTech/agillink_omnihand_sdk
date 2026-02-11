@@ -1,7 +1,7 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
 # OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
-from omnihand import OmniHand2025, EFinger, EControlMode, EHandType
+from omnihand import OmniHand2025, Finger, ControlMode, HandType
 import time
 from enum import Enum
 
@@ -73,7 +73,7 @@ def get_gesture_positions(gesture):
     return gesture_positions.get(gesture, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def main():
-    hand = OmniHand2025.create_hand_by_zlgcan(hand_type=EHandType.RIGHT, canfd_channel_id=1)
+    hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.RIGHT, canfd_channel_id=1)
     
     while True:
         print_menu()

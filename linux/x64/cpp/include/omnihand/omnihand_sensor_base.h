@@ -27,13 +27,13 @@ class AGIBOT_EXPORT OmniHandSensorBase : public virtual OmniHand {
    * @param eFinger Finger enum value
    * @return Sensor data length in bytes
    */
-  static size_t GetSensorDataLength(EFinger eFinger);
+  static size_t GetSensorDataLength(Finger eFinger);
 
   /**
    * @brief Get sensor order vector
    * @return Reference to sensor order vector
    */
-  static const std::vector<EFinger>& GetSensorOrder();
+  static const std::vector<Finger>& GetSensorOrder();
 
   // ============ Common Tactile Sensor Interface (O10 and UMI) ============
   /**
@@ -50,7 +50,7 @@ class AGIBOT_EXPORT OmniHandSensorBase : public virtual OmniHand {
    * @return TactileSensorData structure containing full resolution data
    * @note Supported by OmniHand 2025 (O10) and OmniHand Dex UMI.
    */
-  virtual TactileSensorData GetTactileSensorDataRaw(EFinger eFinger) const = 0;
+  virtual TactileSensorData GetTactileSensorDataRaw(Finger eFinger) const = 0;
 
  protected:
   /**

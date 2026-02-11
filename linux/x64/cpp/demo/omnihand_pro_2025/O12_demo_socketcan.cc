@@ -79,14 +79,14 @@ void controlSingleHand(std::unique_ptr<OmniHandPro2025>& hand, const std::string
   // 读取 3D 触觉传感器数据（O12 特有）
   std::cout << "\n3D Tactile Sensor Data (O12 only):" << std::endl;
   try {
-    auto thumb_sensor = hand->GetTactileSensor3DData(EFinger::eThumb);
+    auto thumb_sensor = hand->GetTactileSensor3DData(Finger::THUMB);
     std::cout << "  Thumb:" << std::endl;
     std::cout << "    Online State: " << (thumb_sensor.online_state_ ? "Online" : "Offline") << std::endl;
     std::cout << "    Normal Force: " << thumb_sensor.normal_force_ << " (0.1N, max: 3000)" << std::endl;
     std::cout << "    Tangent Force: " << thumb_sensor.tangent_force_ << std::endl;
     std::cout << "    Tangent Force Angle: " << thumb_sensor.tangent_force_angle_ << "°" << std::endl;
     
-    auto index_sensor = hand->GetTactileSensor3DData(EFinger::eIndex);
+    auto index_sensor = hand->GetTactileSensor3DData(Finger::INDEX);
     std::cout << "  Index:" << std::endl;
     std::cout << "    Online State: " << (index_sensor.online_state_ ? "Online" : "Offline") << std::endl;
     std::cout << "    Normal Force: " << index_sensor.normal_force_ << " (0.1N, max: 3000)" << std::endl;
@@ -193,7 +193,7 @@ int main(int argc, char** argv) {
 
   if (mode == "left" || mode == "both") {
     auto left_hand = OmniHandPro2025::createHandSocketCan(
-        EHandType::eLeft,
+        HandType::LEFT,
         device_id,
         left_interface
     );
@@ -217,7 +217,7 @@ int main(int argc, char** argv) {
     std::string interface = (mode == "both") ? right_interface : left_interface;
     
     auto right_hand = OmniHandPro2025::createHandSocketCan(
-        EHandType::eRight,
+        HandType::RIGHT,
         device_id,
         interface
     );
@@ -242,7 +242,7 @@ int main(int argc, char** argv) {
       std::cout << "\n=== Dual Hand Control ===" << std::endl;
       
       auto left_hand = OmniHandPro2025::createHandSocketCan(
-          EHandType::eLeft,
+          HandType::LEFT,
           device_id,
           left_interface
       );

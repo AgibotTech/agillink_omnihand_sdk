@@ -27,49 +27,49 @@ enum class ProductType : unsigned char {
     OMNIHAND_2025        = 0,    // OmniHand 2025 (10 自由度)
     OMNIHAND_PRO_2025    = 1,    // OmniHand Pro 2025 (12 自由度)
     OMNIHAND_DEX_UMI     = 2,    // OmniHand Dex UMI (O10 UMI) (10 自由度, UMI 协议)
-    UNKNOWN_PRODUCT_TYPE = 255   // 未知
+    UNKNOWN = 255   // 未知
 };
 ```
 
 **注意**：新的产品特定接口不需要 `ProductType` - 每个类已经为其产品类型化了。
 
-### EHandType
+### HandType
 
 ```cpp
-enum class EHandType : unsigned char {
-    eLeft    = 0,    // 左手
-    eRight   = 1,    // 右手
-    eUnknown = 10    // 未知
+enum class HandType : unsigned char {
+    LEFT = 0,      // 左手
+    RIGHT = 1,     // 右手
+    UNKNOWN = 255  // 未知手型
 };
 ```
 
-### EFinger
+### Finger
 
 ```cpp
-enum class EFinger : unsigned char {
-    eThumb   = 0x01,    // 拇指
-    eIndex   = 0x02,    // 食指
-    eMiddle  = 0x03,    // 中指
-    eRing    = 0x04,    // 无名指
-    eLittle  = 0x05,    // 小指
-    ePalm    = 0x06,    // 手心
-    eDorsum  = 0x07,    // 手背
-    eUnknown = 0xff     // 未知
+enum class Finger : unsigned char {
+    THUMB = 0x01,    // 拇指
+    INDEX = 0x02,    // 食指
+    MIDDLE = 0x03,   // 中指
+    RING = 0x04,     // 无名指
+    LITTLE = 0x05,   // 小指
+    PALM = 0x06,     // 手心
+    DORSUM = 0x07,   // 手背
+    UNKNOWN = 0xff   // 未知
 };
 ```
 
-### EControlMode
+### ControlMode
 
 ```cpp
-enum class EControlMode : unsigned char {
-  ePosi           = 0,    // 位置模式
-  eServo          = 1,    // 伺服模式
-  eVelo           = 2,    // 速度模式
-  eTorque         = 3,    // 力控模式（不支持：纯力控不可用）
-  ePosiTorque     = 4,    // 位置-力控模式（混合控制：位置 + 力矩）
-  eVeloTorque     = 5,    // 速度-力控模式（混合控制：速度 + 力矩）
-  ePosiVeloTorque = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
-  eUnknown        = 10    // 未知模式
+enum class ControlMode : unsigned char {
+    POSITION                  = 0,    // 位置模式
+    SERVO                     = 1,    // 伺服模式
+    VELOCITY                  = 2,    // 速度模式
+    TORQUE                    = 3,    // 力控模式（不支持：纯力控不可用）
+    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 力矩）
+    VELOCITY_TORQUE           = 5,    // 速度-力控模式（混合控制：速度 + 力矩）
+    POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
+    UNKNOWN                   = 10    // 未知模式
 };
 ```
 
@@ -82,7 +82,7 @@ enum class EControlMode : unsigned char {
 
 // 创建手部实例
 auto hand = OmniHand2025::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -105,7 +105,7 @@ hand->SetAllActiveJointAngles(angles);
 
 // 创建手部实例
 auto hand = OmniHandPro2025::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -128,7 +128,7 @@ hand->SetAllActiveJointAngles(angles);
 
 // 创建手部实例
 auto hand = OmniHandDexUMI::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id

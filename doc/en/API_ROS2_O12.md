@@ -65,21 +65,21 @@ You can also use the helper Python scripts under `node/scripts/omnihand_pro_2025
 ```python
 std_msgs/Header header
 
-# ePosi = 0,                    # position control
-# eServo = 1,                   # servo mode
-# eVelo = 2,                    # velocity control
-# eTorque = 3,                  # torque control (not supported, use mixed modes)
-# ePosiTorque = 4,              # position-torque hybrid control
-# eVeloTorque = 5,              # velocity-torque hybrid control
-# ePosiVeloTorque = 6,          # position-velocity-torque hybrid control
-# eUnknown = 10                 # unknown mode
+# POSITION = 0,                    # position control
+# SERVO = 1,                   # servo mode
+# VELOCITY = 2,                    # velocity control
+# TORQUE = 3,                  # torque control (not supported, use mixed modes)
+# POSITION_TORQUE = 4,              # position-torque hybrid control
+# VELOCITY_TORQUE = 5,              # velocity-torque hybrid control
+# POSITION_VELOCITY_TORQUE = 6,          # position-velocity-torque hybrid control
+# UNKNOWN = 10                 # unknown mode
 
 int8[] modes  # 12 values for O12
 ```
 
 **Note**: 
-- **eServo mode (1)**: Servo control mode
-- **Pure torque control (eTorque) is not supported**: Use mixed control modes (ePosiTorque, eVeloTorque, ePosiVeloTorque) instead
+- **SERVO mode (1)**: Servo control mode
+- **Pure torque control (TORQUE) is not supported**: Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead
 
 ### `omnihand_pro_2025_node_msgs.msg.CurrentReport`
 

@@ -14,24 +14,24 @@
 ## Import
 
 ```python
-from omnihand import OmniHand2025, EHandType, EFinger, EControlMode
+from omnihand import OmniHand2025, HandType, Finger, ControlMode
 ```
 
 ## Enumerations
 
-### EHandType
+### HandType
 
 ```python
-class EHandType(IntEnum):
-    LEFT = 0      # Left hand
-    RIGHT = 1     # Right hand
-    UNKNOWN = 10
+class HandType(IntEnum):
+    LEFT = 0              # Left hand
+    RIGHT = 1             # Right hand
+    UNKNOWN = 255  # Unknown hand type
 ```
 
-### EFinger
+### Finger
 
 ```python
-class EFinger(IntEnum):
+class Finger(IntEnum):
     THUMB = 1
     INDEX = 2
     MIDDLE = 3
@@ -42,17 +42,17 @@ class EFinger(IntEnum):
     UNKNOWN = 255
 ```
 
-### EControlMode
+### ControlMode
 
 ```python
-class EControlMode(IntEnum):
-    POSITION = 0         # Position mode
+class ControlMode(IntEnum):
+    POSITIONTION = 0         # Position mode
     SERVO = 1            # Servo mode
-    VELOCITY = 2         # Velocity mode
+    VELOCITYCITY = 2         # Velocity mode
     TORQUE = 3           # Torque mode (pure torque control not supported)
-    POSITION_TORQUE = 4  # Position-Torque mixed mode
-    VELOCITY_TORQUE = 5  # Velocity-Torque mixed mode
-    POSITION_VELOCITY_TORQUE = 6 # Position-Velocity-Torque mixed mode
+    POSITIONTION_TORQUE = 4  # Position-Torque mixed mode
+    VELOCITYCITY_TORQUE = 5  # Velocity-Torque mixed mode
+    POSITIONTION_VELOCITYCITY_TORQUE = 6 # Position-Velocity-Torque mixed mode
     UNKNOWN = 10
 ```
 
@@ -90,7 +90,7 @@ class DeviceInfo:
 
 ```python
 class TactileSensorData:
-    sensor_id: int  # EFinger enum value
+    sensor_id: int  # Finger enum value
     data: List[int]  # Raw sensor data (unit: 1g, max: 255g)
 ```
 
@@ -100,7 +100,7 @@ class TactileSensorData:
 
 ```python
 @staticmethod
-def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_by_zlgcan(hand_type: HandType = HandType.LEFT,
                 hand_hand_device_id: int = 1,
                 canfd_device_id: int = 0,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
@@ -124,7 +124,7 @@ def create_hand_by_zlgcan(hand_type: EHandType = EHandType.LEFT,
 **Example:**
 ```python
 hand = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_channel_id=0
@@ -135,7 +135,7 @@ hand = OmniHand2025.create_hand_by_zlgcan(
 
 ```python
 @staticmethod
-def create_hand_by_zlgcan(hand_type: EHandType,
+def create_hand_by_zlgcan(hand_type: HandType,
                 hand_device_id: int,
                 usbcanfd_serial_number: str,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
@@ -156,7 +156,7 @@ def create_hand_by_zlgcan(hand_type: EHandType,
 
 ```python
 @staticmethod
-def create_hand_by_hcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_by_hcan(hand_type: HandType = HandType.LEFT,
                 hand_hand_device_id: int = 1,
                 canfd_device_id: int = 0,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
@@ -176,7 +176,7 @@ def create_hand_by_hcan(hand_type: EHandType = EHandType.LEFT,
 **Example:**
 ```python
 hand = OmniHand2025.create_hand_by_hcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_canfd_channel_id=0
@@ -187,7 +187,7 @@ hand = OmniHand2025.create_hand_by_hcan(
 
 ```python
 @staticmethod
-def create_hand_by_hcan(hand_type: EHandType,
+def create_hand_by_hcan(hand_type: HandType,
                 hand_device_id: int,
                 hcan_usbcanfd_serial_number: str,
                 canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
@@ -208,7 +208,7 @@ def create_hand_by_hcan(hand_type: EHandType,
 
 ```python
 @staticmethod
-def create_hand_by_rs485(hand_type: EHandType,
+def create_hand_by_rs485(hand_type: HandType,
                       hand_device_id: int,
                       uart_port: str,
                       baudrate: int = 460800) -> 'OmniHand2025':
@@ -229,7 +229,7 @@ def create_hand_by_rs485(hand_type: EHandType,
 
 ```python
 @staticmethod
-def create_hand_socketcan(hand_type: EHandType = EHandType.LEFT,
+def create_hand_socketcan(hand_type: HandType = HandType.LEFT,
                           hand_hand_device_id: int = 1,
                           can_interface: str = "can0") -> 'OmniHand2025':
     """Creates a dexterous hand object using SocketCAN (Linux only, advanced usage).
@@ -325,11 +325,18 @@ def get_joint_position(self, joint_motor_index: int) -> int:
         int: Current position (range: 0-4096).
     """
 
-def set_all_joint_positions(self, positions: List[int]) -> None:
+def set_all_joint_positions(self, positions: List[int], sync: bool = True) -> bool:
     """Sets the positions of all joint motors in batch.
     
     Args:
         positions: List of target positions. Must have 10 values, each in range 0-4096.
+        sync: If True (default), waits for device response. If False, sends without waiting (faster).
+    
+    Returns:
+        True if command was sent successfully, False otherwise.
+    
+    Note:
+        Use sync=False for high-frequency control loops.
     """
 
 def get_all_joint_positions(self) -> List[int]:
@@ -458,7 +465,7 @@ OmniHand 2025 (O10) uses **1D tactile sensors** with the following characteristi
 - **Sensor locations**: Fingers (16 points each), Palm (78 points), Dorsum (102 points)
 
 ```python
-def get_tactile_sensor_data(self, eFinger: EFinger) -> List[int]:
+def get_tactile_sensor_data(self, eFinger: Finger) -> List[int]:
     """Gets the tactile sensor data for a specified part (O10 only).
     
     Args:
@@ -484,7 +491,7 @@ def get_all_tactile_sensor_data_raw(self) -> List[TactileSensorData]:
         This returns full resolution data, unlike get_tactile_sensor_data() which returns downsampled data.
     """
 
-def get_tactile_sensor_data_raw(self, eFinger: EFinger) -> TactileSensorData:
+def get_tactile_sensor_data_raw(self, eFinger: Finger) -> TactileSensorData:
     """Gets 1D tactile sensor raw data for a single sensor.
     
     Args:
@@ -516,7 +523,7 @@ def get_sensor_data_length(finger_index: int) -> int:
     """Get sensor data length for a specific finger (static method).
     
     Args:
-        finger_index: Finger enum value (EFinger).
+        finger_index: Finger enum value (Finger).
     
     Returns:
         int: Sensor data length in bytes.
@@ -539,7 +546,7 @@ def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
     
     Args:
         joint_motor_index: Joint motor index (1-10).
-        mode: Control mode (see EControlMode).
+        mode: Control mode (see ControlMode).
     
     Note:
         - SERVO mode is O10-only
@@ -553,7 +560,7 @@ def get_control_mode(self, joint_motor_index: int) -> int:
         joint_motor_index: Joint motor index (1-10).
     
     Returns:
-        int: Current control mode (see EControlMode).
+        int: Current control mode (see ControlMode).
     
     Note:
         This interface is not supported for serial port communication (RS485).
@@ -739,11 +746,11 @@ def show_data_details(self, show: bool) -> None:
 ## Complete Example
 
 ```python
-from omnihand import OmniHand2025, EHandType, EFinger
+from omnihand import OmniHand2025, HandType, Finger
 
 # Create hand instance
 hand = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
     canfd_channel_id=0
@@ -763,7 +770,7 @@ hand.set_all_active_joint_angles(angles)
 print(f"Set joint angles: {angles} (rad)")
 
 # Get tactile sensor data
-thumb_data = hand.get_tactile_sensor_data(EFinger.THUMB)
+thumb_data = hand.get_tactile_sensor_data(Finger.THUMB)
 print(f"Thumb sensor data: {len(thumb_data)} points")
 ```
 

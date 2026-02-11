@@ -34,19 +34,19 @@ class OmniHandPro2025Test : public ::testing::Test {
     std::string device_type = GetDeviceType();
     if (device_type == "hcan") {
       hand_ = OmniHandPro2025::createHandByHcan(
-          EHandType::eLeft,
-          1,      // device_id
-          0,      // dev_id
-          0       // channel_id
+          HandType::LEFT,        // hand_type: left hand
+          1,                       // hand_device_id: hand device ID
+          0,                       // canfd_device_id: HCAN device index
+          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
       );
       std::cout << "[Info]: Using HCAN device" << std::endl;
     } else {
       // Default: ZLG CAN
       hand_ = OmniHandPro2025::createHandByZlgcan(
-          EHandType::eLeft,
-          1,      // device_id
-          0,      // canfd_id
-          0       // channel_id
+          HandType::LEFT,        // hand_type: left hand
+          1,                       // hand_device_id: hand device ID
+          0,                       // canfd_device_id: USB CANFD adapter device index
+          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
       );
       std::cout << "[Info]: Using ZLG CAN device" << std::endl;
     }
@@ -219,7 +219,7 @@ TEST_F(OmniHandPro2025Test, ControlMode) {
 TEST_F(OmniHandPro2025Test, TactileSensor3D) {
   if (hand_->Init()) {
     // Test single sensor
-    auto thumb_tactile = hand_->GetTactileSensor3DData(EFinger::eThumb);
+    auto thumb_tactile = hand_->GetTactileSensor3DData(Finger::THUMB);
     std::cout << "[GetTactileSensor3DData] Thumb 3D Tactile Data:" << std::endl;
     std::cout << "  Online State: " << static_cast<int>(thumb_tactile.online_state_) << std::endl;
     std::cout << "  Normal Force: " << thumb_tactile.normal_force_ << std::endl;
@@ -228,7 +228,7 @@ TEST_F(OmniHandPro2025Test, TactileSensor3D) {
     EXPECT_GE(thumb_tactile.normal_force_, 0);
     
     // Test multiple sensors
-    std::vector<EFinger> fingers = {EFinger::eIndex, EFinger::eMiddle, EFinger::eRing, EFinger::eLittle};
+    std::vector<Finger> fingers = {Finger::INDEX, Finger::MIDDLE, Finger::RING, Finger::LITTLE};
     for (const auto& finger : fingers) {
       auto tactile_data = hand_->GetTactileSensor3DData(finger);
       std::cout << "[GetTactileSensor3DData] " << static_cast<int>(finger) << " 3D Tactile Data:" << std::endl;

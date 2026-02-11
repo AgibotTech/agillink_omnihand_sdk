@@ -10,7 +10,7 @@ OmniHand Dex UMI 使用一维触觉传感器（1D sensors）。
 因此必须使用 get_tactile_sensor_data_raw() 方法，而不是 get_tactile_sensor_data()。
 """
 
-from omnihand import OmniHandDexUMI, EFinger, EHandType
+from omnihand import OmniHandDexUMI, Finger, HandType
 import time
 
 def main():
@@ -23,7 +23,7 @@ def main():
     
     # 创建 OmniHand Dex UMI 灵巧手实例
     hand = OmniHandDexUMI.create_hand_by_zlgcan(
-        hand_type=EHandType.LEFT,
+        hand_type=HandType.LEFT,
         hand_device_id=1,
         canfd_device_id=0,
         canfd_channel_id=0
@@ -41,12 +41,12 @@ def main():
     
     # UMI has 6 sensors (no Dorsum/back of hand)
     fingers = [
-        (EFinger.THUMB, "Thumb"),
-        (EFinger.INDEX, "Index"),
-        (EFinger.MIDDLE, "Middle"),
-        (EFinger.RING, "Ring"),
-        (EFinger.LITTLE, "Little"),
-        (EFinger.PALM, "Palm"),
+        (Finger.THUMB, "Thumb"),
+        (Finger.INDEX, "Index"),
+        (Finger.MIDDLE, "Middle"),
+        (Finger.RING, "Ring"),
+        (Finger.LITTLE, "Little"),
+        (Finger.PALM, "Palm"),
     ]
     
     for finger_enum, finger_name in fingers:
@@ -73,7 +73,7 @@ def main():
         all_sensor_data = hand.get_all_tactile_sensor_data_raw()
         print(f"Total sensors: {len(all_sensor_data)}")
         for sensor_data in all_sensor_data:
-            # sensor_id is an integer (EFinger enum value)
+            # sensor_id is an integer (Finger enum value)
             sensor_id = sensor_data.sensor_id
             sensor_name = "Unknown"
             for finger_enum, finger_name in fingers:
@@ -91,7 +91,7 @@ def main():
     print("=" * 50)
     for i in range(5):
         try:
-            thumb_sensor_data = hand.get_tactile_sensor_data_raw(EFinger.THUMB)
+            thumb_sensor_data = hand.get_tactile_sensor_data_raw(Finger.THUMB)
             if thumb_sensor_data and thumb_sensor_data.data:
                 thumb_sum = sum(thumb_sensor_data.data)
                 print(f"Sample {i+1}: Thumb sum = {thumb_sum} g")

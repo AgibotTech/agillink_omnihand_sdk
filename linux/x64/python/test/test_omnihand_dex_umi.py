@@ -15,14 +15,14 @@ if parent_dir in sys.path:
     sys.path.remove(parent_dir)
 
 import pytest
-from omnihand import OmniHandDexUMI, EHandType, EFinger
+from omnihand import OmniHandDexUMI, HandType, Finger
 
 
 @pytest.fixture
 def hand():
     """Create and initialize OmniHand Dex UMI instance for testing"""
     hand = OmniHandDexUMI.create_hand_by_zlgcan(
-        hand_type=EHandType.LEFT,
+        hand_type=HandType.LEFT,
         hand_device_id=1,
         canfd_device_id=0,
         canfd_channel_id=0
@@ -64,12 +64,12 @@ def test_tactile_sensor_raw(hand):
     
     # Test all 6 sensors (UMI has: Thumb, Index, Middle, Ring, Little, Palm - no Dorsum)
     fingers = [
-        (EFinger.THUMB, "Thumb"),
-        (EFinger.INDEX, "Index"),
-        (EFinger.MIDDLE, "Middle"),
-        (EFinger.RING, "Ring"),
-        (EFinger.LITTLE, "Little"),
-        (EFinger.PALM, "Palm"),
+        (Finger.THUMB, "Thumb"),
+        (Finger.INDEX, "Index"),
+        (Finger.MIDDLE, "Middle"),
+        (Finger.RING, "Ring"),
+        (Finger.LITTLE, "Little"),
+        (Finger.PALM, "Palm"),
     ]
     
     print(f"\n[get_tactile_sensor_data_raw] Reading individual sensors (unit: 1g, max: 255g):")
@@ -82,12 +82,12 @@ def test_tactile_sensor_raw(hand):
     all_tactile_data = hand.get_all_tactile_sensor_data_raw()
     print(f"\n[get_all_tactile_sensor_data_raw] All {len(all_tactile_data)} sensors:")
     finger_names = {
-        EFinger.THUMB: "Thumb",
-        EFinger.INDEX: "Index",
-        EFinger.MIDDLE: "Middle",
-        EFinger.RING: "Ring",
-        EFinger.LITTLE: "Little",
-        EFinger.PALM: "Palm",
+        Finger.THUMB: "Thumb",
+        Finger.INDEX: "Index",
+        Finger.MIDDLE: "Middle",
+        Finger.RING: "Ring",
+        Finger.LITTLE: "Little",
+        Finger.PALM: "Palm",
     }
     for sensor in all_tactile_data:
         name = finger_names.get(sensor.sensor_id, "Unknown")
@@ -117,7 +117,7 @@ def test_get_all_joint_positions(hand):
     # Expect 10 joint positions (UMI has 10 DOF)
     assert len(positions) == 10
 
-
+'''
 # Position calibration tests
 # Warning: These tests perform actual calibration - use with caution
 def test_min_position_calibration(hand):
@@ -146,7 +146,7 @@ def test_max_position_calibration(hand):
     for joint_idx in range(1, 11):
         hand.set_max_position_calibration(joint_idx)
         print(f"[set_max_position_calibration] Maximum position calibration set for joint {joint_idx}")
-
+'''
 
 if __name__ == "__main__":
     # Default to verbose mode if -v is not already specified

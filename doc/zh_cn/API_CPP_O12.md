@@ -18,6 +18,54 @@
 #include "omnihand/omnihand_pro_2025.h"
 ```
 
+## 枚举类型
+
+### HandType
+
+```cpp
+enum class HandType : unsigned char {
+    LEFT = 0,      // 左手
+    RIGHT = 1,     // 右手
+    UNKNOWN = 255  // 未知手型
+};
+```
+
+### Finger
+
+```cpp
+enum class Finger : unsigned char {
+    THUMB = 0x01,    // 拇指
+    INDEX = 0x02,    // 食指
+    MIDDLE = 0x03,   // 中指
+    RING = 0x04,     // 无名指
+    LITTLE = 0x05,   // 小指
+    PALM = 0x06,     // 手心（O12 不支持）
+    DORSUM = 0x07,   // 手背（O12 不支持）
+    UNKNOWN = 0xff   // 未知
+};
+```
+
+**注意**：O12 仅支持手指传感器（THUMB, INDEX, MIDDLE, RING, LITTLE），不支持手心（PALM）和手背（DORSUM）传感器。
+
+### ControlMode
+
+```cpp
+enum class ControlMode : unsigned char {
+    POSITION                  = 0,    // 位置模式
+    SERVO                     = 1,    // 伺服模式
+    VELOCITY                  = 2,    // 速度模式
+    TORQUE                    = 3,    // 力控模式（不支持：纯力控不可用）
+    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 力矩）
+    VELOCITY_TORQUE           = 5,    // 速度-力控模式（混合控制：速度 + 力矩）
+    POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
+    UNKNOWN                   = 10    // 未知模式
+};
+```
+
+**注意**： 
+- **SERVO 模式 (1)**：伺服控制模式
+- **纯力控模式 (TORQUE) 不支持**：请使用混合控制模式（POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE）
+
 ## 工厂方法
 
 ### 推荐：ZLG USB CANFD（零配置）
@@ -34,7 +82,7 @@
  * @note ✅ 推荐：零配置，开箱即用。无需 root 权限。
  */
 static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id = 1,
     unsigned char canfd_device_id = 0,
     unsigned char canfd_channel_id = 0);
@@ -43,7 +91,7 @@ static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
 **示例：**
 ```cpp
 auto hand = OmniHandPro2025::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -62,7 +110,7 @@ auto hand = OmniHandPro2025::createHandByZlgcan(
  * @return OmniHandPro2025 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& usbcanfd_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -80,7 +128,7 @@ static std::unique_ptr<OmniHandPro2025> createHandByZlgcan(
  * @return OmniHandPro2025 实例的唯一指针
  */
 static std::unique_ptr<OmniHandPro2025> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     unsigned char canfd_device_id,
     unsigned char canfd_channel_id = 0);
@@ -89,7 +137,7 @@ static std::unique_ptr<OmniHandPro2025> createHandByHcan(
 **示例：**
 ```cpp
 auto hand = OmniHandPro2025::createHandByHcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -108,7 +156,7 @@ auto hand = OmniHandPro2025::createHandByHcan(
  * @return OmniHandPro2025 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHandPro2025> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& hcan_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -119,7 +167,7 @@ static std::unique_ptr<OmniHandPro2025> createHandByHcan(
 ```cpp
 #ifdef __linux__
 static std::unique_ptr<OmniHandPro2025> createHandSocketCan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& can_interface = "can0");
 #endif
@@ -178,7 +226,7 @@ std::vector<double> GetAllJointAngles() const;  // 返回 18 个值（12 主动 
 ```cpp
 void SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi);  // 1-12
 int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
-void SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi);  // 12 个值
+bool SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi, bool sync = true);  // 12 个值, sync=false 为异步模式
 std::vector<int16_t> GetAllJointMotorPosi() const;
 ```
 
@@ -196,7 +244,7 @@ std::vector<int16_t> GetAllJointMotorPosi() const;
  *         - tangent_force_angle: 切向力角度（0-359 度）
  *         - capa_approach[4]: 电容接近值
  */
-TactileSensor3DData GetTactileSensor3DData(EFinger eFinger) const;
+TactileSensor3DData GetTactileSensor3DData(Finger eFinger) const;
 ```
 
 ### 温度和电流上报周期设置（O12 特有）
@@ -216,7 +264,7 @@ void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period);
 
 int main() {
     auto hand = OmniHandPro2025::createHandByZlgcan(
-        EHandType::eLeft,
+        HandType::LEFT,
         1,      // hand_device_id
         0,      // canfd_device_id
         0       // canfd_channel_id
@@ -238,7 +286,7 @@ int main() {
     std::cout << " (rad)" << std::endl;
 
     // 获取 3D 触觉传感器数据
-    auto thumb_data = hand->GetTactileSensor3DData(EFinger::eThumb);
+    auto thumb_data = hand->GetTactileSensor3DData(Finger::THUMB);
     std::cout << "拇指法向力: " << thumb_data.normal_force_ << " (0.1N)" << std::endl;
 
     return 0;

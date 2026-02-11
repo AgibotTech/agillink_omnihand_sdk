@@ -21,30 +21,34 @@
 
 ## Enums
 
-### EHandType
+### HandType
 
 ```cpp
-enum class EHandType : unsigned char {
-    eLeft    = 0,    // Left hand
-    eRight   = 1,    // Right hand
-    eUnknown = 10    // Unknown
+enum class HandType : unsigned char {
+    LEFT = 0,      // Left hand
+    RIGHT = 1,     // Right hand
+    UNKNOWN = 255  // Unknown hand type
 };
 ```
 
-### EFinger
+### Finger
 
 ```cpp
-enum class EFinger : unsigned char {
-    eThumb   = 0x01,    // Thumb
-    eIndex   = 0x02,    // Index finger
-    eMiddle  = 0x03,    // Middle finger
-    eRing    = 0x04,    // Ring finger
-    eLittle  = 0x05,    // Little (pinky) finger
-    ePalm    = 0x06,    // Palm
-    // Note: UMI does not have Dorsum (back of hand) sensor
-    eUnknown = 0xff     // Unknown
+enum class Finger : unsigned char {
+    THUMB = 0x01,    // Thumb
+    INDEX = 0x02,    // Index finger
+    MIDDLE = 0x03,   // Middle finger
+    RING = 0x04,     // Ring finger
+    LITTLE = 0x05,   // Little (pinky) finger
+    PALM = 0x06,     // Palm
+    DORSUM = 0x07,   // Dorsum (not supported by UMI)
+    UNKNOWN = 0xff   // Unknown
 };
 ```
+
+**Note**
+- UMI supports finger and palm sensors (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM), but does not support dorsum (DORSUM) sensor.
+- **UMI is a read-only device**: OmniHand Dex UMI (O10 UMI) does not support position, velocity, or torque control, so these control mode enums are not available for UMI devices.
 
 ## Data Structures
 
@@ -78,7 +82,7 @@ struct DeviceInfo {
 
 ```cpp
 struct TactileSensorData {
-    EFinger sensor_id_;           // Sensor ID (finger/palm, UMI has no dorsum)
+    Finger sensor_id_;           // Sensor ID (finger/palm, UMI has no dorsum)
     std::vector<uint8_t> data_;   // Sensor data (unit: 1g, max: 255g)
 };
 ```
@@ -100,7 +104,7 @@ struct TactileSensorData {
  * @note ✅ Recommended: Zero configuration, ready to use out of the box. No root privileges required.
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id = 1,
     unsigned char canfd_device_id = 0,
     unsigned char canfd_channel_id = 0);
@@ -109,7 +113,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
 **Example:**
 ```cpp
 auto hand = OmniHandDexUMI::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -128,7 +132,7 @@ auto hand = OmniHandDexUMI::createHandByZlgcan(
  * @return A unique pointer to OmniHandDexUMI instance, or nullptr if device not found
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& usbcanfd_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -146,7 +150,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
  * @return A unique pointer to OmniHandDexUMI instance
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     unsigned char canfd_device_id,
     unsigned char canfd_channel_id = 0);
@@ -155,7 +159,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
 **Example:**
 ```cpp
 auto hand = OmniHandDexUMI::createHandByHcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -174,7 +178,7 @@ auto hand = OmniHandDexUMI::createHandByHcan(
  * @return A unique pointer to OmniHandDexUMI instance, or nullptr if device not found
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& hcan_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -193,7 +197,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
  * @warning ⚠️ Advanced Usage: Requires driver setup and root privileges.
  */
 static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& can_interface = "can0");
 #endif
@@ -316,25 +320,25 @@ std::vector<TactileSensorData> GetAllTactileSensorDataRaw() const;
  * @param eFinger Finger/palm enum value
  * @return TactileSensorData structure containing full resolution data
  * @note Uses UMI Protocol Pn6.
- * @note UMI does not support eDorsum (dorsum sensor)
+ * @note UMI does not support DORSUM (dorsum sensor)
  */
-TactileSensorData GetTactileSensorDataRaw(EFinger eFinger) const;
+TactileSensorData GetTactileSensorDataRaw(Finger eFinger) const;
 
 /**
  * @brief Get sensor data length for a specific finger (static method)
  * @param eFinger Finger enum value
  * @return Sensor data length in bytes
- * @note For UMI: Returns 0 for eDorsum (UMI does not have dorsum sensor)
+ * @note For UMI: Returns 0 for DORSUM (UMI does not have dorsum sensor)
  */
-static size_t GetSensorDataLength(EFinger eFinger);
+static size_t GetSensorDataLength(Finger eFinger);
 
 /**
  * @brief Get sensor order vector (static method)
  * @return Reference to sensor order vector
- * @note For UMI: The returned vector includes eDorsum, but UMI devices do not have dorsum sensor.
+ * @note For UMI: The returned vector includes DORSUM, but UMI devices do not have dorsum sensor.
  *       When using GetAllTactileSensorDataRaw(), only sensors available on UMI (Thumb, Index, Middle, Ring, Little, Palm) are returned.
  */
-static const std::vector<EFinger>& GetSensorOrder();
+static const std::vector<Finger>& GetSensorOrder();
 ```
 
 ## Debugging Features
@@ -366,7 +370,7 @@ void ShowDataDetails(bool show) const;
 int main() {
     // Create hand instance
     auto hand = OmniHandDexUMI::createHandByZlgcan(
-        EHandType::eLeft,
+        HandType::LEFT,
         1,      // hand_device_id
         0,      // canfd_device_id
         0       // canfd_channel_id

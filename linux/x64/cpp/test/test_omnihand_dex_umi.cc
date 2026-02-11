@@ -16,10 +16,10 @@ class OmniHandDexUMITest : public ::testing::Test {
   void SetUp() override {
     // Create hand instance for testing
     hand_ = OmniHandDexUMI::createHandByZlgcan(
-        EHandType::eLeft,
-        1,      // device_id
-        0,      // canfd_id
-        0       // channel_id
+        HandType::LEFT,        // hand_type: left hand
+        1,                       // hand_device_id: hand device ID
+        0,                       // canfd_device_id: USB CANFD adapter device index
+        0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
     );
   }
 
@@ -63,13 +63,13 @@ TEST_F(OmniHandDexUMITest, TactileSensor) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
   // Test all 6 sensors (UMI has: Thumb, Index, Middle, Ring, Little, Palm - no Dorsum)
-  std::vector<std::pair<EFinger, std::string>> fingers = {
-    {EFinger::eThumb, "Thumb"},
-    {EFinger::eIndex, "Index"},
-    {EFinger::eMiddle, "Middle"},
-    {EFinger::eRing, "Ring"},
-    {EFinger::eLittle, "Little"},
-    {EFinger::ePalm, "Palm"}
+  std::vector<std::pair<Finger, std::string>> fingers = {
+    {Finger::THUMB, "Thumb"},
+    {Finger::INDEX, "Index"},
+    {Finger::MIDDLE, "Middle"},
+    {Finger::RING, "Ring"},
+    {Finger::LITTLE, "Little"},
+    {Finger::PALM, "Palm"}
   };
   
   std::cout << "[GetTactileSensorDataRaw] Reading individual sensors (unit: 1g, max: 255g):" << std::endl;
@@ -90,12 +90,12 @@ TEST_F(OmniHandDexUMITest, TactileSensor) {
   for (const auto& sensor : all_tactile_data) {
     std::string finger_name;
     switch (sensor.sensor_id_) {
-      case EFinger::eThumb: finger_name = "Thumb"; break;
-      case EFinger::eIndex: finger_name = "Index"; break;
-      case EFinger::eMiddle: finger_name = "Middle"; break;
-      case EFinger::eRing: finger_name = "Ring"; break;
-      case EFinger::eLittle: finger_name = "Little"; break;
-      case EFinger::ePalm: finger_name = "Palm"; break;
+      case Finger::THUMB: finger_name = "Thumb"; break;
+      case Finger::INDEX: finger_name = "Index"; break;
+      case Finger::MIDDLE: finger_name = "Middle"; break;
+      case Finger::RING: finger_name = "Ring"; break;
+      case Finger::LITTLE: finger_name = "Little"; break;
+      case Finger::PALM: finger_name = "Palm"; break;
       default: finger_name = "Unknown"; break;
     }
     std::cout << "  " << finger_name << " (" << sensor.data_.size() << " values): [";
@@ -142,34 +142,34 @@ TEST_F(OmniHandDexUMITest, GetAllJointMotorPosi) {
   EXPECT_EQ(positions.size(), OmniHandDexUMI::kDegreesOfActiveFreedom);
 }
 
-// Test position calibration (UMI specific)
-// Warning: These tests perform actual calibration - use with caution
-TEST_F(OmniHandDexUMITest, MinPositionCalibration) {
-  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+// // Test position calibration (UMI specific)
+// // Warning: These tests perform actual calibration - use with caution
+// TEST_F(OmniHandDexUMITest, MinPositionCalibration) {
+//   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
-  // Test all joints calibration
-  hand_->SetMinPositionCalibration();
-  std::cout << "[SetMinPositionCalibration] Minimum position calibration set for all joints" << std::endl;
+//   // Test all joints calibration
+//   hand_->SetMinPositionCalibration();
+//   std::cout << "[SetMinPositionCalibration] Minimum position calibration set for all joints" << std::endl;
   
-  // Test single joint calibration (joint 1-10)
-  for (unsigned char joint_idx = 1; joint_idx <= 10; ++joint_idx) {
-    hand_->SetMinPositionCalibration(joint_idx);
-    std::cout << "[SetMinPositionCalibration] Minimum position calibration set for joint " 
-              << static_cast<int>(joint_idx) << std::endl;
-  }
-}
+//   // Test single joint calibration (joint 1-10)
+//   for (unsigned char joint_idx = 1; joint_idx <= 10; ++joint_idx) {
+//     hand_->SetMinPositionCalibration(joint_idx);
+//     std::cout << "[SetMinPositionCalibration] Minimum position calibration set for joint " 
+//               << static_cast<int>(joint_idx) << std::endl;
+//   }
+// }
 
-TEST_F(OmniHandDexUMITest, MaxPositionCalibration) {
-  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+// TEST_F(OmniHandDexUMITest, MaxPositionCalibration) {
+//   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
-  // Test all joints calibration
-  hand_->SetMaxPositionCalibration();
-  std::cout << "[SetMaxPositionCalibration] Maximum position calibration set for all joints" << std::endl;
+//   // Test all joints calibration
+//   hand_->SetMaxPositionCalibration();
+//   std::cout << "[SetMaxPositionCalibration] Maximum position calibration set for all joints" << std::endl;
   
-  // Test single joint calibration (joint 1-10)
-  for (unsigned char joint_idx = 1; joint_idx <= 10; ++joint_idx) {
-    hand_->SetMaxPositionCalibration(joint_idx);
-    std::cout << "[SetMaxPositionCalibration] Maximum position calibration set for joint " 
-              << static_cast<int>(joint_idx) << std::endl;
-  }
-}
+//   // Test single joint calibration (joint 1-10)
+//   for (unsigned char joint_idx = 1; joint_idx <= 10; ++joint_idx) {
+//     hand_->SetMaxPositionCalibration(joint_idx);
+//     std::cout << "[SetMaxPositionCalibration] Maximum position calibration set for joint " 
+//               << static_cast<int>(joint_idx) << std::endl;
+//   }
+// }

@@ -19,49 +19,49 @@
 
 ## 枚举类型
 
-### EHandType
+### HandType
 
 ```cpp
-enum class EHandType : unsigned char {
-    eLeft    = 0,    // 左手
-    eRight   = 1,    // 右手
-    eUnknown = 10    // 未知
+enum class HandType : unsigned char {
+    LEFT = 0,      // 左手
+    RIGHT = 1,     // 右手
+    UNKNOWN = 255  // 未知手型
 };
 ```
 
-### EFinger
+### Finger
 
 ```cpp
-enum class EFinger : unsigned char {
-    eThumb   = 0x01,    // 拇指
-    eIndex   = 0x02,    // 食指
-    eMiddle  = 0x03,    // 中指
-    eRing    = 0x04,    // 无名指
-    eLittle  = 0x05,    // 小指
-    ePalm    = 0x06,    // 手心
-    eDorsum  = 0x07,    // 手背
-    eUnknown = 0xff     // 未知
+enum class Finger : unsigned char {
+    THUMB = 0x01,    // 拇指
+    INDEX = 0x02,    // 食指
+    MIDDLE = 0x03,   // 中指
+    RING = 0x04,     // 无名指
+    LITTLE = 0x05,   // 小指
+    PALM = 0x06,     // 手心
+    DORSUM = 0x07,   // 手背
+    UNKNOWN = 0xff   // 未知
 };
 ```
 
-### EControlMode
+### ControlMode
 
 ```cpp
-enum class EControlMode : unsigned char {
-  ePosi           = 0,    // 位置模式
-  eServo          = 1,    // 伺服模式
-  eVelo           = 2,    // 速度模式
-  eTorque         = 3,    // 力控模式（不支持：纯力控不可用）
-  ePosiTorque     = 4,    // 位置-力控模式（混合控制：位置 + 力矩）
-  eVeloTorque     = 5,    // 速度-力控模式（混合控制：速度 + 力矩）
-  ePosiVeloTorque = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
-  eUnknown        = 10    // 未知模式
+enum class ControlMode : unsigned char {
+    POSITION                  = 0,    // 位置模式
+    SERVO                     = 1,    // 伺服模式
+    VELOCITY                  = 2,    // 速度模式
+    TORQUE                    = 3,    // 力控模式（不支持：纯力控不可用）
+    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 力矩）
+    VELOCITY_TORQUE           = 5,    // 速度-力控模式（混合控制：速度 + 力矩）
+    POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
+    UNKNOWN                   = 10    // 未知模式
 };
 ```
 
 **注意**： 
-- **eServo 模式 (1)**：伺服控制模式
-- **纯力控模式 (eTorque) 不支持**：请使用混合控制模式（ePosiTorque, eVeloTorque, ePosiVeloTorque）
+- **SERVO 模式 (1)**：伺服控制模式
+- **纯力控模式 (TORQUE) 不支持**：请使用混合控制模式（POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE）
 
 ## 数据结构
 
@@ -94,7 +94,7 @@ struct DeviceInfo {
 
 ```cpp
 struct TactileSensorData {
-    EFinger sensor_id_;           // 传感器 ID（手指/手心/手背）
+    Finger sensor_id_;           // 传感器 ID（手指/手心/手背）
     std::vector<uint8_t> data_;   // 传感器数据（单位：1g，最大值：255g）
 };
 ```
@@ -115,7 +115,7 @@ struct TactileSensorData {
  * @note ✅ 推荐：零配置，开箱即用。无需 root 权限。
  */
 static std::unique_ptr<OmniHand2025> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id = 1,
     unsigned char canfd_device_id = 0,
     unsigned char canfd_channel_id = 0);
@@ -124,7 +124,7 @@ static std::unique_ptr<OmniHand2025> createHandByZlgcan(
 **示例：**
 ```cpp
 auto hand = OmniHand2025::createHandByZlgcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -143,7 +143,7 @@ auto hand = OmniHand2025::createHandByZlgcan(
  * @return OmniHand2025 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHand2025> createHandByZlgcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& usbcanfd_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -161,7 +161,7 @@ static std::unique_ptr<OmniHand2025> createHandByZlgcan(
  * @return OmniHand2025 实例的唯一指针
  */
 static std::unique_ptr<OmniHand2025> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     unsigned char canfd_device_id,
     unsigned char canfd_channel_id = 0);
@@ -170,7 +170,7 @@ static std::unique_ptr<OmniHand2025> createHandByHcan(
 **示例：**
 ```cpp
 auto hand = OmniHand2025::createHandByHcan(
-    EHandType::eLeft,
+    HandType::LEFT,
     1,      // hand_device_id
     0,      // canfd_device_id
     0       // canfd_channel_id
@@ -189,7 +189,7 @@ auto hand = OmniHand2025::createHandByHcan(
  * @return OmniHand2025 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHand2025> createHandByHcan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& hcan_serial_number,
     unsigned char canfd_channel_id = 0);
@@ -207,7 +207,7 @@ static std::unique_ptr<OmniHand2025> createHandByHcan(
  * @return OmniHand2025 实例的唯一指针
  */
 static std::unique_ptr<OmniHand2025> createHandByRs485(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& uart_port,
     int32_t baudrate = 460800);
@@ -226,7 +226,7 @@ static std::unique_ptr<OmniHand2025> createHandByRs485(
  * @warning ⚠️ 高级用法：需要驱动设置和 root 权限。
  */
 static std::unique_ptr<OmniHand2025> createHandSocketCan(
-    EHandType hand_type,
+    HandType hand_type,
     unsigned char hand_device_id,
     const std::string& can_interface = "can0");
 #endif
@@ -393,8 +393,11 @@ int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
 /**
  * @brief 批量设置所有关节电机的位置。
  * @param vec_posi 目标位置向量。必须包含 10 个值，每个值在 0-4096 范围内。
+ * @param sync 如果为 true（默认），等待设备响应。如果为 false，发送后不等待（更快）。
+ * @return 如果命令发送成功返回 true，否则返回 false。
+ * @note 高频控制循环建议使用 sync=false。
  */
-void SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi);
+bool SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi, bool sync = true);
 
 /**
  * @brief 批量获取所有关节电机的位置。
@@ -453,7 +456,7 @@ OmniHand 2025 (O10) 使用 **1D 触觉传感器**，具有以下特性：
  *       - 手心：返回 25 个数据点，每 3 个传感器点一个（降采样）
  *       - 手背：返回 25 个数据点，每 4 个传感器点一个（降采样）
  */
-std::vector<uint8_t> GetTactileSensorData(EFinger eFinger) const;
+std::vector<uint8_t> GetTactileSensorData(Finger eFinger) const;
 
 /**
  * @brief 一次性获取所有 1D 触觉传感器原始数据。
@@ -467,7 +470,7 @@ std::vector<TactileSensorData> GetAllTactileSensorDataRaw() const;
  * @param eFinger 手指/手心枚举值
  * @return 包含完整分辨率数据的 TactileSensorData 结构
  */
-TactileSensorData GetTactileSensorDataRaw(EFinger eFinger) const;
+TactileSensorData GetTactileSensorDataRaw(Finger eFinger) const;
 ```
 
 **⚠️ 重要建议：获取多个传感器数据时，强烈推荐使用 `GetAllTactileSensorDataRaw()` 而不是循环调用 `GetTactileSensorDataRaw()`。**
@@ -492,13 +495,13 @@ TactileSensorData GetTactileSensorDataRaw(EFinger eFinger) const;
  * @param eFinger 手指枚举值
  * @return 传感器数据长度（字节）
  */
-static size_t GetSensorDataLength(EFinger eFinger);
+static size_t GetSensorDataLength(Finger eFinger);
 
 /**
  * @brief 获取传感器顺序向量（静态方法）
  * @return 传感器顺序向量的引用
  */
-static const std::vector<EFinger>& GetSensorOrder();
+static const std::vector<Finger>& GetSensorOrder();
 ```
 
 ## 控制模式
@@ -508,9 +511,9 @@ static const std::vector<EFinger>& GetSensorOrder();
  * @brief 设置单个关节电机的控制模式。
  * @param joint_motor_index 关节电机索引（1-10）。
  * @param mode 控制模式枚举值。
- * @note 纯力控模式 (eTorque) 不支持。请使用混合控制模式（ePosiTorque, eVeloTorque, ePosiVeloTorque）。
+ * @note 纯力控模式 (TORQUE) 不支持。请使用混合控制模式（POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE）。
  */
-void SetControlMode(unsigned char joint_motor_index, EControlMode mode);
+void SetControlMode(unsigned char joint_motor_index, ControlMode mode);
 
 /**
  * @brief 获取单个关节电机的控制模式。
@@ -518,7 +521,7 @@ void SetControlMode(unsigned char joint_motor_index, EControlMode mode);
  * @return 当前控制模式。
  * @note 串口通信（RS485）不支持此接口。
  */
-EControlMode GetControlMode(unsigned char joint_motor_index) const;
+ControlMode GetControlMode(unsigned char joint_motor_index) const;
 
 /**
  * @brief 批量设置所有关节电机的控制模式。
@@ -550,7 +553,7 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 /**
  * @brief 以混合模式控制关节电机。
  * @param mix_ctrls 混合控制参数向量。
- * @note 纯力控模式 (eTorque) 不支持。请使用混合控制模式。
+ * @note 纯力控模式 (TORQUE) 不支持。请使用混合控制模式。
  * @note 串口通信（RS485）不支持此接口。
  */
 void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);
@@ -598,7 +601,7 @@ void ShowDataDetails(bool show) const;
 int main() {
     // 创建手部实例
     auto hand = OmniHand2025::createHandByZlgcan(
-        EHandType::eLeft,
+        HandType::LEFT,
         1,      // hand_device_id
         0,      // canfd_device_id
         0       // canfd_channel_id
@@ -624,7 +627,7 @@ int main() {
     std::cout << " (rad)" << std::endl;
 
     // 获取触觉传感器数据
-    auto thumb_data = hand->GetTactileSensorData(EFinger::eThumb);
+    auto thumb_data = hand->GetTactileSensorData(Finger::THUMB);
     std::cout << "拇指传感器数据: " << thumb_data.size() << " 个点" << std::endl;
 
     return 0;

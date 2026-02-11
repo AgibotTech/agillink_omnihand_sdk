@@ -100,11 +100,11 @@ Example for OmniHand 2025 (O10):
 
 int main() {
     // SocketCAN example: using can0 interface for OmniHand 2025 (O10)
-    // hand_type    : EHandType::eLeft / EHandType::eRight
+    // hand_type    : HandType::LEFT / HandType::RIGHT
     // device_id    : Device ID configured in hand firmware (usually 1)
     // can0         : Linux SocketCAN interface name
     auto hand = OmniHand2025::createHandSocketCan(
-        EHandType::eLeft,
+        HandType::LEFT,
         1,
         "can0"
     );
@@ -138,7 +138,7 @@ Example for OmniHand Pro 2025 (O12):
 int main() {
     // SocketCAN example: using can0 interface for OmniHand Pro 2025 (O12)
     auto hand = OmniHandPro2025::createHandSocketCan(
-        EHandType::eLeft,
+        HandType::LEFT,
         1,
         "can0"
     );
@@ -163,12 +163,12 @@ Same prerequisites: `can0` must be configured.
 Example for OmniHand 2025 (O10):
 
 ```python
-from omnihand import OmniHand2025, EHandType
+from omnihand import OmniHand2025, HandType
 
 def main():
     # SocketCAN example for OmniHand 2025 (O10)
     hand = OmniHand2025.create_hand_socketcan(
-        hand_type=EHandType.LEFT,
+        hand_type=HandType.LEFT,
         device_id=1,       # Device ID in hand firmware
         can_interface="can0"
     )
@@ -195,12 +195,12 @@ if __name__ == "__main__":
 Example for OmniHand Pro 2025 (O12):
 
 ```python
-from omnihand import OmniHandPro2025, EHandType
+from omnihand import OmniHandPro2025, HandType
 
 def main():
     # SocketCAN example for OmniHand Pro 2025 (O12)
     hand = OmniHandPro2025.create_hand_socketcan(
-        hand_type=EHandType.LEFT,
+        hand_type=HandType.LEFT,
         device_id=1,
         can_interface="can0"
     )

@@ -19,7 +19,7 @@ try:
 except ImportError:
     print("Python tests require pytest. Install with: pip install pytest")
     sys.exit(1)
-from omnihand import OmniHand2025, EHandType, EFinger, EControlMode
+from omnihand import OmniHand2025, HandType, Finger, ControlMode
 
 # Global variable to store request interval from command line argument
 # Can be set via environment variable OMNIHAND_REQUEST_INTERVAL or -f when running directly
@@ -57,7 +57,7 @@ elif "-f" in sys.argv:
 def hand():
     """Create and initialize OmniHand 2025 instance for testing"""
     hand = OmniHand2025.create_hand_by_zlgcan(
-        hand_type=EHandType.LEFT,
+        hand_type=HandType.LEFT,
         hand_device_id=1,
         canfd_device_id=0,
         canfd_channel_id=0
@@ -215,18 +215,18 @@ def test_tactile_sensor(hand):
     
     # Test GetTactileSensorData (downsampled data) for all fingers
     fingers = [
-        EFinger.THUMB, EFinger.INDEX, EFinger.MIDDLE,
-        EFinger.RING, EFinger.LITTLE, EFinger.PALM, EFinger.DORSUM
+        Finger.THUMB, Finger.INDEX, Finger.MIDDLE,
+        Finger.RING, Finger.LITTLE, Finger.PALM, Finger.DORSUM
     ]
     
     finger_names = {
-        EFinger.THUMB: "Thumb",
-        EFinger.INDEX: "Index",
-        EFinger.MIDDLE: "Middle",
-        EFinger.RING: "Ring",
-        EFinger.LITTLE: "Little",
-        EFinger.PALM: "Palm",
-        EFinger.DORSUM: "Dorsum",
+        Finger.THUMB: "Thumb",
+        Finger.INDEX: "Index",
+        Finger.MIDDLE: "Middle",
+        Finger.RING: "Ring",
+        Finger.LITTLE: "Little",
+        Finger.PALM: "Palm",
+        Finger.DORSUM: "Dorsum",
     }
     
     print(f"\n[get_all_tactile_sensor_data] Getting all sensor data by iterating through fingers:")
@@ -248,23 +248,23 @@ def test_tactile_sensor_raw(hand):
         pytest.skip("Device not initialized")
     
     # Test single sensor (1D tactile sensor, Raw API - full resolution)
-    thumb_tactile = hand.get_tactile_sensor_data_raw(EFinger.THUMB)
+    thumb_tactile = hand.get_tactile_sensor_data_raw(Finger.THUMB)
     print(f"\n[get_tactile_sensor_data_raw] Thumb Tactile Data ({len(thumb_tactile.data)} values): "
           f"{[int(x) for x in thumb_tactile.data[:10]]}... (unit: 1g, max: 255g)")
-    assert thumb_tactile.sensor_id == EFinger.THUMB
+    assert thumb_tactile.sensor_id == Finger.THUMB
     
     # Test getting all tactile sensor data
     all_tactile_data = hand.get_all_tactile_sensor_data_raw()
     print(f"\n[get_all_tactile_sensor_data_raw] All Tactile Sensors: {len(all_tactile_data)} sensors")
     for sensor in all_tactile_data:
         finger_name = {
-            EFinger.THUMB: "Thumb",
-            EFinger.INDEX: "Index",
-            EFinger.MIDDLE: "Middle",
-            EFinger.RING: "Ring",
-            EFinger.LITTLE: "Little",
-            EFinger.PALM: "Palm",
-            EFinger.DORSUM: "Dorsum",
+            Finger.THUMB: "Thumb",
+            Finger.INDEX: "Index",
+            Finger.MIDDLE: "Middle",
+            Finger.RING: "Ring",
+            Finger.LITTLE: "Little",
+            Finger.PALM: "Palm",
+            Finger.DORSUM: "Dorsum",
         }.get(sensor.sensor_id, "Unknown")
         print(f"  {finger_name}: {len(sensor.data)} points")
     assert len(all_tactile_data) >= 0

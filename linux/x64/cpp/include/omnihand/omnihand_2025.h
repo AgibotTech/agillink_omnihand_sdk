@@ -49,7 +49,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @return A unique pointer to OmniHand2025 instance
    */
   static std::unique_ptr<OmniHand2025> createHandByZlgcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
       unsigned char canfd_channel_id = 0);
@@ -65,7 +65,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @return A unique pointer to OmniHand2025 instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHand2025> createHandByZlgcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& usbcanfd_serial_number,
       unsigned char canfd_channel_id = 0);
@@ -79,7 +79,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @return A unique pointer to OmniHand2025 instance
    */
   static std::unique_ptr<OmniHand2025> createHandByRs485(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& uart_port,
       int32_t baudrate = 460800);
@@ -93,7 +93,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @return A unique pointer to OmniHand2025 instance
    */
   static std::unique_ptr<OmniHand2025> createHandByUsb(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& uart_port,
       int32_t baudrate = 460800);
@@ -107,7 +107,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @return A unique pointer to OmniHand2025 instance
    */
   static std::unique_ptr<OmniHand2025> createHandSocketCan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& can_interface = "can0");
 #endif
@@ -123,7 +123,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @return A unique pointer to OmniHand2025 instance
    */
   static std::unique_ptr<OmniHand2025> createHandByHcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
       unsigned char canfd_channel_id = 0);
@@ -139,7 +139,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @return A unique pointer to OmniHand2025 instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHand2025> createHandByHcan(
-      EHandType hand_type,
+      HandType hand_type,
       unsigned char hand_device_id,
       const std::string& hcan_serial_number,
       unsigned char canfd_channel_id = 0);
@@ -195,7 +195,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @return Tactile sensor data vector
    * @note Data unit: 1g, Max value: 255g, Sampling frequency: 10Hz
    */
-  virtual std::vector<uint8_t> GetTactileSensorData(EFinger eFinger) const = 0;
+  virtual std::vector<uint8_t> GetTactileSensorData(Finger eFinger) const = 0;
 
   // GetAllTactileSensorDataRaw and GetTactileSensorDataRaw are inherited from OmniHandSensorBase
 
@@ -206,6 +206,17 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    */
   void SetHandGesture(int gesture_num = 1) override;
 
+  // ============ Firmware Update (OTA) ============
+  /**
+   * @brief Updates firmware via OTA (Over-The-Air) upgrade
+   * @param file_name Path to the firmware binary file
+   * @note This function is only supported for CAN communication (ZLG CANFD, HCAN, SocketCAN)
+   * @note USB and RS485 communication do not support OTA upgrade
+   * @note Do not power off or restart the device during the update process
+   * @warning This is a blocking operation that may take several minutes depending on firmware size
+   */
+  void UpdateFirmware(const std::string& file_name);
+
  protected:
   /**
    * @brief Initialize base class members and kinematics solver
@@ -214,7 +225,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @note This method automatically initializes the kinematics solver after calling base class Reset()
    * @note Product type is fixed to ProductType::OMNIHAND_2025 for this class
    */
-  void Reset(unsigned char device_id, EHandType hand_type) {
+  void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_2025, device_id, hand_type);
     // Automatically initialize kinematics solver
     kinematics_solver_ = std::make_unique<OmniHand2025Solver>(is_left_hand_);

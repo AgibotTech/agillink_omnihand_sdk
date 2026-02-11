@@ -21,11 +21,11 @@ OmniHand 2025 SDK 为三种不同的产品提供了**产品特定的接口**：
 ### OmniHand 2025 (O10)
 
 ```python
-from omnihand import OmniHand2025, EHandType
+from omnihand import OmniHand2025, HandType
 
 # 创建手部实例
 hand = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     device_id=1,
     canfd_id=0,
     channel_id=0
@@ -43,11 +43,11 @@ hand.set_all_active_joint_angles(angles)
 ### OmniHand Pro 2025 (O12)
 
 ```python
-from omnihand import OmniHandPro2025, EHandType
+from omnihand import OmniHandPro2025, HandType
 
 # 创建手部实例
 hand = OmniHandPro2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     device_id=1,
     canfd_id=0,
     channel_id=0
@@ -65,11 +65,11 @@ hand.set_all_active_joint_angles(angles)
 ### OmniHand Dex UMI
 
 ```python
-from omnihand import OmniHandDexUMI, EHandType
+from omnihand import OmniHandDexUMI, HandType
 
 # 创建手部实例
 hand = OmniHandDexUMI.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,
+    hand_type=HandType.LEFT,
     device_id=1,
     canfd_id=0,
     channel_id=0

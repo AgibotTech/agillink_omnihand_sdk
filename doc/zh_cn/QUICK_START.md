@@ -85,11 +85,11 @@ python3 -c "from omnihand import OmniHand2025; print('SDK 安装成功！')"
 ### Python 示例
 
 ```python
-from omnihand import OmniHand2025, EHandType
+from omnihand import OmniHand2025, HandType
 
 # 创建灵巧手实例（ZLG USBCANFD）
 hand = OmniHand2025.create_hand_by_zlgcan(
-    hand_type=EHandType.LEFT,    # 或 EHandType.RIGHT
+    hand_type=HandType.LEFT,    # 或 HandType.RIGHT
     hand_device_id=1,            # 灵巧手 ID（通常为 1）
     canfd_device_id=0,           # CANFD 适配器索引
     canfd_channel_id=0           # 通道（0 或 1）
@@ -145,7 +145,7 @@ int main() {
     //   hand_device_id: 灵巧手 CAN ID（1-254，通常为 1）
     //   canfd_device_id: ZLG 适配器索引（0 = 第一个适配器）
     //   canfd_channel_id: 通道（双通道适配器为 0 或 1）
-    auto hand = OmniHand2025::createHandByZlgcan(EHandType::eLeft, 1, 0, 0);
+    auto hand = OmniHand2025::createHandByZlgcan(HandType::LEFT, 1, 0, 0);
     
     if (!hand || !hand->Init()) {
         std::cerr << "初始化失败" << std::endl;
