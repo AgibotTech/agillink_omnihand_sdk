@@ -123,15 +123,24 @@ TEST_F(OmniHand2025Test, MotorPositionControl) {
     
     // Test batch motor positions
     std::vector<int16_t> positions(10, 2048);  // 10 motors, all at middle
-    hand_->SetAllJointMotorPosi(positions);
-    std::cout << "[SetAllJointMotorPosi] Set Motor Positions: ";
-    for (size_t i = 0; i < positions.size(); ++i) {
-      std::cout << positions[i];
-      if (i < positions.size() - 1) std::cout << ", ";
+    
+    // Test SetAllJointMotorPosi - returns actual positions
+    auto set_result = hand_->SetAllJointMotorPosi(positions);
+    std::cout << "[SetAllJointMotorPosi] returned: ";
+    for (size_t i = 0; i < set_result.size(); ++i) {
+      std::cout << set_result[i];
+      if (i < set_result.size() - 1) std::cout << ", ";
     }
     std::cout << std::endl;
     
+    // Test GetAllJointMotorPosi separately
     auto all_positions = hand_->GetAllJointMotorPosi();
+    std::cout << "[GetAllJointMotorPosi] returned: ";
+    for (size_t i = 0; i < all_positions.size(); ++i) {
+      std::cout << all_positions[i];
+      if (i < all_positions.size() - 1) std::cout << ", ";
+    }
+    std::cout << std::endl;
     // Check if request succeeded (non-empty result)
     if (all_positions.empty()) {
       // Request failed (timeout), skip assertion to avoid false failure

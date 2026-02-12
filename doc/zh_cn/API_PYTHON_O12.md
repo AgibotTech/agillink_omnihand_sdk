@@ -180,18 +180,14 @@ def get_joint_position(self, joint_motor_index: int) -> int:
         int: 当前位置（范围：0-2000）。
     """
 
-def set_all_joint_positions(self, positions: List[int], sync: bool = True) -> bool:
-    """批量设置所有关节电机的位置。
+def set_all_joint_positions(self, positions: List[int]) -> List[int]:
+    """批量设置所有关节电机的位置并返回实际位置。
     
     Args:
         positions: 目标位置列表。必须包含 12 个值，每个值在 0-2000 范围内。
-        sync: 如果为 True（默认），等待设备响应。如果为 False，发送后不等待（更快）。
     
     Returns:
-        如果命令发送成功返回 True，否则返回 False。
-    
-    Note:
-        高频控制循环建议使用 sync=False。
+        设备响应的实际位置列表。失败时返回空列表。
     """
 
 def get_all_joint_positions(self) -> List[int]:

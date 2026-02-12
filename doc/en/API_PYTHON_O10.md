@@ -325,18 +325,14 @@ def get_joint_position(self, joint_motor_index: int) -> int:
         int: Current position (range: 0-4096).
     """
 
-def set_all_joint_positions(self, positions: List[int], sync: bool = True) -> bool:
-    """Sets the positions of all joint motors in batch.
+def set_all_joint_positions(self, positions: List[int]) -> List[int]:
+    """Sets the positions of all joint motors in batch and returns the actual positions.
     
     Args:
         positions: List of target positions. Must have 10 values, each in range 0-4096.
-        sync: If True (default), waits for device response. If False, sends without waiting (faster).
     
     Returns:
-        True if command was sent successfully, False otherwise.
-    
-    Note:
-        Use sync=False for high-frequency control loops.
+        List of actual positions from device response. Empty list on failure.
     """
 
 def get_all_joint_positions(self) -> List[int]:

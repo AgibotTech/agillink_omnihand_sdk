@@ -60,11 +60,11 @@ def main():
     # Define all 7 sensor positions with expected data lengths
     # Expected lengths: Thumb=16, Index=18, Middle=18, Ring=18, Little=18, Palm=78, Dorsum=102
     sensor_positions = [
-        (Finger.THUMB, "Thumb", 16),
-        (Finger.INDEX, "Index", 18),
-        (Finger.MIDDLE, "Middle", 18),
-        (Finger.RING, "Ring", 18),
-        (Finger.LITTLE, "Little", 18),
+        # (Finger.THUMB, "Thumb", 16),
+        # (Finger.INDEX, "Index", 18),
+        # (Finger.MIDDLE, "Middle", 18),
+        # (Finger.RING, "Ring", 18),
+        # (Finger.LITTLE, "Little", 18),
         (Finger.PALM, "Palm", 78),
         (Finger.DORSUM, "Dorsum", 102),
     ]
@@ -96,6 +96,7 @@ def main():
             query_start_time = time.time()
             for finger, sensor_name, expected_length in sensor_positions:
                 try:
+                    # time.sleep(0.002)
                     sensor_data = hand.get_tactile_sensor_data_raw(finger)
                     
                     # Check if data is valid

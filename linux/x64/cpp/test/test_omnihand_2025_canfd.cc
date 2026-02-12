@@ -158,18 +158,26 @@ TEST_F(OmniHand2025CanfdTest, SetGetAllAxisPos) {
 
   // Safe positions from Python demo (not all-zero to avoid limit issues)
   std::vector<int16_t> positions = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
-  hand_->SetAllJointMotorPosi(positions);
-  std::cout << "[SetAllJointMotorPosi] All joints -> init positions" << std::endl;
-
-  auto all_pos = hand_->GetAllJointMotorPosi();
-  std::cout << "[GetAllJointMotorPosi] ";
-  for (size_t i = 0; i < all_pos.size(); ++i) {
-    std::cout << all_pos[i];
-    if (i < all_pos.size() - 1) std::cout << ", ";
+  
+  // Test SetAllJointMotorPosi - returns actual positions
+  auto set_result = hand_->SetAllJointMotorPosi(positions);
+  std::cout << "[SetAllJointMotorPosi] returned " << set_result.size() << " positions: ";
+  for (size_t i = 0; i < set_result.size(); ++i) {
+    std::cout << set_result[i];
+    if (i < set_result.size() - 1) std::cout << ", ";
   }
   std::cout << std::endl;
+  EXPECT_EQ(set_result.size(), 10);
 
-  EXPECT_EQ(all_pos.size(), 10);
+  // Test GetAllJointMotorPosi separately
+  auto get_result = hand_->GetAllJointMotorPosi();
+  std::cout << "[GetAllJointMotorPosi] returned " << get_result.size() << " positions: ";
+  for (size_t i = 0; i < get_result.size(); ++i) {
+    std::cout << get_result[i];
+    if (i < get_result.size() - 1) std::cout << ", ";
+  }
+  std::cout << std::endl;
+  EXPECT_EQ(get_result.size(), 10);
 }
 
 // ============================================================================

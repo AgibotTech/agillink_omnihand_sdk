@@ -94,7 +94,7 @@ def main():
     parser.add_argument(
         '--update-interval',
         type=float,
-        default=0.01,
+        default=0.001,
         help='Update interval in seconds (default: 0.02, i.e., 50Hz)'
     )
     
@@ -175,19 +175,10 @@ def main():
     except Exception as e:
         print(f"[ERROR]: Failed to initialize O10 device: {e}")
         return 1
-    
-    # ============ 主循环：从 UMI 读取位置并设置到 O10 ============
-    print("\n[3/3] Starting control loop...")
-    print(f"Update interval: {args.update_interval} seconds ({1.0/args.update_interval:.1f} Hz)")
-    print("Press Ctrl+C to stop")
-    print("-" * 60)
-    print("Performance notes:")
-    print("  - Serial execution: UMI read + O10 write (blocking)")
-    print("  - Reduced timeout: 80ms (from 130ms) for faster error recovery")
-    print("  - Each loop: UMI read (~50ms) + O10 set (~50ms) = ~100ms minimum")
-    print("-" * 60)
-    
+
     update_period = args.update_interval
+    request_interval = 0
+    recv_timeout = 10
     loop_count = 0
     total_time = 0.0
     max_time = 0.0
@@ -196,16 +187,25 @@ def main():
     o10_error_count = 0
     consecutive_errors = 0
     max_consecutive_errors = 10  # 连续错误超过此数量时打印警告
+
+    # ============ 主循环：从 UMI 读取位置并设置到 O10 ============
+    print("\n[3/3] Starting control loop...")
+    print("-" * 60)
+    print("**Press Ctrl+C to stop**")
+    print("-" * 60)
+    print("Performance notes:")
+    print(f"  - Update interval: {update_period} seconds")
+    print("  - Serial execution: UMI read + O10 write (blocking)")
+    print(f"  - UMI/O10 timeout: {recv_timeout}ms, request interval: {request_interval}ms")
+    print("-" * 60)
     
     # 设置较短的超时以提高响应速度（降低单次超时等待时间）
     # 注意：如果设置太短可能导致频繁超时
-    umi_hand.set_request_interval(2)       # 5ms 请求间隔
-    umi_hand.set_frame_recv_timeout(80)    # 80ms 超时（原 130ms）
-    o10_hand.set_request_interval(2)
-    o10_hand.set_frame_recv_timeout(80)
-    
-    print(f"  UMI/O10 timeout: 80ms, request interval: 5ms")
-    
+    # umi_hand.set_request_interval(request_interval)
+    umi_hand.set_frame_recv_timeout(recv_timeout)
+    # o10_hand.set_request_interval(request_interval)
+    o10_hand.set_frame_recv_timeout(recv_timeout)
+
     # 开启调试模式，查看 CAN 收发数据（出问题时取消注释）
     # umi_hand.show_data_details(True)
     # o10_hand.show_data_details(True)
@@ -225,8 +225,9 @@ def main():
                     continue
                 
                 # 直接设置电机位置值到 O10（无需转换）
-                # set_all_joint_positions(positions, sync=False) 异步模式提高性能
-                if o10_hand.set_all_joint_positions(umi_positions, sync=False):
+                # set_all_joint_positions 返回实际位置，空列表表示失败
+                actual_positions = o10_hand.set_all_joint_positions(umi_positions)
+                if len(actual_positions) > 0:
                     consecutive_errors = 0
                 else:
                     o10_error_count += 1

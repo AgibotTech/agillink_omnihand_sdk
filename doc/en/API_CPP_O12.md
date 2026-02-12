@@ -281,13 +281,11 @@ void SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi);
 int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
 
 /**
- * @brief Sets the positions of all joint motors in batch.
+ * @brief Sets the positions of all joint motors in batch and returns the actual positions.
  * @param vec_posi A vector of target positions. Must have 12 values, each in range 0-2000.
- * @param sync If true (default), waits for device response. If false, sends without waiting (faster).
- * @return true if command was sent successfully, false otherwise.
- * @note Use sync=false for high-frequency control loops.
+ * @return A vector of actual positions from device response. Empty vector on failure.
  */
-bool SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi, bool sync = true);
+std::vector<int16_t> SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi);
 
 /**
  * @brief Gets the positions of all joint motors in batch.

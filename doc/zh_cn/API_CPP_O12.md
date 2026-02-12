@@ -226,7 +226,7 @@ std::vector<double> GetAllJointAngles() const;  // 返回 18 个值（12 主动 
 ```cpp
 void SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi);  // 1-12
 int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
-bool SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi, bool sync = true);  // 12 个值, sync=false 为异步模式
+std::vector<int16_t> SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi);  // 12 个值，返回实际位置
 std::vector<int16_t> GetAllJointMotorPosi() const;
 ```
 

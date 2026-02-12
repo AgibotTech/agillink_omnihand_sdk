@@ -45,16 +45,13 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
   virtual int16_t GetJointMotorPosi(unsigned char joint_motor_index) const = 0;
   
   /**
-   * @brief Sets positions of all joint motors in batch.
+   * @brief Sets positions of all joint motors in batch and returns the actual positions.
    * @param vec_posi Target position vector. Length and range depend on product type:
    *                 - OmniHand 2025 (O10): 10 values, each in range 0-4096
    *                 - OmniHand Pro 2025 (O12): 12 values, each in range 0-2000
-   * @param sync If true (default), waits for device response (synchronous mode).
-   *             If false, sends command without waiting (asynchronous mode, faster).
-   * @return true if command was sent successfully, false otherwise.
-   * @note Asynchronous mode (sync=false) is recommended for high-frequency control loops.
+   * @return Actual position vector from device response. Empty vector on failure.
    */
-  virtual bool SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi, bool sync = true) = 0;
+  virtual std::vector<int16_t> SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi) = 0;
   
   /**
    * @brief Gets positions of all joint motors in batch.

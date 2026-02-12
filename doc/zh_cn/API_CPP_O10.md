@@ -391,13 +391,11 @@ void SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi);
 int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
 
 /**
- * @brief 批量设置所有关节电机的位置。
+ * @brief 批量设置所有关节电机的位置并返回实际位置。
  * @param vec_posi 目标位置向量。必须包含 10 个值，每个值在 0-4096 范围内。
- * @param sync 如果为 true（默认），等待设备响应。如果为 false，发送后不等待（更快）。
- * @return 如果命令发送成功返回 true，否则返回 false。
- * @note 高频控制循环建议使用 sync=false。
+ * @return 设备响应的实际位置向量。失败时返回空向量。
  */
-bool SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi, bool sync = true);
+std::vector<int16_t> SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi);
 
 /**
  * @brief 批量获取所有关节电机的位置。
