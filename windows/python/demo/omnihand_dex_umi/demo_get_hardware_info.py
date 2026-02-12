@@ -7,7 +7,7 @@ OmniHand Dex UMI 硬件信息获取示例
 此示例演示如何获取 OmniHand Dex UMI 产品的厂家信息和设备信息。
 """
 
-from omnihand import OmniHandDexUMI, EHandType
+from omnihand import OmniHandDexUMI, HandType
 import time
 
 def main():
@@ -17,7 +17,7 @@ def main():
     
     # 创建 OmniHand Dex UMI 灵巧手实例
     hand = OmniHandDexUMI.create_hand_by_zlgcan(
-        hand_type=EHandType.LEFT,
+        hand_type=HandType.LEFT,
         hand_device_id=1,
         canfd_device_id=0,
         canfd_channel_id=0

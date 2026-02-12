@@ -1,21 +1,21 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
 # OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
-from omnihand import OmniHand2025, EFinger, EControlMode, EHandType
+from omnihand import OmniHand2025, Finger, ControlMode, HandType
 import time
 
 def main():
     # 通过序列号直接创建 hand（推荐方式）
-    left_hand = OmniHand2025.create_hand_by_zlgcan(EHandType.LEFT, 1, "201BFF2AF01202D44690")
-    right_hand = OmniHand2025.create_hand_by_zlgcan(EHandType.RIGHT, 1, "A029A58630B30D14DBB")
+    left_hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, "201BFF2AF01202D44690")
+    right_hand = OmniHand2025.create_hand_by_zlgcan(HandType.RIGHT, 1, "A029A58630B30D14DBB")
     
     if left_hand is None or right_hand is None:
         print("Cannot find CANFD devices by serial numbers!")
         return
     
     # 或者如果已知 canfd_id，可以直接使用：
-    # left_hand = OmniHand2025.create_hand_by_zlgcan(EHandType.LEFT, 1, 0)  # canfd_device_id= 0
-    # right_hand = OmniHand2025.create_hand_by_zlgcan(EHandType.RIGHT, 1, 1)  # canfd_device_id= 1
+    # left_hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, 0)  # canfd_device_id= 0
+    # right_hand = OmniHand2025.create_hand_by_zlgcan(HandType.RIGHT, 1, 1)  # canfd_device_id= 1
     
     # 启用详细日志查看 CAN 通信
     left_hand.show_data_details(True)

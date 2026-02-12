@@ -22,10 +22,10 @@ class OmniHand2025Test : public ::testing::Test {
   void SetUp() override {
     // Create hand instance for testing
     hand_ = OmniHand2025::createHandByZlgcan(
-        EHandType::eLeft,
-        1,      // device_id
-        0,      // canfd_id
-        0       // channel_id
+        HandType::LEFT,        // hand_type: left hand
+        1,                       // hand_device_id: hand device ID
+        0,                       // canfd_device_id: USB CANFD adapter device index
+        0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
     );
     int request_interval = GetRequestInterval();
     hand_->SetRequestInterval(request_interval);
@@ -123,15 +123,24 @@ TEST_F(OmniHand2025Test, MotorPositionControl) {
     
     // Test batch motor positions
     std::vector<int16_t> positions(10, 2048);  // 10 motors, all at middle
-    hand_->SetAllJointMotorPosi(positions);
-    std::cout << "[SetAllJointMotorPosi] Set Motor Positions: ";
-    for (size_t i = 0; i < positions.size(); ++i) {
-      std::cout << positions[i];
-      if (i < positions.size() - 1) std::cout << ", ";
+    
+    // Test SetAllJointMotorPosi - returns actual positions
+    auto set_result = hand_->SetAllJointMotorPosi(positions);
+    std::cout << "[SetAllJointMotorPosi] returned: ";
+    for (size_t i = 0; i < set_result.size(); ++i) {
+      std::cout << set_result[i];
+      if (i < set_result.size() - 1) std::cout << ", ";
     }
     std::cout << std::endl;
     
+    // Test GetAllJointMotorPosi separately
     auto all_positions = hand_->GetAllJointMotorPosi();
+    std::cout << "[GetAllJointMotorPosi] returned: ";
+    for (size_t i = 0; i < all_positions.size(); ++i) {
+      std::cout << all_positions[i];
+      if (i < all_positions.size() - 1) std::cout << ", ";
+    }
+    std::cout << std::endl;
     // Check if request succeeded (non-empty result)
     if (all_positions.empty()) {
       // Request failed (timeout), skip assertion to avoid false failure
@@ -194,7 +203,7 @@ TEST_F(OmniHand2025Test, JointAngleControl) {
 // Only testing read operation (GetAllControlMode)
 TEST_F(OmniHand2025Test, ControlMode) {
   if (hand_->Init()) {
-    // std::vector<unsigned char> control_modes(10, static_cast<unsigned char>(EControlMode::eServo));
+    // std::vector<unsigned char> control_modes(10, static_cast<unsigned char>(ControlMode::SERVO));
     // hand_->SetAllControlMode(control_modes);
     // Only test reading control mode (read-only operation)
     // Note: SetAllControlMode is not tested as it may cause CANFD communication to crash
@@ -219,9 +228,9 @@ TEST_F(OmniHand2025Test, ControlMode) {
 TEST_F(OmniHand2025Test, TactileSensor) {
   if (hand_->Init()) {
     // Test GetTactileSensorData (downsampled data) for all fingers
-    std::vector<EFinger> fingers = {
-      EFinger::eThumb, EFinger::eIndex, EFinger::eMiddle,
-      EFinger::eRing, EFinger::eLittle, EFinger::ePalm, EFinger::eDorsum
+    std::vector<Finger> fingers = {
+      Finger::THUMB, Finger::INDEX, Finger::MIDDLE,
+      Finger::RING, Finger::LITTLE, Finger::PALM, Finger::DORSUM
     };
     
     std::cout << "[GetTactileSensorData] Getting all sensor data:" << std::endl;
@@ -242,13 +251,13 @@ TEST_F(OmniHand2025Test, TactileSensor) {
 TEST_F(OmniHand2025Test, TactileSensorRaw) {
   if (hand_->Init()) {
     // Test all 7 sensors individually (Thumb, Index, Middle, Ring, Little, Palm, Dorsum)
-    std::vector<EFinger> all_fingers = {
-      EFinger::eThumb, EFinger::eIndex, EFinger::eMiddle, EFinger::eRing,
-      EFinger::eLittle, EFinger::ePalm, EFinger::eDorsum
+    std::vector<Finger> all_fingers = {
+      Finger::THUMB, Finger::INDEX, Finger::MIDDLE, Finger::RING,
+      Finger::LITTLE, Finger::PALM, Finger::DORSUM
     };
     
     // Check if firmware supports raw tactile sensor data by testing Thumb first
-    auto thumb_tactile = hand_->GetTactileSensorDataRaw(EFinger::eThumb);
+    auto thumb_tactile = hand_->GetTactileSensorDataRaw(Finger::THUMB);
     if (thumb_tactile.data_.empty()) {
       std::cout << "[Info]: Raw tactile sensor data is not supported by this firmware version. "
                 << "This feature requires firmware version that supports multi-frame tactile sensor data protocol." << std::endl;
@@ -286,13 +295,13 @@ TEST_F(OmniHand2025Test, TactileSensorRaw) {
     for (const auto& sensor : all_tactile_data) {
       std::string finger_name;
       switch (sensor.sensor_id_) {
-        case EFinger::eThumb: finger_name = "Thumb"; break;
-        case EFinger::eIndex: finger_name = "Index"; break;
-        case EFinger::eMiddle: finger_name = "Middle"; break;
-        case EFinger::eRing: finger_name = "Ring"; break;
-        case EFinger::eLittle: finger_name = "Little"; break;
-        case EFinger::ePalm: finger_name = "Palm"; break;
-        case EFinger::eDorsum: finger_name = "Dorsum"; break;
+        case Finger::THUMB: finger_name = "Thumb"; break;
+        case Finger::INDEX: finger_name = "Index"; break;
+        case Finger::MIDDLE: finger_name = "Middle"; break;
+        case Finger::RING: finger_name = "Ring"; break;
+        case Finger::LITTLE: finger_name = "Little"; break;
+        case Finger::PALM: finger_name = "Palm"; break;
+        case Finger::DORSUM: finger_name = "Dorsum"; break;
         default: finger_name = "Unknown"; break;
       }
       std::cout << "  " << finger_name << " (" << sensor.data_.size() << " values): ";

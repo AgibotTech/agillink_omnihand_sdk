@@ -133,13 +133,13 @@ class AGIBOT_EXPORT OmniHand {
    * @param device_id Device ID
    * @param hand_type Hand type (left/right)
    */
-  void Reset(ProductType product_type, unsigned char device_id, EHandType hand_type) {
+  void Reset(ProductType product_type, unsigned char device_id, HandType hand_type) {
     product_type_ = product_type;
     device_id_ = device_id;
-    is_left_hand_ = (hand_type == EHandType::eLeft);
+    is_left_hand_ = (hand_type == HandType::LEFT);
   }
 
-  ProductType product_type_{ProductType::UNKNOWN_PRODUCT_TYPE};
+  ProductType product_type_{ProductType::UNKNOWN};
   unsigned char device_id_{DEFAULT_DEVICE_ID};
   bool is_left_hand_{true};
   bool is_init_{false};

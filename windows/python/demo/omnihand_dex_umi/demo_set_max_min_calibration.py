@@ -17,7 +17,7 @@ OmniHand Dex UMI 最大最小位置校准示例
 - 校准后需要重新初始化设备才能生效
 """
 
-from omnihand import OmniHandDexUMI, EHandType
+from omnihand import OmniHandDexUMI, HandType
 import time
 
 def main():
@@ -27,7 +27,7 @@ def main():
     
     # 创建 OmniHand Dex UMI 灵巧手实例
     hand = OmniHandDexUMI.create_hand_by_zlgcan(
-        hand_type=EHandType.LEFT,
+        hand_type=HandType.LEFT,
         hand_device_id=1,
         canfd_device_id=0,
         canfd_channel_id=0

@@ -14,7 +14,7 @@ Features:
 3. Continuous reading with data statistics
 """
 
-from omnihand import OmniHand2025, EFinger, EHandType
+from omnihand import OmniHand2025, Finger, HandType
 import time
 
 def print_sensor_raw_data(sensor_data, sensor_name=""):
@@ -64,7 +64,7 @@ def main():
     
     # Create OmniHand 2025 hand instance
     hand = OmniHand2025.create_hand_by_zlgcan(
-        hand_type=EHandType.RIGHT,
+        hand_type=HandType.RIGHT,
         hand_device_id=1,
         canfd_device_id=0,
         canfd_channel_id=1
@@ -85,13 +85,13 @@ def main():
     print("=" * 60)
     
     sensors = [
-        (EFinger.THUMB, "Thumb"),
-        (EFinger.INDEX, "Index"),
-        (EFinger.MIDDLE, "Middle"),
-        (EFinger.RING, "Ring"),
-        (EFinger.LITTLE, "Little"),
-        (EFinger.PALM, "Palm"),
-        (EFinger.DORSUM, "Dorsum"),
+        (Finger.THUMB, "Thumb"),
+        (Finger.INDEX, "Index"),
+        (Finger.MIDDLE, "Middle"),
+        (Finger.RING, "Ring"),
+        (Finger.LITTLE, "Little"),
+        (Finger.PALM, "Palm"),
+        (Finger.DORSUM, "Dorsum"),
     ]
     
     for finger_enum, finger_name in sensors:
@@ -140,7 +140,7 @@ def main():
     
     for i in range(5):
         try:
-            thumb_data = hand.get_tactile_sensor_data_raw(EFinger.THUMB)
+            thumb_data = hand.get_tactile_sensor_data_raw(Finger.THUMB)
             if thumb_data:
                 data = thumb_data.data
                 if data and len(data) > 0:
@@ -178,8 +178,8 @@ def main():
     # Compare Palm
     try:
         print("\n--- Palm Comparison ---")
-        palm_raw = hand.get_tactile_sensor_data_raw(EFinger.PALM)
-        palm_downsampled = hand.get_tactile_sensor_data(EFinger.PALM)
+        palm_raw = hand.get_tactile_sensor_data_raw(Finger.PALM)
+        palm_downsampled = hand.get_tactile_sensor_data(Finger.PALM)
         
         if palm_raw:
             raw_data = palm_raw.data
@@ -220,8 +220,8 @@ def main():
     # Compare Dorsum
     try:
         print("\n--- Dorsum Comparison ---")
-        dorsum_raw = hand.get_tactile_sensor_data_raw(EFinger.DORSUM)
-        dorsum_downsampled = hand.get_tactile_sensor_data(EFinger.DORSUM)
+        dorsum_raw = hand.get_tactile_sensor_data_raw(Finger.DORSUM)
+        dorsum_downsampled = hand.get_tactile_sensor_data(Finger.DORSUM)
         
         if dorsum_raw:
             raw_data = dorsum_raw.data

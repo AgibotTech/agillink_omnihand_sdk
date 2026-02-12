@@ -18,7 +18,7 @@ OmniHand Pro 2025 综合控制示例 - CANFD 通信（通过 serial_number）
 
 import sys
 import time
-from omnihand import OmniHandPro2025, EHandType, EFinger
+from omnihand import OmniHandPro2025, HandType, Finger
 
 
 def print_usage(program_name):
@@ -64,14 +64,14 @@ def control_single_hand(hand, hand_name):
     # 读取 3D 触觉传感器数据（O12 特有）
     print("\n--- 3D Tactile Sensor Data (O12 only) ---")
     try:
-        thumb_sensor = hand.get_tactile_sensor_3d_data(EFinger.THUMB)
+        thumb_sensor = hand.get_tactile_sensor_3d_data(Finger.THUMB)
         print(f"  Thumb:")
         print(f"    Online State: {'Online' if thumb_sensor.online_state else 'Offline'}")
         print(f"    Normal Force: {thumb_sensor.normal_force} (0.1N, max: 3000)")
         print(f"    Tangent Force: {thumb_sensor.tangent_force}")
         print(f"    Tangent Force Angle: {thumb_sensor.tangent_force_angle}°")
 
-        index_sensor = hand.get_tactile_sensor_3d_data(EFinger.INDEX)
+        index_sensor = hand.get_tactile_sensor_3d_data(Finger.INDEX)
         print(f"  Index:")
         print(f"    Online State: {'Online' if index_sensor.online_state else 'Offline'}")
         print(f"    Normal Force: {index_sensor.normal_force} (0.1N, max: 3000)")
@@ -180,7 +180,7 @@ def main():
 
     if mode == "left" or mode == "both":
         left_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=hand_device_id,
             usbcanfd_serial_number=left_serial,
             canfd_channel_id=0
@@ -201,7 +201,7 @@ def main():
 
     if mode == "right" or mode == "both":
         right_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=EHandType.RIGHT,
+            hand_type=HandType.RIGHT,
             hand_device_id=hand_device_id,
             usbcanfd_serial_number=right_serial,
             canfd_channel_id=0
@@ -227,7 +227,7 @@ def main():
             if left_hand is None:
                 # 如果之前没有创建左手，现在创建
                 left_hand = OmniHandPro2025.create_hand_by_zlgcan(
-                    hand_type=EHandType.LEFT,
+                    hand_type=HandType.LEFT,
                     hand_device_id=hand_device_id,
                     usbcanfd_serial_number=left_serial,
                     canfd_channel_id=0

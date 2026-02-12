@@ -51,7 +51,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
   void SetUp() override {
     try {
       hand_ = OmniHand2025::createHandByUsb(
-          EHandType::eLeft,
+          HandType::LEFT,
           1,              // device_id
           g_usb_port,
           g_baudrate
@@ -159,18 +159,26 @@ TEST_F(OmniHand2025UsbTest, SetGetAllAxisPos) {
   
   // Safe positions from Python demo (not all-zero to avoid limit issues)
   std::vector<int16_t> positions = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
-  hand_->SetAllJointMotorPosi(positions);
-  std::cout << "[SetAllJointMotorPosi] All joints -> init positions" << std::endl;
   
-  auto all_pos = hand_->GetAllJointMotorPosi();
-  std::cout << "[GetAllJointMotorPosi] ";
-  for (size_t i = 0; i < all_pos.size(); ++i) {
-    std::cout << all_pos[i];
-    if (i < all_pos.size() - 1) std::cout << ", ";
+  // Test SetAllJointMotorPosi - returns actual positions
+  auto set_result = hand_->SetAllJointMotorPosi(positions);
+  std::cout << "[SetAllJointMotorPosi] returned " << set_result.size() << " positions: ";
+  for (size_t i = 0; i < set_result.size(); ++i) {
+    std::cout << set_result[i];
+    if (i < set_result.size() - 1) std::cout << ", ";
   }
   std::cout << std::endl;
+  EXPECT_EQ(set_result.size(), 10);
   
-  EXPECT_EQ(all_pos.size(), 10);
+  // Test GetAllJointMotorPosi separately
+  auto get_result = hand_->GetAllJointMotorPosi();
+  std::cout << "[GetAllJointMotorPosi] returned " << get_result.size() << " positions: ";
+  for (size_t i = 0; i < get_result.size(); ++i) {
+    std::cout << get_result[i];
+    if (i < get_result.size() - 1) std::cout << ", ";
+  }
+  std::cout << std::endl;
+  EXPECT_EQ(get_result.size(), 10);
 }
 
 // ============================================================================
@@ -262,8 +270,8 @@ TEST_F(OmniHand2025UsbTest, GetTactileSensorData) {
   std::cout << "[GetTactileSensorData] Testing all tactile sensors:" << std::endl;
   
   // Test finger sensors (Thumb, Index, Middle, Ring, Little) - 16 values each
-  std::vector<EFinger> fingers = {
-    EFinger::eThumb, EFinger::eIndex, EFinger::eMiddle, EFinger::eRing, EFinger::eLittle
+  std::vector<Finger> fingers = {
+    Finger::THUMB, Finger::INDEX, Finger::MIDDLE, Finger::RING, Finger::LITTLE
   };
   
   std::cout << "  Fingers (16 values each):" << std::endl;
@@ -279,7 +287,7 @@ TEST_F(OmniHand2025UsbTest, GetTactileSensorData) {
   }
   
   // Test palm/dorsum sensors - 25 values each
-  std::vector<EFinger> palm_dorsum = {EFinger::ePalm, EFinger::eDorsum};
+  std::vector<Finger> palm_dorsum = {Finger::PALM, Finger::DORSUM};
   
   std::cout << "  Palm/Dorsum (25 values each):" << std::endl;
   for (auto sensor : palm_dorsum) {
@@ -302,8 +310,8 @@ TEST_F(OmniHand2025UsbTest, SetControlMode) {
   RequireDevice();
   
   // Set control mode for joint 1
-  hand_->SetControlMode(1, EControlMode::eServo);
-  std::cout << "[SetControlMode] Joint 1 -> eServo" << std::endl;
+  hand_->SetControlMode(1, ControlMode::SERVO);
+  std::cout << "[SetControlMode] Joint 1 -> SERVO" << std::endl;
   
   // Note: GetAllControlMode returns cached values for USB
   auto modes = hand_->GetAllControlMode();
@@ -350,12 +358,12 @@ TEST_F(OmniHand2025UsbTest, MixCtrlJointMotor_PosiVeloTorque) {
   // Safe positions from Python demo (per joint)
   const int16_t safe_pos[10] = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
   
-  // ePosiVeloTorque mode: max 8 joints
+  // POSITION_VELOCITY_TORQUE mode: max 8 joints
   std::vector<MixCtrl> mix_ctrls;
   for (int i = 1; i <= 8; ++i) {
     MixCtrl ctrl;
     ctrl.joint_index_ = static_cast<unsigned char>(i);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(EControlMode::ePosiVeloTorque);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::POSITION_VELOCITY_TORQUE);
     ctrl.tgt_posi_ = safe_pos[i - 1];
     ctrl.tgt_velo_ = 50;
     ctrl.tgt_torque_ = 0;
@@ -363,7 +371,7 @@ TEST_F(OmniHand2025UsbTest, MixCtrlJointMotor_PosiVeloTorque) {
   }
   
   hand_->MixCtrlJointMotor(mix_ctrls);
-  std::cout << "[MixCtrlJointMotor] ePosiVeloTorque mode for 8 joints" << std::endl;
+  std::cout << "[MixCtrlJointMotor] POSITION_VELOCITY_TORQUE mode for 8 joints" << std::endl;
   
   auto positions = hand_->GetAllJointMotorPosi();
   std::cout << "[GetAllJointMotorPosi] After mixed control: ";
@@ -379,12 +387,12 @@ TEST_F(OmniHand2025UsbTest, MixCtrlJointMotor_PosiVeloTorque) {
 TEST_F(OmniHand2025UsbTest, MixCtrlJointMotor_VeloTorque) {
   RequireDevice();
   
-  std::cout << "[MixCtrlJointMotor] eVeloTorque mode for all 10 joints:" << std::endl;
+  std::cout << "[MixCtrlJointMotor] VELOCITY_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
     std::vector<MixCtrl> mix_ctrls;
     MixCtrl ctrl;
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(EControlMode::eVeloTorque);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::VELOCITY_TORQUE);
     ctrl.tgt_posi_ = std::nullopt;
     ctrl.tgt_velo_ = 100;
     ctrl.tgt_torque_ = 0;
@@ -403,12 +411,12 @@ TEST_F(OmniHand2025UsbTest, MixCtrlJointMotor_PosiTorque) {
   // Safe positions from Python demo (per joint)
   const int16_t safe_pos[10] = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
   
-  std::cout << "[MixCtrlJointMotor] ePosiTorque mode for all 10 joints:" << std::endl;
+  std::cout << "[MixCtrlJointMotor] POSITION_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
     std::vector<MixCtrl> mix_ctrls;
     MixCtrl ctrl;
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(EControlMode::ePosiTorque);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::POSITION_TORQUE);
     ctrl.tgt_posi_ = safe_pos[joint - 1];
     ctrl.tgt_velo_ = std::nullopt;
     ctrl.tgt_torque_ = 0;

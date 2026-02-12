@@ -1,11 +1,11 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
 # OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
-from omnihand import OmniHand2025, EHandType
+from omnihand import OmniHand2025, HandType
 import time
 
 def main():
-    hand = OmniHand2025.create_hand_by_zlgcan(hand_type=EHandType.LEFT)
+    hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.LEFT)
     # hand.show_data_details(True)
 
     hand.set_joint_position(2, 200)

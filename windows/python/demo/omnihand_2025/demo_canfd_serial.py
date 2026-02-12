@@ -18,7 +18,7 @@ OmniHand 2025 综合控制示例 - CANFD 通信（通过 serial_number）
 
 import sys
 import time
-from omnihand import OmniHand2025, EHandType, EFinger
+from omnihand import OmniHand2025, HandType, Finger
 
 
 def print_usage(program_name):
@@ -64,10 +64,10 @@ def control_single_hand(hand, hand_name):
     # 读取触觉传感器数据（1D）
     print("\n--- Tactile Sensor Data (1D) ---")
     try:
-        thumb_tactile = hand.get_tactile_sensor_data(EFinger.THUMB)
+        thumb_tactile = hand.get_tactile_sensor_data(Finger.THUMB)
         print(f"  Thumb: {thumb_tactile} (unit: 1g, max: 255g)")
 
-        index_tactile = hand.get_tactile_sensor_data(EFinger.INDEX)
+        index_tactile = hand.get_tactile_sensor_data(Finger.INDEX)
         print(f"  Index: {index_tactile} (unit: 1g, max: 255g)")
     except Exception as e:
         print(f"  Warning: {e}")
@@ -172,7 +172,7 @@ def main():
 
     if mode == "left" or mode == "both":
         left_hand = OmniHand2025.create_hand_by_zlgcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=hand_device_id,
             usbcanfd_serial_number=left_serial,
             canfd_channel_id=0
@@ -193,7 +193,7 @@ def main():
 
     if mode == "right" or mode == "both":
         right_hand = OmniHand2025.create_hand_by_zlgcan(
-            hand_type=EHandType.RIGHT,
+            hand_type=HandType.RIGHT,
             hand_device_id=hand_device_id,
             usbcanfd_serial_number=right_serial,
             canfd_channel_id=0
@@ -219,7 +219,7 @@ def main():
             if left_hand is None:
                 # 如果之前没有创建左手，现在创建
                 left_hand = OmniHand2025.create_hand_by_zlgcan(
-                    hand_type=EHandType.LEFT,
+                    hand_type=HandType.LEFT,
                     hand_device_id=hand_device_id,
                     usbcanfd_serial_number=left_serial,
                     canfd_channel_id=0

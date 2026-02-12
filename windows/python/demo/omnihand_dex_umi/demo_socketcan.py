@@ -27,7 +27,7 @@ OmniHand Dex UMI 综合控制示例 - SocketCAN 通信（仅 Linux）
 import sys
 import time
 import threading
-from omnihand import OmniHandDexUMI, EHandType, EFinger
+from omnihand import OmniHandDexUMI, HandType, Finger
 
 
 def print_usage(program_name):
@@ -114,9 +114,9 @@ def read_single_hand(hand, hand_name):
     print("\n--- 1D Tactile Sensor Data (Raw) ---")
     try:
         fingers = [
-            (EFinger.THUMB, "Thumb"),
-            (EFinger.INDEX, "Index"),
-            (EFinger.MIDDLE, "Middle"),
+            (Finger.THUMB, "Thumb"),
+            (Finger.INDEX, "Index"),
+            (Finger.MIDDLE, "Middle"),
         ]
         
         for finger_enum, finger_name in fingers:
@@ -190,7 +190,7 @@ def main():
 
     if mode == "left" or mode == "both":
         left_hand = OmniHandDexUMI.create_hand_socketcan(
-            hand_type=EHandType.LEFT,
+            hand_type=HandType.LEFT,
             hand_device_id=hand_device_id,
             can_interface=left_interface
         )
@@ -214,7 +214,7 @@ def main():
         interface = right_interface if mode == "both" else left_interface
 
         right_hand = OmniHandDexUMI.create_hand_socketcan(
-            hand_type=EHandType.RIGHT,
+            hand_type=HandType.RIGHT,
             hand_device_id=hand_device_id,
             can_interface=interface
         )
@@ -241,7 +241,7 @@ def main():
             if left_hand is None:
                 # 如果之前没有创建左手，现在创建
                 left_hand = OmniHandDexUMI.create_hand_socketcan(
-                    hand_type=EHandType.LEFT,
+                    hand_type=HandType.LEFT,
                     hand_device_id=hand_device_id,
                     can_interface=left_interface
                 )
