@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
 /**
@@ -47,7 +47,7 @@ void printUsage(const char* program_name) {
   std::cout << "  sudo ip link set can1 up" << std::endl;
 }
 
-void controlSingleHand(std::unique_ptr<OmniHandPro2025>& hand, const std::string& hand_name) {
+void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand, const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
 
   // ============ 获取设备信息 ============
@@ -79,14 +79,14 @@ void controlSingleHand(std::unique_ptr<OmniHandPro2025>& hand, const std::string
   // 读取 3D 触觉传感器数据（O12 特有）
   std::cout << "\n3D Tactile Sensor Data (O12 only):" << std::endl;
   try {
-    auto thumb_sensor = hand->GetTactileSensor3DData(Finger::THUMB);
+    auto thumb_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::THUMB);
     std::cout << "  Thumb:" << std::endl;
     std::cout << "    Online State: " << (thumb_sensor.online_state_ ? "Online" : "Offline") << std::endl;
     std::cout << "    Normal Force: " << thumb_sensor.normal_force_ << " (0.1N, max: 3000)" << std::endl;
     std::cout << "    Tangent Force: " << thumb_sensor.tangent_force_ << std::endl;
     std::cout << "    Tangent Force Angle: " << thumb_sensor.tangent_force_angle_ << "°" << std::endl;
     
-    auto index_sensor = hand->GetTactileSensor3DData(Finger::INDEX);
+    auto index_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::INDEX);
     std::cout << "  Index:" << std::endl;
     std::cout << "    Online State: " << (index_sensor.online_state_ ? "Online" : "Offline") << std::endl;
     std::cout << "    Normal Force: " << index_sensor.normal_force_ << " (0.1N, max: 3000)" << std::endl;
@@ -192,8 +192,8 @@ int main(int argc, char** argv) {
   std::string right_interface = "can1";
 
   if (mode == "left" || mode == "both") {
-    auto left_hand = OmniHandPro2025::createHandSocketCan(
-        HandType::LEFT,
+    auto left_hand = agilink::omnihand::OmniHandPro2025::createHandSocketCan(
+        agilink::omnihand::HandType::LEFT,
         device_id,
         left_interface
     );
@@ -216,8 +216,8 @@ int main(int argc, char** argv) {
   if (mode == "right" || mode == "both") {
     std::string interface = (mode == "both") ? right_interface : left_interface;
     
-    auto right_hand = OmniHandPro2025::createHandSocketCan(
-        HandType::RIGHT,
+    auto right_hand = agilink::omnihand::OmniHandPro2025::createHandSocketCan(
+        agilink::omnihand::HandType::RIGHT,
         device_id,
         interface
     );
@@ -241,8 +241,8 @@ int main(int argc, char** argv) {
       // both 模式：同时控制
       std::cout << "\n=== Dual Hand Control ===" << std::endl;
       
-      auto left_hand = OmniHandPro2025::createHandSocketCan(
-          HandType::LEFT,
+      auto left_hand = agilink::omnihand::OmniHandPro2025::createHandSocketCan(
+          agilink::omnihand::HandType::LEFT,
           device_id,
           left_interface
       );

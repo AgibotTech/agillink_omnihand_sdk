@@ -15,6 +15,9 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/proto.h"
 
+namespace agilink {
+namespace omnihand {
+
 #define DEFAULT_DEVICE_ID 0x01
 
 /**
@@ -144,3 +147,6 @@ class AGIBOT_EXPORT OmniHand {
   bool is_left_hand_{true};
   bool is_init_{false};
 };
+
+}  // namespace omnihand
+}  // namespace agilink

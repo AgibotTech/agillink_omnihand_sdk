@@ -14,6 +14,9 @@
 #include "omnihand/omnihand.h"
 #include "omnihand/proto.h"
 
+namespace agilink {
+namespace omnihand {
+
 // Forward declarations
 struct MixCtrl;
 struct JointMotorErrorReport;
@@ -327,3 +330,6 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    */
   virtual ~OmniHandBase() = default;
 };
+
+}  // namespace omnihand
+}  // namespace agilink

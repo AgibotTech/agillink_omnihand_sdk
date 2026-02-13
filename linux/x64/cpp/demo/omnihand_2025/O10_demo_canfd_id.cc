@@ -35,7 +35,7 @@ void printUsage(const char* program_name) {
   std::cout << "  " << program_name << " both" << std::endl;
 }
 
-void controlSingleHand(std::unique_ptr<OmniHand2025>& hand, const std::string& hand_name) {
+void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
 
   // ============ 获取设备信息 ============
@@ -67,7 +67,7 @@ void controlSingleHand(std::unique_ptr<OmniHand2025>& hand, const std::string& h
   // 读取触觉传感器数据
   std::cout << "\nTactile Sensor Data (1D):" << std::endl;
   try {
-    auto thumb_tactile = hand->GetTactileSensorData(Finger::THUMB);
+    auto thumb_tactile = hand->GetTactileSensorData(agilink::omnihand::Finger::THUMB);
     std::cout << "  Thumb: [";
     for (size_t i = 0; i < thumb_tactile.size(); ++i) {
       std::cout << static_cast<int>(thumb_tactile[i]);
@@ -75,7 +75,7 @@ void controlSingleHand(std::unique_ptr<OmniHand2025>& hand, const std::string& h
     }
     std::cout << "] (unit: 1g, max: 255g)" << std::endl;
     
-    auto index_tactile = hand->GetTactileSensorData(Finger::INDEX);
+    auto index_tactile = hand->GetTactileSensorData(agilink::omnihand::Finger::INDEX);
     std::cout << "  Index: [";
     for (size_t i = 0; i < index_tactile.size(); ++i) {
       std::cout << static_cast<int>(index_tactile[i]);
@@ -192,8 +192,8 @@ int main(int argc, char** argv) {
 
   if (mode == "left") {
     // 创建左手实例
-    auto left_hand = OmniHand2025::createHandByZlgcan(
-        HandType::LEFT,
+    auto left_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
+        agilink::omnihand::HandType::LEFT,
         device_id,
         canfd_id,
         0  // channel_id (第一个通道)
@@ -213,8 +213,8 @@ int main(int argc, char** argv) {
     controlSingleHand(left_hand, "Left");
   } else if (mode == "right") {
     // 创建右手实例
-    auto right_hand = OmniHand2025::createHandByZlgcan(
-        HandType::RIGHT,
+    auto right_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
+        agilink::omnihand::HandType::RIGHT,
         device_id,
         canfd_id,
         0  // channel_id (第一个通道)
@@ -234,15 +234,15 @@ int main(int argc, char** argv) {
     controlSingleHand(right_hand, "Right");
   } else if (mode == "both") {
     // both 模式：同时创建两个手
-    auto left_hand = OmniHand2025::createHandByZlgcan(
-        HandType::LEFT,
+    auto left_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
+        agilink::omnihand::HandType::LEFT,
         device_id,
         canfd_id,
         0  // channel_id (第一个通道)
     );
 
-    auto right_hand = OmniHand2025::createHandByZlgcan(
-        HandType::RIGHT,
+    auto right_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
+        agilink::omnihand::HandType::RIGHT,
         device_id,
         canfd_id,
         1  // channel_id (第二个通道)

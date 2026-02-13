@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
 #include <gtest/gtest.h>
@@ -33,8 +33,8 @@ class OmniHandPro2025Test : public ::testing::Test {
     // Create hand instance for testing based on device type
     std::string device_type = GetDeviceType();
     if (device_type == "hcan") {
-      hand_ = OmniHandPro2025::createHandByHcan(
-          HandType::LEFT,        // hand_type: left hand
+      hand_ = agilink::omnihand::OmniHandPro2025::createHandByHcan(
+          agilink::omnihand::HandType::LEFT,        // hand_type: left hand
           1,                       // hand_device_id: hand device ID
           0,                       // canfd_device_id: HCAN device index
           0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
@@ -42,8 +42,8 @@ class OmniHandPro2025Test : public ::testing::Test {
       std::cout << "[Info]: Using HCAN device" << std::endl;
     } else {
       // Default: ZLG CAN
-      hand_ = OmniHandPro2025::createHandByZlgcan(
-          HandType::LEFT,        // hand_type: left hand
+      hand_ = agilink::omnihand::OmniHandPro2025::createHandByZlgcan(
+          agilink::omnihand::HandType::LEFT,        // hand_type: left hand
           1,                       // hand_device_id: hand device ID
           0,                       // canfd_device_id: USB CANFD adapter device index
           0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
@@ -63,7 +63,7 @@ class OmniHandPro2025Test : public ::testing::Test {
     // std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
-  std::unique_ptr<OmniHandPro2025> hand_;
+  std::unique_ptr<agilink::omnihand::OmniHandPro2025> hand_;
 };
 
 // Test factory method
@@ -219,7 +219,7 @@ TEST_F(OmniHandPro2025Test, ControlMode) {
 TEST_F(OmniHandPro2025Test, TactileSensor3D) {
   if (hand_->Init()) {
     // Test single sensor
-    auto thumb_tactile = hand_->GetTactileSensor3DData(Finger::THUMB);
+    auto thumb_tactile = hand_->GetTactileSensor3DData(agilink::omnihand::Finger::THUMB);
     std::cout << "[GetTactileSensor3DData] Thumb 3D Tactile Data:" << std::endl;
     std::cout << "  Online State: " << static_cast<int>(thumb_tactile.online_state_) << std::endl;
     std::cout << "  Normal Force: " << thumb_tactile.normal_force_ << std::endl;
@@ -228,7 +228,7 @@ TEST_F(OmniHandPro2025Test, TactileSensor3D) {
     EXPECT_GE(thumb_tactile.normal_force_, 0);
     
     // Test multiple sensors
-    std::vector<Finger> fingers = {Finger::INDEX, Finger::MIDDLE, Finger::RING, Finger::LITTLE};
+    std::vector<agilink::omnihand::Finger> fingers = {agilink::omnihand::Finger::INDEX, agilink::omnihand::Finger::MIDDLE, agilink::omnihand::Finger::RING, agilink::omnihand::Finger::LITTLE};
     for (const auto& finger : fingers) {
       auto tactile_data = hand_->GetTactileSensor3DData(finger);
       std::cout << "[GetTactileSensor3DData] " << static_cast<int>(finger) << " 3D Tactile Data:" << std::endl;

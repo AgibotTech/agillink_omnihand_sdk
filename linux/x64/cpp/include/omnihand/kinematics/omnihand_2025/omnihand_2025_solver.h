@@ -14,6 +14,10 @@
 
 #include "omnihand/export_symbols.h"
 
+namespace agilink {
+namespace omnihand {
+namespace o10 {
+
 /**
  * @brief O10灵巧手主动关节枚举
  */
@@ -178,5 +182,9 @@ class AGIBOT_EXPORT OmniHand2025Solver {
   std::vector<double>
   GetAllJointPos(const std::vector<double> &active_joint_pos);
 };
+
+}  // namespace o10
+}  // namespace omnihand
+}  // namespace agilink
 
 #endif  // OMNIHAND_2025_SOLVER_H

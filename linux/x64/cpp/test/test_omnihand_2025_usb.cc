@@ -50,8 +50,8 @@ class OmniHand2025UsbTest : public ::testing::Test {
  protected:
   void SetUp() override {
     try {
-      hand_ = OmniHand2025::createHandByUsb(
-          HandType::LEFT,
+      hand_ = agilink::omnihand::OmniHand2025::createHandByUsb(
+          agilink::omnihand::HandType::LEFT,
           1,              // device_id
           g_usb_port,
           g_baudrate
@@ -81,7 +81,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
     }
   }
 
-  std::unique_ptr<OmniHand2025> hand_;
+  std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
   bool device_available_ = false;
 };
 
@@ -270,14 +270,14 @@ TEST_F(OmniHand2025UsbTest, GetTactileSensorData) {
   std::cout << "[GetTactileSensorData] Testing all tactile sensors:" << std::endl;
   
   // Test finger sensors (Thumb, Index, Middle, Ring, Little) - 16 values each
-  std::vector<Finger> fingers = {
-    Finger::THUMB, Finger::INDEX, Finger::MIDDLE, Finger::RING, Finger::LITTLE
+  std::vector<agilink::omnihand::Finger> fingers = {
+    agilink::omnihand::Finger::THUMB, agilink::omnihand::Finger::INDEX, agilink::omnihand::Finger::MIDDLE, agilink::omnihand::Finger::RING, agilink::omnihand::Finger::LITTLE
   };
   
   std::cout << "  Fingers (16 values each):" << std::endl;
   for (auto finger : fingers) {
     auto data = hand_->GetTactileSensorData(finger);
-    std::cout << "    " << ToString(finger) << ": ";
+    std::cout << "    " << agilink::omnihand::ToString(finger) << ": ";
     for (size_t i = 0; i < data.size(); ++i) {
       std::cout << static_cast<int>(data[i]);
       if (i < data.size() - 1) std::cout << ", ";
@@ -287,12 +287,12 @@ TEST_F(OmniHand2025UsbTest, GetTactileSensorData) {
   }
   
   // Test palm/dorsum sensors - 25 values each
-  std::vector<Finger> palm_dorsum = {Finger::PALM, Finger::DORSUM};
+  std::vector<agilink::omnihand::Finger> palm_dorsum = {agilink::omnihand::Finger::PALM, agilink::omnihand::Finger::DORSUM};
   
   std::cout << "  Palm/Dorsum (25 values each):" << std::endl;
   for (auto sensor : palm_dorsum) {
     auto data = hand_->GetTactileSensorData(sensor);
-    std::cout << "    " << ToString(sensor) << ": ";
+    std::cout << "    " << agilink::omnihand::ToString(sensor) << ": ";
     for (size_t i = 0; i < data.size(); ++i) {
       std::cout << static_cast<int>(data[i]);
       if (i < data.size() - 1) std::cout << ", ";
@@ -310,7 +310,7 @@ TEST_F(OmniHand2025UsbTest, SetControlMode) {
   RequireDevice();
   
   // Set control mode for joint 1
-  hand_->SetControlMode(1, ControlMode::SERVO);
+  hand_->SetControlMode(1, agilink::omnihand::ControlMode::SERVO);
   std::cout << "[SetControlMode] Joint 1 -> SERVO" << std::endl;
   
   // Note: GetAllControlMode returns cached values for USB
@@ -359,11 +359,11 @@ TEST_F(OmniHand2025UsbTest, MixCtrlJointMotor_PosiVeloTorque) {
   const int16_t safe_pos[10] = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
   
   // POSITION_VELOCITY_TORQUE mode: max 8 joints
-  std::vector<MixCtrl> mix_ctrls;
+  std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
   for (int i = 1; i <= 8; ++i) {
-    MixCtrl ctrl;
+    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
     ctrl.joint_index_ = static_cast<unsigned char>(i);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::POSITION_VELOCITY_TORQUE);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_VELOCITY_TORQUE);
     ctrl.tgt_posi_ = safe_pos[i - 1];
     ctrl.tgt_velo_ = 50;
     ctrl.tgt_torque_ = 0;
@@ -389,10 +389,10 @@ TEST_F(OmniHand2025UsbTest, MixCtrlJointMotor_VeloTorque) {
   
   std::cout << "[MixCtrlJointMotor] VELOCITY_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
-    std::vector<MixCtrl> mix_ctrls;
-    MixCtrl ctrl;
+    std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
+    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::VELOCITY_TORQUE);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::VELOCITY_TORQUE);
     ctrl.tgt_posi_ = std::nullopt;
     ctrl.tgt_velo_ = 100;
     ctrl.tgt_torque_ = 0;
@@ -413,10 +413,10 @@ TEST_F(OmniHand2025UsbTest, MixCtrlJointMotor_PosiTorque) {
   
   std::cout << "[MixCtrlJointMotor] POSITION_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
-    std::vector<MixCtrl> mix_ctrls;
-    MixCtrl ctrl;
+    std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
+    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::POSITION_TORQUE);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_TORQUE);
     ctrl.tgt_posi_ = safe_pos[joint - 1];
     ctrl.tgt_velo_ = std::nullopt;
     ctrl.tgt_torque_ = 0;

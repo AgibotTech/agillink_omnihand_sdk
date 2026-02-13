@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
 /**
@@ -35,7 +35,7 @@ void printUsage(const char* program_name) {
   std::cout << "Note: UMI protocol is read-only, position/velocity/torque control is not supported" << std::endl;
 }
 
-void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& hand_name) {
+void readSingleHand(std::unique_ptr<agilink::omnihand::OmniHandDexUMI>& hand, const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Data Reading ===" << std::endl;
 
   // ============ 获取设备信息 ============
@@ -72,7 +72,7 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
   // 读取触觉传感器数据（1D，使用 Raw API）
   std::cout << "\n1D Tactile Sensor Data (Raw):" << std::endl;
   try {
-    auto thumb_sensor = hand->GetTactileSensorDataRaw(Finger::THUMB);
+    auto thumb_sensor = hand->GetTactileSensorDataRaw(agilink::omnihand::Finger::THUMB);
     std::cout << "  Thumb: [";
     for (size_t i = 0; i < thumb_sensor.data_.size(); ++i) {
       std::cout << static_cast<int>(thumb_sensor.data_[i]);
@@ -80,7 +80,7 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
     }
     std::cout << "] (unit: 1g, max: 255g)" << std::endl;
     
-    auto index_sensor = hand->GetTactileSensorDataRaw(Finger::INDEX);
+    auto index_sensor = hand->GetTactileSensorDataRaw(agilink::omnihand::Finger::INDEX);
     std::cout << "  Index: [";
     for (size_t i = 0; i < index_sensor.data_.size(); ++i) {
       std::cout << static_cast<int>(index_sensor.data_[i]);
@@ -88,7 +88,7 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
     }
     std::cout << "] (unit: 1g, max: 255g)" << std::endl;
     
-    auto middle_sensor = hand->GetTactileSensorDataRaw(Finger::MIDDLE);
+    auto middle_sensor = hand->GetTactileSensorDataRaw(agilink::omnihand::Finger::MIDDLE);
     std::cout << "  Middle: [";
     for (size_t i = 0; i < middle_sensor.data_.size(); ++i) {
       std::cout << static_cast<int>(middle_sensor.data_[i]);
@@ -102,12 +102,12 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
     for (const auto& sensor : all_sensors) {
       std::string finger_name;
       switch (sensor.sensor_id_) {
-        case Finger::THUMB: finger_name = "Thumb"; break;
-        case Finger::INDEX: finger_name = "Index"; break;
-        case Finger::MIDDLE: finger_name = "Middle"; break;
-        case Finger::RING: finger_name = "Ring"; break;
-        case Finger::LITTLE: finger_name = "Little"; break;
-        case Finger::PALM: finger_name = "Palm"; break;
+        case agilink::omnihand::Finger::THUMB: finger_name = "Thumb"; break;
+        case agilink::omnihand::Finger::INDEX: finger_name = "Index"; break;
+        case agilink::omnihand::Finger::MIDDLE: finger_name = "Middle"; break;
+        case agilink::omnihand::Finger::RING: finger_name = "Ring"; break;
+        case agilink::omnihand::Finger::LITTLE: finger_name = "Little"; break;
+        case agilink::omnihand::Finger::PALM: finger_name = "Palm"; break;
         // Note: UMI does not have Dorsum sensor
         default: finger_name = "Unknown"; break;
       }
@@ -119,7 +119,7 @@ void readSingleHand(std::unique_ptr<OmniHandDexUMI>& hand, const std::string& ha
 }
 
 int main(int argc, char** argv) {
-  // 解析命令行参数
+  // 解析命令行参�?
   std::string mode = "left";  // 默认左手
   if (argc > 1) {
     std::string arg = argv[1];
@@ -145,8 +145,8 @@ int main(int argc, char** argv) {
 
   if (mode == "left") {
     // 创建左手实例
-    auto left_hand = OmniHandDexUMI::createHandByZlgcan(
-        HandType::LEFT,
+    auto left_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
+        agilink::omnihand::HandType::LEFT,
         device_id,
         canfd_id,
         0  // channel_id (第一个通道)
@@ -166,8 +166,8 @@ int main(int argc, char** argv) {
     readSingleHand(left_hand, "Left");
   } else if (mode == "right") {
     // 创建右手实例
-    auto right_hand = OmniHandDexUMI::createHandByZlgcan(
-        HandType::RIGHT,
+    auto right_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
+        agilink::omnihand::HandType::RIGHT,
         device_id,
         canfd_id,
         0  // channel_id (第一个通道)
@@ -187,15 +187,15 @@ int main(int argc, char** argv) {
     readSingleHand(right_hand, "Right");
   } else if (mode == "both") {
     // both 模式：同时读取两个手
-    auto left_hand = OmniHandDexUMI::createHandByZlgcan(
-        HandType::LEFT,
+    auto left_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
+        agilink::omnihand::HandType::LEFT,
         device_id,
         canfd_id,
         0  // channel_id (第一个通道)
     );
 
-    auto right_hand = OmniHandDexUMI::createHandByZlgcan(
-        HandType::RIGHT,
+    auto right_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
+        agilink::omnihand::HandType::RIGHT,
         device_id,
         canfd_id,
         1  // channel_id (第二个通道)

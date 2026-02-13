@@ -17,6 +17,10 @@
 #include "omnihand/omnihand_base.h"
 #include "omnihand/proto.h"
 #include "omnihand/kinematics/omnihand_pro_2025/omnihand_pro_2025_solver.h"
+
+namespace agilink {
+namespace omnihand {
+
 class OmniHandPro2025CanImpl;
 
 /**
@@ -180,5 +184,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
   /**
    * @brief Kinematics solver for OmniHand Pro 2025 (O12)
    */
-  std::unique_ptr<omnihandProSDK::OmniHandPro2025Solver> kinematics_solver_;
+  std::unique_ptr<o12::OmniHandPro2025Solver> kinematics_solver_;
 };
+
+}  // namespace omnihand
+}  // namespace agilink

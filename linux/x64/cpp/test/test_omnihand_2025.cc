@@ -21,8 +21,8 @@ class OmniHand2025Test : public ::testing::Test {
  protected:
   void SetUp() override {
     // Create hand instance for testing
-    hand_ = OmniHand2025::createHandByZlgcan(
-        HandType::LEFT,        // hand_type: left hand
+    hand_ = agilink::omnihand::OmniHand2025::createHandByZlgcan(
+        agilink::omnihand::HandType::LEFT,        // hand_type: left hand
         1,                       // hand_device_id: hand device ID
         0,                       // canfd_device_id: USB CANFD adapter device index
         0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
@@ -38,7 +38,7 @@ class OmniHand2025Test : public ::testing::Test {
     hand_.reset();
   }
 
-  std::unique_ptr<OmniHand2025> hand_;
+  std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
 };
 
 // Test factory method
@@ -203,7 +203,7 @@ TEST_F(OmniHand2025Test, JointAngleControl) {
 // Only testing read operation (GetAllControlMode)
 TEST_F(OmniHand2025Test, ControlMode) {
   if (hand_->Init()) {
-    // std::vector<unsigned char> control_modes(10, static_cast<unsigned char>(ControlMode::SERVO));
+    // std::vector<unsigned char> control_modes(10, static_cast<unsigned char>(agilink::omnihand::ControlMode::SERVO));
     // hand_->SetAllControlMode(control_modes);
     // Only test reading control mode (read-only operation)
     // Note: SetAllControlMode is not tested as it may cause CANFD communication to crash
@@ -228,15 +228,15 @@ TEST_F(OmniHand2025Test, ControlMode) {
 TEST_F(OmniHand2025Test, TactileSensor) {
   if (hand_->Init()) {
     // Test GetTactileSensorData (downsampled data) for all fingers
-    std::vector<Finger> fingers = {
-      Finger::THUMB, Finger::INDEX, Finger::MIDDLE,
-      Finger::RING, Finger::LITTLE, Finger::PALM, Finger::DORSUM
+    std::vector<agilink::omnihand::Finger> fingers = {
+      agilink::omnihand::Finger::THUMB, agilink::omnihand::Finger::INDEX, agilink::omnihand::Finger::MIDDLE,
+      agilink::omnihand::Finger::RING, agilink::omnihand::Finger::LITTLE, agilink::omnihand::Finger::PALM, agilink::omnihand::Finger::DORSUM
     };
     
     std::cout << "[GetTactileSensorData] Getting all sensor data:" << std::endl;
     for (const auto& finger : fingers) {
       auto tactile_data = hand_->GetTactileSensorData(finger);
-      std::cout << "  " << ToString(finger) << " (" << tactile_data.size() << " values): ";
+      std::cout << "  " << agilink::omnihand::ToString(finger) << " (" << tactile_data.size() << " values): ";
       for (size_t i = 0; i < tactile_data.size(); ++i) {
         std::cout << static_cast<int>(tactile_data[i]);
         if (i < tactile_data.size() - 1) std::cout << ", ";
@@ -251,13 +251,13 @@ TEST_F(OmniHand2025Test, TactileSensor) {
 TEST_F(OmniHand2025Test, TactileSensorRaw) {
   if (hand_->Init()) {
     // Test all 7 sensors individually (Thumb, Index, Middle, Ring, Little, Palm, Dorsum)
-    std::vector<Finger> all_fingers = {
-      Finger::THUMB, Finger::INDEX, Finger::MIDDLE, Finger::RING,
-      Finger::LITTLE, Finger::PALM, Finger::DORSUM
+    std::vector<agilink::omnihand::Finger> all_fingers = {
+      agilink::omnihand::Finger::THUMB, agilink::omnihand::Finger::INDEX, agilink::omnihand::Finger::MIDDLE, agilink::omnihand::Finger::RING,
+      agilink::omnihand::Finger::LITTLE, agilink::omnihand::Finger::PALM, agilink::omnihand::Finger::DORSUM
     };
     
     // Check if firmware supports raw tactile sensor data by testing Thumb first
-    auto thumb_tactile = hand_->GetTactileSensorDataRaw(Finger::THUMB);
+    auto thumb_tactile = hand_->GetTactileSensorDataRaw(agilink::omnihand::Finger::THUMB);
     if (thumb_tactile.data_.empty()) {
       std::cout << "[Info]: Raw tactile sensor data is not supported by this firmware version. "
                 << "This feature requires firmware version that supports multi-frame tactile sensor data protocol." << std::endl;
@@ -268,10 +268,10 @@ TEST_F(OmniHand2025Test, TactileSensorRaw) {
     for (const auto& finger : all_fingers) {
       auto tactile_data = hand_->GetTactileSensorDataRaw(finger);
       if (tactile_data.data_.empty()) {
-        std::cout << "  " << ToString(finger) << ": No data available" << std::endl;
+        std::cout << "  " << agilink::omnihand::ToString(finger) << ": No data available" << std::endl;
         continue;  // Skip this sensor
       }
-      std::cout << "  " << ToString(finger) << " (" << tactile_data.data_.size() << " values): ";
+      std::cout << "  " << agilink::omnihand::ToString(finger) << " (" << tactile_data.data_.size() << " values): ";
       // Print first 10 values (or all if less than 10)
       size_t print_count = std::min(tactile_data.data_.size(), size_t(10));
       for (size_t i = 0; i < print_count; ++i) {
@@ -295,13 +295,13 @@ TEST_F(OmniHand2025Test, TactileSensorRaw) {
     for (const auto& sensor : all_tactile_data) {
       std::string finger_name;
       switch (sensor.sensor_id_) {
-        case Finger::THUMB: finger_name = "Thumb"; break;
-        case Finger::INDEX: finger_name = "Index"; break;
-        case Finger::MIDDLE: finger_name = "Middle"; break;
-        case Finger::RING: finger_name = "Ring"; break;
-        case Finger::LITTLE: finger_name = "Little"; break;
-        case Finger::PALM: finger_name = "Palm"; break;
-        case Finger::DORSUM: finger_name = "Dorsum"; break;
+        case agilink::omnihand::Finger::THUMB: finger_name = "Thumb"; break;
+        case agilink::omnihand::Finger::INDEX: finger_name = "Index"; break;
+        case agilink::omnihand::Finger::MIDDLE: finger_name = "Middle"; break;
+        case agilink::omnihand::Finger::RING: finger_name = "Ring"; break;
+        case agilink::omnihand::Finger::LITTLE: finger_name = "Little"; break;
+        case agilink::omnihand::Finger::PALM: finger_name = "Palm"; break;
+        case agilink::omnihand::Finger::DORSUM: finger_name = "Dorsum"; break;
         default: finger_name = "Unknown"; break;
       }
       std::cout << "  " << finger_name << " (" << sensor.data_.size() << " values): ";

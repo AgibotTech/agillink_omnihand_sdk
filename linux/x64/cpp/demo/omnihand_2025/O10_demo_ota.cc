@@ -52,11 +52,11 @@ int main(int argc, char* argv[]) {
   unsigned char hand_device_id = (argc > 5) ? static_cast<unsigned char>(std::stoi(argv[5])) : 1;
 
   // Parse hand type
-  HandType hand_type;
+  agilink::omnihand::HandType hand_type;
   if (hand_type_str == "left") {
-    hand_type = HandType::LEFT;
+    hand_type = agilink::omnihand::HandType::LEFT;
   } else if (hand_type_str == "right") {
-    hand_type = HandType::RIGHT;
+    hand_type = agilink::omnihand::HandType::RIGHT;
   } else {
     std::cerr << "[ERROR]: Invalid hand type: " << hand_type_str << ". Must be 'left' or 'right'." << std::endl;
     return 1;
@@ -77,13 +77,13 @@ int main(int argc, char* argv[]) {
   std::cout << "\n=== OmniHand 2025 OTA Firmware Upgrade Demo ===" << std::endl;
   std::cout << "CANFD Device ID: " << static_cast<int>(canfd_device_id) << std::endl;
   std::cout << "CAN Channel ID: " << static_cast<int>(canfd_channel_id) << std::endl;
-  std::cout << "Hand Type: " << (hand_type == HandType::LEFT ? "Left" : "Right") << std::endl;
+  std::cout << "Hand Type: " << (hand_type == agilink::omnihand::HandType::LEFT ? "Left" : "Right") << std::endl;
   std::cout << "Hand Device ID: " << static_cast<int>(hand_device_id) << std::endl;
   std::cout << std::endl;
 
   // Create OmniHand 2025 instance (CANFD communication)
   std::cout << "Initializing OmniHand 2025..." << std::endl;
-  auto hand = OmniHand2025::createHandByZlgcan(hand_type, hand_device_id, canfd_device_id, canfd_channel_id);
+  auto hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(hand_type, hand_device_id, canfd_device_id, canfd_channel_id);
   
   if (!hand || !hand->Init()) {
     std::cerr << "[ERROR]: Failed to initialize OmniHand 2025" << std::endl;
@@ -125,11 +125,83 @@ int main(int argc, char* argv[]) {
   std::cout << "Please wait and do not interrupt the process." << std::endl;
   std::cout << std::endl;
 
+  // Define progress callback
+  agilink::omnihand::OtaProgressCallback progress_callback = [](int current_packet, int total_packets, agilink::omnihand::OtaProgressStatus status) {
+    switch (status) {
+      case agilink::omnihand::OtaProgressStatus::FILE_LOADED:
+        std::cout << "[OTA] Firmware file loaded, total packets: " << total_packets << std::endl;
+        break;
+      case agilink::omnihand::OtaProgressStatus::REQUESTING_UPGRADE:
+        std::cout << "[OTA] Requesting upgrade..." << std::endl;
+        break;
+      case agilink::omnihand::OtaProgressStatus::UPGRADE_ACCEPTED:
+        std::cout << "[OTA] Upgrade request accepted, starting transmission..." << std::endl;
+        break;
+      case agilink::omnihand::OtaProgressStatus::TRANSMITTING:
+        {
+          std::cout << "[OTA] Transmitting: " << current_packet << "/" << total_packets << std::endl;
+          if (current_packet == total_packets) {
+            std::cout << std::endl;
+            std::cout << "[OTA] All " << total_packets << " packets transmitted successfully" << std::endl;
+          }
+        }
+        break;
+      case agilink::omnihand::OtaProgressStatus::SENDING_FINISH:
+        std::cout << "[OTA] Sending finish request..." << std::endl;
+        break;
+      case agilink::omnihand::OtaProgressStatus::RESTARTING:
+        std::cout << "[OTA] Device restarting..." << std::endl;
+        break;
+      case agilink::omnihand::OtaProgressStatus::VERIFYING:
+        std::cout << "[OTA] Verifying upgrade result..." << std::endl;
+        break;
+      case agilink::omnihand::OtaProgressStatus::SUCCESS:
+        std::cout << "[OTA] Upgrade successful!" << std::endl;
+        break;
+      case agilink::omnihand::OtaProgressStatus::ERROR:
+        {
+          if (current_packet < 0) {
+            // SDK error
+            agilink::omnihand::OtaErrorCode error_code = static_cast<agilink::omnihand::OtaErrorCode>(current_packet);
+            std::cerr << "\n[OTA ERROR] SDK error: ";
+            switch (error_code) {
+              case agilink::omnihand::OtaErrorCode::FILE_NOT_FOUND:
+                std::cerr << "File not found";
+                break;
+              case agilink::omnihand::OtaErrorCode::FILE_EMPTY:
+                std::cerr << "File is empty";
+                break;
+              case agilink::omnihand::OtaErrorCode::REQUEST_TIMEOUT:
+                std::cerr << "Request timeout";
+                break;
+              case agilink::omnihand::OtaErrorCode::RESTART_TIMEOUT:
+                std::cerr << "Restart timeout";
+                break;
+              case agilink::omnihand::OtaErrorCode::TRANSMISSION_TIMEOUT:
+                std::cerr << "Transmission timeout";
+                break;
+              case agilink::omnihand::OtaErrorCode::CRC_CHECK_FAILED:
+                std::cerr << "CRC check failed";
+                break;
+              default:
+                std::cerr << "Unknown error code: " << current_packet;
+                break;
+            }
+            std::cerr << std::endl;
+          } else {
+            // Device error
+            std::cerr << "\n[OTA ERROR] Device error code: " << current_packet << std::endl;
+          }
+        }
+        break;
+    }
+  };
+
   try {
     auto start_time = std::chrono::steady_clock::now();
     
-    // Call UpdateFirmware
-    hand->UpdateFirmware(absolute_firmware_path);
+    // Call UpdateFirmware with progress callback
+    hand->UpdateFirmware(absolute_firmware_path, progress_callback);
     
     auto end_time = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
@@ -140,15 +212,15 @@ int main(int argc, char* argv[]) {
     std::cout << "Please wait for the device to restart and reconnect..." << std::endl;
     
     // Wait for device to restart
-    std::cout << "\nWaiting for device to restart (10 seconds)..." << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::cout << "\nWaiting for device to restart (2 seconds)..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     
     // Try to reconnect and get vendor info
     std::cout << "\n=== Reconnecting to Device ===" << std::endl;
     hand.reset();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     
-    hand = OmniHand2025::createHandByZlgcan(hand_type, hand_device_id, canfd_device_id, canfd_channel_id);
+    hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(hand_type, hand_device_id, canfd_device_id, canfd_channel_id);
     if (!hand || !hand->Init()) {
       std::cerr << "[WARN]: Failed to reconnect to device. Please check manually." << std::endl;
       return 0;

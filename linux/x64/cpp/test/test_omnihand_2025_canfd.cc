@@ -32,8 +32,8 @@ static int g_request_interval = 5;  // CANFD default: 5ms
 class OmniHand2025CanfdTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    hand_ = OmniHand2025::createHandByZlgcan(
-        HandType::LEFT,        // hand_type: left hand
+    hand_ = agilink::omnihand::OmniHand2025::createHandByZlgcan(
+        agilink::omnihand::HandType::LEFT,        // hand_type: left hand
         1,                       // hand_device_id: hand device ID
         g_canfd_id,              // canfd_device_id: USB CANFD adapter device index
         g_channel_id             // canfd_channel_id: CAN channel index (0=can0, 1=can1)
@@ -58,7 +58,7 @@ class OmniHand2025CanfdTest : public ::testing::Test {
     }
   }
 
-  std::unique_ptr<OmniHand2025> hand_;
+  std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
   bool device_available_ = false;
 };
 
@@ -268,14 +268,14 @@ TEST_F(OmniHand2025CanfdTest, GetTactileSensorData) {
   std::cout << "[GetTactileSensorData] Testing all tactile sensors:" << std::endl;
   
   // Test finger sensors (Thumb, Index, Middle, Ring, Little) - 16 values each
-  std::vector<Finger> fingers = {
-    Finger::THUMB, Finger::INDEX, Finger::MIDDLE, Finger::RING, Finger::LITTLE
+    std::vector<agilink::omnihand::Finger> fingers = {
+    agilink::omnihand::Finger::THUMB, agilink::omnihand::Finger::INDEX, agilink::omnihand::Finger::MIDDLE, agilink::omnihand::Finger::RING, agilink::omnihand::Finger::LITTLE
   };
   
   std::cout << "  Fingers (16 values each):" << std::endl;
   for (auto finger : fingers) {
     auto data = hand_->GetTactileSensorData(finger);
-    std::cout << "    " << ToString(finger) << ": ";
+    std::cout << "    " << agilink::omnihand::ToString(finger) << ": ";
     for (size_t i = 0; i < data.size(); ++i) {
       std::cout << static_cast<int>(data[i]);
       if (i < data.size() - 1) std::cout << ", ";
@@ -285,12 +285,12 @@ TEST_F(OmniHand2025CanfdTest, GetTactileSensorData) {
   }
   
   // Test palm/dorsum sensors - 25 values each
-  std::vector<Finger> palm_dorsum = {Finger::PALM, Finger::DORSUM};
+  std::vector<agilink::omnihand::Finger> palm_dorsum = {agilink::omnihand::Finger::PALM, agilink::omnihand::Finger::DORSUM};
   
   std::cout << "  Palm/Dorsum (25 values each):" << std::endl;
   for (auto sensor : palm_dorsum) {
     auto data = hand_->GetTactileSensorData(sensor);
-    std::cout << "    " << ToString(sensor) << ": ";
+    std::cout << "    " << agilink::omnihand::ToString(sensor) << ": ";
     for (size_t i = 0; i < data.size(); ++i) {
       std::cout << static_cast<int>(data[i]);
       if (i < data.size() - 1) std::cout << ", ";
@@ -304,7 +304,7 @@ TEST_F(OmniHand2025CanfdTest, GetTactileSensorDataRaw) {
   RequireDevice();
   
   // CANFD supports raw tactile sensor data (multi-frame protocol)
-  auto data = hand_->GetTactileSensorDataRaw(Finger::THUMB);
+    auto data = hand_->GetTactileSensorDataRaw(agilink::omnihand::Finger::THUMB);
   
   if (data.data_.empty()) {
     std::cout << "[GetTactileSensorDataRaw] Not supported by this firmware" << std::endl;
@@ -334,7 +334,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllTactileSensorDataRaw) {
   
   std::cout << "[GetAllTactileSensorDataRaw] " << all_data.size() << " sensors" << std::endl;
   for (const auto& sensor : all_data) {
-    std::cout << "  " << ToString(sensor.sensor_id_) << " (" << sensor.data_.size() << " values): ";
+    std::cout << "  " << agilink::omnihand::ToString(sensor.sensor_id_) << " (" << sensor.data_.size() << " values): ";
     for (size_t i = 0; i < sensor.data_.size(); ++i) {
       std::cout << static_cast<int>(sensor.data_[i]);
       if (i < sensor.data_.size() - 1) std::cout << ", ";
@@ -430,11 +430,11 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor) {
   const int16_t safe_pos[10] = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
   
   // POSITION_VELOCITY_TORQUE mode: max 8 joints
-  std::vector<MixCtrl> mix_ctrls;
+  std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
   for (int i = 1; i <= 8; ++i) {
-    MixCtrl ctrl;
+    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
     ctrl.joint_index_ = static_cast<unsigned char>(i);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::POSITION_VELOCITY_TORQUE);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_VELOCITY_TORQUE);
     ctrl.tgt_posi_ = safe_pos[i - 1];
     ctrl.tgt_velo_ = 50;
     ctrl.tgt_torque_ = 0;
@@ -460,10 +460,10 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_VeloTorque) {
   
   std::cout << "[MixCtrlJointMotor] VELOCITY_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
-    std::vector<MixCtrl> mix_ctrls;
-    MixCtrl ctrl;
+    std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
+    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::VELOCITY_TORQUE);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::VELOCITY_TORQUE);
     ctrl.tgt_posi_ = std::nullopt;
     ctrl.tgt_velo_ = 100;
     ctrl.tgt_torque_ = 0;
@@ -484,10 +484,10 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_PosiTorque) {
   
   std::cout << "[MixCtrlJointMotor] POSITION_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
-    std::vector<MixCtrl> mix_ctrls;
-    MixCtrl ctrl;
+    std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
+    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(ControlMode::POSITION_TORQUE);
+    ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_TORQUE);
     ctrl.tgt_posi_ = safe_pos[joint - 1];
     ctrl.tgt_velo_ = std::nullopt;
     ctrl.tgt_torque_ = 0;
