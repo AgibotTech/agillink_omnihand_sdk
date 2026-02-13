@@ -23,6 +23,7 @@ This guide helps you get started with the OmniHand 2025 SDK in 5 minutes.
 | **OS** | Ubuntu 22.04+ | Windows 10/11 |
 | **Python** | 3.10+ | 3.10+ |
 | **C++ Compiler** | gcc 11.4+ | MSVC 2019+ |
+| **C++ Standard** | C++17+ | C++17+ |
 | **CMake** | 3.24+ | 3.24+ |
 | **ROS2** (optional) | Humble | ❌ Not supported |
 
@@ -123,6 +124,10 @@ print("Moved to target position")
 ```cmake
 cmake_minimum_required(VERSION 3.14)
 project(my_omnihand_app)
+
+# Set C++17 standard (required by SDK)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find omnihand package
 list(APPEND CMAKE_MODULE_PATH "/usr/local/share/cmake/omnihand")  # Linux

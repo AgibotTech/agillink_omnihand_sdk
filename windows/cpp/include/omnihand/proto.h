@@ -254,18 +254,22 @@ struct AGIBOT_EXPORT DeviceInfo {
   }
 };
 
-#pragma pack(pop)
-
 /**
  * @brief 混合控制参数
+ * @note 默认构造函数确保位域自动初始化为0，使用更安全
  */
 struct AGIBOT_EXPORT MixCtrl {
-  unsigned char joint_index_ : 5 {};
-  unsigned char ctrl_mode_ : 3 {};
+  unsigned char joint_index_ : 5;
+  unsigned char ctrl_mode_ : 3;
   std::optional<short> tgt_posi_;
   std::optional<short> tgt_velo_;
   std::optional<short> tgt_torque_;
+
+  // 默认构造函数：确保位域初始化为0（C++17兼容）
+  MixCtrl() : joint_index_(0), ctrl_mode_(0) {}
 };
+
+#pragma pack(pop)
 
 }  // namespace omnihand
 }  // namespace agilink

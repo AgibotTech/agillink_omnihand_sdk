@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025, Agibot Co., Ltd.
+// Copyright (c) 2025, Agibot Co., Ltd.
 // OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
 /**
@@ -432,7 +432,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor) {
   // POSITION_VELOCITY_TORQUE mode: max 8 joints
   std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
   for (int i = 1; i <= 8; ++i) {
-    agilink::omnihand::MixCtrl ctrl;
+    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
     ctrl.joint_index_ = static_cast<unsigned char>(i);
     ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_VELOCITY_TORQUE);
     ctrl.tgt_posi_ = safe_pos[i - 1];
@@ -461,7 +461,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_VeloTorque) {
   std::cout << "[MixCtrlJointMotor] VELOCITY_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
     std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
-    agilink::omnihand::MixCtrl ctrl;
+    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
     ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::VELOCITY_TORQUE);
     ctrl.tgt_posi_ = std::nullopt;
@@ -485,7 +485,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_PosiTorque) {
   std::cout << "[MixCtrlJointMotor] POSITION_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
     std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
-    agilink::omnihand::MixCtrl ctrl;
+    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
     ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_TORQUE);
     ctrl.tgt_posi_ = safe_pos[joint - 1];

@@ -1,4 +1,4 @@
-﻿# OmniHand 2025 SDK C++ API
+# OmniHand 2025 SDK C++ API
 
 ## 概述
 

@@ -23,6 +23,7 @@
 | **操作系统** | Ubuntu 22.04+ | Windows 10/11 |
 | **Python** | 3.10+ | 3.10+ |
 | **C++ 编译器** | gcc 11.4+ | MSVC 2019+ |
+| **C++ 标准** | C++17+ | C++17+ |
 | **CMake** | 3.24+ | 3.24+ |
 | **ROS2**（可选） | Humble | ❌ 不支持 |
 
@@ -123,6 +124,10 @@ print("已移动到目标位置")
 ```cmake
 cmake_minimum_required(VERSION 3.14)
 project(my_omnihand_app)
+
+# 设置 C++17 标准（SDK 要求）
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 查找 omnihand 包
 list(APPEND CMAKE_MODULE_PATH "/usr/local/share/cmake/omnihand")  # Linux
