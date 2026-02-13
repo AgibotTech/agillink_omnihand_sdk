@@ -17,6 +17,7 @@
 #include "omnihand/omnihand_base.h"
 #include "omnihand/omnihand_sensor_base.h"
 #include "omnihand/proto.h"
+#include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"
 class OmniHand2025CanImpl;
 class OmniHand2025RsImpl;
@@ -210,14 +211,19 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
   /**
    * @brief Updates firmware via OTA (Over-The-Air) upgrade
    * @param file_name Path to the firmware binary file
+   * @param progress_callback Optional callback function to receive progress updates
+   *                          - current_packet: Meaning depends on status (see OtaProgressStatus)
+   *                          - total_packets: Total number of packets
+   *                          - status: Progress status (see OtaProgressStatus)
    * @note This function is supported for:
    *       - CAN communication (ZLG CANFD, HCAN, SocketCAN) - all platforms
    *       - USB communication (Windows only, Ubuntu does not support USB CDC OTA)
    * @note RS485 communication does not support OTA upgrade
    * @note Do not power off or restart the device during the update process
    * @warning This is a blocking operation that may take several minutes depending on firmware size
+   * @note If progress_callback is nullptr (default), progress will be printed to stdout/stderr
    */
-  virtual void UpdateFirmware(const std::string& file_name);
+  virtual void UpdateFirmware(const std::string& file_name, OtaProgressCallback progress_callback = nullptr);
 
  protected:
   /**

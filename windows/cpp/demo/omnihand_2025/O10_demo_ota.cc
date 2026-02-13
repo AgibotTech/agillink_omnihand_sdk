@@ -125,11 +125,83 @@ int main(int argc, char* argv[]) {
   std::cout << "Please wait and do not interrupt the process." << std::endl;
   std::cout << std::endl;
 
+  // Define progress callback
+  OtaProgressCallback progress_callback = [](int current_packet, int total_packets, OtaProgressStatus status) {
+    switch (status) {
+      case OtaProgressStatus::FILE_LOADED:
+        std::cout << "[OTA] Firmware file loaded, total packets: " << total_packets << std::endl;
+        break;
+      case OtaProgressStatus::REQUESTING_UPGRADE:
+        std::cout << "[OTA] Requesting upgrade..." << std::endl;
+        break;
+      case OtaProgressStatus::UPGRADE_ACCEPTED:
+        std::cout << "[OTA] Upgrade request accepted, starting transmission..." << std::endl;
+        break;
+      case OtaProgressStatus::TRANSMITTING:
+        {
+          std::cout << "[OTA] Transmitting: " << current_packet << "/" << total_packets << std::endl;
+          if (current_packet == total_packets) {
+            std::cout << std::endl;
+            std::cout << "[OTA] All " << total_packets << " packets transmitted successfully" << std::endl;
+          }
+        }
+        break;
+      case OtaProgressStatus::SENDING_FINISH:
+        std::cout << "[OTA] Sending finish request..." << std::endl;
+        break;
+      case OtaProgressStatus::RESTARTING:
+        std::cout << "[OTA] Device restarting..." << std::endl;
+        break;
+      case OtaProgressStatus::VERIFYING:
+        std::cout << "[OTA] Verifying upgrade result..." << std::endl;
+        break;
+      case OtaProgressStatus::SUCCESS:
+        std::cout << "[OTA] Upgrade successful!" << std::endl;
+        break;
+      case OtaProgressStatus::ERROR:
+        {
+          if (current_packet < 0) {
+            // SDK error
+            OtaErrorCode error_code = static_cast<OtaErrorCode>(current_packet);
+            std::cerr << "\n[OTA ERROR] SDK error: ";
+            switch (error_code) {
+              case OtaErrorCode::FILE_NOT_FOUND:
+                std::cerr << "File not found";
+                break;
+              case OtaErrorCode::FILE_EMPTY:
+                std::cerr << "File is empty";
+                break;
+              case OtaErrorCode::REQUEST_TIMEOUT:
+                std::cerr << "Request timeout";
+                break;
+              case OtaErrorCode::RESTART_TIMEOUT:
+                std::cerr << "Restart timeout";
+                break;
+              case OtaErrorCode::TRANSMISSION_TIMEOUT:
+                std::cerr << "Transmission timeout";
+                break;
+              case OtaErrorCode::CRC_CHECK_FAILED:
+                std::cerr << "CRC check failed";
+                break;
+              default:
+                std::cerr << "Unknown error code: " << current_packet;
+                break;
+            }
+            std::cerr << std::endl;
+          } else {
+            // Device error
+            std::cerr << "\n[OTA ERROR] Device error code: " << current_packet << std::endl;
+          }
+        }
+        break;
+    }
+  };
+
   try {
     auto start_time = std::chrono::steady_clock::now();
     
-    // Call UpdateFirmware
-    hand->UpdateFirmware(absolute_firmware_path);
+    // Call UpdateFirmware with progress callback
+    hand->UpdateFirmware(absolute_firmware_path, progress_callback);
     
     auto end_time = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
