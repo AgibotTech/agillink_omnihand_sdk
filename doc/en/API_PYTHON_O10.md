@@ -1,4 +1,4 @@
-# OmniHand 2025 (O10) Python API
+﻿# OmniHand 2025 (O10) Python API
 
 ## Overview
 

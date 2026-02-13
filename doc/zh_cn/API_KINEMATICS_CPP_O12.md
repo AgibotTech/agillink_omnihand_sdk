@@ -2,7 +2,7 @@
 
 ## 简介
 
-**OmniHandPro2025Solver** 类（命名空间：`omnihandProSDK`）为 OmniHand Pro 2025 (O12) 灵巧手提供控制功能，包括手势设置和关节位置转换。
+**OmniHandPro2025Solver** 类（命名空间：`agilink::omnihand::o12`）为 OmniHand Pro 2025 (O12) 灵巧手提供控制功能，包括手势设置和关节位置转换。
 
 ## 包含头文件
 
@@ -13,7 +13,7 @@
 ## 构造函数
 
 ```cpp
-omnihandProSDK::OmniHandPro2025Solver(const bool& hand_type);
+agilink::o12::OmniHandPro2025Solver(const bool& hand_type);
 ```
 
 - **`hand_type`**: 设置为 `true` 表示左手，`false` 表示右手。
@@ -109,7 +109,7 @@ std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos);
 #include "kinematics/omnihand_pro_2025/omnihand_pro_2025_solver.h"
 
 // 创建右手求解器
-omnihandProSDK::OmniHandPro2025Solver solver(false);
+agilink::omnihand::o12::OmniHandPro2025Solver solver(false);
 
 // 检查并验证关节位置
 std::vector<double> active_joint_pos = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3};

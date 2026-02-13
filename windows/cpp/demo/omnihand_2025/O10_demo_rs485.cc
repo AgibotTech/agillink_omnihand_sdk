@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
 /**
@@ -35,7 +35,7 @@ void printUsage(const char* program_name) {
   std::cout << "Note: Serial port paths in code need to be modified according to actual devices" << std::endl;
 }
 
-void controlSingleHand(std::unique_ptr<OmniHand2025>& hand, const std::string& hand_name) {
+void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
 
   // ============ 获取设备信息 ============
@@ -68,7 +68,7 @@ void controlSingleHand(std::unique_ptr<OmniHand2025>& hand, const std::string& h
   // 但支持 GetTactileSensorData（降采样数据）
   std::cout << "\nTactile Sensor Data (1D):" << std::endl;
   try {
-    auto thumb_tactile = hand->GetTactileSensorData(Finger::THUMB);
+    auto thumb_tactile = hand->GetTactileSensorData(agilink::omnihand::Finger::THUMB);
     std::cout << "  Thumb: [";
     for (size_t i = 0; i < thumb_tactile.size(); ++i) {
       std::cout << static_cast<int>(thumb_tactile[i]);
@@ -76,7 +76,7 @@ void controlSingleHand(std::unique_ptr<OmniHand2025>& hand, const std::string& h
     }
     std::cout << "] (unit: 1g, max: 255g)" << std::endl;
     
-    auto index_tactile = hand->GetTactileSensorData(Finger::INDEX);
+    auto index_tactile = hand->GetTactileSensorData(agilink::omnihand::Finger::INDEX);
     std::cout << "  Index: [";
     for (size_t i = 0; i < index_tactile.size(); ++i) {
       std::cout << static_cast<int>(index_tactile[i]);
@@ -136,8 +136,8 @@ int main(int argc, char** argv) {
   int32_t baudrate = 115200;
 
   if (mode == "left" || mode == "both") {
-    auto left_hand = OmniHand2025::createHandByRs485(
-        HandType::LEFT,
+    auto left_hand = agilink::omnihand::OmniHand2025::createHandByRs485(
+        agilink::omnihand::HandType::LEFT,
         device_id,
         left_port,
         baudrate
@@ -162,8 +162,8 @@ int main(int argc, char** argv) {
   }
 
   if (mode == "right" || mode == "both") {
-    auto right_hand = OmniHand2025::createHandByRs485(
-        HandType::RIGHT,
+    auto right_hand = agilink::omnihand::OmniHand2025::createHandByRs485(
+        agilink::omnihand::HandType::RIGHT,
         device_id,
         right_port,
         baudrate
@@ -187,8 +187,8 @@ int main(int argc, char** argv) {
       // both 模式：同时控制
       std::cout << "\n=== Dual Hand Control ===" << std::endl;
       
-      auto left_hand = OmniHand2025::createHandByRs485(
-          HandType::LEFT,
+      auto left_hand = agilink::omnihand::OmniHand2025::createHandByRs485(
+          agilink::omnihand::HandType::LEFT,
           device_id,
           left_port,
           baudrate

@@ -1,4 +1,4 @@
-# OmniHand 2025 SDK Python API
+﻿# OmniHand 2025 SDK Python API
 
 ## Overview
 

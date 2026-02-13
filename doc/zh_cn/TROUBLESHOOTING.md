@@ -212,7 +212,62 @@ find_package(omnihand REQUIRED)
 
 ---
 
-### 7. ROS2 节点无法启动（Linux）
+### 7. 命名空间冲突（C++）
+
+**症状：**
+- 编译错误：`'HandType' is ambiguous`（'HandType' 不明确）
+- `'OmniHand2025' is ambiguous`（'OmniHand2025' 不明确）
+- 与其他库发生冲突
+
+**解决方案：**
+
+#### 使用完整命名空间（推荐）
+
+避免使用 `using namespace` 以防止命名冲突：
+
+```cpp
+#include "omnihand/omnihand_2025.h"
+// 避免：using namespace agilink::omnihand;
+
+int main() {
+    // 使用完整命名空间
+    auto hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
+        agilink::omnihand::HandType::LEFT, 1, 0, 0
+    );
+    
+    if (!hand || !hand->Init()) {
+        return -1;
+    }
+    
+    return 0;
+}
+```
+
+#### 或使用类型别名（如需要）
+
+如果需要更短的名称，可以使用类型别名：
+
+```cpp
+#include "omnihand/omnihand_2025.h"
+
+namespace oh = agilink::omnihand;  // 类型别名
+
+int main() {
+    auto hand = oh::OmniHand2025::createHandByZlgcan(
+        oh::HandType::LEFT, 1, 0, 0
+    );
+    // ...
+}
+```
+
+**为什么避免使用 `using namespace`？**
+- 防止与其他库发生冲突（如 ROS2、Eigen）
+- 使代码更明确、更易理解
+- 更适合具有多个依赖项的大型项目
+
+---
+
+### 8. ROS2 节点无法启动（Linux）
 
 **症状：**
 - `Package 'omnihand_node' not found`

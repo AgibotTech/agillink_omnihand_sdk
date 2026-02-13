@@ -17,6 +17,9 @@
 #include <vector>
 #include "omnihand/export_symbols.h"
 
+namespace agilink {
+namespace omnihand {
+
 #pragma pack(push, 1)
 
 /**
@@ -263,5 +266,8 @@ struct AGIBOT_EXPORT MixCtrl {
   std::optional<short> tgt_velo_;
   std::optional<short> tgt_torque_;
 };
+
+}  // namespace omnihand
+}  // namespace agilink
 
 #endif  // PROTO_H

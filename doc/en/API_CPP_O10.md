@@ -15,6 +15,7 @@
 
 ```cpp
 #include "omnihand/omnihand_2025.h"
+using namespace agilink::omnihand;
 ```
 
 ## Enums

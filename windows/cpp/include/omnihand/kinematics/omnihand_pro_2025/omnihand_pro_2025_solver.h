@@ -18,7 +18,10 @@
 
 #include "omnihand/export_symbols.h"
 
-namespace omnihandProSDK {
+namespace agilink {
+namespace omnihand {
+namespace o12 {
+
 enum JointID {
 
   JThumbRoll,
@@ -327,6 +330,8 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
                              const std::vector<OutputT> &target_max,
                              const std::vector<OutputT> &target_min);
 };
-};  // namespace omnihandProSDK
+}  // namespace o12
+}  // namespace omnihand
+}  // namespace agilink
 
 #endif  // OMNIHAND_PRO_2025_SOLVER_H

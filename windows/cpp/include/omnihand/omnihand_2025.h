@@ -19,6 +19,10 @@
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"
+
+namespace agilink {
+namespace omnihand {
+
 class OmniHand2025CanImpl;
 class OmniHand2025RsImpl;
 
@@ -236,11 +240,14 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_2025, device_id, hand_type);
     // Automatically initialize kinematics solver
-    kinematics_solver_ = std::make_unique<OmniHand2025Solver>(is_left_hand_);
+    kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(is_left_hand_);
   }
 
   /**
    * @brief Kinematics solver for OmniHand 2025 (O10)
    */
-  std::unique_ptr<OmniHand2025Solver> kinematics_solver_;
+  std::unique_ptr<o10::OmniHand2025Solver> kinematics_solver_;
 };
+
+}  // namespace omnihand
+}  // namespace agilink

@@ -1,4 +1,4 @@
-# OmniHand 2025 SDK C++ API
+﻿# OmniHand 2025 SDK C++ API
 
 ## 概述
 
@@ -36,16 +36,22 @@ enum class ProductType : unsigned char {
 ### HandType
 
 ```cpp
+namespace agilink {
+namespace omnihand {
 enum class HandType : unsigned char {
     LEFT = 0,      // 左手
     RIGHT = 1,     // 右手
     UNKNOWN = 255  // 未知手型
 };
+}  // namespace omnihand
+}  // namespace agilink
 ```
 
 ### Finger
 
 ```cpp
+namespace agilink {
+namespace omnihand {
 enum class Finger : unsigned char {
     THUMB = 0x01,    // 拇指
     INDEX = 0x02,    // 食指
@@ -56,11 +62,15 @@ enum class Finger : unsigned char {
     DORSUM = 0x07,   // 手背
     UNKNOWN = 0xff   // 未知
 };
+}  // namespace omnihand
+}  // namespace agilink
 ```
 
 ### ControlMode
 
 ```cpp
+namespace agilink {
+namespace omnihand {
 enum class ControlMode : unsigned char {
     POSITION                  = 0,    // 位置模式
     SERVO                     = 1,    // 伺服模式
@@ -71,6 +81,8 @@ enum class ControlMode : unsigned char {
     POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
     UNKNOWN                   = 10    // 未知模式
 };
+}  // namespace omnihand
+}  // namespace agilink
 ```
 
 ## 快速开始示例

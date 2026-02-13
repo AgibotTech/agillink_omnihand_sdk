@@ -1,4 +1,4 @@
-# OmniHand Pro 2025 (O12) Kinematics Solver Python API
+﻿# OmniHand Pro 2025 (O12) Kinematics Solver Python API
 
 ## Introduction
 

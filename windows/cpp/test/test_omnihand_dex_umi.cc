@@ -15,8 +15,8 @@ class OmniHandDexUMITest : public ::testing::Test {
  protected:
   void SetUp() override {
     // Create hand instance for testing
-    hand_ = OmniHandDexUMI::createHandByZlgcan(
-        HandType::LEFT,        // hand_type: left hand
+    hand_ = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
+        agilink::omnihand::HandType::LEFT,        // hand_type: left hand
         1,                       // hand_device_id: hand device ID
         0,                       // canfd_device_id: USB CANFD adapter device index
         0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
@@ -27,7 +27,7 @@ class OmniHandDexUMITest : public ::testing::Test {
     hand_.reset();
   }
 
-  std::unique_ptr<OmniHandDexUMI> hand_;
+  std::unique_ptr<agilink::omnihand::OmniHandDexUMI> hand_;
 };
 
 // Test factory method
@@ -63,13 +63,13 @@ TEST_F(OmniHandDexUMITest, TactileSensor) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
   // Test all 6 sensors (UMI has: Thumb, Index, Middle, Ring, Little, Palm - no Dorsum)
-  std::vector<std::pair<Finger, std::string>> fingers = {
-    {Finger::THUMB, "Thumb"},
-    {Finger::INDEX, "Index"},
-    {Finger::MIDDLE, "Middle"},
-    {Finger::RING, "Ring"},
-    {Finger::LITTLE, "Little"},
-    {Finger::PALM, "Palm"}
+  std::vector<std::pair<agilink::omnihand::Finger, std::string>> fingers = {
+    {agilink::omnihand::Finger::THUMB, "Thumb"},
+    {agilink::omnihand::Finger::INDEX, "Index"},
+    {agilink::omnihand::Finger::MIDDLE, "Middle"},
+    {agilink::omnihand::Finger::RING, "Ring"},
+    {agilink::omnihand::Finger::LITTLE, "Little"},
+    {agilink::omnihand::Finger::PALM, "Palm"}
   };
   
   std::cout << "[GetTactileSensorDataRaw] Reading individual sensors (unit: 1g, max: 255g):" << std::endl;
@@ -81,7 +81,7 @@ TEST_F(OmniHandDexUMITest, TactileSensor) {
       if (i < tactile_data.data_.size() - 1) std::cout << ", ";
     }
     std::cout << "]" << std::endl;
-    EXPECT_EQ(tactile_data.sensor_id_, finger);
+    EXPECT_EQ(static_cast<unsigned char>(tactile_data.sensor_id_), static_cast<unsigned char>(finger));
   }
   
   // Test getting all tactile sensor data at once
@@ -90,12 +90,12 @@ TEST_F(OmniHandDexUMITest, TactileSensor) {
   for (const auto& sensor : all_tactile_data) {
     std::string finger_name;
     switch (sensor.sensor_id_) {
-      case Finger::THUMB: finger_name = "Thumb"; break;
-      case Finger::INDEX: finger_name = "Index"; break;
-      case Finger::MIDDLE: finger_name = "Middle"; break;
-      case Finger::RING: finger_name = "Ring"; break;
-      case Finger::LITTLE: finger_name = "Little"; break;
-      case Finger::PALM: finger_name = "Palm"; break;
+      case agilink::omnihand::Finger::THUMB: finger_name = "Thumb"; break;
+      case agilink::omnihand::Finger::INDEX: finger_name = "Index"; break;
+      case agilink::omnihand::Finger::MIDDLE: finger_name = "Middle"; break;
+      case agilink::omnihand::Finger::RING: finger_name = "Ring"; break;
+      case agilink::omnihand::Finger::LITTLE: finger_name = "Little"; break;
+      case agilink::omnihand::Finger::PALM: finger_name = "Palm"; break;
       default: finger_name = "Unknown"; break;
     }
     std::cout << "  " << finger_name << " (" << sensor.data_.size() << " values): [";
@@ -113,7 +113,7 @@ TEST_F(OmniHandDexUMITest, GetJointMotorPosi) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
   // Test single joint position query
-  for (unsigned char joint_idx = 1; joint_idx <= OmniHandDexUMI::kDegreesOfActiveFreedom; ++joint_idx) {
+  for (unsigned char joint_idx = 1; joint_idx <= agilink::omnihand::OmniHandDexUMI::kDegreesOfActiveFreedom; ++joint_idx) {
     int16_t pos = hand_->GetJointMotorPosi(joint_idx);
     std::cout << "[GetJointMotorPosi] Joint " << static_cast<int>(joint_idx) 
               << " position: " << pos << std::endl;
@@ -139,7 +139,7 @@ TEST_F(OmniHandDexUMITest, GetAllJointMotorPosi) {
   std::cout << std::endl;
   
   // Expect 10 joint positions
-  EXPECT_EQ(positions.size(), OmniHandDexUMI::kDegreesOfActiveFreedom);
+  EXPECT_EQ(positions.size(), agilink::omnihand::OmniHandDexUMI::kDegreesOfActiveFreedom);
 }
 
 // // Test position calibration (UMI specific)

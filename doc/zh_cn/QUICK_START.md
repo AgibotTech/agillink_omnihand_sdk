@@ -137,6 +137,7 @@ target_link_libraries(my_app PRIVATE omnihand)
 
 ```cpp
 #include "omnihand/omnihand_2025.h"
+using namespace agilink::omnihand;
 #include <iostream>
 
 int main() {

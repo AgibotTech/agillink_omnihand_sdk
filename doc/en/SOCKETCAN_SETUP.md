@@ -1,4 +1,4 @@
-# SocketCAN Setup Guide
+﻿# SocketCAN Setup Guide
 
 > ⚠️ **Linux Only**: SocketCAN is a Linux kernel feature and is not available on Windows.
 

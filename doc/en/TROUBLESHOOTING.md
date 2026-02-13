@@ -212,7 +212,62 @@ find_package(omnihand REQUIRED)
 
 ---
 
-### 7. ROS2 Node Not Starting (Linux)
+### 7. Namespace Conflicts (C++)
+
+**Symptoms:**
+- Compilation errors: `'HandType' is ambiguous`
+- `'OmniHand2025' is ambiguous`
+- Conflicts with other libraries
+
+**Solutions:**
+
+#### Use Fully Qualified Names (Recommended)
+
+Avoid `using namespace` to prevent naming conflicts:
+
+```cpp
+#include "omnihand/omnihand_2025.h"
+// Avoid: using namespace agilink::omnihand;
+
+int main() {
+    // Use fully qualified names
+    auto hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
+        agilink::omnihand::HandType::LEFT, 1, 0, 0
+    );
+    
+    if (!hand || !hand->Init()) {
+        return -1;
+    }
+    
+    return 0;
+}
+```
+
+#### Or Use Type Aliases (If Needed)
+
+If you need shorter names, use type aliases instead:
+
+```cpp
+#include "omnihand/omnihand_2025.h"
+
+namespace oh = agilink::omnihand;  // Type alias
+
+int main() {
+    auto hand = oh::OmniHand2025::createHandByZlgcan(
+        oh::HandType::LEFT, 1, 0, 0
+    );
+    // ...
+}
+```
+
+**Why avoid `using namespace`?**
+- Prevents conflicts with other libraries (e.g., ROS2, Eigen)
+- Makes code more explicit and easier to understand
+- Better for large projects with multiple dependencies
+
+---
+
+### 8. ROS2 Node Not Starting (Linux)
 
 **Symptoms:**
 - `Package 'omnihand_node' not found`

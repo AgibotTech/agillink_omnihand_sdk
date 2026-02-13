@@ -11,6 +11,9 @@
 
 #include <functional>
 
+namespace agilink {
+namespace omnihand {
+
 /**
  * @brief OTA upgrade error codes
  * 
@@ -103,3 +106,6 @@ enum class OtaProgressStatus : int {
  */
 using OtaProgressCallback = std::function<void(int current_packet, int total_packets, 
                                                OtaProgressStatus status)>;
+
+}  // namespace omnihand
+}  // namespace agilink

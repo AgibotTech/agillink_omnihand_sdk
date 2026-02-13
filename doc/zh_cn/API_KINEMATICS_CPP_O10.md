@@ -2,7 +2,7 @@
 
 ## 简介
 
-**OmniHand2025Solver** 类为 OmniHand 2025 (O10) 灵巧手提供控制功能，包括手势设置和关节位置转换。
+**OmniHand2025Solver** 类（命名空间：`agilink::omnihand::o10`）为 OmniHand 2025 (O10) 灵巧手提供控制功能，包括手势设置和关节位置转换。
 
 ## 包含头文件
 
@@ -13,7 +13,7 @@
 ## 构造函数
 
 ```cpp
-OmniHand2025Solver(const bool& is_left_hand);
+agilink::omnihand::o10::OmniHand2025Solver(const bool& is_left_hand);
 ```
 
 - **`is_left_hand`**: 设置为 `true` 表示左手，`false` 表示右手。
@@ -89,7 +89,7 @@ void show_log(bool flag);
 #include "kinematics/omnihand_2025/omnihand_2025_solver.h"
 
 // 创建右手求解器
-OmniHand2025Solver solver(false);
+agilink::omnihand::o10::OmniHand2025Solver solver(false);
 
 // 启用日志
 solver.show_log(true);

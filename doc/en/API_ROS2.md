@@ -1,4 +1,4 @@
-# OmniHand 2025 SDK ROS2 Interface
+﻿# OmniHand 2025 SDK ROS2 Interface
 
 > ⚠️ **Linux Only**: ROS2 interface is only available on Linux. Windows is not supported.
 

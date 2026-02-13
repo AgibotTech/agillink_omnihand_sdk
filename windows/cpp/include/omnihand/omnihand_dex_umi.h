@@ -20,6 +20,9 @@
 #include "omnihand/omnihand_sensor_base.h"
 #include "omnihand/proto.h"
 
+namespace agilink {
+namespace omnihand {
+
 // Forward declarations
 class OmniHandDexUmiCanImpl;
 
@@ -177,3 +180,6 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
     OmniHand::Reset(ProductType::OMNIHAND_DEX_UMI, device_id, hand_type);
   }
 };
+
+}  // namespace omnihand
+}  // namespace agilink

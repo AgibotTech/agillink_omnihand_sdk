@@ -1,8 +1,8 @@
-# OmniHand 2025 (O10) Kinematics Solver C++ API
+﻿# OmniHand 2025 (O10) Kinematics Solver C++ API
 
 ## Introduction
 
-The **OmniHand2025Solver** class provides control functionalities for the OmniHand 2025 (O10) robotic hand, including gesture setting and joint position conversion.
+The **OmniHand2025Solver** class (namespace: `agilink::omnihand::omnihand::o10`) provides control functionalities for the OmniHand 2025 (O10) robotic hand, including gesture setting and joint position conversion.
 
 ## Include Header
 
@@ -13,7 +13,7 @@ The **OmniHand2025Solver** class provides control functionalities for the OmniHa
 ## Constructor
 
 ```cpp
-OmniHand2025Solver(const bool& is_left_hand);
+agilink::omnihand::omnihand::o10::OmniHand2025Solver(const bool& is_left_hand);
 ```
 
 - **`is_left_hand`**: Set to `true` for a left-hand and `false` for a right-hand.
@@ -89,7 +89,7 @@ void show_log(bool flag);
 #include "kinematics/omnihand_2025/omnihand_2025_solver.h"
 
 // Create solver for right hand
-OmniHand2025Solver solver(false);
+agilink::omnihand::omnihand::o10::OmniHand2025Solver solver(false);
 
 // Enable logging
 solver.show_log(true);

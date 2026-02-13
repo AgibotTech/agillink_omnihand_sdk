@@ -1,8 +1,8 @@
-# OmniHand Pro 2025 (O12) Kinematics Solver C++ API
+﻿# OmniHand Pro 2025 (O12) Kinematics Solver C++ API
 
 ## Introduction
 
-The **OmniHandPro2025Solver** class (namespace: `omnihandProSDK`) provides control functionalities for the OmniHand Pro 2025 (O12) robotic hand, including gesture setting and joint position conversion.
+The **OmniHandPro2025Solver** class (namespace: `agilink::omnihand::omnihand::o12`) provides control functionalities for the OmniHand Pro 2025 (O12) robotic hand, including gesture setting and joint position conversion.
 
 ## Include Header
 
@@ -13,7 +13,7 @@ The **OmniHandPro2025Solver** class (namespace: `omnihandProSDK`) provides contr
 ## Constructor
 
 ```cpp
-omnihandProSDK::OmniHandPro2025Solver(const bool& hand_type);
+agilink::omnihand::omnihand::o12::OmniHandPro2025Solver(const bool& hand_type);
 ```
 
 - **`hand_type`**: Set to `true` for a left-hand and `false` for a right-hand.
@@ -109,7 +109,7 @@ std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos);
 #include "kinematics/omnihand_pro_2025/omnihand_pro_2025_solver.h"
 
 // Create solver for right hand
-omnihandProSDK::OmniHandPro2025Solver solver(false);
+agilink::omnihand::omnihand::o12::OmniHandPro2025Solver solver(false);
 
 // Check and validate joint positions
 std::vector<double> active_joint_pos = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3};

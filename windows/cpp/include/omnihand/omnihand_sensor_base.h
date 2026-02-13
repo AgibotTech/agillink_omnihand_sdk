@@ -14,6 +14,9 @@
 #include "omnihand/omnihand.h"
 #include "omnihand/proto.h"
 
+namespace agilink {
+namespace omnihand {
+
 /**
  * @brief Internal base class for O10 and UMI common sensor interfaces
  * @note This class is not exported. It provides common methods shared by OmniHand2025 and OmniHandDexUMI.
@@ -65,3 +68,6 @@ class AGIBOT_EXPORT OmniHandSensorBase : public virtual OmniHand {
    */
   virtual ~OmniHandSensorBase() = default;
 };
+
+}  // namespace omnihand
+}  // namespace agilink

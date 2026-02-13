@@ -1,4 +1,4 @@
-# OmniHand 2025 SDK - Windows (x64)
+# OmniHand 2025 SDK - Windows (x64) - 版本 1.0.0
 
 [English Documentation](README.md) | [产品概述 & API 文档](../README_zh_cn.md)
 
