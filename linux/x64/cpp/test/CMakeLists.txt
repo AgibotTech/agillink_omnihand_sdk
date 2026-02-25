@@ -121,6 +121,7 @@ add_test(NAME OmniHandDexUMITest COMMAND test_omnihand_dex_umi)
 # Note: BUILD_OMNIHAND_3_LITE is defined in the main CMakeLists.txt
 if(BUILD_OMNIHAND_3_LITE)
   add_executable(test_omnihand_3_lite test_omnihand_3_lite.cc)
+  target_compile_definitions(test_omnihand_3_lite PRIVATE BUILD_OMNIHAND_3_LITE)
   target_link_libraries(
     test_omnihand_3_lite
     PRIVATE

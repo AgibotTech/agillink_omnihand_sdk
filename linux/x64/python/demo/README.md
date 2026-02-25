@@ -25,6 +25,10 @@
 - `omnihand_dex_umi/demo_periodic_report.py` - Receive periodic reports (position and tactile sensor)
 - `omnihand_dex_umi/demo_set_max_min_calibration.py` - Set max/min position calibration
 
+## OmniHand 3 Lite (4 DOF) Examples
+- `omnihand_3_lite/demo_get_hardware_info.py` - Get hardware information
+- `omnihand_3_lite/demo_socketcan.py` - SocketCAN example (Linux only)
+
 ## Usage
 
 ```bash
@@ -35,4 +39,5 @@ pip3 list | grep omnihand
 python3 omnihand_2025/demo_get_hardware_info.py
 python3 omnihand_pro_2025/demo_get_hardware_info.py
 python3 omnihand_dex_umi/demo_get_hardware_info.py
+python3 omnihand_3_lite/demo_get_hardware_info.py
 ```
