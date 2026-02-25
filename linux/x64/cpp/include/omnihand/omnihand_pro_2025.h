@@ -7,7 +7,8 @@
  * @note This is the public interface for OmniHand Pro 2025 product
  */
 
-#pragma once
+#ifndef AGILINK_OMNIHAND_2025_PRO_H
+#define AGILINK_OMNIHAND_2025_PRO_H
 
 #include <cstdint>
 #include <memory>
@@ -189,3 +190,5 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
 
 }  // namespace omnihand
 }  // namespace agilink
+
+#endif  // AGILINK_OMNIHAND_2025_PRO_H

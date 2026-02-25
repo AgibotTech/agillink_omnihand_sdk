@@ -7,9 +7,16 @@
  * @note This header defines all OTA-related types including status, error codes, and callbacks
  */
 
-#pragma once
+#ifndef AGILINK_OTA_TYPES_H
+#define AGILINK_OTA_TYPES_H
 
+#include "omnihand/export_symbols.h"
+#include <array>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <string>
+#include <vector>
 
 namespace agilink {
 namespace omnihand {
@@ -21,26 +28,44 @@ namespace omnihand {
  * 
  * | Error Code | Value | Description |
  * |------------|-------|-------------|
- * | SUCCESS | 0 | Operation successful |
- * | NOT_SUPPORTED | -1 | OTA not supported (e.g., RS485) |
- * | FILE_NOT_FOUND | -2 | Firmware file not found |
- * | FILE_EMPTY | -3 | Firmware file is empty |
- * | REQUEST_TIMEOUT | -4 | Upgrade request or finish response timeout |
- * | RESTART_TIMEOUT | -5 | Restart response timeout |
- * | TRANSMISSION_TIMEOUT | -6 | Data transmission timeout |
- * | CRC_CHECK_FAILED | -7 | CRC checksum verification failed |
+ * | AGILINK_SUCCESS | 0 | Operation successful |
+ * | AGILINK_OTA_NOT_SUPPORTED | -1 | OTA not supported (e.g., RS485) |
+ * | AGILINK_OTA_FILE_NOT_FOUND | -2 | Firmware file not found |
+ * | AGILINK_OTA_FILE_EMPTY | -3 | Firmware file is empty |
+ * | AGILINK_OTA_REQUEST_TIMEOUT | -4 | Upgrade request or finish response timeout |
+ * | AGILINK_OTA_RESTART_TIMEOUT | -5 | Restart response timeout |
+ * | AGILINK_OTA_TRANSMISSION_TIMEOUT | -6 | Data transmission timeout |
+ * | AGILINK_OTA_CRC_CHECK_FAILED | -7 | CRC checksum verification failed |
  * | >0 | varies | Device-returned error codes |
  */
-enum class OtaErrorCode : int {
-  SUCCESS = 0,               // Operation successful
-  NOT_SUPPORTED = -1,        // OTA not supported for this communication type (e.g., RS485)
-  FILE_NOT_FOUND = -2,       // Firmware file not found or cannot be opened
-  FILE_EMPTY = -3,           // Firmware file is empty
-  REQUEST_TIMEOUT = -4,      // Upgrade request or finish response timeout
-  RESTART_TIMEOUT = -5,      // Restart response timeout
-  TRANSMISSION_TIMEOUT = -6, // Data transmission timeout
-  CRC_CHECK_FAILED = -7      // CRC checksum verification failed
+enum class AGIBOT_EXPORT OtaErrorCode : int {
+  AGILINK_SUCCESS = 0,                    // Operation successful
+  AGILINK_OTA_NOT_SUPPORTED = -1,         // OTA not supported for this communication type (e.g., RS485)
+  AGILINK_OTA_FILE_NOT_FOUND = -2,        // Firmware file not found or cannot be opened
+  AGILINK_OTA_FILE_EMPTY = -3,            // Firmware file is empty
+  AGILINK_OTA_REQUEST_TIMEOUT = -4,       // Upgrade request or finish response timeout
+  AGILINK_OTA_RESTART_TIMEOUT = -5,       // Restart response timeout
+  AGILINK_OTA_TRANSMISSION_TIMEOUT = -6,  // Data transmission timeout
+  AGILINK_OTA_CRC_CHECK_FAILED = -7       // CRC checksum verification failed
   // Positive values (>0) are device-returned error codes
+};
+
+/** OTA 每包字节数，与实现中 2KB 分包一致 */
+constexpr int kOtaPacketSizeBytes = 2048;
+
+/** 单包类型：固定 2KB，不足部分以 0xFF 填充 */
+using OtaPacket = std::array<std::uint8_t, kOtaPacketSizeBytes>;
+
+/**
+ * @brief 仅加载固件文件的结果（不进行设备通信）
+ * @note 成功与否看 error_code == OtaErrorCode::AGILINK_SUCCESS
+ * @note packets 已按 2KB 分包，最后一包不足部分已填 0xFF，可供 UpdateFirmware 复用
+ */
+struct AGIBOT_EXPORT FirmwareLoadResult {
+  int total_packets{0};          ///< 总包数（按 kOtaPacketSizeBytes 计算）
+  size_t file_size_bytes{0};     ///< 文件大小（字节）
+  OtaErrorCode error_code{OtaErrorCode::AGILINK_SUCCESS};  ///< 成功为 AGILINK_SUCCESS，失败为具体错误码
+  std::vector<OtaPacket> packets;  ///< 已加载并分包的数据，最后一包不足 2KB 已用 0xFF 填充
 };
 
 /**
@@ -48,26 +73,26 @@ enum class OtaErrorCode : int {
  * 
  * | Status | current_packet | total_packets | Description |
  * |--------|----------------|---------------|-------------|
- * | FILE_LOADED | 0 | total | Firmware file loaded |
- * | REQUESTING_UPGRADE | 0 | total | Sending upgrade request |
- * | UPGRADE_ACCEPTED | 0 | total | Upgrade request accepted |
- * | TRANSMITTING | current | total | Transmitting packet current/total |
- * | SENDING_FINISH | total | total | Sending finish request |
- * | RESTARTING | total | total | Device restarting |
- * | VERIFYING | total | total | Verifying upgrade result |
- * | SUCCESS | total | total | Upgrade successful |
- * | ERROR | error_code | total | Error (current=OtaErrorCode or device error) |
+ * | AGILINK_OTA_FILE_LOADED | 0 | total | Firmware file loaded |
+ * | AGILINK_OTA_REQUESTING_UPGRADE | 0 | total | Sending upgrade request |
+ * | AGILINK_OTA_UPGRADE_ACCEPTED | 0 | total | Upgrade request accepted |
+ * | AGILINK_OTA_TRANSMITTING | current | total | Transmitting packet current/total |
+ * | AGILINK_OTA_SENDING_FINISH | total | total | Sending finish request |
+ * | AGILINK_OTA_RESTARTING | total | total | Device restarting |
+ * | AGILINK_OTA_VERIFYING | total | total | Verifying upgrade result |
+ * | AGILINK_OTA_SUCCESS | total | total | Upgrade successful |
+ * | AGILINK_OTA_ERROR | error_code | total | Error (current=OtaErrorCode or device error) |
  */
-enum class OtaProgressStatus : int {
-  FILE_LOADED = 1,        // Firmware file loaded (total=total packets)
-  REQUESTING_UPGRADE = 2, // Sending upgrade request
-  UPGRADE_ACCEPTED = 3,   // Upgrade request accepted by device
-  TRANSMITTING = 4,       // Transmitting packets (current/total=packet progress)
-  SENDING_FINISH = 5,     // Sending finish request
-  RESTARTING = 6,         // Device restarting
-  VERIFYING = 7,          // Verifying upgrade result
-  SUCCESS = 0,            // Upgrade successful
-  ERROR = -1              // Error occurred (current_packet=error code, see OtaErrorCode)
+enum class AGIBOT_EXPORT OtaProgressStatus : int {
+  AGILINK_OTA_FILE_LOADED = 1,        // Firmware file loaded (total=total packets)
+  AGILINK_OTA_REQUESTING_UPGRADE = 2, // Sending upgrade request
+  AGILINK_OTA_UPGRADE_ACCEPTED = 3,   // Upgrade request accepted by device
+  AGILINK_OTA_TRANSMITTING = 4,       // Transmitting packets (current/total=packet progress)
+  AGILINK_OTA_SENDING_FINISH = 5,     // Sending finish request
+  AGILINK_OTA_RESTARTING = 6,         // Device restarting
+  AGILINK_OTA_VERIFYING = 7,          // Verifying upgrade result
+  AGILINK_OTA_SUCCESS = 0,            // Upgrade successful
+  AGILINK_OTA_ERROR = -1              // Error occurred (current_packet=error code, see OtaErrorCode)
 };
 
 /**
@@ -81,16 +106,16 @@ enum class OtaProgressStatus : int {
  * @code
  * hand->UpdateFirmware("firmware.bin", [](int current, int total, OtaProgressStatus status) {
  *     switch (status) {
- *         case OtaProgressStatus::FILE_LOADED:
+ *         case OtaProgressStatus::AGILINK_OTA_FILE_LOADED:
  *             printf("File loaded, %d packets\n", total);
  *             break;
- *         case OtaProgressStatus::TRANSMITTING:
+ *         case OtaProgressStatus::AGILINK_OTA_TRANSMITTING:
  *             printf("Transmitting %d/%d\n", current, total);
  *             break;
- *         case OtaProgressStatus::SUCCESS:
+ *         case OtaProgressStatus::AGILINK_OTA_SUCCESS:
  *             printf("Upgrade successful\n");
  *             break;
- *         case OtaProgressStatus::ERROR:
+ *         case OtaProgressStatus::AGILINK_OTA_ERROR:
  *             if (current < 0) {
  *                 // SDK error (see OtaErrorCode)
  *                 printf("SDK error: %d\n", current);
@@ -99,7 +124,8 @@ enum class OtaProgressStatus : int {
  *                 printf("Device error: %d\n", current);
  *             }
  *             break;
- *         // ...
+ *         default:
+ *             break;
  *     }
  * });
  * @endcode
@@ -107,5 +133,15 @@ enum class OtaProgressStatus : int {
 using OtaProgressCallback = std::function<void(int current_packet, int total_packets, 
                                                OtaProgressStatus status)>;
 
+/**
+ * @brief 仅加载固件文件并计算包数，不与设备通信
+ * @param file_name 固件文件路径
+ * @return FirmwareLoadResult 含 total_packets、file_size_bytes、packets、error_code（成功时为 AGILINK_SUCCESS）
+ * @note 与 UpdateFirmware 内部分包规则一致；packets 已按 2KB 分包，最后一包不足处填 0xFF，可供更新接口复用
+ */
+AGIBOT_EXPORT FirmwareLoadResult LoadFirmwareOnly(const std::string& file_name);
+
 }  // namespace omnihand
 }  // namespace agilink
+
+#endif  // AGILINK_OTA_TYPES_H

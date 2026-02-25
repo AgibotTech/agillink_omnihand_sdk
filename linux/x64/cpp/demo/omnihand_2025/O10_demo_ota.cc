@@ -6,15 +6,20 @@
  * @brief OmniHand 2025 OTA 固件升级示例
  * 
  * 此示例演示如何使用 OTA 功能升级 OmniHand 2025 固件
- * 支持 CANFD 通信方式（ZLG CANFD、HCAN、SocketCAN）
+ * 支持的通信方式：
+ *   - CANFD 通信（ZLG CANFD、HCAN、SocketCAN）- 所有平台
+ *   - USB 通信（仅 Windows，Ubuntu不支持USB CDC OTA）
  * 
  * 编译: cmake .. && make
  * 运行: 
- *   ./demo_omnihand_2025_ota <firmware_file_path> [canfd_device_id] [canfd_channel_id]
+ *   ./demo_omnihand_2025_ota <firmware_file_path> [canfd_device_id] [canfd_channel_id] [hand_type] [hand_device_id]
  * 
- * 示例:
- *   ./demo_omnihand_2025_ota ../../release/firmware/O10/ag001_hc00_app_v1.2.2_20260123.bin 0 0
- *   ./demo_omnihand_2025_ota ../../release/firmware/O10/ag001_hc00_app_v99.02.06_20260202.bin 0 0
+ * 示例（CANFD）:
+ *   ./demo_omnihand_2025_ota ../../release/firmware/O10/ag001_hc00_app_v1.2.2_20260123.bin 0 0 right 1
+ *   ./demo_omnihand_2025_ota ../../release/firmware/O10/ag001_hc00_app_v99.02.06_20260202.bin
+ * 
+ * 示例（USB，仅Windows）:
+ *   ./demo_omnihand_2025_ota ../../release/firmware/O10/ag001_hc00_app_v1.2.2_20260123.bin COM3
  */
 
 #include <iostream>
@@ -128,16 +133,16 @@ int main(int argc, char* argv[]) {
   // Define progress callback
   agilink::omnihand::OtaProgressCallback progress_callback = [](int current_packet, int total_packets, agilink::omnihand::OtaProgressStatus status) {
     switch (status) {
-      case agilink::omnihand::OtaProgressStatus::FILE_LOADED:
+      case agilink::omnihand::OtaProgressStatus::AGILINK_OTA_FILE_LOADED:
         std::cout << "[OTA] Firmware file loaded, total packets: " << total_packets << std::endl;
         break;
-      case agilink::omnihand::OtaProgressStatus::REQUESTING_UPGRADE:
+      case agilink::omnihand::OtaProgressStatus::AGILINK_OTA_REQUESTING_UPGRADE:
         std::cout << "[OTA] Requesting upgrade..." << std::endl;
         break;
-      case agilink::omnihand::OtaProgressStatus::UPGRADE_ACCEPTED:
+      case agilink::omnihand::OtaProgressStatus::AGILINK_OTA_UPGRADE_ACCEPTED:
         std::cout << "[OTA] Upgrade request accepted, starting transmission..." << std::endl;
         break;
-      case agilink::omnihand::OtaProgressStatus::TRANSMITTING:
+      case agilink::omnihand::OtaProgressStatus::AGILINK_OTA_TRANSMITTING:
         {
           std::cout << "[OTA] Transmitting: " << current_packet << "/" << total_packets << std::endl;
           if (current_packet == total_packets) {
@@ -146,42 +151,45 @@ int main(int argc, char* argv[]) {
           }
         }
         break;
-      case agilink::omnihand::OtaProgressStatus::SENDING_FINISH:
+      case agilink::omnihand::OtaProgressStatus::AGILINK_OTA_SENDING_FINISH:
         std::cout << "[OTA] Sending finish request..." << std::endl;
         break;
-      case agilink::omnihand::OtaProgressStatus::RESTARTING:
+      case agilink::omnihand::OtaProgressStatus::AGILINK_OTA_RESTARTING:
         std::cout << "[OTA] Device restarting..." << std::endl;
         break;
-      case agilink::omnihand::OtaProgressStatus::VERIFYING:
+      case agilink::omnihand::OtaProgressStatus::AGILINK_OTA_VERIFYING:
         std::cout << "[OTA] Verifying upgrade result..." << std::endl;
         break;
-      case agilink::omnihand::OtaProgressStatus::SUCCESS:
+      case agilink::omnihand::OtaProgressStatus::AGILINK_OTA_SUCCESS:
         std::cout << "[OTA] Upgrade successful!" << std::endl;
         break;
-      case agilink::omnihand::OtaProgressStatus::ERROR:
+      case agilink::omnihand::OtaProgressStatus::AGILINK_OTA_ERROR:
         {
           if (current_packet < 0) {
             // SDK error
             agilink::omnihand::OtaErrorCode error_code = static_cast<agilink::omnihand::OtaErrorCode>(current_packet);
             std::cerr << "\n[OTA ERROR] SDK error: ";
             switch (error_code) {
-              case agilink::omnihand::OtaErrorCode::FILE_NOT_FOUND:
+              case agilink::omnihand::OtaErrorCode::AGILINK_OTA_FILE_NOT_FOUND:
                 std::cerr << "File not found";
                 break;
-              case agilink::omnihand::OtaErrorCode::FILE_EMPTY:
+              case agilink::omnihand::OtaErrorCode::AGILINK_OTA_FILE_EMPTY:
                 std::cerr << "File is empty";
                 break;
-              case agilink::omnihand::OtaErrorCode::REQUEST_TIMEOUT:
+              case agilink::omnihand::OtaErrorCode::AGILINK_OTA_REQUEST_TIMEOUT:
                 std::cerr << "Request timeout";
                 break;
-              case agilink::omnihand::OtaErrorCode::RESTART_TIMEOUT:
+              case agilink::omnihand::OtaErrorCode::AGILINK_OTA_RESTART_TIMEOUT:
                 std::cerr << "Restart timeout";
                 break;
-              case agilink::omnihand::OtaErrorCode::TRANSMISSION_TIMEOUT:
+              case agilink::omnihand::OtaErrorCode::AGILINK_OTA_TRANSMISSION_TIMEOUT:
                 std::cerr << "Transmission timeout";
                 break;
-              case agilink::omnihand::OtaErrorCode::CRC_CHECK_FAILED:
+              case agilink::omnihand::OtaErrorCode::AGILINK_OTA_CRC_CHECK_FAILED:
                 std::cerr << "CRC check failed";
+                break;
+              case agilink::omnihand::OtaErrorCode::AGILINK_OTA_NOT_SUPPORTED:
+                std::cerr << "OTA not supported";
                 break;
               default:
                 std::cerr << "Unknown error code: " << current_packet;
