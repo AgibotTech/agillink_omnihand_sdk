@@ -7,7 +7,8 @@
  * @note This is an internal class, not exported. Users should use OmniHand2025 or OmniHandDexUMI.
  */
 
-#pragma once
+#ifndef AGILINK_OMNIHAND_SENSOR_BASE_H
+#define AGILINK_OMNIHAND_SENSOR_BASE_H
 
 #include <cstddef>
 #include <vector>
@@ -71,3 +72,5 @@ class AGIBOT_EXPORT OmniHandSensorBase : public virtual OmniHand {
 
 }  // namespace omnihand
 }  // namespace agilink
+
+#endif  // AGILINK_OMNIHAND_SENSOR_BASE_H

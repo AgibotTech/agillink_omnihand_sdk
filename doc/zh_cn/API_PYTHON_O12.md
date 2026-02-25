@@ -55,7 +55,7 @@ def create_hand_by_hcan(hand_type: HandType = HandType.LEFT,
         hand_type: 手型，默认为左手。
         device_id: 手部设备 ID，默认为 1。
         canfd_device_id: HCAN 设备索引，默认为 0。
-        canfd_channel_id: CAN 通道索引，默认为 0。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0。
+        canfd_channel_id: CAN 通道索引，默认为 0。双通道适配器(USBCANFD-200U）： can0=0, can1=1；单通道适配器(USBCANFD-100U）： 始终为0。
     
     Returns:
         OmniHandPro2025: 灵巧手实例。
@@ -86,7 +86,7 @@ def create_hand_by_hcan(hand_type: HandType,
         hand_type: 手型。
         device_id: 手部设备 ID。
         hcan_serial_number: HCAN 设备序列号（支持部分匹配）。
-        canfd_channel_id: CAN 通道索引，默认为 0。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0。
+        canfd_channel_id: CAN 通道索引，默认为 0。双通道适配器(USBCANFD-200U）： can0=0, can1=1；单通道适配器(USBCANFD-100U）： 始终为0。
     
     Returns:
         OmniHandPro2025: 灵巧手实例，如果找不到设备则返回 None。
@@ -152,8 +152,8 @@ def get_all_joint_angles(self) -> List[float]:
     """获取所有关节角度（包括主动和被动，单位：弧度）。
     
     Returns:
-        List[float]: 关节角度列表。返回 18 个值（12 主动 + 6 被动）。
-                    前 12 个值为主动关节（顺序见上表），后 6 个为被动关节。
+        List[float]: 关节角度列表。返回 19 个值（12 主动 + 7 被动）。
+                    前 12 个值为主动关节（顺序见上表），后 7 个为被动关节。
     """
 ```
 

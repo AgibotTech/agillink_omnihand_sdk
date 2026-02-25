@@ -7,7 +7,8 @@
  * @note This is the public interface for OmniHand Dex UMI product
  */
 
-#pragma once
+#ifndef AGILINK_OMNIHAND_DEX_UMI_H
+#define AGILINK_OMNIHAND_DEX_UMI_H
 
 #include <cstdint>
 #include <functional>
@@ -18,6 +19,7 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/omnihand.h"
 #include "omnihand/omnihand_sensor_base.h"
+#include "omnihand/ota_types.h"
 #include "omnihand/proto.h"
 
 namespace agilink {
@@ -165,9 +167,16 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
    * @param joint_index Joint index (1-10, where 1 is the first joint)
    * @note This is a write-only operation for position calibration.
    */
-  virtual void SetMaxPositionCalibration(unsigned char joint_index) = 0;
+  virtual   void SetMaxPositionCalibration(unsigned char joint_index) = 0;
 
   // GetAllTactileSensorDataRaw and GetTactileSensorDataRaw are inherited from OmniHandSensorBase
+
+  /**
+   * @brief OTA firmware update (same protocol as O10 CAN FD extended)
+   * @param file_name Path to firmware binary
+   * @param progress_callback Optional progress callback
+   */
+  virtual void UpdateFirmware(const std::string& file_name, OtaProgressCallback progress_callback = nullptr) = 0;
 
  protected:
   /**
@@ -183,3 +192,5 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
 
 }  // namespace omnihand
 }  // namespace agilink
+
+#endif  // AGILINK_OMNIHAND_DEX_UMI_H

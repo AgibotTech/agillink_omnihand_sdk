@@ -8,8 +8,8 @@
  * @date 25-8-7
  **/
 
-#ifndef PROTO_H
-#define PROTO_H
+#ifndef AGILINK_PROTO_H
+#define AGILINK_PROTO_H
 
 #include <optional>
 #include <sstream>
@@ -48,10 +48,11 @@ inline std::string ToString(HandType hand_type) {
  * @brief Product type enumeration
  */
 enum class AGIBOT_EXPORT ProductType : unsigned char {
-  OMNIHAND_2025 = 0,        // OmniHand 2025 (10 DOF)
-  OMNIHAND_PRO_2025 = 1,    // OmniHand Pro 2025 (12 DOF)
-  OMNIHAND_DEX_UMI = 2,     // OmniHand Dex UMI (10 DOF, UMI protocol)
-  OMNIHAND_3_LITE = 3,      // OmniHand 3 Lite S (4 DOF)
+  OMNIHAND_2025 = 0,        // OmniHand 2025 (O10, 10 DOF)
+  OMNIHAND_PRO_2025 = 1,    // OmniHand Pro 2025 (O12, 12 DOF)
+  OMNIHAND_DEX_UMI = 2,     // OmniHand Dex UMI (O10 UMI, 10 DOF)
+  OMNIHAND_3_LITE = 3,      // OmniHand 3 Lite S (O4, 4 DOF)
+  OMNIHAND_3_ULTRA = 4,     // OmniHand 3 Ultra (O20, 20 DOF)
   UNKNOWN = 255             // Unknown product type
 };
 
@@ -66,8 +67,22 @@ inline std::string ToString(ProductType product_type) {
     case ProductType::OMNIHAND_PRO_2025: return "OmniHand Pro 2025";
     case ProductType::OMNIHAND_DEX_UMI: return "OmniHand Dex UMI";
     case ProductType::OMNIHAND_3_LITE: return "OmniHand 3 Lite";
+    case ProductType::OMNIHAND_3_ULTRA: return "OmniHand 3 Ultra";
     default: return "Unknown";
   }
+}
+
+/**
+ * @brief CAN frame format for createHandByZlgcan / createHandByHcan (interface layer)
+ * @see docs/REFACTOR_SDK_PROTOCOL.md
+ */
+enum class AGIBOT_EXPORT CanFrameFormat : unsigned char {
+  Extended = 0,  ///< 29-bit ID, command in ID (default, backward compatible)
+  Standard = 1   ///< 11-bit ID, command in D0, same data format as USB/RS485
+};
+
+inline std::string ToString(CanFrameFormat f) {
+  return f == CanFrameFormat::Standard ? "Standard" : "Extended";
 }
 
 /**
@@ -274,4 +289,4 @@ struct AGIBOT_EXPORT MixCtrl {
 }  // namespace omnihand
 }  // namespace agilink
 
-#endif  // PROTO_H
+#endif  // AGILINK_PROTO_H

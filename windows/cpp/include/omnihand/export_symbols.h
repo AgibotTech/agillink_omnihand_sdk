@@ -8,8 +8,8 @@
  * @date 25-8-1
  **/
 
-#ifndef EXPORT_SYMBOLS_H
-#define EXPORT_SYMBOLS_H
+#ifndef AGILINK_EXPORT_SYMBOLS_H
+#define AGILINK_EXPORT_SYMBOLS_H
 
 #if defined(_WIN32) || defined(_WIN64)
   #ifdef BUILDING_DLL
@@ -21,4 +21,4 @@
   #define AGIBOT_EXPORT __attribute__((visibility("default")))
 #endif
 
-#endif  // EXPORT_SYMBOLS_H
+#endif  // AGILINK_EXPORT_SYMBOLS_H

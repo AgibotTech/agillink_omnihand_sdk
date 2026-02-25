@@ -7,7 +7,8 @@
  * @note This is an internal class, not exported. Users should use OmniHand2025 or OmniHandPro2025.
  */
 
-#pragma once
+#ifndef AGILINK_OMNIHAND_BASE_H
+#define AGILINK_OMNIHAND_BASE_H
 
 #include <cstdint>
 #include <vector>
@@ -333,3 +334,5 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
 
 }  // namespace omnihand
 }  // namespace agilink
+
+#endif  // AGILINK_OMNIHAND_BASE_H

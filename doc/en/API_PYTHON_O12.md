@@ -1,4 +1,4 @@
-﻿# OmniHand Pro 2025 (O12) Python API
+# OmniHand Pro 2025 (O12) Python API
 
 ## Overview
 
@@ -434,8 +434,8 @@ def get_all_joint_angles(self) -> List[float]:
     """Gets the angles of all joints (active and passive, in radians).
     
     Returns:
-        List[float]: List of all joint angles in radians. Returns 18 values (12 active + 6 passive).
-                    The first 12 values are active joints (order follows the table above), followed by 6 passive joints.
+        List[float]: List of all joint angles in radians. Returns 19 values (12 active + 7 passive).
+                    The first 12 values are active joints (order follows the table above), followed by 7 passive joints.
     """
 ```
 

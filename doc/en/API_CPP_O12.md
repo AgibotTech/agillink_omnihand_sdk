@@ -350,8 +350,8 @@ std::vector<double> GetAllActiveJointAngles() const;
 
 /**
  * @brief Gets the angles of all joints (both active and passive).
- * @return A vector of joint angles (in radians). Returns 18 values (12 active + 6 passive).
- * @note The first 12 values are active joints (order follows the table above), followed by 6 passive joints.
+ * @return A vector of joint angles (in radians). Returns 19 values (12 active + 7 passive).
+ * @note The first 12 values are active joints (order follows the table above), followed by 7 passive joints.
  */
 std::vector<double> GetAllJointAngles() const;
 

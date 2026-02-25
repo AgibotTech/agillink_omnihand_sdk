@@ -7,7 +7,8 @@
  * @note This is the public interface for OmniHand Pro 2025 product
  */
 
-#pragma once
+#ifndef AGILINK_OMNIHAND_2025_PRO_H
+#define AGILINK_OMNIHAND_2025_PRO_H
 
 #include <cstdint>
 #include <memory>
@@ -33,7 +34,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 12;  // O12 has 12 active degrees of freedom (DoA)
-  static constexpr unsigned char kDegreesOfPassiveFreedom = 11;  // O12 has 11 passive degrees of freedom (DoP)
+  static constexpr unsigned char kDegreesOfPassiveFreedom = 7;   // O12: 19 total joints (MaxJoint) − 12 active = 7 passive (DoP), see omnihand_pro_2025_solver.h
 
   virtual ~OmniHandPro2025() = default;
 
@@ -189,3 +190,5 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
 
 }  // namespace omnihand
 }  // namespace agilink
+
+#endif  // AGILINK_OMNIHAND_2025_PRO_H

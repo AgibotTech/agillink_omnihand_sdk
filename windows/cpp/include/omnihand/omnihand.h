@@ -7,7 +7,8 @@
  * @note Users should use OmniHand2025, OmniHandPro2025, or OmniHandDexUMI instead
  */
 
-#pragma once
+#ifndef AGILINK_OMNIHAND_H
+#define AGILINK_OMNIHAND_H
 
 #include <cstdint>
 #include <memory>
@@ -150,3 +151,5 @@ class AGIBOT_EXPORT OmniHand {
 
 }  // namespace omnihand
 }  // namespace agilink
+
+#endif  // AGILINK_OMNIHAND_H
