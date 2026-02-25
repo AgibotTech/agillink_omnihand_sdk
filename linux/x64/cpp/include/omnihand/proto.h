@@ -259,11 +259,37 @@ struct AGIBOT_EXPORT DeviceInfo {
     std::vector<std::string> vecSamplePoint = {"75.0%", "80.0%", "87.5%"};
 
     std::stringstream sstream;
-    sstream << "Device ID: " << static_cast<unsigned int>(hand_device_id)
-            << "\nArbitration Bitrate: " << vecBitrate[commu_params.bitrate_]
-            << "\nArbitration Sample Point: " << vecSamplePoint[commu_params.sample_point_]
-            << "\nData Bitrate: " << vecBitrate[commu_params.dbitrate_]
-            << "\nData Sample Point: " << vecSamplePoint[commu_params.dsample_point_];
+    sstream << "Device ID: " << static_cast<unsigned int>(hand_device_id);
+    
+    // Add bounds checking to prevent array out-of-bounds access
+    unsigned char bitrate_idx = commu_params.bitrate_;
+    unsigned char sample_point_idx = commu_params.sample_point_;
+    unsigned char dbitrate_idx = commu_params.dbitrate_;
+    unsigned char dsample_point_idx = commu_params.dsample_point_;
+    
+    if (bitrate_idx < vecBitrate.size()) {
+      sstream << "\nArbitration Bitrate: " << vecBitrate[bitrate_idx];
+    } else {
+      sstream << "\nArbitration Bitrate: Invalid(" << static_cast<unsigned int>(bitrate_idx) << ")";
+    }
+    
+    if (sample_point_idx < vecSamplePoint.size()) {
+      sstream << "\nArbitration Sample Point: " << vecSamplePoint[sample_point_idx];
+    } else {
+      sstream << "\nArbitration Sample Point: Invalid(" << static_cast<unsigned int>(sample_point_idx) << ")";
+    }
+    
+    if (dbitrate_idx < vecBitrate.size()) {
+      sstream << "\nData Bitrate: " << vecBitrate[dbitrate_idx];
+    } else {
+      sstream << "\nData Bitrate: Invalid(" << static_cast<unsigned int>(dbitrate_idx) << ")";
+    }
+    
+    if (dsample_point_idx < vecSamplePoint.size()) {
+      sstream << "\nData Sample Point: " << vecSamplePoint[dsample_point_idx];
+    } else {
+      sstream << "\nData Sample Point: Invalid(" << static_cast<unsigned int>(dsample_point_idx) << ")";
+    }
 
     return sstream.str();
   }
