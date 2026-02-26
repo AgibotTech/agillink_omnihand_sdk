@@ -52,7 +52,7 @@ def main():
         'hand',
         nargs='?',
         choices=['left', 'right'],
-        default='right',
+        default='left',
         help='Hand type: left or right (default: left)'
     )
     parser.add_argument(
@@ -82,13 +82,13 @@ def main():
     parser.add_argument(
         '--o10-canfd-id',
         type=int,
-        default=1,
+        default=0,
         help='O10 CANFD device ID (default: 0)'
     )
     parser.add_argument(
         '--o10-channel-id',
         type=int,
-        default=0,
+        default=1,
         help='O10 CANFD channel ID (default: 0)'
     )
     parser.add_argument(
