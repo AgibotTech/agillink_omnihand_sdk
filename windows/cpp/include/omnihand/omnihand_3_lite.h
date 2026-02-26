@@ -50,13 +50,15 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHand
    * @param canfd_channel_id CAN channel index (default 0)
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
+   * @param frame_format Standard = 11-bit ID D0=cmd, Extended = 29-bit ID
    * @return A unique pointer to OmniHand3Lite instance
    */
   static std::unique_ptr<OmniHand3Lite> createHandByZlgcan(
       HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      unsigned char canfd_channel_id = 0,
+      CanFrameFormat frame_format = CanFrameFormat::Extended);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -66,13 +68,15 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHand
    * @param canfd_channel_id CAN channel index (default 0)
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
+   * @param frame_format Standard = 11-bit ID D0=cmd, Extended = 29-bit ID
    * @return A unique pointer to OmniHand3Lite instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHand3Lite> createHandByZlgcan(
       HandType hand_type,
       unsigned char hand_device_id,
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0);
+      unsigned char canfd_channel_id = 0,
+      CanFrameFormat frame_format = CanFrameFormat::Extended);
 
 #ifdef __linux__
   /**
@@ -97,12 +101,14 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHand
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
    * @return A unique pointer to OmniHand3Lite instance
+   * @param frame_format Standard = 11-bit ID D0=cmd, Extended = 29-bit ID
    */
   static std::unique_ptr<OmniHand3Lite> createHandByHcan(
       HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      unsigned char canfd_channel_id = 0,
+      CanFrameFormat frame_format = CanFrameFormat::Extended);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -112,13 +118,15 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHand
    * @param canfd_channel_id CAN channel index (default 0)
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
+   * @param frame_format Standard = 11-bit ID D0=cmd, Extended = 29-bit ID
    * @return A unique pointer to OmniHand3Lite instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHand3Lite> createHandByHcan(
       HandType hand_type,
       unsigned char hand_device_id,
       const std::string& hcan_serial_number,
-      unsigned char canfd_channel_id = 0);
+      unsigned char canfd_channel_id = 0,
+      CanFrameFormat frame_format = CanFrameFormat::Extended);
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
