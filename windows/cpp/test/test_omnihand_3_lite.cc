@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025, Agibot Co., Ltd.
+// Copyright (c) 2025, Agibot Co., Ltd.
 // OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
 #include <gtest/gtest.h>
@@ -303,7 +303,8 @@ TEST_F(OmniHand3LiteTest, ErrorReport) {
   
   // Test all joints error reports
   auto all_error_reports = hand_->GetAllErrorReport();
-  // Check if request succeeded (non-empty result)
+  EXPECT_FALSE(all_error_reports.empty())
+      << "GetAllErrorReport returned empty (request timeout - check device/firmware or extended-frame response)";
   if (all_error_reports.empty()) {
     return;
   }
@@ -330,7 +331,8 @@ TEST_F(OmniHand3LiteTest, TemperatureReport) {
   
   // Test all joints temperatures
   auto all_temps = hand_->GetAllTemperatureReport();
-  // Check if request succeeded (non-empty result)
+  EXPECT_FALSE(all_temps.empty())
+      << "GetAllTemperatureReport returned empty (request timeout - check device/firmware or extended-frame response)";
   if (all_temps.empty()) {
     return;
   }
