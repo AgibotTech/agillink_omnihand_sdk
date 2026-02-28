@@ -22,19 +22,16 @@
 namespace agilink {
 namespace omnihand {
 
-class OmniHand3LiteCanImpl;
-
 /**
  * @brief OmniHand 3 Lite S (O4) interface class - 4 DOF
  * 
  * This class provides the public interface for OmniHand 3 Lite S product.
  * 
- * @note Uses virtual inheritance from OmniHandSensorBase to avoid diamond inheritance problem.
  * @note O4 does not have tactile sensors. Tactile sensor methods return empty data.
  * @note Currently does not support angle-based control (SetAllActiveJointAngles) as kinematics solver is not available.
  *       Use motor position control (SetJointMotorPosi, SetAllJointMotorPosi) instead.
  */
-class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHandSensorBase {
+class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // O4 has 4 active degrees of freedom (DoA)
@@ -50,15 +47,13 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHand
    * @param canfd_channel_id CAN channel index (default 0)
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
-   * @param frame_format Standard = 11-bit ID D0=cmd, Extended = 29-bit ID
    * @return A unique pointer to OmniHand3Lite instance
    */
   static std::unique_ptr<OmniHand3Lite> createHandByZlgcan(
       HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0,
-      CanFrameFormat frame_format = CanFrameFormat::Extended);
+      unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -68,15 +63,13 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHand
    * @param canfd_channel_id CAN channel index (default 0)
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
-   * @param frame_format Standard = 11-bit ID D0=cmd, Extended = 29-bit ID
    * @return A unique pointer to OmniHand3Lite instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHand3Lite> createHandByZlgcan(
       HandType hand_type,
       unsigned char hand_device_id,
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0,
-      CanFrameFormat frame_format = CanFrameFormat::Extended);
+      unsigned char canfd_channel_id = 0);
 
 #ifdef __linux__
   /**
@@ -101,14 +94,12 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHand
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
    * @return A unique pointer to OmniHand3Lite instance
-   * @param frame_format Standard = 11-bit ID D0=cmd, Extended = 29-bit ID
    */
   static std::unique_ptr<OmniHand3Lite> createHandByHcan(
       HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0,
-      CanFrameFormat frame_format = CanFrameFormat::Extended);
+      unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -118,15 +109,13 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHand
    * @param canfd_channel_id CAN channel index (default 0)
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
-   * @param frame_format Standard = 11-bit ID D0=cmd, Extended = 29-bit ID
    * @return A unique pointer to OmniHand3Lite instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHand3Lite> createHandByHcan(
       HandType hand_type,
       unsigned char hand_device_id,
       const std::string& hcan_serial_number,
-      unsigned char canfd_channel_id = 0,
-      CanFrameFormat frame_format = CanFrameFormat::Extended);
+      unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)

@@ -316,7 +316,9 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param gesture_num Gesture number (implementation-specific, see derived classes for details)
    * @note Default implementation is provided in OmniHand2025 and OmniHandPro2025
    */
-  virtual void SetHandGesture(int gesture_num = 1) {}
+  virtual void SetHandGesture(int gesture_num = 1) {
+    (void)gesture_num;  // Suppress unused parameter warning
+  }
 
  protected:
   /**

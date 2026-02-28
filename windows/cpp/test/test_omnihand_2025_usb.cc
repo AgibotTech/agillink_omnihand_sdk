@@ -32,7 +32,6 @@
  */
 
 #include <gtest/gtest.h>
-#include "omnihand/omnihand_2025.h"
 #include "omnihand/private_omnihand_2025.h"
 #include <memory>
 #include <vector>
