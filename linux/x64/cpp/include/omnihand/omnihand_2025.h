@@ -24,9 +24,6 @@
 namespace agilink {
 namespace omnihand {
 
-class OmniHand2025CanImpl;
-class OmniHand2025RsImpl;
-
 /**
  * @brief OmniHand 2025 (O10) interface class - 10 DOF
  * 
@@ -52,15 +49,13 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @param canfd_channel_id CAN channel index (default 0)
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
-   * @param frame_format Extended (command in CAN ID) or Standard (command in D0, same as USB/RS485). Default Extended.
    * @return A unique pointer to OmniHand2025 instance
    */
   static std::unique_ptr<OmniHand2025> createHandByZlgcan(
       HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0,
-      CanFrameFormat frame_format = CanFrameFormat::Extended);
+      unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -70,15 +65,13 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @param canfd_channel_id CAN channel index (default 0)
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
-   * @param frame_format Extended or Standard. Default Extended.
    * @return A unique pointer to OmniHand2025 instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHand2025> createHandByZlgcan(
       HandType hand_type,
       unsigned char hand_device_id,
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0,
-      CanFrameFormat frame_format = CanFrameFormat::Extended);
+      unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - RS485 communication (OmniHand 2025 only)
@@ -94,19 +87,6 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
       const std::string& uart_port,
       int32_t baudrate = 460800);
 
-  /**
-   * @brief Factory method - USB communication (OmniHand 2025 only)
-   * @param hand_type Hand type (left/right)
-   * @param hand_device_id Hand device ID
-   * @param uart_port Serial port path (e.g., "/dev/ttyUSB0")
-   * @param baudrate Baud rate (default 460800)
-   * @return A unique pointer to OmniHand2025 instance
-   */
-  static std::unique_ptr<OmniHand2025> createHandByUsb(
-      HandType hand_type,
-      unsigned char hand_device_id,
-      const std::string& uart_port,
-      int32_t baudrate = 460800);
 
 #ifdef __linux__
   /**
@@ -114,14 +94,12 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param can_interface CAN interface name (e.g., "can0", "can1")
-   * @param frame_format Extended or Standard. Default Extended.
    * @return A unique pointer to OmniHand2025 instance
    */
   static std::unique_ptr<OmniHand2025> createHandSocketCan(
       HandType hand_type,
       unsigned char hand_device_id,
-      const std::string& can_interface = "can0",
-      CanFrameFormat frame_format = CanFrameFormat::Extended);
+      const std::string& can_interface = "can0");
 #endif
 
   /**
@@ -130,15 +108,13 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @param hand_device_id Hand device ID
    * @param canfd_device_id HCAN device index
    * @param canfd_channel_id CAN channel index (default 0)
-   * @param frame_format Extended or Standard. Default Extended.
    * @return A unique pointer to OmniHand2025 instance
    */
   static std::unique_ptr<OmniHand2025> createHandByHcan(
       HandType hand_type,
       unsigned char hand_device_id,
       unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0,
-      CanFrameFormat frame_format = CanFrameFormat::Extended);
+      unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -146,15 +122,13 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @param hand_device_id Hand device ID
    * @param hcan_serial_number HCAN device serial number (supports partial matching)
    * @param canfd_channel_id CAN channel index (default 0)
-   * @param frame_format Extended or Standard. Default Extended.
    * @return A unique pointer to OmniHand2025 instance, or nullptr if device not found
    */
   static std::unique_ptr<OmniHand2025> createHandByHcan(
       HandType hand_type,
       unsigned char hand_device_id,
       const std::string& hcan_serial_number,
-      unsigned char canfd_channel_id = 0,
-      CanFrameFormat frame_format = CanFrameFormat::Extended);
+      unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)

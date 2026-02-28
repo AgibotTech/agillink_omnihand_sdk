@@ -108,6 +108,20 @@ class AGIBOT_EXPORT OmniHand {
    */
   virtual int GetFrameRecvTimeout() const = 0;
 
+  // ============ Frame Send Timeout Control (CAN only) ============
+  /**
+   * @brief Set frame send timeout (ZLG device tx_timeout)
+   * @param milliseconds Timeout for send in milliseconds (0 = driver default, typically no limit; 1-10000ms recommended, e.g. 100ms)
+   * @note Only applies to ZLG CAN FD. Reduces send blocking and request timeout when buffer is busy. RS485/USB do nothing.
+   */
+  virtual void SetFrameSendTimeout(int milliseconds) = 0;
+
+  /**
+   * @brief Get current frame send timeout setting
+   * @return Frame send timeout in milliseconds (0 = not set / not applicable)
+   */
+  virtual int GetFrameSendTimeout() const = 0;
+
  protected:
   /**
    * @brief Constructor - protected to prevent direct instantiation

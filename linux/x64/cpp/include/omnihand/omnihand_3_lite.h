@@ -22,19 +22,16 @@
 namespace agilink {
 namespace omnihand {
 
-class OmniHand3LiteCanImpl;
-
 /**
  * @brief OmniHand 3 Lite S (O4) interface class - 4 DOF
  * 
  * This class provides the public interface for OmniHand 3 Lite S product.
  * 
- * @note Uses virtual inheritance from OmniHandSensorBase to avoid diamond inheritance problem.
  * @note O4 does not have tactile sensors. Tactile sensor methods return empty data.
  * @note Currently does not support angle-based control (SetAllActiveJointAngles) as kinematics solver is not available.
  *       Use motor position control (SetJointMotorPosi, SetAllJointMotorPosi) instead.
  */
-class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase, public virtual OmniHandSensorBase {
+class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // O4 has 4 active degrees of freedom (DoA)

@@ -26,13 +26,13 @@
  *   ./test_omnihand_2025_usb [-p PORT] [-b BAUDRATE] [-f INTERVAL]
  *   
  *   Options:
- *     -p PORT      USB serial port (default: /dev/ttyACM0)
+ *     -p PORT      USB serial port (default: Windows COM3, Linux /dev/ttyACM0)
  *     -b BAUDRATE  Baudrate (default: 460800)
  *     -f INTERVAL  Request interval in ms (default: 500, max: 500)
  */
 
 #include <gtest/gtest.h>
-#include "omnihand/omnihand_2025.h"
+#include "omnihand/private_omnihand_2025.h"
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -41,8 +41,12 @@
 #include <thread>
 #include <chrono>
 
-// Global configuration
+// Global configuration (default port: Windows COM3, Linux /dev/ttyACM0)
+#if defined(_WIN32)
+static std::string g_usb_port = "COM3";
+#else
 static std::string g_usb_port = "/dev/ttyACM0";
+#endif
 static int g_baudrate = 460800;
 static int g_request_interval = 500;  // USB default: 500ms
 
@@ -50,12 +54,13 @@ class OmniHand2025UsbTest : public ::testing::Test {
  protected:
   void SetUp() override {
     try {
-      hand_ = agilink::omnihand::OmniHand2025::createHandByUsb(
+      auto private_hand = agilink::omnihand::PrivateOmniHand2025::createHandByUsb(
           agilink::omnihand::HandType::LEFT,
           1,              // device_id
           g_usb_port,
           g_baudrate
       );
+      hand_ = std::move(private_hand);  // Convert PrivateOmniHand2025 to OmniHand2025
       
       if (hand_) {
         hand_->SetRequestInterval(g_request_interval);
@@ -515,11 +520,21 @@ int main(int argc, char** argv) {
       std::cout << "OmniHand 2025 USB Test\n\n";
       std::cout << "Usage: " << argv[0] << " [options]\n\n";
       std::cout << "Options:\n";
-      std::cout << "  -p PORT      USB serial port (default: /dev/ttyACM0)\n";
+      std::cout << "  -p PORT      USB serial port (default: "
+#if defined(_WIN32)
+                << "COM3"
+#else
+                << "/dev/ttyACM0"
+#endif
+                << ")\n";
       std::cout << "  -b BAUDRATE  Baudrate (default: 460800)\n";
       std::cout << "  -f INTERVAL  Request interval in ms (default: 500, max: 500)\n";
       std::cout << "\nExample:\n";
+#if defined(_WIN32)
+      std::cout << "  " << argv[0] << " -p COM3 -b 460800 -f 500\n";
+#else
       std::cout << "  " << argv[0] << " -p /dev/ttyACM0 -b 460800 -f 500\n";
+#endif
       return 0;
     } else {
       gtest_args.push_back(argv[i]);

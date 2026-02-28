@@ -24,22 +24,16 @@
 ### HandType
 
 ```cpp
-namespace agilink {
-namespace omnihand {
 enum class HandType : unsigned char {
     LEFT = 0,      // 左手
     RIGHT = 1,     // 右手
     UNKNOWN = 255  // 未知手型
 };
-}  // namespace omnihand
-}  // namespace agilink
 ```
 
 ### Finger
 
 ```cpp
-namespace agilink {
-namespace omnihand {
 enum class Finger : unsigned char {
     THUMB = 0x01,    // 拇指
     INDEX = 0x02,    // 食指
@@ -50,34 +44,11 @@ enum class Finger : unsigned char {
     DORSUM = 0x07,   // 手背（UMI 不支持）
     UNKNOWN = 0xff   // 未知
 };
-}  // namespace omnihand
-}  // namespace agilink
 ```
 
-**注意**：UMI 支持手指和手心传感器（THUMB, INDEX, MIDDLE, RING, LITTLE, PALM），但不支持手背（DORSUM）传感器。
-
-### ControlMode
-
-```cpp
-namespace agilink {
-namespace omnihand {
-enum class ControlMode : unsigned char {
-    POSITION                  = 0,    // 位置模式
-    SERVO                     = 1,    // 伺服模式
-    VELOCITY                  = 2,    // 速度模式
-    TORQUE                    = 3,    // 力控模式（不支持：纯力控不可用）
-    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 力矩）
-    VELOCITY_TORQUE           = 5,    // 速度-力控模式（混合控制：速度 + 力矩）
-    POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
-    UNKNOWN                   = 10    // 未知模式
-};
-}  // namespace omnihand
-}  // namespace agilink
-```
-
-**注意**： 
+**注意**：
+- UMI 支持手指和手心传感器（THUMB, INDEX, MIDDLE, RING, LITTLE, PALM），但不支持手背（DORSUM）传感器。
 - **UMI 是只读设备**：OmniHand Dex UMI (O10 UMI) 不支持位置、速度或力矩控制，因此控制模式枚举ControlMode在 UMI 设备上不可用。
-- UMI 仅支持主动查询位置信息，不支持任何控制模式。
 
 ## 工厂方法
 
@@ -89,7 +60,7 @@ enum class ControlMode : unsigned char {
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 设备 ID（默认：1）
  * @param canfd_device_id USB CANFD 适配器设备索引（默认：0）
- * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U）： can0=0, can1=1；单通道适配器(USBCANFD-100U）： 始终为0。双通道适配器(USBCANFD-200U）： can0=0, can1=1；单通道适配器(USBCANFD-100U）： 始终为0
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHandDexUMI 实例的唯一指针
  * @note 设备类型（200U/100U/MINI）会自动检测，无需手动指定
  * @note ✅ 推荐：零配置，开箱即用。无需 root 权限。
@@ -119,7 +90,7 @@ auto hand = OmniHandDexUMI::createHandByZlgcan(
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 设备 ID
  * @param usbcanfd_serial_number USB CANFD 设备序列号（支持部分匹配）
- * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U）： can0=0, can1=1；单通道适配器(USBCANFD-100U）： 始终为0
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHandDexUMI 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
@@ -137,7 +108,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 手部设备 ID
  * @param canfd_device_id HCAN 设备索引
- * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U）： can0=0, can1=1；单通道适配器(USBCANFD-100U）： 始终为0
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHandDexUMI 实例的唯一指针
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
@@ -165,7 +136,7 @@ auto hand = OmniHandDexUMI::createHandByHcan(
  * @param hand_type 手型（左手/右手）
  * @param hand_device_id 手部设备 ID
  * @param hcan_serial_number HCAN 设备序列号（支持部分匹配）
- * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U）： can0=0, can1=1；单通道适配器(USBCANFD-100U）： 始终为0
+ * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器(USBCANFD-200U): can0=0, can1=1；单通道适配器(USBCANFD-100U): 始终为0
  * @return OmniHandDexUMI 实例的唯一指针，如果找不到设备则返回 nullptr
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
