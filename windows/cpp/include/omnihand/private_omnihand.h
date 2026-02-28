@@ -17,16 +17,10 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include "omnihand/omnihand.h"
-#include "omnihand/omnihand_base.h"
 #include "omnihand/proto.h"
 
 namespace agilink {
 namespace omnihand {
-
-// Forward declarations
-struct MixCtrl;
-struct JointMotorErrorReport;
 
 /**
  * @brief Product serial number structure (0xC2 response)
@@ -115,7 +109,7 @@ struct AGIBOT_EXPORT FirmwareVersionInfo {
  * @note Tactile sensor interfaces (GetTactileSensorData, etc.) are declared here but should only
  *       be implemented by products that support them (e.g., O10). O4 does not support tactile sensors.
  */
-class AGIBOT_EXPORT PrivateOmniHand : public virtual OmniHandBase {
+class AGIBOT_EXPORT PrivateOmniHand {
  public:
   virtual ~PrivateOmniHand() = default;
 
