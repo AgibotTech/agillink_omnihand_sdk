@@ -164,20 +164,30 @@ inline std::string ToString(ControlMode mode) {
  * @brief 关节电机错误上报
  */
 struct AGIBOT_EXPORT JointMotorErrorReport {
-  unsigned char stalled_ : 1;
-  unsigned char overheat_ : 1;
-  unsigned char over_current_ : 1;
-  unsigned char motor_except_ : 1;
-  unsigned char commu_except_ : 1;
-  unsigned char res1_ : 3;
-  unsigned char res2_;
-};
+  union {
+    struct {
+      unsigned char stalled_ : 1;
+      unsigned char overheat_ : 1;
+      unsigned char over_current_ : 1;
+      unsigned char motor_except_ : 1;
+      unsigned char commu_except_ : 1;
+      unsigned char res1_ : 3;
+      unsigned char res2_;
+    };
+    unsigned char res_[2];
+  };
 
-/**
- * @brief 所有关节电机错误上报 (O10专用)
- */
-struct AGIBOT_EXPORT JointMotorAllErrorReport {
-  unsigned char res_[2];
+  std::string ToString() const {
+    std::string s;
+    if (stalled_) s += "stalled,";
+    if (overheat_) s += "overheat,";
+    if (over_current_) s += "over_current,";
+    if (motor_except_) s += "motor_except,";
+    if (commu_except_) s += "commu_except,";
+    if (s.empty()) return "0";
+    s.pop_back();
+    return s;
+  }
 };
 
 /**
