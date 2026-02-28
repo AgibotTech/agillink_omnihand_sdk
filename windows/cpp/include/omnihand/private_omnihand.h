@@ -20,7 +20,6 @@
 #include "omnihand/omnihand.h"
 #include "omnihand/omnihand_base.h"
 #include "omnihand/proto.h"
-#include "omnihand/impl/stream_protocol.h"
 
 namespace agilink {
 namespace omnihand {
