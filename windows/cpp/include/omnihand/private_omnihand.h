@@ -263,6 +263,12 @@ class AGIBOT_EXPORT PrivateOmniHand {
    */
   virtual std::vector<uint8_t> GetAllFingertipSensorC() const = 0;
 
+  /**
+   * @brief Get all tactile sensor data by querying 0x12, 0x13, 0x14 and assembling into vector&lt;TactileSensorData&gt;
+   * @return Vector of TactileSensorData (7 elements: thumb..dorsum), empty on failure
+   */
+  virtual std::vector<TactileSensorData> GetAllTactileSensorData() const = 0;
+
   // 0x15: 运行模式
   /**
    * @brief Set run mode
