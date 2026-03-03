@@ -241,11 +241,11 @@ TEST_F(OmniHand2025CanfdTest, GetAllErrorReport) {
   std::cout << "[GetAllErrorReport] ";
   for (size_t i = 0; i < errors.size(); ++i) {
     std::cout << "J" << (i+1) << ":[";
-    if (errors[i].stalled_) std::cout << "S";
-    if (errors[i].overheat_) std::cout << "H";
-    if (errors[i].over_current_) std::cout << "C";
-    if (errors[i].motor_except_) std::cout << "M";
-    if (errors[i].commu_except_) std::cout << "X";
+    if (errors[i].bits.stalled_) std::cout << "S";
+    if (errors[i].bits.overheat_) std::cout << "H";
+    if (errors[i].bits.over_current_) std::cout << "C";
+    if (errors[i].bits.motor_except_) std::cout << "M";
+    if (errors[i].bits.commu_except_) std::cout << "X";
     std::cout << "]";
     if (i < errors.size() - 1) std::cout << " ";
   }

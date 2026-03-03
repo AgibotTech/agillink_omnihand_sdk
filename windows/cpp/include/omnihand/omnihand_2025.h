@@ -202,7 +202,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    *                          - status: Progress status (see OtaProgressStatus)
    * @note This function is supported for:
    *       - CAN communication (ZLG CANFD, HCAN, SocketCAN) - all platforms
-   *       - USB communication (Windows only, Ubuntu does not support USB CDC OTA)
+   *       - USB communication - all platforms
    * @note RS485 communication does not support OTA upgrade
    * @note Do not power off or restart the device during the update process
    * @warning This is a blocking operation that may take several minutes depending on firmware size

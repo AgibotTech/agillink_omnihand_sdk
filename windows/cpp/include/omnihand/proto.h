@@ -164,6 +164,7 @@ inline std::string ToString(ControlMode mode) {
  * @brief 关节电机错误上报
  */
 struct AGIBOT_EXPORT JointMotorErrorReport {
+  // 使用命名 union（匿名 union 不能包含命名结构体），但使用简洁的访问路径
   union {
     struct {
       unsigned char stalled_ : 1;
@@ -173,17 +174,17 @@ struct AGIBOT_EXPORT JointMotorErrorReport {
       unsigned char commu_except_ : 1;
       unsigned char res1_ : 3;
       unsigned char res2_;
-    };
+    } bits;
     unsigned char res_[2];
   };
 
   std::string ToString() const {
     std::string s;
-    if (stalled_) s += "stalled,";
-    if (overheat_) s += "overheat,";
-    if (over_current_) s += "over_current,";
-    if (motor_except_) s += "motor_except,";
-    if (commu_except_) s += "commu_except,";
+    if (bits.stalled_) s += "stalled,";
+    if (bits.overheat_) s += "overheat,";
+    if (bits.over_current_) s += "over_current,";
+    if (bits.motor_except_) s += "motor_except,";
+    if (bits.commu_except_) s += "commu_except,";
     if (s.empty()) return "0";
     s.pop_back();
     return s;
