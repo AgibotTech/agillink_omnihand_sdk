@@ -295,11 +295,11 @@ TEST_F(OmniHand3LiteTest, ErrorReport) {
   // Test single joint error report
   auto error_report = hand_->GetErrorReport(1);
   std::cout << "[GetErrorReport] Joint 1 Error Report:" << std::endl;
-  std::cout << "  Stalled: " << (error_report.stalled_ ? "Yes" : "No") << std::endl;
-  std::cout << "  Overheat: " << (error_report.overheat_ ? "Yes" : "No") << std::endl;
-  std::cout << "  Over Current: " << (error_report.over_current_ ? "Yes" : "No") << std::endl;
-  std::cout << "  Motor Exception: " << (error_report.motor_except_ ? "Yes" : "No") << std::endl;
-  std::cout << "  Communication Exception: " << (error_report.commu_except_ ? "Yes" : "No") << std::endl;
+  std::cout << "  Stalled: " << (error_report.bits.stalled_ ? "Yes" : "No") << std::endl;
+  std::cout << "  Overheat: " << (error_report.bits.overheat_ ? "Yes" : "No") << std::endl;
+  std::cout << "  Over Current: " << (error_report.bits.over_current_ ? "Yes" : "No") << std::endl;
+  std::cout << "  Motor Exception: " << (error_report.bits.motor_except_ ? "Yes" : "No") << std::endl;
+  std::cout << "  Communication Exception: " << (error_report.bits.commu_except_ ? "Yes" : "No") << std::endl;
   
   // Test all joints error reports
   auto all_error_reports = hand_->GetAllErrorReport();
@@ -311,11 +311,11 @@ TEST_F(OmniHand3LiteTest, ErrorReport) {
   std::cout << "[GetAllErrorReport] All Error Reports (" << all_error_reports.size() << " joints):" << std::endl;
   for (size_t i = 0; i < all_error_reports.size(); ++i) {
     std::cout << "  Joint " << (i + 1) << ": "
-              << "Stalled=" << all_error_reports[i].stalled_
-              << ", Overheat=" << all_error_reports[i].overheat_
-              << ", OverCurrent=" << all_error_reports[i].over_current_
-              << ", MotorExcept=" << all_error_reports[i].motor_except_
-              << ", CommuExcept=" << all_error_reports[i].commu_except_
+              << "Stalled=" << all_error_reports[i].bits.stalled_
+              << ", Overheat=" << all_error_reports[i].bits.overheat_
+              << ", OverCurrent=" << all_error_reports[i].bits.over_current_
+              << ", MotorExcept=" << all_error_reports[i].bits.motor_except_
+              << ", CommuExcept=" << all_error_reports[i].bits.commu_except_
               << std::endl;
   }
   EXPECT_EQ(all_error_reports.size(), OmniHand3Lite::kDegreesOfActiveFreedom);

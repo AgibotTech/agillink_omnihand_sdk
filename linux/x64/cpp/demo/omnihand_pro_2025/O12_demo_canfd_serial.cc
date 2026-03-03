@@ -108,20 +108,20 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
   std::cout << "\nError Reports:" << std::endl;
   auto errors = hand->GetAllErrorReport();
   for (size_t i = 0; i < errors.size(); ++i) {
-    if (errors[i].stalled_ || errors[i].overheat_ || errors[i].over_current_ || 
-        errors[i].motor_except_ || errors[i].commu_except_) {
+    if (errors[i].bits.stalled_ || errors[i].bits.overheat_ || errors[i].bits.over_current_ || 
+        errors[i].bits.motor_except_ || errors[i].bits.commu_except_) {
       std::cout << "  Joint " << (i + 1) << ": ";
-      if (errors[i].stalled_) std::cout << "Stalled ";
-      if (errors[i].overheat_) std::cout << "Overheat ";
-      if (errors[i].over_current_) std::cout << "OverCurrent ";
-      if (errors[i].motor_except_) std::cout << "MotorException ";
-      if (errors[i].commu_except_) std::cout << "CommException ";
+      if (errors[i].bits.stalled_) std::cout << "Stalled ";
+      if (errors[i].bits.overheat_) std::cout << "Overheat ";
+      if (errors[i].bits.over_current_) std::cout << "OverCurrent ";
+      if (errors[i].bits.motor_except_) std::cout << "MotorException ";
+      if (errors[i].bits.commu_except_) std::cout << "CommException ";
       std::cout << std::endl;
     }
   }
   if (std::all_of(errors.begin(), errors.end(), [](const auto& e) {
-        return !e.stalled_ && !e.overheat_ && !e.over_current_ && 
-               !e.motor_except_ && !e.commu_except_;
+        return !e.bits.stalled_ && !e.bits.overheat_ && !e.bits.over_current_ && 
+               !e.bits.motor_except_ && !e.bits.commu_except_;
       })) {
     std::cout << "  No errors detected" << std::endl;
   }

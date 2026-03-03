@@ -332,23 +332,23 @@ TEST_F(OmniHand2025Test, ErrorReport) {
     bool has_errors = false;
     for (size_t i = 0; i < error_reports.size(); ++i) {
       std::cout << "J" << (i+1) << ":[";
-      if (error_reports[i].stalled_) {
+      if (error_reports[i].bits.stalled_) {
         std::cout << "S";  // Stalled
         has_errors = true;
       }
-      if (error_reports[i].overheat_) {
+      if (error_reports[i].bits.overheat_) {
         std::cout << "H";  // Overheat
         has_errors = true;
       }
-      if (error_reports[i].over_current_) {
+      if (error_reports[i].bits.over_current_) {
         std::cout << "C";  // Over-current
         has_errors = true;
       }
-      if (error_reports[i].motor_except_) {
+      if (error_reports[i].bits.motor_except_) {
         std::cout << "M";  // Motor exception
         has_errors = true;
       }
-      if (error_reports[i].commu_except_) {
+      if (error_reports[i].bits.commu_except_) {
         std::cout << "X";  // Communication exception
         has_errors = true;
       }

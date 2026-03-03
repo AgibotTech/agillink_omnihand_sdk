@@ -17,17 +17,10 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include "omnihand/omnihand.h"
-#include "omnihand/omnihand_base.h"
 #include "omnihand/proto.h"
-#include "omnihand/impl/stream_protocol.h"
 
 namespace agilink {
 namespace omnihand {
-
-// Forward declarations
-struct MixCtrl;
-struct JointMotorErrorReport;
 
 /**
  * @brief Product serial number structure (0xC2 response)
@@ -116,7 +109,7 @@ struct AGIBOT_EXPORT FirmwareVersionInfo {
  * @note Tactile sensor interfaces (GetTactileSensorData, etc.) are declared here but should only
  *       be implemented by products that support them (e.g., O10). O4 does not support tactile sensors.
  */
-class AGIBOT_EXPORT PrivateOmniHand : public virtual OmniHandBase {
+class AGIBOT_EXPORT PrivateOmniHand {
  public:
   virtual ~PrivateOmniHand() = default;
 
@@ -269,6 +262,12 @@ class AGIBOT_EXPORT PrivateOmniHand : public virtual OmniHandBase {
    * @return Sensor data (50 bytes, 5x5 points per sensor, uint8 per point)
    */
   virtual std::vector<uint8_t> GetAllFingertipSensorC() const = 0;
+
+  /**
+   * @brief Get all tactile sensor data by querying 0x12, 0x13, 0x14 and assembling into vector&lt;TactileSensorData&gt;
+   * @return Vector of TactileSensorData (7 elements: thumb..dorsum), empty on failure
+   */
+  virtual std::vector<TactileSensorData> GetAllTactileSensorData() const = 0;
 
   // 0x15: 运行模式
   /**
