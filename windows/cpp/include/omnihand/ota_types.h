@@ -36,6 +36,7 @@ namespace omnihand {
  * | AGILINK_OTA_RESTART_TIMEOUT | -5 | Restart response timeout |
  * | AGILINK_OTA_TRANSMISSION_TIMEOUT | -6 | Data transmission timeout |
  * | AGILINK_OTA_CRC_CHECK_FAILED | -7 | CRC checksum verification failed |
+ * | AGILINK_OTA_DEVICE_DISCONNECTED | -8 | Device disconnected during OTA |
  * | >0 | varies | Device-returned error codes |
  */
 enum class AGIBOT_EXPORT OtaErrorCode : int {
@@ -46,7 +47,8 @@ enum class AGIBOT_EXPORT OtaErrorCode : int {
   AGILINK_OTA_REQUEST_TIMEOUT = -4,       // Upgrade request or finish response timeout
   AGILINK_OTA_RESTART_TIMEOUT = -5,       // Restart response timeout
   AGILINK_OTA_TRANSMISSION_TIMEOUT = -6,  // Data transmission timeout
-  AGILINK_OTA_CRC_CHECK_FAILED = -7       // CRC checksum verification failed
+  AGILINK_OTA_CRC_CHECK_FAILED = -7,      // CRC checksum verification failed
+  AGILINK_OTA_DEVICE_DISCONNECTED = -8    // Device disconnected during transmission
   // Positive values (>0) are device-returned error codes
 };
 
@@ -76,6 +78,8 @@ struct AGIBOT_EXPORT FirmwareLoadResult {
  * | AGILINK_OTA_FILE_LOADED | 0 | total | Firmware file loaded |
  * | AGILINK_OTA_REQUESTING_UPGRADE | 0 | total | Sending upgrade request |
  * | AGILINK_OTA_UPGRADE_ACCEPTED | 0 | total | Upgrade request accepted |
+ * | AGILINK_OTA_DEVICE_RECONNECTED | 0 | total | USB device reconnected (e.g. after OTA reset); app may set connect UI to "connected" |
+ * | AGILINK_OTA_REQUEST_NO_REPLY | attempt | total | Nth upgrade request got no reply, reconnecting (current_packet=1 or 2) |
  * | AGILINK_OTA_TRANSMITTING | current | total | Transmitting packet current/total |
  * | AGILINK_OTA_SENDING_FINISH | total | total | Sending finish request |
  * | AGILINK_OTA_RESTARTING | total | total | Device restarting |
@@ -87,6 +91,8 @@ enum class AGIBOT_EXPORT OtaProgressStatus : int {
   AGILINK_OTA_FILE_LOADED = 1,        // Firmware file loaded (total=total packets)
   AGILINK_OTA_REQUESTING_UPGRADE = 2, // Sending upgrade request
   AGILINK_OTA_UPGRADE_ACCEPTED = 3,   // Upgrade request accepted by device
+  AGILINK_OTA_DEVICE_RECONNECTED = 8, // USB device reconnected; app should set connect module to "connected"
+  AGILINK_OTA_REQUEST_NO_REPLY = 9,   // Nth request got no reply, reconnecting (current_packet=attempt 1 or 2)
   AGILINK_OTA_TRANSMITTING = 4,       // Transmitting packets (current/total=packet progress)
   AGILINK_OTA_SENDING_FINISH = 5,     // Sending finish request
   AGILINK_OTA_RESTARTING = 6,         // Device restarting
