@@ -73,7 +73,17 @@ def get_gesture_positions(gesture):
     return gesture_positions.get(gesture, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def main():
-    hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.RIGHT, canfd_channel_id=1)
+    import argparse
+    parser = argparse.ArgumentParser(description='OmniHand 2025 Gesture Control Demo')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    
+    # Create hand instance based on device type
+    if args.device == 'hcan':
+        hand = OmniHand2025.create_hand_by_hcan(hand_type=HandType.RIGHT, canfd_channel_id=1)
+    else:  # default: zlgcan
+        hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.RIGHT, canfd_channel_id=1)
     
     while True:
         print_menu()

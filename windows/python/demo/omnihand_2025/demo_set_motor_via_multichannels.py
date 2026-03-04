@@ -1,12 +1,23 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
 # OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
-from omnihand import OmniHand2025, Finger, ControlMode, HandType
+import argparse
 import time
+from omnihand import OmniHand2025, Finger, ControlMode, HandType
 
 def main():
-    left_hand = OmniHand2025.create_hand_by_zlgcan(canfd_device_id=0, hand_type=HandType.LEFT, canfd_channel_id=0)
-    right_hand = OmniHand2025.create_hand_by_zlgcan(canfd_device_id=0, hand_type=HandType.RIGHT, canfd_channel_id=1)
+    parser = argparse.ArgumentParser(description='Control multiple hands via multiple channels')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    
+    # Create hand instances based on device type
+    if args.device == 'hcan':
+        left_hand = OmniHand2025.create_hand_by_hcan(canfd_device_id=0, hand_type=HandType.LEFT, canfd_channel_id=0)
+        right_hand = OmniHand2025.create_hand_by_hcan(canfd_device_id=0, hand_type=HandType.RIGHT, canfd_channel_id=1)
+    else:  # default: zlgcan
+        left_hand = OmniHand2025.create_hand_by_zlgcan(canfd_device_id=0, hand_type=HandType.LEFT, canfd_channel_id=0)
+        right_hand = OmniHand2025.create_hand_by_zlgcan(canfd_device_id=0, hand_type=HandType.RIGHT, canfd_channel_id=1)
     
     # 启用详细日志查看 CAN 通信
     left_hand.show_data_details(True)

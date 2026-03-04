@@ -11,16 +11,35 @@
 #include <chrono>
 #include <string>
 
+// Global variable to store device type from command line argument
+static std::string g_device_type = "zlgcan";  // Default: zlgcan
+
+// Helper function to get device type
+static std::string GetDeviceType() {
+  return g_device_type;
+}
+
 class OmniHandDexUMITest : public ::testing::Test {
  protected:
   void SetUp() override {
-    // Create hand instance for testing
-    hand_ = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
-        agilink::omnihand::HandType::LEFT,        // hand_type: left hand
-        1,                       // hand_device_id: hand device ID
-        0,                       // canfd_device_id: USB CANFD adapter device index
-        0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
-    );
+    // Create hand instance for testing based on device type
+    std::string device_type = GetDeviceType();
+    if (device_type == "hcan") {
+      hand_ = agilink::omnihand::OmniHandDexUMI::createHandByHcan(
+          agilink::omnihand::HandType::LEFT,        // hand_type: left hand
+          1,                       // hand_device_id: hand device ID
+          0,                       // canfd_device_id: USB CANFD adapter device index
+          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
+      );
+    } else {  // default: zlgcan
+      hand_ = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
+          agilink::omnihand::HandType::LEFT,        // hand_type: left hand
+          1,                       // hand_device_id: hand device ID
+          0,                       // canfd_device_id: USB CANFD adapter device index
+          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
+      );
+    }
+    std::cout << "[Info]: Using device type: " << device_type << std::endl;
   }
 
   void TearDown() override {
@@ -173,3 +192,24 @@ TEST_F(OmniHandDexUMITest, GetAllJointMotorPosi) {
 //               << static_cast<int>(joint_idx) << std::endl;
 //   }
 // }
+
+// Main function for gtest
+int main(int argc, char** argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  
+  // Parse command line arguments
+  for (int i = 1; i < argc; ++i) {
+    std::string arg = argv[i];
+    if ((arg == "-d" || arg == "--device") && i + 1 < argc) {
+      std::string device_arg = argv[++i];
+      if (device_arg == "zlgcan" || device_arg == "hcan") {
+        g_device_type = device_arg;
+      } else {
+        std::cerr << "[Error]: -d value must be 'zlgcan' or 'hcan', got: " << device_arg << std::endl;
+        return 1;
+      }
+    }
+  }
+  
+  return RUN_ALL_TESTS();
+}

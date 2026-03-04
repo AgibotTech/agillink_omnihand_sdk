@@ -168,11 +168,20 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
 int main(int argc, char** argv) {
   // 解析命令行参数
   std::string mode = "left";  // 默认左手
-  if (argc > 1) {
-    std::string arg = argv[1];
+  std::string device_type = "zlgcan";  // 默认 zlgcan
+  
+  for (int i = 1; i < argc; ++i) {
+    std::string arg = argv[i];
     if (arg == "--help" || arg == "-h") {
       printUsage(argv[0]);
+      std::cout << "  -d DEVICE    Set CAN device type (zlgcan or hcan, default: zlgcan)" << std::endl;
       return 0;
+    } else if ((arg == "-d" || arg == "--device") && i + 1 < argc) {
+      device_type = argv[++i];
+      if (device_type != "zlgcan" && device_type != "hcan") {
+        std::cerr << "[Error]: -d value must be 'zlgcan' or 'hcan', got: " << device_type << std::endl;
+        return 1;
+      }
     } else if (arg == "left" || arg == "right" || arg == "both") {
       mode = arg;
     } else {
@@ -185,19 +194,26 @@ int main(int argc, char** argv) {
   std::cout << "============================================" << std::endl;
   std::cout << "OmniHand 2025 - CANFD Control (by canfd_id)" << std::endl;
   std::cout << "Mode: " << mode << std::endl;
+  std::cout << "Device: " << device_type << std::endl;
   std::cout << "============================================" << std::endl;
 
   unsigned char device_id = 1;
   unsigned char canfd_id = 0;
 
+  // Helper function to create hand instance
+  auto createHand = [&](agilink::omnihand::HandType hand_type, unsigned char channel_id) {
+    if (device_type == "hcan") {
+      return agilink::omnihand::OmniHand2025::createHandByHcan(
+          hand_type, device_id, canfd_id, channel_id);
+    } else {  // default: zlgcan
+      return agilink::omnihand::OmniHand2025::createHandByZlgcan(
+          hand_type, device_id, canfd_id, channel_id);
+    }
+  };
+
   if (mode == "left") {
     // 创建左手实例
-    auto left_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
-        agilink::omnihand::HandType::LEFT,
-        device_id,
-        canfd_id,
-        0  // channel_id (第一个通道)
-    );
+    auto left_hand = createHand(agilink::omnihand::HandType::LEFT, 0);
 
     if (!left_hand) {
       std::cerr << "[Error]: Failed to create left hand instance" << std::endl;
@@ -213,12 +229,7 @@ int main(int argc, char** argv) {
     controlSingleHand(left_hand, "Left");
   } else if (mode == "right") {
     // 创建右手实例
-    auto right_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
-        agilink::omnihand::HandType::RIGHT,
-        device_id,
-        canfd_id,
-        0  // channel_id (第一个通道)
-    );
+    auto right_hand = createHand(agilink::omnihand::HandType::RIGHT, 0);
 
     if (!right_hand) {
       std::cerr << "[Error]: Failed to create right hand instance" << std::endl;
@@ -234,19 +245,8 @@ int main(int argc, char** argv) {
     controlSingleHand(right_hand, "Right");
   } else if (mode == "both") {
     // both 模式：同时创建两个手
-    auto left_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
-        agilink::omnihand::HandType::LEFT,
-        device_id,
-        canfd_id,
-        0  // channel_id (第一个通道)
-    );
-
-    auto right_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
-        agilink::omnihand::HandType::RIGHT,
-        device_id,
-        canfd_id,
-        1  // channel_id (第二个通道)
-    );
+    auto left_hand = createHand(agilink::omnihand::HandType::LEFT, 0);  // 第一个通道
+    auto right_hand = createHand(agilink::omnihand::HandType::RIGHT, 1);  // 第二个通道
 
     if (!left_hand || !right_hand) {
       std::cerr << "[Error]: Failed to create hand instances" << std::endl;

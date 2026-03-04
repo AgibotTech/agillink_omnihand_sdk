@@ -97,6 +97,12 @@ def main():
         default=0.001,
         help='Update interval in seconds (default: 0.02, i.e., 50Hz)'
     )
+    parser.add_argument(
+        '-d', '--device',
+        choices=['zlgcan', 'hcan'],
+        default='zlgcan',
+        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan'
+    )
     
     args = parser.parse_args()
     
@@ -113,12 +119,20 @@ def main():
     # ============ 初始化 UMI 设备 ============
     print("\n[1/3] Initializing UMI device...")
     try:
-        umi_hand = OmniHandDexUMI.create_hand_by_zlgcan(
-            hand_type=hand_type,
-            hand_device_id=args.umi_device_id,
-            canfd_device_id=args.umi_canfd_id,
-            canfd_channel_id=args.umi_channel_id
-        )
+        if args.device == 'hcan':
+            umi_hand = OmniHandDexUMI.create_hand_by_hcan(
+                hand_type=hand_type,
+                hand_device_id=args.umi_device_id,
+                canfd_device_id=args.umi_canfd_id,
+                canfd_channel_id=args.umi_channel_id
+            )
+        else:  # default: zlgcan
+            umi_hand = OmniHandDexUMI.create_hand_by_zlgcan(
+                hand_type=hand_type,
+                hand_device_id=args.umi_device_id,
+                canfd_device_id=args.umi_canfd_id,
+                canfd_channel_id=args.umi_channel_id
+            )
         
         if umi_hand is None:
             print("[ERROR]: Failed to create UMI hand instance")
@@ -144,12 +158,20 @@ def main():
     # ============ 初始化 O10 设备 ============
     print("\n[2/3] Initializing O10 device...")
     try:
-        o10_hand = OmniHand2025.create_hand_by_zlgcan(
-            hand_type=hand_type,
-            hand_device_id=args.o10_device_id,
-            canfd_device_id=args.o10_canfd_id,
-            canfd_channel_id=args.o10_channel_id
-        )
+        if args.device == 'hcan':
+            o10_hand = OmniHand2025.create_hand_by_hcan(
+                hand_type=hand_type,
+                hand_device_id=args.o10_device_id,
+                canfd_device_id=args.o10_canfd_id,
+                canfd_channel_id=args.o10_channel_id
+            )
+        else:  # default: zlgcan
+            o10_hand = OmniHand2025.create_hand_by_zlgcan(
+                hand_type=hand_type,
+                hand_device_id=args.o10_device_id,
+                canfd_device_id=args.o10_canfd_id,
+                canfd_channel_id=args.o10_channel_id
+            )
         
         if o10_hand is None:
             print("[ERROR]: Failed to create O10 hand instance")

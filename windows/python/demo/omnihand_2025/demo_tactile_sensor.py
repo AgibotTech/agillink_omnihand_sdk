@@ -1,11 +1,21 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
 # OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
-from omnihand import OmniHand2025, Finger, HandType
+import argparse
 import time
+from omnihand import OmniHand2025, Finger, HandType
 
 def main():
-    hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.LEFT)
+    parser = argparse.ArgumentParser(description='Get tactile sensor data for OmniHand 2025')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    
+    # Create hand instance based on device type
+    if args.device == 'hcan':
+        hand = OmniHand2025.create_hand_by_hcan(hand_type=HandType.LEFT)
+    else:  # default: zlgcan
+        hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.LEFT)
 
     thumb_tactile_data = hand.get_tactile_sensor_data(Finger.THUMB)
     print("Thumb tactile data: {} g".format(sum(thumb_tactile_data)))
