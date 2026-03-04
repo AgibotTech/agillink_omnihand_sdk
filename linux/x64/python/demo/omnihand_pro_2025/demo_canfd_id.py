@@ -161,36 +161,45 @@ def control_single_hand(hand, hand_name):
 
 def main():
     """主函数"""
-    # 解析命令行参数
-    mode = "left"  # 默认左手
-    if len(sys.argv) > 1:
-        arg = sys.argv[1]
-        if arg in ["--help", "-h"]:
-            print_usage(sys.argv[0])
-            return 0
-        elif arg in ["left", "right", "both"]:
-            mode = arg
-        else:
-            print(f"[Error]: Invalid argument: {arg}")
-            print_usage(sys.argv[0])
-            return 1
+    import argparse
+    parser = argparse.ArgumentParser(description='OmniHand Pro 2025 - CANFD Control (by canfd_id)')
+    parser.add_argument('mode', nargs='?', choices=['left', 'right', 'both'], default='left',
+                        help='Hand control mode: left, right, or both (default: left)')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    mode = args.mode
+    device_type = args.device
 
     print("=" * 60)
     print("OmniHand Pro 2025 - CANFD Control (by canfd_id)")
     print(f"Mode: {mode}")
+    print(f"Device: {device_type}")
     print("=" * 60)
 
     hand_device_id= 1
     canfd_device_id= 0
 
+    # Helper function to create hand instance
+    def create_hand(hand_type, channel_id=0):
+        if device_type == 'hcan':
+            return OmniHandPro2025.create_hand_by_hcan(
+                hand_type=hand_type,
+                hand_device_id=hand_device_id,
+                canfd_device_id=canfd_device_id,
+                canfd_channel_id=channel_id
+            )
+        else:  # default: zlgcan
+            return OmniHandPro2025.create_hand_by_zlgcan(
+                hand_type=hand_type,
+                hand_device_id=hand_device_id,
+                canfd_device_id=canfd_device_id,
+                canfd_channel_id=channel_id
+            )
+
     if mode == "left":
         # 创建左手实例
-        left_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=HandType.LEFT,
-            hand_device_id=hand_device_id,
-            canfd_device_id=canfd_device_id,
-            canfd_channel_id=0  # 第一个通道
-        )
+        left_hand = create_hand(HandType.LEFT, 0)
 
         if left_hand is None:
             print("[Error]: Failed to create left hand instance")
@@ -205,12 +214,7 @@ def main():
 
     elif mode == "right":
         # 创建右手实例
-        right_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=HandType.RIGHT,
-            hand_device_id=hand_device_id,
-            canfd_device_id=canfd_device_id,
-            canfd_channel_id=0  # 第一个通道
-        )
+        right_hand = create_hand(HandType.RIGHT, 0)
 
         if right_hand is None:
             print("[Error]: Failed to create right hand instance")
@@ -225,19 +229,8 @@ def main():
 
     elif mode == "both":
         # both 模式：同时创建两个手
-        left_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=HandType.LEFT,
-            hand_device_id=hand_device_id,
-            canfd_device_id=canfd_device_id,
-            canfd_channel_id=0  # 第一个通道
-        )
-
-        right_hand = OmniHandPro2025.create_hand_by_zlgcan(
-            hand_type=HandType.RIGHT,
-            hand_device_id=hand_device_id,
-            canfd_device_id=canfd_device_id,
-            canfd_channel_id=1  # 第二个通道（需要多通道适配器）
-        )
+        left_hand = create_hand(HandType.LEFT, 0)  # 第一个通道
+        right_hand = create_hand(HandType.RIGHT, 1)  # 第二个通道（需要多通道适配器）
 
         if left_hand is None or right_hand is None:
             print("[Error]: Failed to create hand instances")

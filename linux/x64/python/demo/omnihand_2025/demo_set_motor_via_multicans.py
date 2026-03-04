@@ -1,13 +1,23 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
 # OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
-from omnihand import OmniHand2025, Finger, ControlMode, HandType
+import argparse
 import time
+from omnihand import OmniHand2025, Finger, ControlMode, HandType
 
 def main():
-    # 通过序列号直接创建 hand（推荐方式）
-    left_hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, "201BFF2AF01202D44690")
-    right_hand = OmniHand2025.create_hand_by_zlgcan(HandType.RIGHT, 1, "A029A58630B30D14DBB")
+    parser = argparse.ArgumentParser(description='Control multiple hands via multiple CAN devices')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    
+    # 通过序列号直接创建 hand（推荐方式）based on device type
+    if args.device == 'hcan':
+        left_hand = OmniHand2025.create_hand_by_hcan(HandType.LEFT, 1, "201BFF2AF01202D44690")
+        right_hand = OmniHand2025.create_hand_by_hcan(HandType.RIGHT, 1, "A029A58630B30D14DBB")
+    else:  # default: zlgcan
+        left_hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, "201BFF2AF01202D44690")
+        right_hand = OmniHand2025.create_hand_by_zlgcan(HandType.RIGHT, 1, "A029A58630B30D14DBB")
     
     if left_hand is None or right_hand is None:
         print("Cannot find CANFD devices by serial numbers!")

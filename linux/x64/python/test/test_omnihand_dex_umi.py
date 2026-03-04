@@ -17,16 +17,52 @@ if parent_dir in sys.path:
 import pytest
 from omnihand import OmniHandDexUMI, HandType, Finger
 
+# Global variable to store device type (zlgcan or hcan)
+# Can be set via environment variable OMNIHAND_DEVICE_TYPE or -d when running directly
+DEVICE_TYPE = "zlgcan"  # Default: zlgcan
+
+# Try to get device type from environment variable first (works with pytest)
+import os
+env_device = os.environ.get("OMNIHAND_DEVICE_TYPE")
+if env_device is not None:
+    if env_device in ["zlgcan", "hcan"]:
+        DEVICE_TYPE = env_device
+    else:
+        print(f"[Error]: OMNIHAND_DEVICE_TYPE must be 'zlgcan' or 'hcan'")
+
+if "-d" in sys.argv:
+    # Parse -d argument when running directly with Python (not with pytest)
+    # Note: -d doesn't work with pytest directly, use OMNIHAND_DEVICE_TYPE env var instead
+    idx = sys.argv.index("-d")
+    if idx + 1 < len(sys.argv):
+        device_arg = sys.argv[idx + 1]
+        if device_arg in ["zlgcan", "hcan"]:
+            DEVICE_TYPE = device_arg
+        else:
+            print(f"[Error]: -d value must be 'zlgcan' or 'hcan'")
+            sys.exit(1)
+        # Remove -d and its value from sys.argv so pytest.main() doesn't see them
+        sys.argv.pop(idx)
+        sys.argv.pop(idx)
 
 @pytest.fixture
 def hand():
     """Create and initialize OmniHand Dex UMI instance for testing"""
-    hand = OmniHandDexUMI.create_hand_by_zlgcan(
-        hand_type=HandType.LEFT,
-        hand_device_id=1,
-        canfd_device_id=0,
-        canfd_channel_id=0
-    )
+    if DEVICE_TYPE == "hcan":
+        hand = OmniHandDexUMI.create_hand_by_hcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=0
+        )
+    else:  # default: zlgcan
+        hand = OmniHandDexUMI.create_hand_by_zlgcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=0
+        )
+    print(f"[Info]: Using device type: {DEVICE_TYPE}")
     yield hand
 
 

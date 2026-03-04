@@ -9,16 +9,25 @@ OmniHand 2025 关节角度控制示例
 适合快速测试关节角度控制功能。
 """
 
-from omnihand import OmniHand2025, HandType
+import argparse
 import time
+from omnihand import OmniHand2025, HandType
 
 def main():
+    parser = argparse.ArgumentParser(description='OmniHand 2025 Joint Angle Control Demo')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    
     print("=" * 50)
     print("OmniHand 2025 Joint Angle Control Demo")
     print("=" * 50)
     
-    # 创建 OmniHand 2025 灵巧手实例
-    hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.RIGHT)
+    # 创建 OmniHand 2025 灵巧手实例 based on device type
+    if args.device == 'hcan':
+        hand = OmniHand2025.create_hand_by_hcan(hand_type=HandType.RIGHT)
+    else:  # default: zlgcan
+        hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.RIGHT)
     
     # 检查初始化状态
     if not hand.init():

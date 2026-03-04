@@ -7,21 +7,35 @@ OmniHand Dex UMI 硬件信息获取示例
 此示例演示如何获取 OmniHand Dex UMI 产品的厂家信息和设备信息。
 """
 
-from omnihand import OmniHandDexUMI, HandType
+import argparse
 import time
+from omnihand import OmniHandDexUMI, HandType
 
 def main():
+    parser = argparse.ArgumentParser(description='Get hardware info from OmniHand Dex UMI')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    
     print("=" * 50)
     print("OmniHand Dex UMI Hardware Info Demo")
     print("=" * 50)
     
-    # 创建 OmniHand Dex UMI 灵巧手实例
-    hand = OmniHandDexUMI.create_hand_by_zlgcan(
-        hand_type=HandType.LEFT,
-        hand_device_id=1,
-        canfd_device_id=0,
-        canfd_channel_id=0
-    )
+    # 创建 OmniHand Dex UMI 灵巧手实例 based on device type
+    if args.device == 'hcan':
+        hand = OmniHandDexUMI.create_hand_by_hcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=0
+        )
+    else:  # default: zlgcan
+        hand = OmniHandDexUMI.create_hand_by_zlgcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=0
+        )
     
     # 检查初始化状态
     if not hand.init():

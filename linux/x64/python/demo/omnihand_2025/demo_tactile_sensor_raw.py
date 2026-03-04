@@ -62,13 +62,27 @@ def main():
     print("=" * 60)
     print()
     
-    # Create OmniHand 2025 hand instance
-    hand = OmniHand2025.create_hand_by_zlgcan(
-        hand_type=HandType.RIGHT,
-        hand_device_id=1,
-        canfd_device_id=0,
-        canfd_channel_id=1
-    )
+    import argparse
+    parser = argparse.ArgumentParser(description='OmniHand 2025 Tactile Sensor Raw Data Demo')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    
+    # Create OmniHand 2025 hand instance based on device type
+    if args.device == 'hcan':
+        hand = OmniHand2025.create_hand_by_hcan(
+            hand_type=HandType.RIGHT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=1
+        )
+    else:  # default: zlgcan
+        hand = OmniHand2025.create_hand_by_zlgcan(
+            hand_type=HandType.RIGHT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=1
+        )
     
     # Check initialization status
     if not hand.init():

@@ -28,15 +28,29 @@ def main():
     print("=" * 60)
     print()
 
-    # Create hand instance: left hand, channel 0
+    import argparse
+    parser = argparse.ArgumentParser(description='OmniHand 2025 100Hz Control + 10Hz Tactile Sensor Reliability Test')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    
+    # Create hand instance: left hand, channel 0 based on device type
     print("Creating hand instance (Left hand, channel 0)...")
     try:
-        hand = OmniHand2025.create_hand_by_zlgcan(
-            hand_type=HandType.LEFT,
-            hand_device_id=1,
-            canfd_device_id=0,
-            canfd_channel_id=0
-        )
+        if args.device == 'hcan':
+            hand = OmniHand2025.create_hand_by_hcan(
+                hand_type=HandType.LEFT,
+                hand_device_id=1,
+                canfd_device_id=0,
+                canfd_channel_id=0
+            )
+        else:  # default: zlgcan
+            hand = OmniHand2025.create_hand_by_zlgcan(
+                hand_type=HandType.LEFT,
+                hand_device_id=1,
+                canfd_device_id=0,
+                canfd_channel_id=0
+            )
     except Exception as e:
         print(f"Failed to create hand: {e}")
         return

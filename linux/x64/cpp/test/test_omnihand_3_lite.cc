@@ -7,6 +7,8 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <thread>
+#include <chrono>
 
 #ifdef BUILD_OMNIHAND_3_LITE
 #include "omnihand/omnihand_3_lite.h"
@@ -16,26 +18,45 @@ using namespace agilink::omnihand;
 // Global variable to store request interval from command line argument
 static int g_request_interval = 5;  // Default: 5ms
 
+// Global variable to store device type from command line argument
+static std::string g_device_type = "zlgcan";  // Default: zlgcan
+
 // Helper function to get request interval
 static int GetRequestInterval() {
   return g_request_interval;
 }
 
+// Helper function to get device type
+static std::string GetDeviceType() {
+  return g_device_type;
+}
+
 class OmniHand3LiteTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    // Create hand instance for testing
-    hand_ = OmniHand3Lite::createHandByZlgcan(
-        HandType::LEFT,        // hand_type: left hand
-        1,                       // hand_device_id: hand device ID
-        0,                       // canfd_device_id: USB CANFD adapter device index
-        0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
-    );
+    // Create hand instance for testing based on device type
+    std::string device_type = GetDeviceType();
+    if (device_type == "hcan") {
+      hand_ = OmniHand3Lite::createHandByHcan(
+          HandType::LEFT,        // hand_type: left hand
+          1,                       // hand_device_id: hand device ID
+          0,                       // canfd_device_id: USB CANFD adapter device index
+          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
+      );
+    } else {  // default: zlgcan
+      hand_ = OmniHand3Lite::createHandByZlgcan(
+          HandType::LEFT,        // hand_type: left hand
+          1,                       // hand_device_id: hand device ID
+          0,                       // canfd_device_id: USB CANFD adapter device index
+          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
+      );
+    }
     int request_interval = GetRequestInterval();
     hand_->SetRequestInterval(request_interval);
     if (request_interval != 0) {
       std::cout << "[Info]: Using request interval: " << request_interval << " ms" << std::endl;
     }
+    std::cout << "[Info]: Using device type: " << device_type << std::endl;
   }
 
   void TearDown() override {
@@ -93,6 +114,7 @@ TEST_F(OmniHand3LiteTest, SetDeviceId) {
   unsigned char target_id = 2;
   hand_->SetDeviceId(target_id);
   std::cout << "[SetDeviceId] Set Device ID: " << static_cast<int>(target_id) << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
 
   auto device_info = hand_->GetDeviceInfo();
   EXPECT_EQ(device_info.hand_device_id, 2);
@@ -101,6 +123,7 @@ TEST_F(OmniHand3LiteTest, SetDeviceId) {
   unsigned char original_id = 1;
   hand_->SetDeviceId(original_id);
   std::cout << "[SetDeviceId] Reset Device ID: " << static_cast<int>(original_id) << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
   
   auto device_info1 = hand_->GetDeviceInfo();
   EXPECT_EQ(device_info1.hand_device_id, 1);
@@ -425,11 +448,19 @@ TEST_F(OmniHand3LiteTest, Constants) {
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   
-  // Parse command line arguments for request interval
+  // Parse command line arguments
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
     if (arg == "--request-interval" && i + 1 < argc) {
       g_request_interval = std::stoi(argv[++i]);
+    } else if ((arg == "-d" || arg == "--device") && i + 1 < argc) {
+      std::string device_arg = argv[++i];
+      if (device_arg == "zlgcan" || device_arg == "hcan") {
+        g_device_type = device_arg;
+      } else {
+        std::cerr << "[Error]: -d value must be 'zlgcan' or 'hcan', got: " << device_arg << std::endl;
+        return 1;
+      }
     }
   }
   

@@ -12,26 +12,45 @@
 // Global variable to store request interval from command line argument
 static int g_request_interval = 5;  // Default: 5ms
 
+// Global variable to store device type from command line argument
+static std::string g_device_type = "zlgcan";  // Default: zlgcan
+
 // Helper function to get request interval
 static int GetRequestInterval() {
   return g_request_interval;
 }
 
+// Helper function to get device type
+static std::string GetDeviceType() {
+  return g_device_type;
+}
+
 class OmniHand2025Test : public ::testing::Test {
  protected:
   void SetUp() override {
-    // Create hand instance for testing
-    hand_ = agilink::omnihand::OmniHand2025::createHandByZlgcan(
-        agilink::omnihand::HandType::LEFT,        // hand_type: left hand
-        1,                       // hand_device_id: hand device ID
-        0,                       // canfd_device_id: USB CANFD adapter device index
-        0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
-    );
+    // Create hand instance for testing based on device type
+    std::string device_type = GetDeviceType();
+    if (device_type == "hcan") {
+      hand_ = agilink::omnihand::OmniHand2025::createHandByHcan(
+          agilink::omnihand::HandType::LEFT,        // hand_type: left hand
+          1,                       // hand_device_id: hand device ID
+          0,                       // canfd_device_id: USB CANFD adapter device index
+          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
+      );
+    } else {  // default: zlgcan
+      hand_ = agilink::omnihand::OmniHand2025::createHandByZlgcan(
+          agilink::omnihand::HandType::LEFT,        // hand_type: left hand
+          1,                       // hand_device_id: hand device ID
+          0,                       // canfd_device_id: USB CANFD adapter device index
+          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
+      );
+    }
     int request_interval = GetRequestInterval();
     hand_->SetRequestInterval(request_interval);
     if (request_interval != 0) {
       std::cout << "[Info]: Using request interval: " << request_interval << " ms" << std::endl;
     }
+    std::cout << "[Info]: Using device type: " << device_type << std::endl;
   }
 
   void TearDown() override {
@@ -447,12 +466,25 @@ int main(int argc, char** argv) {
         std::cerr << "[Error]: Invalid -f value: " << argv[i + 1] << std::endl;
         return 1;
       }
+      } else if ((arg == "-d" || arg == "--device") && i + 1 < argc) {
+      std::string device_arg = argv[i + 1];
+      if (device_arg == "zlgcan" || device_arg == "hcan") {
+        g_device_type = device_arg;
+        ++i;  // Skip the next argument (the device type value)
+        continue;
+      } else {
+        std::cerr << "[Error]: -d value must be 'zlgcan' or 'hcan', got: " << device_arg << std::endl;
+        return 1;
+      }
     } else if (arg == "--help" || arg == "-h") {
-      std::cout << "Usage: " << argv[0] << " [-f INTERVAL]" << std::endl;
+      std::cout << "Usage: " << argv[0] << " [-f INTERVAL] [-d DEVICE]" << std::endl;
       std::cout << "  -f INTERVAL  Set CAN request interval (0-100ms, 0=no limit, default: 5ms)" << std::endl;
+      std::cout << "  -d DEVICE    Set CAN device type (zlgcan or hcan, default: zlgcan)" << std::endl;
       std::cout << std::endl;
       std::cout << "Example:" << std::endl;
       std::cout << "  " << argv[0] << " -f 20" << std::endl;
+      std::cout << "  " << argv[0] << " -d hcan" << std::endl;
+      std::cout << "  " << argv[0] << " -f 20 -d hcan" << std::endl;
       return 0;
     }
     // Pass other arguments to gtest

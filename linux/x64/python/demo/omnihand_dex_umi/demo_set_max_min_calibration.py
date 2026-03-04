@@ -25,13 +25,27 @@ def main():
     print("OmniHand Dex UMI Max/Min Position Calibration Demo")
     print("=" * 60)
     
-    # 创建 OmniHand Dex UMI 灵巧手实例
-    hand = OmniHandDexUMI.create_hand_by_zlgcan(
-        hand_type=HandType.LEFT,
-        hand_device_id=1,
-        canfd_device_id=0,
-        canfd_channel_id=0
-    )
+    import argparse
+    parser = argparse.ArgumentParser(description='OmniHand Dex UMI Max/Min Position Calibration Demo')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    args = parser.parse_args()
+    
+    # 创建 OmniHand Dex UMI 灵巧手实例 based on device type
+    if args.device == 'hcan':
+        hand = OmniHandDexUMI.create_hand_by_hcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=0
+        )
+    else:  # default: zlgcan
+        hand = OmniHandDexUMI.create_hand_by_zlgcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=0
+        )
     
     # 检查初始化状态
     if not hand.init():

@@ -25,6 +25,10 @@ from omnihand import OmniHand2025, HandType, Finger, ControlMode
 # Can be set via environment variable OMNIHAND_REQUEST_INTERVAL or -f when running directly
 REQUEST_INTERVAL = 5  # Default: 5ms
 
+# Global variable to store device type (zlgcan or hcan)
+# Can be set via environment variable OMNIHAND_DEVICE_TYPE or -d when running directly
+DEVICE_TYPE = "zlgcan"  # Default: zlgcan
+
 # Try to get from environment variable first (works with pytest)
 import os
 env_interval = os.environ.get("OMNIHAND_REQUEST_INTERVAL")
@@ -35,7 +39,15 @@ if env_interval is not None:
             print(f"[Error]: OMNIHAND_REQUEST_INTERVAL value {REQUEST_INTERVAL} is out of range (0-100ms)")
     except ValueError:
         print(f"[Error]: Invalid OMNIHAND_REQUEST_INTERVAL value")
-elif "-f" in sys.argv:
+
+env_device = os.environ.get("OMNIHAND_DEVICE_TYPE")
+if env_device is not None:
+    if env_device in ["zlgcan", "hcan"]:
+        DEVICE_TYPE = env_device
+    else:
+        print(f"[Error]: OMNIHAND_DEVICE_TYPE must be 'zlgcan' or 'hcan'")
+
+if "-f" in sys.argv:
     # Parse -f argument when running directly with Python (not with pytest)
     # Note: -f doesn't work with pytest directly, use OMNIHAND_REQUEST_INTERVAL env var instead
     idx = sys.argv.index("-f")
@@ -52,19 +64,43 @@ elif "-f" in sys.argv:
             print(f"[Error]: Invalid -f value")
             sys.exit(1)
 
+if "-d" in sys.argv:
+    # Parse -d argument when running directly with Python (not with pytest)
+    # Note: -d doesn't work with pytest directly, use OMNIHAND_DEVICE_TYPE env var instead
+    idx = sys.argv.index("-d")
+    if idx + 1 < len(sys.argv):
+        device_arg = sys.argv[idx + 1]
+        if device_arg in ["zlgcan", "hcan"]:
+            DEVICE_TYPE = device_arg
+        else:
+            print(f"[Error]: -d value must be 'zlgcan' or 'hcan'")
+            sys.exit(1)
+        # Remove -d and its value from sys.argv so pytest.main() doesn't see them
+        sys.argv.pop(idx)
+        sys.argv.pop(idx)
+
 
 @pytest.fixture
 def hand():
     """Create and initialize OmniHand 2025 instance for testing"""
-    hand = OmniHand2025.create_hand_by_zlgcan(
-        hand_type=HandType.LEFT,
-        hand_device_id=1,
-        canfd_device_id=0,
-        canfd_channel_id=0
-    )
+    if DEVICE_TYPE == "hcan":
+        hand = OmniHand2025.create_hand_by_hcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=0
+        )
+    else:  # default: zlgcan
+        hand = OmniHand2025.create_hand_by_zlgcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=1,
+            canfd_device_id=0,
+            canfd_channel_id=0
+        )
     if REQUEST_INTERVAL != 0:
         hand.set_request_interval(REQUEST_INTERVAL)
         print(f"[Info]: Using request interval: {REQUEST_INTERVAL} ms")
+    print(f"[Info]: Using device type: {DEVICE_TYPE}")
     yield hand
 
 
