@@ -297,11 +297,11 @@ class AGIBOT_EXPORT PrivateOmniHand {
 
   // 0x18: 设置全部轴位置（标定）
   /**
-   * @brief Set all axes positions (calibration)
-   * @param positions Vector of target positions (20 bytes, 10 axes * 2 bytes each, range 0-4095)
-   * @return Response data (60 bytes: positions, fault states, currents)
+   * @brief Set all axes positions (calibration), 0x18
+   * @param positions Target positions (O10: 10 axes, O4: 4 axes), each 0-4096
+   * @return Actual position list after set (same length), empty on failure
    */
-  virtual std::vector<uint8_t> SetAllActualAxisPos(const std::vector<uint16_t>& positions) = 0;
+  virtual std::vector<uint16_t> SetAllActualAxisPos(const std::vector<uint16_t>& positions) = 0;
 
   // 0x19: 读取全部轴位置数据（标定）
   /**
