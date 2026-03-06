@@ -101,6 +101,18 @@ struct AGIBOT_EXPORT FirmwareVersionInfo {
 };
 
 /**
+ * @brief Response of SetAllAxisPos (0x08): positions, velocities, currents after set.
+ * @note 60-byte protocol: [0:20] 10×position (uint16 LE), [20:40] 10×velocity (uint16 LE), [40:50] 10×current (1 byte/axis).
+ *       O10: all three filled (10 elements each). O4: positions.size()=4, velocities/currents empty or 4 if device returns them.
+ */
+ struct AGIBOT_EXPORT SetAllAxisPosResponse {
+  std::vector<uint16_t> positions;   ///< Position per axis (O10: 10, O4: 4)
+  std::vector<uint16_t> velocities; ///< Velocity per axis (same length as positions when present)
+  std::vector<uint16_t> currents;   ///< Current per axis, 1 byte in protocol zero-extended to uint16 (same length when present)
+  bool empty() const { return positions.empty(); }
+};
+
+/**
  * @brief Private base class for internal implementations - StreamCmd protocol interface
  * @note This class is for internal software use. It provides all StreamCmd protocol functions
  *       directly, implementing the complete stream protocol command set.
@@ -172,17 +184,17 @@ class AGIBOT_EXPORT PrivateOmniHand {
   // 0x08: 设置全部轴位置
   /**
    * @brief Set all axes positions
-   * @param positions Vector of target positions (20 bytes, 10 axes * 2 bytes each, range 0-4096)
-   * @return Response data (60 bytes: positions, velocities, torques, fault states)
+   * @param positions Target positions; length = axis count (O10: 10, O4: 4), each 0-4096
+   * @return Positions, velocities, currents after set (for o10_hmi compatibility); empty on failure
    */
-  virtual std::vector<uint8_t> SetAllAxisPos(const std::vector<uint16_t>& positions) = 0;
+  virtual SetAllAxisPosResponse SetAllAxisPos(const std::vector<uint16_t>& positions) = 0;
 
   // 0x09: 读取全部轴位置数据
   /**
    * @brief Get all axes position data
-   * @return Position data (20 bytes) + fault states (12 bytes)
+   * @return Position list; length = axis count (O10: 10, O4: 4), each 0-4096
    */
-  virtual std::vector<uint8_t> GetAllAxisPos() const = 0;
+  virtual std::vector<uint16_t> GetAllAxisPos() const = 0;
 
   // 0x0A: 读取所有轴电流信息
   /**
@@ -298,15 +310,15 @@ class AGIBOT_EXPORT PrivateOmniHand {
   // 0x18: 设置全部轴位置（标定）
   /**
    * @brief Set all axes positions (calibration), 0x18
-   * @param positions Target positions (O10: 10 axes, O4: 4 axes), each 0-4096
-   * @return Actual position list after set (same length), empty on failure
+   * @param positions Target positions; length = axis count (O10: 10, O4: 4), each 0-4096
+   * @return Actual position list after set; length = axis count (same as input), empty on failure
    */
   virtual std::vector<uint16_t> SetAllActualAxisPos(const std::vector<uint16_t>& positions) = 0;
 
   // 0x19: 读取全部轴位置数据（标定）
   /**
    * @brief Get all axes position data (calibration)
-   * @return Position data (20 bytes, range 0-4096)
+   * @return Position list; length = axis count (O10: 10, O4: 4), each 0-4096
    */
   virtual std::vector<uint16_t> GetAllActualAxisPos() const = 0;
 
