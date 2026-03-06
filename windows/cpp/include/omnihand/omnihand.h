@@ -15,6 +15,7 @@
 #include <string>
 #include "omnihand/export_symbols.h"
 #include "omnihand/proto.h"
+#include "omnihand/ota_types.h"
 
 namespace agilink {
 namespace omnihand {
@@ -121,6 +122,19 @@ class AGIBOT_EXPORT OmniHand {
    * @return Frame send timeout in milliseconds (0 = not set / not applicable)
    */
   virtual int GetFrameSendTimeout() const = 0;
+
+  // ============ Firmware Update (OTA) ============
+  /**
+   * @brief Updates firmware via OTA (Over-The-Air) upgrade
+   * @param file_name Path to the firmware binary file
+   * @param progress_callback Optional callback for progress (current_packet, total_packets, status)
+   * @note Default implementation reports AGILINK_OTA_NOT_SUPPORTED. Products that support OTA override this.
+   */
+  virtual void UpdateFirmware(const std::string& file_name, OtaProgressCallback progress_callback = nullptr) {
+    if (progress_callback) {
+      progress_callback(static_cast<int>(OtaErrorCode::AGILINK_OTA_NOT_SUPPORTED), 0, OtaProgressStatus::AGILINK_OTA_ERROR);
+    }
+  }
 
  protected:
   /**

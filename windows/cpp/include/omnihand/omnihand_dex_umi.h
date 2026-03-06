@@ -171,13 +171,6 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
 
   // GetAllTactileSensorDataRaw and GetTactileSensorDataRaw are inherited from OmniHandSensorBase
 
-  /**
-   * @brief OTA firmware update (same protocol as O10 CAN FD extended)
-   * @param file_name Path to firmware binary
-   * @param progress_callback Optional progress callback
-   */
-  virtual void UpdateFirmware(const std::string& file_name, OtaProgressCallback progress_callback = nullptr) = 0;
-
  protected:
   /**
    * @brief Initialize base class members

@@ -18,6 +18,7 @@
 #include "omnihand/omnihand_base.h"
 #include "omnihand/omnihand_sensor_base.h"
 #include "omnihand/proto.h"
+#include "omnihand/ota_types.h"
 
 namespace agilink {
 namespace omnihand {
