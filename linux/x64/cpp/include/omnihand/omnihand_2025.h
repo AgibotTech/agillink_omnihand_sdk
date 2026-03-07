@@ -14,9 +14,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "omnihand/export_symbols.h"
 #include "omnihand/omnihand_base.h"
-#include "omnihand/omnihand_sensor_base.h"
+#include "omnihand/io10_tactile_sensor_1d.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"
@@ -30,9 +29,9 @@ namespace omnihand {
  * This class provides the public interface for OmniHand 2025 product.
  * It includes all methods supported by O10, including 1D tactile sensors.
  * 
- * @note Uses virtual inheritance from OmniHandSensorBase to avoid diamond inheritance problem.
+ * @note Inherits from IO10TactileSensor1D for 1D tactile sensor interface.
  */
-class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandSensorBase {
+class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor1D {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // O10 has 10 active degrees of freedom (DoA)
@@ -170,20 +169,30 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
       const std::string& can_interface = "can0");
 #endif
 
-
-  // ============ Sensor Utilities (from OmniHandSensorBase) ============
-  // GetSensorDataLength and GetSensorOrder are inherited from OmniHandSensorBase
-
-  // ============ O10-Specific Tactile Sensor Interface ============
-  /**
-   * @brief Gets tactile sensor data for the specified part (O10 only).
-   * @param eFinger Finger/palm enum value
-   * @return Tactile sensor data vector
-   * @note Data unit: 1g, Max value: 255g, Sampling frequency: 10Hz
+    /**
+   * @brief Get sensor data length for a specific finger
+   * @param finger Finger enum value
+   * @return Sensor data length in bytes
    */
-  virtual std::vector<uint8_t> GetTactileSensorData(Finger eFinger) const = 0;
+   virtual size_t GetSensorDataLength(Finger finger) const override;
+   /**
+    * @brief Get sensor order vector
+    * @return Reference to sensor order vector
+    */
+   virtual const std::vector<Finger>& GetSensorOrder() const override;
 
-  // GetAllTactileSensorDataRaw and GetTactileSensorDataRaw are inherited from OmniHandSensorBase
+  /**
+   * @brief Gets tactile sensor data for the specified process, such as downsampled data.
+   * @param finger Finger/palm enum value
+   * @return Tactile sensor data vector
+   */
+  virtual std::vector<uint8_t> GetTactileSensorData(Finger finger) const = 0;
+
+  /**
+   * @brief Gets all 1D tactile sensor data for the specified process, such as downsampled data.
+   * @return Vector of tactile sensor data vector
+   */
+  virtual std::vector<TactileSensorData> GetAllTactileSensorData() const = 0;
 
   // ============ Gesture Control ============
   /**
@@ -191,24 +200,6 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public virtual OmniHandS
    * @param gesture_num Gesture number: 1 = FIST1, 2 = FIST2 (default: 1)
    */
   void SetHandGesture(int gesture_num = 1) override;
-
-  // ============ Firmware Update (OTA) ============
-  /**
-   * @brief Updates firmware via OTA (Over-The-Air) upgrade
-   * @param file_name Path to the firmware binary file
-   * @param progress_callback Optional callback function to receive progress updates
-   *                          - current_packet: Meaning depends on status (see OtaProgressStatus)
-   *                          - total_packets: Total number of packets
-   *                          - status: Progress status (see OtaProgressStatus)
-   * @note This function is supported for:
-   *       - CAN communication (ZLG CANFD, HCAN, SocketCAN) - all platforms
-   *       - USB communication - all platforms
-   * @note RS485 communication does not support OTA upgrade
-   * @note Do not power off or restart the device during the update process
-   * @warning This is a blocking operation that may take several minutes depending on firmware size
-   * @note If progress_callback is nullptr (default), progress will be printed to stdout/stderr
-   */
-  virtual void UpdateFirmware(const std::string& file_name, OtaProgressCallback progress_callback = nullptr);
 
  protected:
   /**

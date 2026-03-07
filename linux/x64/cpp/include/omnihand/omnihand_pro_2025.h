@@ -17,6 +17,7 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/omnihand_base.h"
 #include "omnihand/proto.h"
+#include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_pro_2025/omnihand_pro_2025_solver.h"
 
 namespace agilink {

@@ -18,7 +18,7 @@
 #include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/omnihand.h"
-#include "omnihand/omnihand_sensor_base.h"
+#include "omnihand/io10_tactile_sensor_1d.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/proto.h"
 
@@ -35,7 +35,7 @@ class OmniHandDexUmiCanImpl;
  * UMI uses a different protocol (Pn1-Pn8) and supports active position query.
  * Note: UMI does not support position/velocity/torque control (read-only position information).
  */
-class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
+class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // O10 UMI has 10 active degrees of freedom (DoA)
@@ -121,12 +121,17 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
       const std::string& hcan_serial_number,
       unsigned char canfd_channel_id = 0);
 
-  // ============ Sensor Utilities (from OmniHandSensorBase) ============
-  // GetSensorDataLength and GetSensorOrder are inherited from OmniHandSensorBase
-  // Note: For UMI, GetSensorDataLength returns 0 for DORSUM (UMI does not have dorsum sensor)
-  //       GetSensorOrder includes DORSUM, but UMI cannot retrieve dorsum sensor data.
-  //       Calling GetTactileSensorDataRaw(DORSUM) will fail and return empty data.
-  //       GetAllTactileSensorDataRaw() only returns sensors available on UMI (Thumb, Index, Middle, Ring, Little, Palm)
+  /**
+   * @brief Get sensor data length for a specific finger
+   * @param finger Finger enum value
+   * @return Sensor data length in bytes
+   */
+   virtual size_t GetSensorDataLength(Finger finger) const override;
+   /**
+    * @brief Get sensor order vector
+    * @return Reference to sensor order vector
+    */
+   virtual const std::vector<Finger>& GetSensorOrder() const override;
 
   // ============ Position Query (UMI Protocol Pn3=0x13) ============
   /**
@@ -169,14 +174,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public virtual OmniHandSensorBase {
    */
   virtual   void SetMaxPositionCalibration(unsigned char joint_index) = 0;
 
-  // GetAllTactileSensorDataRaw and GetTactileSensorDataRaw are inherited from OmniHandSensorBase
-
-  /**
-   * @brief OTA firmware update (same protocol as O10 CAN FD extended)
-   * @param file_name Path to firmware binary
-   * @param progress_callback Optional progress callback
-   */
-  virtual void UpdateFirmware(const std::string& file_name, OtaProgressCallback progress_callback = nullptr) = 0;
+  // GetAllTactileSensorDataRaw and GetTactileSensorDataRaw are inherited from IO10TactileSensor1D
 
  protected:
   /**
