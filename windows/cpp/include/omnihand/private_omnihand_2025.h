@@ -16,17 +16,12 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/private_omnihand.h"
 #include "omnihand/omnihand_2025.h"
-#include "omnihand/omnihand_sensor_base.h"
+#include "omnihand/io10_tactile_sensor_1d.h"
 #include "omnihand/proto.h"
 #include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"
 
 namespace agilink {
 namespace omnihand {
-
-// Forward declarations
-class OmniHand2025CanStandardImpl;
-class OmniHand2025RsStandardImpl;
-class OmniHand2025UsbImpl;
 
 /**
  * @brief Private interface class for OmniHand 2025 (O10) - internal software use
@@ -35,7 +30,7 @@ class OmniHand2025UsbImpl;
  * It includes factory methods for all communication types (CAN, USB, RS485).
  * 
  * @note Public users should use OmniHand2025 instead.
- * @note O10 supports tactile sensors, so this class inherits from OmniHandSensorBase.
+ * @note O10 supports tactile sensors, so this class inherits from IO10TactileSensor1D.
  * @note This class also inherits from OmniHand2025 to allow conversion to public interface.
  */
 class AGIBOT_EXPORT PrivateOmniHand2025 : public OmniHand2025, public PrivateOmniHand {

@@ -204,14 +204,6 @@ struct AGIBOT_EXPORT TactileSensor3DData {
 };
 
 /**
- * @brief 单个传感器的1D触觉数据 (O10专用)
- */
-struct AGIBOT_EXPORT TactileSensorData {
-  Finger sensor_id_;                   // 传感器ID (手指/手心/手背)
-  std::vector<uint8_t> data_;           // 传感器数据，单位: 1g, 最大值: 255g
-};
-
-/**
  * @brief 版本信息
  */
 struct AGIBOT_EXPORT Version {

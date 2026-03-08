@@ -21,8 +21,6 @@
 namespace agilink {
 namespace omnihand {
 
-class OmniHand3UltraCanImpl;
-
 /**
  * @brief OmniHand 3 Ultra (O20) interface class - 20 DOF
  *

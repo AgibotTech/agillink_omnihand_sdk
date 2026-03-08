@@ -16,7 +16,6 @@
 #include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/omnihand_base.h"
-#include "omnihand/omnihand_sensor_base.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 
@@ -158,8 +157,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
       const std::string& can_interface = "can0");
 #endif
 
-  // ============ Sensor Utilities (from OmniHandSensorBase) ============
-  // GetSensorDataLength and GetSensorOrder are inherited from OmniHandSensorBase
+  // ============ Sensor Utilities ============
+  // Note: O4 (OmniHand3Lite) does not support tactile sensors
 
   // ============ Gesture Control ============
   /**

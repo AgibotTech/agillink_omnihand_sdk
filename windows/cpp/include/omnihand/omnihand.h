@@ -130,7 +130,7 @@ class AGIBOT_EXPORT OmniHand {
    * @param progress_callback Optional callback for progress (current_packet, total_packets, status)
    * @note Default implementation reports AGILINK_OTA_NOT_SUPPORTED. Products that support OTA override this.
    */
-  virtual void UpdateFirmware(const std::string& file_name, OtaProgressCallback progress_callback = nullptr) {
+  virtual void UpdateFirmware(const std::string& /* file_name */, OtaProgressCallback progress_callback = nullptr) {
     if (progress_callback) {
       progress_callback(static_cast<int>(OtaErrorCode::AGILINK_OTA_NOT_SUPPORTED), 0, OtaProgressStatus::AGILINK_OTA_ERROR);
     }
