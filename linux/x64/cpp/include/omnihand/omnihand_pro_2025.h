@@ -23,8 +23,6 @@
 namespace agilink {
 namespace omnihand {
 
-class OmniHandPro2025CanImpl;
-
 /**
  * @brief OmniHand Pro 2025 (O12) interface class - 12 DOF
  * 

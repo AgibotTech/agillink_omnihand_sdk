@@ -37,7 +37,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *             - OmniHand 2025 (O10): 0-4096
    *             - OmniHand Pro 2025 (O12): 0-2000
    */
-  virtual void SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi) = 0;
+  virtual void SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi) { (void)joint_motor_index; (void)posi; }
   
   /**
    * @brief Gets the position of a single joint motor.
@@ -55,7 +55,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *                 - OmniHand Pro 2025 (O12): 12 values, each in range 0-2000
    * @return Actual position vector from device response. Empty vector on failure.
    */
-  virtual std::vector<int16_t> SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi) = 0;
+  virtual std::vector<int16_t> SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi) { (void)vec_posi; return {}; }
   
   /**
    * @brief Gets positions of all joint motors in batch.
@@ -75,7 +75,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *               - OmniHand 2025 (O10): 10 values
    *               - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual void SetAllActiveJointAngles(const std::vector<double>& angles) = 0;
+  virtual void SetAllActiveJointAngles(const std::vector<double>& angles) { (void)angles; }
   
   /**
    * @brief Gets joint angles of all active joints in batch.
@@ -83,13 +83,13 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *         - OmniHand 2025 (O10): 10 values
    *         - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual std::vector<double> GetAllActiveJointAngles() const = 0;
+  virtual std::vector<double> GetAllActiveJointAngles() const { return {}; }
   
   /**
    * @brief Gets joint angles of all joints (including active and passive joints).
    * @return All joint angle vector (unit: radians)
    */
-  virtual std::vector<double> GetAllJointAngles() const = 0;
+  virtual std::vector<double> GetAllJointAngles() const { return {}; }
   
   /**
    * @brief Calculates all joint angles (including active and passive joints) from active joint angles.
@@ -99,7 +99,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @return All joint angle vector (unit: radians), including active and passive joints
    * @note This function does not perform hardware communication, only kinematics calculation.
    */
-  virtual std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos) const = 0;
+  virtual std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos) const { (void)active_joint_pos; return {}; }
 
   // ============ Velocity Control ============
   /**
@@ -108,7 +108,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param velo Target velocity value
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo) = 0;
+  virtual void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo) { (void)joint_motor_index; (void)velo; }
   
   /**
    * @brief Gets the velocity of a single joint motor.
@@ -116,7 +116,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @return Current velocity value
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual int16_t GetJointMotorVelo(unsigned char joint_motor_index) const = 0;
+  virtual int16_t GetJointMotorVelo(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
   
   /**
    * @brief Sets velocities of all joint motors in batch.
@@ -124,7 +124,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *                 - OmniHand 2025 (O10): 10 values
    *                 - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo) = 0;
+  virtual void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo) { (void)vec_velo; }
   
   /**
    * @brief Gets velocities of all joint motors in batch.
@@ -132,7 +132,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *         - OmniHand 2025 (O10): 10 values
    *         - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual std::vector<int16_t> GetAllJointMotorVelo() const = 0;
+  virtual std::vector<int16_t> GetAllJointMotorVelo() const { return {}; }
 
   // ============ Torque Control ============
   // Note: SetJointMotorTorque, GetJointMotorTorque, SetAllJointMotorTorque, GetAllJointMotorTorque
@@ -146,7 +146,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @note SERVO mode (1) is available for servo control
    * @note Pure torque control (TORQUE) is not supported: Both O10 and O12 do not support pure torque mode, only mixed control modes
    */
-  virtual void SetControlMode(unsigned char joint_motor_index, ControlMode mode) = 0;
+  virtual void SetControlMode(unsigned char joint_motor_index, ControlMode mode) { (void)joint_motor_index; (void)mode; }
   
   /**
    * @brief Gets the control mode of a single joint motor.
@@ -154,7 +154,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @return Current control mode
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual ControlMode GetControlMode(unsigned char joint_motor_index) const = 0;
+  virtual ControlMode GetControlMode(unsigned char joint_motor_index) const { (void)joint_motor_index; return ControlMode::POSITION; }
   
   /**
    * @brief Sets control modes of all joint motors in batch.
@@ -163,7 +163,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *                   - OmniHand Pro 2025 (O12): 12 values
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual void SetAllControlMode(const std::vector<unsigned char>& ctrl_modes) = 0;
+  virtual void SetAllControlMode(const std::vector<unsigned char>& ctrl_modes) { (void)ctrl_modes; }
   
   /**
    * @brief Gets control modes of all joint motors in batch.
@@ -172,7 +172,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *         - OmniHand Pro 2025 (O12): 12 values
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual std::vector<unsigned char> GetAllControlMode() const = 0;
+  virtual std::vector<unsigned char> GetAllControlMode() const { return {}; }
 
   // ============ Current Threshold ============
   /**
@@ -181,7 +181,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param current_threshold Current threshold value
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold) = 0;
+  virtual void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold) { (void)joint_motor_index; (void)current_threshold; }
   
   /**
    * @brief Gets the current threshold of a single joint motor.
@@ -189,7 +189,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @return Current threshold value
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual int16_t GetCurrentThreshold(unsigned char joint_motor_index) const = 0;
+  virtual int16_t GetCurrentThreshold(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
   
   /**
    * @brief Sets current thresholds of all joint motors in batch.
@@ -198,7 +198,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *                           - OmniHand Pro 2025 (O12): 12 values
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual void SetAllCurrentThreshold(const std::vector<int16_t>& current_thresholds) = 0;
+  virtual void SetAllCurrentThreshold(const std::vector<int16_t>& current_thresholds) { (void)current_thresholds; }
   
   /**
    * @brief Gets current thresholds of all joint motors in batch.
@@ -207,7 +207,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *         - OmniHand Pro 2025 (O12): 12 values
    * @note Serial port communication (RS485) does not support this interface.
    */
-  virtual std::vector<int16_t> GetAllCurrentThreshold() const = 0;
+  virtual std::vector<int16_t> GetAllCurrentThreshold() const { return {}; }
 
   // ============ Mixed Control ============
   /**
@@ -215,7 +215,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param mix_ctrls Mixed control parameter vector
    * @note Pure torque control (TORQUE) is not supported: Both O10 and O12 do not support pure torque mode, only mixed control modes
    */
-  virtual void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls) = 0;
+  virtual void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls) { (void)mix_ctrls; }
 
   // ============ Error Report ============
   /**
@@ -223,7 +223,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
    * @return Error report structure
    */
-  virtual JointMotorErrorReport GetErrorReport(unsigned char joint_motor_index) const = 0;
+  virtual JointMotorErrorReport GetErrorReport(unsigned char joint_motor_index) const { (void)joint_motor_index; return {}; }
   
   /**
    * @brief Gets error reports of all joint motors.
@@ -231,14 +231,14 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *         - OmniHand 2025 (O10): 10 values
    *         - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual std::vector<JointMotorErrorReport> GetAllErrorReport() const = 0;
+  virtual std::vector<JointMotorErrorReport> GetAllErrorReport() const { return {}; }
   
   /**
    * @brief Sets error report period of a single joint motor.
    * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
    * @param period Report period (unit: milliseconds)
    */
-  virtual void SetErrorReportPeriod(unsigned char joint_motor_index, uint16_t period) = 0;
+  virtual void SetErrorReportPeriod(unsigned char joint_motor_index, uint16_t period) { (void)joint_motor_index; (void)period; }
   
   /**
    * @brief Sets error report periods of all joint motors in batch.
@@ -246,7 +246,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *                   - OmniHand 2025 (O10): 10 values
    *                   - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual void SetAllErrorReportPeriod(std::vector<uint16_t> vec_period) = 0;
+  virtual void SetAllErrorReportPeriod(std::vector<uint16_t> vec_period) { (void)vec_period; }
 
   // ============ Temperature Report ============
   /**
@@ -254,7 +254,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
    * @return Current temperature value (unit: Celsius)
    */
-  virtual uint16_t GetTemperatureReport(unsigned char joint_motor_index) const = 0;
+  virtual uint16_t GetTemperatureReport(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
   
   /**
    * @brief Gets temperature reports of all joint motors in batch.
@@ -262,7 +262,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *         - OmniHand 2025 (O10): 10 values
    *         - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual std::vector<uint16_t> GetAllTemperatureReport() const = 0;
+  virtual std::vector<uint16_t> GetAllTemperatureReport() const { return {}; }
   
   /**
    * @brief Sets temperature report period of a single joint motor (O12 only).
@@ -270,14 +270,14 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param period Report period (unit: milliseconds)
    * @note OmniHand 2025 (O10) does not support this interface.
    */
-  virtual void SetTemperReportPeriod(unsigned char joint_motor_index, uint16_t period) = 0;
+  virtual void SetTemperReportPeriod(unsigned char joint_motor_index, uint16_t period) { (void)joint_motor_index; (void)period; }
   
   /**
    * @brief Sets temperature report periods of all joint motors in batch (O12 only).
    * @param vec_period Report period vector, length 12
    * @note OmniHand 2025 (O10) does not support this interface.
    */
-  virtual void SetAllTemperReportPeriod(std::vector<uint16_t> vec_period) = 0;
+  virtual void SetAllTemperReportPeriod(std::vector<uint16_t> vec_period) { (void)vec_period; }
 
   // ============ Current Report ============
   /**
@@ -285,7 +285,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
    * @return Current value
    */
-  virtual int16_t GetCurrentReport(unsigned char joint_motor_index) const = 0;
+  virtual int16_t GetCurrentReport(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
   
   /**
    * @brief Gets current reports of all joint motors in batch.
@@ -293,7 +293,7 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *         - OmniHand 2025 (O10): 10 values
    *         - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual std::vector<uint16_t> GetAllCurrentReport() const = 0;
+  virtual std::vector<uint16_t> GetAllCurrentReport() const { return {}; }
   
   /**
    * @brief Sets current report period of a single joint motor (O12 only).
@@ -301,14 +301,14 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param period Report period (unit: milliseconds)
    * @note OmniHand 2025 (O10) does not support this interface.
    */
-  virtual void SetCurrentReportPeriod(unsigned char joint_motor_index, uint16_t period) = 0;
+  virtual void SetCurrentReportPeriod(unsigned char joint_motor_index, uint16_t period) { (void)joint_motor_index; (void)period; }
   
   /**
    * @brief Sets current report periods of all joint motors in batch (O12 only).
    * @param vec_period Report period vector, length 12
    * @note OmniHand 2025 (O10) does not support this interface.
    */
-  virtual void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period) = 0;
+  virtual void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period) { (void)vec_period; }
 
   // ============ Gesture Control ============
   /**

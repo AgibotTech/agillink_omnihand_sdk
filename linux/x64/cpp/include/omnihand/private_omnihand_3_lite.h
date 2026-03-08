@@ -21,9 +21,6 @@
 namespace agilink {
 namespace omnihand {
 
-// Forward declarations
-class OmniHand3LiteCanStandardImpl;
-
 /**
  * @brief Private interface class for OmniHand 3 Lite S (O4) - internal software use
  * 

@@ -74,14 +74,14 @@ def main():
             hand_type=HandType.RIGHT,
             hand_device_id=1,
             canfd_device_id=0,
-            canfd_channel_id=1
+            canfd_channel_id=0
         )
     else:  # default: zlgcan
         hand = OmniHand2025.create_hand_by_zlgcan(
             hand_type=HandType.RIGHT,
             hand_device_id=1,
             canfd_device_id=0,
-            canfd_channel_id=1
+            canfd_channel_id=0
         )
     
     # Check initialization status

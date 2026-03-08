@@ -23,11 +23,6 @@
 namespace agilink {
 namespace omnihand {
 
-// Forward declarations
-class OmniHand2025CanStandardImpl;
-class OmniHand2025RsStandardImpl;
-class OmniHand2025UsbImpl;
-
 /**
  * @brief Private interface class for OmniHand 2025 (O10) - internal software use
  * 
