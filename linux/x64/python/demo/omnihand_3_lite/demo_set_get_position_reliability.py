@@ -122,15 +122,16 @@ def main():
                 set_position_end_time = time.time()
                 set_position_duration_ms = (set_position_end_time - set_position_start_time) * 1000.0
                 set_position_times.append(set_position_duration_ms)
-                set_position_success_count += 1
-                
-                # Check if we got valid response (should have 4 positions)
-                if len(actual_positions) != num_joints:
+                # C++ may return [] on timeout without raising; count by result length
+                if len(actual_positions) == num_joints:
+                    set_position_success_count += 1
+                else:
                     set_position_failure_count += 1
                     if iteration < 10:  # Only print first few errors to avoid spam
                         print(f"\n[Iteration {iteration}] Warning: set_all_joint_positions returned {len(actual_positions)} positions, expected {num_joints}")
             except Exception as e:
                 set_position_failure_count += 1
+                set_position_times.append(0.0)  # no duration on exception
                 if iteration < 10:  # Only print first few errors to avoid spam
                     print(f"\n[Iteration {iteration}] Error setting all joint positions: {e}")
             
@@ -142,7 +143,20 @@ def main():
                 get_position_end_time = time.time()
                 get_position_duration_ms = (get_position_end_time - get_position_start_time) * 1000.0
                 get_position_times.append(get_position_duration_ms)
-                get_position_success_count += 1
+                # C++ may return [] on timeout without raising; count by result length and validity
+                if all_positions is not None and len(all_positions) == num_joints:
+                    # Also require all position values valid (e.g. not -1 from timeout/stale data)
+                    all_valid = all(p is not None and p >= 0 for p in all_positions)
+                    if all_valid:
+                        get_position_success_count += 1
+                    else:
+                        get_position_failure_count += 1
+                        if iteration < 10:
+                            print(f"\n[Iteration {iteration}] Error getting all joint positions: invalid values (e.g. < 0), got {all_positions}")
+                else:
+                    get_position_failure_count += 1
+                    if iteration < 10:  # Only print first few errors to avoid spam
+                        print(f"\n[Iteration {iteration}] Error getting all joint positions: returned {len(all_positions) if all_positions is not None else 0} positions, expected {num_joints}")
             except Exception as e:
                 # Exception during data acquisition - still record query time
                 get_position_end_time = time.time()
@@ -305,6 +319,8 @@ def main():
     print(f"{'Get All Joint Positions':<30} {get_position_success_count:<10} {get_position_failure_count:<10} {get_position_failure_rate:>6.2f}%")
     
     print("-" * 60)
+    print("  (Set/Get failures = failed operations per type; same iteration can have both set and get failed.")
+    print("   Failed data points = invalid joint values: e.g. 12 = 3 iterations × 4 joints.)")
     print()
     
     # Total operation timing statistics (set position + get position)
