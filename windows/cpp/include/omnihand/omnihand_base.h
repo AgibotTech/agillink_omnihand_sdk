@@ -36,8 +36,9 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param posi Motor position. Range:
    *             - OmniHand 2025 (O10): 0-4096
    *             - OmniHand Pro 2025 (O12): 0-2000
+   * @return Actual position from device response. -1 on failure or if protocol has no reply (e.g. USB no-reply).
    */
-  virtual void SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi) { (void)joint_motor_index; (void)posi; }
+  virtual int16_t SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi) { (void)joint_motor_index; (void)posi; return -1; }
   
   /**
    * @brief Gets the position of a single joint motor.
@@ -74,8 +75,9 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    * @param angles Joint angle vector (unit: radians). Length depends on product type:
    *               - OmniHand 2025 (O10): 10 values
    *               - OmniHand Pro 2025 (O12): 12 values
+   * @return Actual joint angles from device (e.g. from SetAllJointMotorPosi response converted to angles). Empty on failure.
    */
-  virtual void SetAllActiveJointAngles(const std::vector<double>& angles) { (void)angles; }
+  virtual std::vector<double> SetAllActiveJointAngles(const std::vector<double>& angles) { (void)angles; return {}; }
   
   /**
    * @brief Gets joint angles of all active joints in batch.
