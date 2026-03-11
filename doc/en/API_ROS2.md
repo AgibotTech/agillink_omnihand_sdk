@@ -22,84 +22,142 @@ The ROS2 nodes support YAML configuration files for flexible parameter managemen
 
 ### Configuration Parameters
 
+#### First Hand Parameters
+
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `hand_type` | string | "left" | Hand type: "left" or "right" |
 | `hand_device_id` | int | 1 | Hand device ID (1-255) |
-| `canfd_device_id` | int | 0 | USB CANFD adapter device index |
+| `connection_type` | string | "zlg_can" | Connection type: "zlg_can", "hcan", or "rs485" |
+| `canfd_serial_number` | string | "" | CANFD adapter serial number (recommended, stable after reboot/unplug) |
+| `canfd_device_id` | int | 0 | CANFD adapter device index (alternative, may change after reboot/unplug) |
 | `canfd_channel_id` | int | 0 | CAN channel index (0 or 1) |
-| `enable_both_hands` | bool | true | Enable dual-hand mode |
-| `second_hand_type` | string | "right" | Second hand type (for dual mode) |
+| `uart_port` | string | "/dev/ttyUSB0" | Serial port path (rs485 only) |
+| `baudrate` | int | 460800 | Baudrate (rs485 only) |
+
+#### Second Hand Parameters (Optional)
+
+If second hand parameters are configured, the second hand will be automatically started.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `second_hand_type` | string | "" | Second hand type: "left" or "right" |
 | `second_hand_device_id` | int | 1 | Second hand device ID |
-| `second_canfd_device_id` | int | 0 | Second hand CANFD adapter device index |
-| `second_canfd_channel_id` | int | 1 | Second hand channel index |
+| `second_connection_type` | string | "zlg_can" | Second hand connection type |
+| `second_canfd_serial_number` | string | "" | Second hand CANFD adapter serial number (recommended) |
+| `second_canfd_device_id` | int | 0 | Second hand CANFD adapter device index (alternative) |
+| `second_canfd_channel_id` | int | 1 | Second hand CAN channel index |
+| `second_uart_port` | string | "/dev/ttyUSB1" | Second hand serial port path (rs485 only) |
+| `second_baudrate` | int | 460800 | Second hand baudrate (rs485 only) |
+
+**Note**:
+- It is recommended to use `canfd_serial_number` (serial number) because it remains stable after device reboot or unplug
+- `canfd_device_id` is an alternative, but may change after device reboot or unplug
 
 ### Usage Examples
 
-**Default: Both hands mode** - Both `ros2 run` and `ros2 launch` default to dual-hand mode (left hand on channel 0, right hand on channel 1).
+**Default: Single hand mode** - Both `ros2 run` and `ros2 launch` default to single hand mode (left hand). Dual-hand mode is enabled by configuring `second_hand_type` parameter.
 
-**1. Using ros2 run (default: both hands):**
+**1. Using ros2 launch (recommended):**
 
 ```bash
-# Default: both hands (left on channel 0, right on channel 1)
+# Use default configuration file (single hand, left)
+# Default loads config/omnihand_2025_node.yaml (single hand config)
+ros2 launch omnihand_node omnihand_2025_node.launch.py
+
+# Use specified configuration file (relative path, relative to package share directory)
+ros2 launch omnihand_node omnihand_2025_node.launch.py config_file:=config/omnihand_2025_node.yaml
+
+# Use specified configuration file (absolute path)
+ros2 launch omnihand_node omnihand_2025_node.launch.py \
+  config_file:=$(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_node.yaml
+
+# Override config via parameters (using serial number, recommended)
+ros2 launch omnihand_node omnihand_2025_node.launch.py \
+  hand_type:=left \
+  canfd_serial_number:="12345678" \
+  canfd_channel_id:=0
+
+# Override config via parameters (using device ID, alternative)
+ros2 launch omnihand_node omnihand_2025_node.launch.py \
+  hand_type:=left \
+  canfd_device_id:=0 \
+  canfd_channel_id:=0
+
+# Configure two hands (using serial numbers)
+ros2 launch omnihand_node omnihand_2025_node.launch.py \
+  hand_type:=left \
+  canfd_serial_number:="12345678" \
+  canfd_channel_id:=0 \
+  second_hand_type:=right \
+  second_canfd_serial_number:="87654321" \
+  second_canfd_channel_id:=1
+```
+
+**2. Using ros2 run:**
+
+```bash
+# Direct run (uses default parameters from code, not recommended)
+# Default parameters are defined in node/src/omnihand_2025/main.cpp
+# Recommended to use config file or launch file
 ros2 run omnihand_node omnihand_2025_node
 
-# Single hand only
-ros2 run omnihand_node omnihand_2025_node --ros-args -p enable_both_hands:=false -p hand_type:=left
-```
-
-**2. Using ros2 launch (default: both hands):**
-
-```bash
-# Default: both hands (left on channel 0, right on channel 1)
-ros2 launch omnihand_node omnihand_2025.launch.py
-
-# Single left hand
-ros2 launch omnihand_node omnihand_2025.launch.py enable_both_hands:=false hand_type:=left canfd_channel_id:=0
-
-# Single right hand
-ros2 launch omnihand_node omnihand_2025.launch.py enable_both_hands:=false hand_type:=right canfd_channel_id:=1
-
-# Custom dual-hand configuration
-ros2 launch omnihand_node omnihand_2025.launch.py canfd_channel_id:=0 second_canfd_channel_id:=1
-```
-
-**3. Using YAML configuration file:**
-
-```bash
-# Use pre-configured files from installed ROS2 package (recommended)
+# Use configuration file (recommended)
 ros2 run omnihand_node omnihand_2025_node --ros-args \
-    --params-file $(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_node.yaml
+  --params-file $(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_node.yaml
 
-# Or use absolute path to config file
+# Configure via parameters (using serial number, recommended)
 ros2 run omnihand_node omnihand_2025_node --ros-args \
-    --params-file /path/to/your/config/omnihand_2025_node.yaml
+  -p hand_type:=left \
+  -p canfd_serial_number:="12345678" \
+  -p canfd_channel_id:=0
+
+# Configure via parameters (using device ID, alternative)
+ros2 run omnihand_node omnihand_2025_node --ros-args \
+  -p hand_type:=left \
+  -p canfd_device_id:=0 \
+  -p canfd_channel_id:=0
+
+# Configure two hands (using serial numbers)
+ros2 run omnihand_node omnihand_2025_node --ros-args \
+  -p hand_type:=left \
+  -p canfd_serial_number:="12345678" \
+  -p canfd_channel_id:=0 \
+  -p second_hand_type:=right \
+  -p second_canfd_serial_number:="87654321" \
+  -p second_canfd_channel_id:=1
 ```
 
-**4. Example YAML configuration:**
+**3. Example YAML configuration:**
 
 ```yaml
-# omnihand_2025_left.yaml
+# omnihand_2025_node.yaml (single hand, left - default)
 omnihand_2025_param_reader:
   ros__parameters:
-    hand_type: "left"
-    hand_device_id: 1
-    canfd_device_id: 0
-    canfd_channel_id: 0
-    enable_both_hands: false
-
-# omnihand_2025_both.yaml
-omnihand_2025_param_reader:
-  ros__parameters:
-    hand_type: "left"
-    hand_device_id: 1
-    canfd_device_id: 0
-    canfd_channel_id: 0
-    enable_both_hands: true
-    second_hand_type: "right"
-    second_hand_device_id: 1
-    second_canfd_device_id: 0
-    second_canfd_channel_id: 1
+    # First hand (required)
+    hand_type: "left"                    # "left" or "right"
+    hand_device_id: 1                     # Hand device ID (1-255)
+    connection_type: "zlg_can"            # "zlg_can", "hcan", or "rs485" (O10 only)
+    
+    # CANFD connection (recommended: use serial number)
+    canfd_serial_number: ""               # CANFD device serial number (recommended, more stable)
+    canfd_device_id: 0                    # CANFD device index (alternative if serial number not provided)
+    canfd_channel_id: 0                   # CAN channel (0 or 1)
+    
+    # RS485 connection (O10 only, if connection_type is "rs485")
+    uart_port: "/dev/ttyUSB0"             # Serial port
+    baudrate: 460800                      # Baudrate
+    
+    # Second hand (optional - if second_hand_type is set, dual-hand mode is enabled)
+    # Uncomment below to enable dual-hand mode:
+    # second_hand_type: "right"            # "left" or "right" (empty = single hand mode)
+    # second_hand_device_id: 1
+    # second_connection_type: "zlg_can"
+    # second_canfd_serial_number: ""
+    # second_canfd_device_id: 0
+    # second_canfd_channel_id: 1
+    # second_uart_port: "/dev/ttyUSB1"
+    # second_baudrate: 460800
 ```
 
 ### Pre-configured YAML Files
