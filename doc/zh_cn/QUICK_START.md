@@ -181,21 +181,37 @@ int main() {
 source /opt/ros/humble/setup.bash
 source ros2/setup.bash
 
-# 运行节点（默认双手）
-ros2 run omnihand_node omnihand_2025_node
+# 使用 launch 文件启动（推荐，默认单手左手）
+ros2 launch omnihand_node omnihand_2025_node.launch.py
 
-# 或单手
-ros2 run omnihand_node omnihand_2025_node --ros-args -p enable_both_hands:=false -p hand_type:=left
+# 或使用 ros2 run（使用默认参数）
+ros2 run omnihand_node omnihand_2025_node
 ```
 
-通过 ROS2 话题控制：
+**通过 ROS2 Service 控制（推荐）：**
+
+```bash
+# 设置关节角度（10 个值，单位弧度）
+ros2 service call /omnihand/omnihand_2025/left/set_joint_angles \
+  omnihand_2025_node_msgs/srv/SetJointAngles \
+  "{target_angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], timeout: 5.0}"
+
+# 获取关节角度
+ros2 service call /omnihand/omnihand_2025/left/get_joint_angles \
+  omnihand_2025_node_msgs/srv/GetJointAngles \
+  "{ }"
+```
+
+**通过 ROS2 话题控制：**
 
 ```bash
 # 列出可用话题
 ros2 topic list | grep omnihand
 
 # 设置关节角度（10 个值，单位弧度）
-ros2 topic pub /omnihand/omnihand_2025/left/motor_angle_cmd omnihand_2025_node_msgs/msg/MotorAngle "{angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
+ros2 topic pub /omnihand/omnihand_2025/left/motor_angle_cmd \
+  omnihand_2025_node_msgs/msg/MotorAngle \
+  "{angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
 
 # 读取关节角度
 ros2 topic echo /omnihand/omnihand_2025/left/motor_angle

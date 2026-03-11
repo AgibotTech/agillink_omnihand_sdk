@@ -181,21 +181,37 @@ int main() {
 source /opt/ros/humble/setup.bash
 source ros2/setup.bash
 
-# Run node (defaults to both hands)
-ros2 run omnihand_node omnihand_2025_node
+# Launch node using launch file (recommended, defaults to single left hand)
+ros2 launch omnihand_node omnihand_2025_node.launch.py
 
-# Or single hand
-ros2 run omnihand_node omnihand_2025_node --ros-args -p enable_both_hands:=false -p hand_type:=left
+# Or use ros2 run (uses default parameters)
+ros2 run omnihand_node omnihand_2025_node
 ```
 
-Control via ROS2 topics:
+**Control via ROS2 Services (Recommended):**
+
+```bash
+# Set joint angles (10 values in radians)
+ros2 service call /omnihand/omnihand_2025/left/set_joint_angles \
+  omnihand_2025_node_msgs/srv/SetJointAngles \
+  "{target_angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], timeout: 5.0}"
+
+# Get joint angles
+ros2 service call /omnihand/omnihand_2025/left/get_joint_angles \
+  omnihand_2025_node_msgs/srv/GetJointAngles \
+  "{ }"
+```
+
+**Control via ROS2 Topics:**
 
 ```bash
 # List available topics
 ros2 topic list | grep omnihand
 
 # Set joint angles (10 values in radians)
-ros2 topic pub /omnihand/omnihand_2025/left/motor_angle_cmd omnihand_2025_node_msgs/msg/MotorAngle "{angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
+ros2 topic pub /omnihand/omnihand_2025/left/motor_angle_cmd \
+  omnihand_2025_node_msgs/msg/MotorAngle \
+  "{angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
 
 # Read joint angles
 ros2 topic echo /omnihand/omnihand_2025/left/motor_angle

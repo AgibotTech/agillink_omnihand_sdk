@@ -67,12 +67,13 @@ ros2 launch omnihand_node omnihand_2025.launch.py canfd_channel_id:=0 second_can
 **3. Using YAML configuration file:**
 
 ```bash
-# Use pre-configured files from release package (ros2/config/)
-ros2 run omnihand_node omnihand_2025_node --ros-args --params-file ros2/config/omnihand_2025_left.yaml
-
-# Use pre-configured files from installed ROS2 package
+# Use pre-configured files from installed ROS2 package (recommended)
 ros2 run omnihand_node omnihand_2025_node --ros-args \
-    --params-file $(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_left.yaml
+    --params-file $(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_node.yaml
+
+# Or use absolute path to config file
+ros2 run omnihand_node omnihand_2025_node --ros-args \
+    --params-file /path/to/your/config/omnihand_2025_node.yaml
 ```
 
 **4. Example YAML configuration:**
@@ -103,14 +104,12 @@ omnihand_2025_param_reader:
 
 ### Pre-configured YAML Files
 
-The SDK includes pre-configured YAML files in `ros2/config/`:
+The SDK includes pre-configured YAML files in the ROS2 package share directory:
 
-- `omnihand_2025_left.yaml` - Left hand only
-- `omnihand_2025_right.yaml` - Right hand only
-- `omnihand_2025_both.yaml` - Both hands
-- `omnihand_pro_2025_left.yaml` - Left hand only (O12)
-- `omnihand_pro_2025_right.yaml` - Right hand only (O12)
-- `omnihand_pro_2025_both.yaml` - Both hands (O12)
+- `omnihand_2025_node.yaml` - Default configuration (single hand, left - can be configured for dual hands)
+- `omnihand_pro_2025_node.yaml` - O12 default configuration (single hand, left - can be configured for dual hands)
+
+Access via: `$(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/`
 
 ## Quick Reference
 
