@@ -158,9 +158,3 @@ else:
 - 角度单位为弧度
 - `is_ready` 为 `true` 时表示手部已初始化并可以接收命令
 - 如果手部未就绪，`error_message` 包含原因
-
-## 相关文档
-
-- [OmniHand 2025 (O10) C++ API](API_CPP_O10.md) - C++ API 文档
-- [OmniHand 2025 (O10) Python API](API_PYTHON_O10.md) - Python API 文档
-- [OmniHand Pro 2025 (O12) ROS2 接口](API_ROS2_O12.md) - O12 ROS2 接口

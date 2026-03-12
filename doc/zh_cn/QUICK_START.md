@@ -91,9 +91,9 @@ from omnihand import OmniHand2025, HandType
 # 创建灵巧手实例（ZLG USBCANFD）
 hand = OmniHand2025.create_hand_by_zlgcan(
     hand_type=HandType.LEFT,    # 或 HandType.RIGHT
-    hand_device_id=1,            # 灵巧手 ID（通常为 1）
-    canfd_device_id=0,           # CANFD 适配器索引
-    canfd_channel_id=0           # 通道（0 或 1）
+    hand_device_id=1,            # 灵巧手 ID（出厂默认为 1）
+    canfd_device_id=0,           # CANFD 适配器索引（默认从 0 起）
+    canfd_channel_id=0           # USBCANFD 200U 有两个通道 (can0/can1)，100U 或 MINI 的通道 id 恒为 0
 )
 
 # 初始化

@@ -13,8 +13,8 @@ OmniHand 2025 SDK 为两种产品型号提供 ROS2 接口：
 
 ## 产品特定 ROS2 文档
 
-- **[OmniHand 2025 (O10) ROS2 接口](API_ROS2_O10.md)** - 10 自由度，1D 触觉传感器，支持混合控制
-- **[OmniHand Pro 2025 (O12) ROS2 接口](API_ROS2_O12.md)** - 12 自由度，3D 触觉传感器，不支持混合控制
+- **[OmniHand 2025 (O10) ROS2 接口](API_ROS2_O10.md)** - 10 自由度，关节角话题与 set/get 关节角服务
+- **[OmniHand Pro 2025 (O12) ROS2 接口](API_ROS2_O12.md)** - 12 自由度，关节角话题与 set/get 关节角服务
 
 ## 配置
 
@@ -118,6 +118,7 @@ ros2 run omnihand_node omnihand_2025_node --ros-args \
 
 ```yaml
 # omnihand_2025_node.yaml - 单手配置
+# SDK 中路径：ros2/humble/share/omnihand_node/config/omnihand_2025_node.yaml
 omnihand_2025_param_reader:
   ros__parameters:
     # 第一个手配置
@@ -140,6 +141,7 @@ omnihand_2025_param_reader:
 
 ```yaml
 # omnihand_2025_node.yaml - 双手配置
+# SDK 中路径：ros2/humble/share/omnihand_node/config/omnihand_2025_node.yaml
 omnihand_2025_param_reader:
   ros__parameters:
     # 第一个手配置
@@ -168,30 +170,7 @@ omnihand_2025_param_reader:
 
 **6. 设备识别方式：**
 
+使用 ZLG USBCANFD 时：**200U** 有两个 CAN 通道（can0、can1），可分别接左右手；**100U / MINI** 仅单通道，`canfd_channel_id` 恒为 0，仅支持单手。
+
 - **推荐：使用序列号** (`canfd_serial_number`) - 设备序列号，重启/插拔后稳定不变
 - **备选：使用设备ID** (`canfd_device_id`) - 设备索引，重启/插拔后可能变化
-
-### 预配置 YAML 文件
-
-SDK 在 `config/` 目录中包含预配置的 YAML 文件：
-
-- `omnihand_2025_node.yaml` - 默认配置文件（可配置单手或双手）
-- `omnihand_pro_2025_node.yaml` - O12 默认配置文件
-
-## 快速参考
-
-### O10 话题
-- 话题前缀：`/omnihand/omnihand_2025/`
-- 消息命名空间：`omnihand_2025_node_msgs`
-- 自由度：10
-- 关节角度范围：各关节不同，详见 [O10 接口文档](API_ROS2_O10.md)
-- 支持混合控制：是
-
-### O12 话题
-- 话题前缀：`/omnihand/omnihand_pro_2025/`
-- 消息命名空间：`omnihand_pro_2025_node_msgs`
-- 自由度：12
-- 关节角度范围：各关节不同，详见 [O12 接口文档](API_ROS2_O12.md)
-- 支持混合控制：否
-
-详细的话题列表和消息定义，请参考上面的产品特定文档。

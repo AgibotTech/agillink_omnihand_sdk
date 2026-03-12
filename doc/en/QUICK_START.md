@@ -91,9 +91,9 @@ from omnihand import OmniHand2025, HandType
 # Create hand instance (ZLG USBCANFD)
 hand = OmniHand2025.create_hand_by_zlgcan(
     hand_type=HandType.LEFT,    # or HandType.RIGHT
-    hand_device_id=1,            # Hand ID (usually 1)
-    canfd_device_id=0,           # CANFD adapter index
-    canfd_channel_id=0           # Channel (0 or 1)
+    hand_device_id=1,            # Hand device ID (factory default: 1)
+    canfd_device_id=0,           # CANFD adapter index (default start from zero)
+    canfd_channel_id=0           # USBCANFD 200U has 2 channels (can0 or can1), while channel id for 100U or MINI is always zero. 
 )
 
 # Initialize

@@ -1,4 +1,4 @@
-﻿# OmniHand 2025 SDK ROS2 Interface
+# OmniHand 2025 SDK ROS2 Interface
 
 > ⚠️ **Linux Only**: ROS2 interface is only available on Linux. Windows is not supported.
 
@@ -13,8 +13,8 @@ Each product has its own ROS2 node and message types, providing product-specific
 
 ## Product-Specific ROS2 Documentation
 
-- **[OmniHand 2025 (O10) ROS2 Interface](API_ROS2_O10.md)** - 10 DOF, 1D tactile sensors, supports mix control
-- **[OmniHand Pro 2025 (O12) ROS2 Interface](API_ROS2_O12.md)** - 12 DOF, 3D tactile sensors, no mix control
+- **[OmniHand 2025 (O10) ROS2 Interface](API_ROS2_O10.md)** - 10 DOF, joint angle topics and set/get joint angle services
+- **[OmniHand Pro 2025 (O12) ROS2 Interface](API_ROS2_O12.md)** - 12 DOF, joint angle topics and set/get joint angle services
 
 ## Configuration
 
@@ -132,6 +132,7 @@ ros2 run omnihand_node omnihand_2025_node --ros-args \
 
 ```yaml
 # omnihand_2025_node.yaml (single hand, left - default)
+# Path in SDK: ros2/humble/share/omnihand_node/config/omnihand_2025_node.yaml
 omnihand_2025_param_reader:
   ros__parameters:
     # First hand (required)
@@ -160,29 +161,39 @@ omnihand_2025_param_reader:
     # second_baudrate: 460800
 ```
 
-### Pre-configured YAML Files
+**4. Example YAML configuration (dual hand):**
 
-The SDK includes pre-configured YAML files in the ROS2 package share directory:
+```yaml
+# omnihand_2025_node.yaml (dual hand - left + right)
+# Path in SDK: ros2/humble/share/omnihand_node/config/omnihand_2025_node.yaml
+omnihand_2025_param_reader:
+  ros__parameters:
+    # First hand (required)
+    hand_type: "left"
+    hand_device_id: 1
+    connection_type: "zlg_can"
+    canfd_serial_number: "12345678"       # Recommended: use serial number
+    canfd_channel_id: 0
+    
+    # Second hand (optional - dual-hand mode when set)
+    second_hand_type: "right"
+    second_hand_device_id: 1
+    second_connection_type: "zlg_can"
+    second_canfd_serial_number: "87654321"  # Recommended: use serial number
+    second_canfd_channel_id: 1
+```
 
-- `omnihand_2025_node.yaml` - Default configuration (single hand, left - can be configured for dual hands)
-- `omnihand_pro_2025_node.yaml` - O12 default configuration (single hand, left - can be configured for dual hands)
+**5. Connection types:**
 
-Access via: `$(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/`
+- **zlg_can** - ZLG USB CANFD (default)
+- **hcan** - HCAN USB CANFD
+- **rs485** - RS485 serial (O10 only)
 
-## Quick Reference
+Each hand can use a different connection type.
 
-### O10 Topics
-- Topic prefix: `/omnihand/omnihand_2025/`
-- Message namespace: `omnihand_2025_node_msgs`
-- DOF: 10
-- Motor position range: 0-4096
-- Supports mix control: Yes
+**6. Device identification:**
 
-### O12 Topics
-- Topic prefix: `/omnihand/omnihand_pro_2025/`
-- Message namespace: `omnihand_pro_2025_node_msgs`
-- DOF: 12
-- Motor position range: 0-2000
-- Supports mix control: No
+With ZLG USBCANFD: **200U** has two CAN channels (can0, can1) for left/right hand; **100U / MINI** has a single channel, `canfd_channel_id` is always 0, single hand only.
 
-For detailed topic lists and message definitions, please refer to the product-specific documentation above.
+- **Recommended: Serial number** (`canfd_serial_number`) - Stable after reboot/unplug
+- **Alternative: Device index** (`canfd_device_id`) - May change after reboot/unplug

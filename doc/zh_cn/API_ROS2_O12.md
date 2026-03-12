@@ -173,4 +173,3 @@ else:
 
 - [OmniHand Pro 2025 (O12) C++ API](API_CPP_O12.md) - C++ API 文档
 - [OmniHand Pro 2025 (O12) Python API](API_PYTHON_O12.md) - Python API 文档
-- [OmniHand 2025 (O10) ROS2 接口](API_ROS2_O10.md) - O10 ROS2 接口

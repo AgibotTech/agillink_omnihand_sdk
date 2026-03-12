@@ -1,4 +1,4 @@
-﻿# OmniHand 2025 (O10) ROS2 Interface
+# OmniHand 2025 (O10) ROS2 Interface
 
 > ⚠️ **Linux Only**: ROS2 interface is only available on Linux. Windows is not supported.
 
@@ -160,9 +160,3 @@ else:
 - Angles are in radians
 - `is_ready` is `true` when the hand is initialized and can receive commands
 - If the hand is not ready, `error_message` contains the reason
-
-## Related Documentation
-
-- [OmniHand 2025 (O10) C++ API](API_CPP_O10.md) - C++ API documentation
-- [OmniHand 2025 (O10) Python API](API_PYTHON_O10.md) - Python API documentation
-- [OmniHand Pro 2025 (O12) ROS2 Interface](API_ROS2_O12.md) - O12 ROS2 interface
