@@ -16,7 +16,7 @@
 ## ROS2 服务
 
 | 服务名                                              | 服务描述 | 服务类型                                                                                              | 备注 |  
-|:----------------------------------------------|  :----:  |:--------:|---------------------------------------------------------------------------------------------------|  ---  |
+|:----------------------------------------------|  :----:  |:--------:|-------------------------------------------------|
 | `/omnihand/omnihand_pro_2025/left/set_joint_angles`  | 设置关节角度 | [omnihand_pro_2025_node_msgs.srv.SetJointAngles](#omnihand_pro_2025_node_msgssrvsetjointangles) | 
 | `/omnihand/omnihand_pro_2025/left/get_joint_angles`  | 获取关节角度 | [omnihand_pro_2025_node_msgs.srv.GetJointAngles](#omnihand_pro_2025_node_msgssrvgetjointangles) | 
 | `/omnihand/omnihand_pro_2025/right/set_joint_angles`  | 设置关节角度 | [omnihand_pro_2025_node_msgs.srv.SetJointAngles](#omnihand_pro_2025_node_msgssrvsetjointangles) | 

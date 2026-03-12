@@ -16,7 +16,7 @@
 ## ROS2 Services
 
 | Service Name                                           | Description | Service Type                                                                                              | Notes |  
-|:----------------------------------------------|  :----:  |:--------:|---------------------------------------------------------------------------------------------------|  ---  |
+|:----------------------------------------------|  :----:  |:--------:|-------------------------------------------------
 | `/omnihand/omnihand_2025/left/set_joint_angles`  | Set joint angles |    Service    | [omnihand_2025_node_msgs.srv.SetJointAngles](#omnihand_2025_node_msgs_srv_SetJointAngles) | 
 | `/omnihand/omnihand_2025/left/get_joint_angles`  | Get joint angles |    Service    | [omnihand_2025_node_msgs.srv.GetJointAngles](#omnihand_2025_node_msgs_srv_GetJointAngles) | 
 | `/omnihand/omnihand_2025/right/set_joint_angles`  | Set joint angles |    Service    | [omnihand_2025_node_msgs.srv.SetJointAngles](#omnihand_2025_node_msgs_srv_SetJointAngles) | 
