@@ -70,6 +70,16 @@ class AGIBOT_EXPORT PrivateOmniHand3Lite : public OmniHand3Lite, public PrivateO
       const std::string& usbcanfd_serial_number,
       unsigned char canfd_channel_id = 0);
 
+  /**
+   * @brief Factory method - ZLG CANFD over TCP (WiFi/网口转 CANFD)
+   */
+  static std::unique_ptr<PrivateOmniHand3Lite> createHandByZlgCanTcp(
+      HandType hand_type,
+      unsigned char hand_device_id,
+      const std::string& tcp_host,
+      uint16_t tcp_port,
+      unsigned char canfd_channel_id = 0);
+
 #ifdef __linux__
   /**
    * @brief Factory method - SocketCAN communication (Linux native CAN interface)
