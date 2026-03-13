@@ -73,6 +73,22 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
       unsigned char canfd_channel_id = 0);
 
   /**
+   * @brief Factory method - ZLG CANFD over TCP (e.g. WiFi/Ethernet adapter as TCP server)
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param host TCP server IP or hostname (e.g. "192.168.0.178")
+   * @param port TCP server port (e.g. 8000)
+   * @param canfd_channel_id Logical channel (default 0)
+   * @return A unique pointer to OmniHand2025 instance
+   */
+  static std::unique_ptr<OmniHand2025> createHandByZlgCanTcp(
+      HandType hand_type,
+      unsigned char hand_device_id,
+      const std::string& host,
+      uint16_t port,
+      unsigned char canfd_channel_id = 0);
+
+  /**
    * @brief Factory method - RS485 communication (OmniHand 2025 only)
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
