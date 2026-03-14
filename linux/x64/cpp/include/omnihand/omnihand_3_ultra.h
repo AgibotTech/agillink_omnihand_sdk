@@ -57,6 +57,25 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
       const std::string& usbcanfd_serial_number,
       unsigned char canfd_channel_id = 0);
 
+#ifdef ZLG_CANFD_WIFI_SUPPORTED
+  /**
+   * @brief Factory method - ZLG CANFD over TCP (WiFi/Ethernet to CANFD, this machine acts as TCP client)
+   * @note Only available on Windows and Linux x64 (not supported on Linux aarch64/arm64)
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param tcp_host TCP server IP or hostname (e.g. "192.168.0.178")
+   * @param tcp_port TCP server port (e.g. 8000)
+   * @param canfd_channel_id CAN channel index (0 or 1, default 0)
+   * @return A unique pointer to OmniHand3Ultra instance
+   */
+  static std::unique_ptr<OmniHand3Ultra> createHandByZlgCanTcp(
+      HandType hand_type,
+      unsigned char hand_device_id,
+      const std::string& tcp_host,
+      uint16_t tcp_port,
+      unsigned char canfd_channel_id = 0);
+#endif  // ZLG_CANFD_WIFI_SUPPORTED
+
 #ifdef __linux__
   /**
    * @brief Factory method - SocketCAN communication (Linux native CAN interface)
