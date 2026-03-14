@@ -62,7 +62,7 @@ sudo ./setup_udev.sh
 
 以管理员身份运行：
 ```cmd
-cd release\windows
+cd release\windows\x64
 install.bat
 ```
 

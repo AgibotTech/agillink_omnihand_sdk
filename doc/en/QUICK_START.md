@@ -62,7 +62,7 @@ sudo ./setup_udev.sh
 
 Run as Administrator:
 ```cmd
-cd release\windows
+cd release\windows\x64
 install.bat
 ```
 

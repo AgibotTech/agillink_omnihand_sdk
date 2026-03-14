@@ -70,6 +70,22 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
       const std::string& usbcanfd_serial_number,
       unsigned char canfd_channel_id = 0);
 
+  /**
+   * @brief Factory method - ZLG CANFD over TCP (e.g. WiFi/Ethernet adapter as TCP server)
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param host TCP server IP or hostname (e.g. "192.168.0.178")
+   * @param port TCP server port (e.g. 8000)
+   * @param canfd_channel_id Logical channel (default 0)
+   * @return A unique pointer to OmniHandPro2025 instance
+   */
+  static std::unique_ptr<OmniHandPro2025> createHandByZlgCanTcp(
+      HandType hand_type,
+      unsigned char hand_device_id,
+      const std::string& host,
+      uint16_t port,
+      unsigned char canfd_channel_id = 0);
+
 #ifdef __linux__
   /**
    * @brief Factory method - SocketCAN communication (Linux native CAN interface)
