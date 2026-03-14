@@ -131,7 +131,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 查找 omnihand 包
 list(APPEND CMAKE_MODULE_PATH "/usr/local/share/cmake/omnihand")  # Linux
-# list(APPEND CMAKE_MODULE_PATH "C:/Program Files/omnihand2025/share/cmake/omnihand")  # Windows
+# list(APPEND CMAKE_MODULE_PATH "C:/omnihand/share/cmake/omnihand")  # Windows（默认安装目录见 install.bat）
 find_package(omnihand REQUIRED)
 
 add_executable(my_app main.cpp)

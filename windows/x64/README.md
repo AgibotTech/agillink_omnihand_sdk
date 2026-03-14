@@ -1,8 +1,8 @@
 # OmniHand 2025 SDK - Windows (x64) - Version 1.0.0
 
-[中文文档](README_zh_cn.md) | [Overview & API Docs](../README.md)
+[中文文档](README_zh_cn.md) | [Overview & API Docs](../../README.md)
 
-📖 **[Quick Start](../doc/en/QUICK_START.md)** | 🔧 **[Troubleshooting](../doc/en/TROUBLESHOOTING.md)**
+📖 **[Quick Start](../../doc/en/QUICK_START.md)** | 🔧 **[Troubleshooting](../../doc/en/TROUBLESHOOTING.md)**
 
 > **Note**: ROS2 and SocketCAN are **Linux only**.
 
@@ -22,7 +22,7 @@ uninstall.bat
 ## Directory Structure
 
 ```
-windows/
+x64/
 ├── cpp/
 │   ├── share/cmake/omnihand/    # CMake config
 │   ├── include/omnihand/        # Header files
@@ -44,13 +44,13 @@ windows/
 
 ## Usage
 
-- **[Quick Start Guide](../doc/en/QUICK_START.md)** - Get started in 5 minutes
+- **[Quick Start Guide](../../doc/en/QUICK_START.md)** - Get started in 5 minutes
 - Demo code: [cpp/demo/](cpp/demo/), [python/demo/](python/demo/)
 - Test code: [cpp/test/](cpp/test/), [python/test/](python/test/)
 
 For detailed API reference:
-- [C++ API](../doc/en/API_CPP.md)
-- [Python API](../doc/en/API_PYTHON.md)
+- [C++ API](../../doc/en/API_CPP.md)
+- [Python API](../../doc/en/API_PYTHON.md)
 
 ## License
 

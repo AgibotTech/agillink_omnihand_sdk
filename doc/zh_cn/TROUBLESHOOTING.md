@@ -204,7 +204,7 @@ pip install pytest numpy
 ```cmake
 # 设置正确的路径
 set(OMNIHAND_ROOT "/usr/local")  # Linux 默认
-# set(OMNIHAND_ROOT "C:/Program Files/omnihand2025")  # Windows
+# set(OMNIHAND_ROOT "C:/omnihand")  # Windows（默认安装目录，见 install.bat）
 
 list(APPEND CMAKE_MODULE_PATH "${OMNIHAND_ROOT}/share/cmake/omnihand")
 find_package(omnihand REQUIRED)

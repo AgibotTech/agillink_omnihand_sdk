@@ -1,8 +1,8 @@
 # OmniHand 2025 SDK - Windows (x64) - 版本 1.0.0
 
-[English Documentation](README.md) | [产品概述 & API 文档](../README_zh_cn.md)
+[English Documentation](README.md) | [产品概述 & API 文档](../../README_zh_cn.md)
 
-📖 **[快速入门](../doc/zh_cn/QUICK_START.md)** | 🔧 **[故障排除](../doc/zh_cn/TROUBLESHOOTING.md)**
+📖 **[快速入门](../../doc/zh_cn/QUICK_START.md)** | 🔧 **[故障排除](../../doc/zh_cn/TROUBLESHOOTING.md)**
 
 > **说明**：ROS2 和 SocketCAN **仅 Linux 支持**。
 
@@ -22,7 +22,7 @@ uninstall.bat
 ## 目录结构
 
 ```
-windows/
+x64/
 ├── cpp/
 │   ├── share/cmake/omnihand/    # CMake 配置
 │   ├── include/omnihand/        # 头文件
@@ -44,13 +44,13 @@ windows/
 
 ## 使用方法
 
-- **[快速入门指南](../doc/zh_cn/QUICK_START.md)** - 5 分钟上手
+- **[快速入门指南](../../doc/zh_cn/QUICK_START.md)** - 5 分钟上手
 - 示例代码：[cpp/demo/](cpp/demo/)、[python/demo/](python/demo/)
 - 测试代码：[cpp/test/](cpp/test/)、[python/test/](python/test/)
 
 详细 API 参考：
-- [C++ API](../doc/zh_cn/API_CPP.md)
-- [Python API](../doc/zh_cn/API_PYTHON.md)
+- [C++ API](../../doc/zh_cn/API_CPP.md)
+- [Python API](../../doc/zh_cn/API_PYTHON.md)
 
 更多示例，请参阅 [python/demo/](python/demo/) 目录。
 
