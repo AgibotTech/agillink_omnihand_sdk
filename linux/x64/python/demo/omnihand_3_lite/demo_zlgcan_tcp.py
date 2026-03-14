@@ -107,9 +107,13 @@ def main():
 
     # Step 3: Set individual joint positions
     print("\nStep 3: Setting individual joint positions...")
-    hand.set_joint_position(1, 2000)
+    hand.set_joint_position(4, 0)
     time.sleep(1)
-    hand.set_joint_position(2, 2100)
+    hand.set_joint_position(3, 4095)
+    time.sleep(1)
+    hand.set_joint_position(2, 4095)
+    time.sleep(1)
+    hand.set_joint_position(1, 4095)
     time.sleep(1)
     
     # Get updated positions
