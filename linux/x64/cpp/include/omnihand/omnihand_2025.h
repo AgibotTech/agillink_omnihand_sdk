@@ -72,7 +72,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
       const std::string& usbcanfd_serial_number,
       unsigned char canfd_channel_id = 0);
 
-#ifdef ZLG_CANFD_WIFI_SUPPORTED
+#if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
    * @brief Factory method - ZLG CANFD over TCP (e.g. WiFi/Ethernet adapter as TCP server)
    * @note Only available on Windows and Linux x64 (not supported on Linux aarch64/arm64)
@@ -89,7 +89,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
       const std::string& host,
       uint16_t port,
       unsigned char canfd_channel_id = 0);
-#endif  // ZLG_CANFD_WIFI_SUPPORTED
+#endif  // OMNIHAND_ZLG_TCP_SUPPORTED
 
   /**
    * @brief Factory method - RS485 communication (OmniHand 2025 only)
