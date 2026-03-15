@@ -92,8 +92,8 @@ print(f"Actual device ID: {info.hand_device_id}")
 # If mismatch, create with correct ID
 hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, actual_id, 0, 0)
 
-# If you don't know canfd_device_id, use SN (serial number) interface:
-hand = OmniHand2025.create_hand_by_zlgcan_sn(HandType.LEFT, 1, "YOUR_DEVICE_SN", 0)
+# Alternatively, by serial number (stable after reboot; triggers scan then open):
+hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, usbcanfd_serial_number="YOUR_DEVICE_SN", canfd_channel_id=0)
 ```
 
 > **Note on `canfd_channel_id`**:

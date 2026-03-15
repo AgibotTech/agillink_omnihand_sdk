@@ -29,8 +29,8 @@ The ROS2 nodes support YAML configuration files for flexible parameter managemen
 | `hand_type` | string | "left" | Hand type: "left" or "right" |
 | `hand_device_id` | int | 1 | Hand device ID (1-255) |
 | `connection_type` | string | "zlg_can" | Connection type: "zlg_can", "hcan", or "rs485" |
-| `canfd_serial_number` | string | "" | CANFD adapter serial number (recommended, stable after reboot/unplug) |
-| `canfd_device_id` | int | 0 | CANFD adapter device index (alternative, may change after reboot/unplug) |
+| `canfd_serial_number` | string | "" | CANFD adapter serial number (stable after reboot/unplug; requires scan then open) |
+| `canfd_device_id` | int | 0 | CANFD adapter device index (device opened once without scan; index may change after reboot/unplug) |
 | `canfd_channel_id` | int | 0 | CAN channel index (0 or 1) |
 | `uart_port` | string | "/dev/ttyUSB0" | Serial port path (rs485 only) |
 | `baudrate` | int | 460800 | Baudrate (rs485 only) |
@@ -44,15 +44,15 @@ If second hand parameters are configured, the second hand will be automatically 
 | `second_hand_type` | string | "" | Second hand type: "left" or "right" |
 | `second_hand_device_id` | int | 1 | Second hand device ID |
 | `second_connection_type` | string | "zlg_can" | Second hand connection type |
-| `second_canfd_serial_number` | string | "" | Second hand CANFD adapter serial number (recommended) |
-| `second_canfd_device_id` | int | 0 | Second hand CANFD adapter device index (alternative) |
+| `second_canfd_serial_number` | string | "" | Second hand CANFD adapter serial number |
+| `second_canfd_device_id` | int | 0 | Second hand CANFD adapter device index |
 | `second_canfd_channel_id` | int | 1 | Second hand CAN channel index |
 | `second_uart_port` | string | "/dev/ttyUSB1" | Second hand serial port path (rs485 only) |
 | `second_baudrate` | int | 460800 | Second hand baudrate (rs485 only) |
 
-**Note**:
-- It is recommended to use `canfd_serial_number` (serial number) because it remains stable after device reboot or unplug
-- `canfd_device_id` is an alternative, but may change after device reboot or unplug
+**Note (ZLG CANFD device identification)**:
+- **By serial number** (`canfd_serial_number`): Stable after reboot/unplug; internally triggers a scan (open/close to read info) then open for use.
+- **By device index** (`canfd_device_id`): Device is opened once without prior scan; index may change after reboot/unplug.
 
 ### Usage Examples
 
@@ -72,13 +72,13 @@ ros2 launch omnihand_node omnihand_2025_node.launch.py config_file:=config/omnih
 ros2 launch omnihand_node omnihand_2025_node.launch.py \
   config_file:=$(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_node.yaml
 
-# Override config via parameters (using serial number, recommended)
+# Override config via parameters (by serial number)
 ros2 launch omnihand_node omnihand_2025_node.launch.py \
   hand_type:=left \
   canfd_serial_number:="12345678" \
   canfd_channel_id:=0
 
-# Override config via parameters (using device ID, alternative)
+# Override config via parameters (by device index)
 ros2 launch omnihand_node omnihand_2025_node.launch.py \
   hand_type:=left \
   canfd_device_id:=0 \
@@ -106,13 +106,13 @@ ros2 run omnihand_node omnihand_2025_node
 ros2 run omnihand_node omnihand_2025_node --ros-args \
   --params-file $(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_node.yaml
 
-# Configure via parameters (using serial number, recommended)
+# Configure via parameters (by serial number)
 ros2 run omnihand_node omnihand_2025_node --ros-args \
   -p hand_type:=left \
   -p canfd_serial_number:="12345678" \
   -p canfd_channel_id:=0
 
-# Configure via parameters (using device ID, alternative)
+# Configure via parameters (by device index)
 ros2 run omnihand_node omnihand_2025_node --ros-args \
   -p hand_type:=left \
   -p canfd_device_id:=0 \
@@ -140,9 +140,9 @@ omnihand_2025_param_reader:
     hand_device_id: 1                     # Hand device ID (1-255)
     connection_type: "zlg_can"            # "zlg_can", "hcan", or "rs485" (O10 only)
     
-    # CANFD connection (recommended: use serial number)
-    canfd_serial_number: ""               # CANFD device serial number (recommended, more stable)
-    canfd_device_id: 0                    # CANFD device index (alternative if serial number not provided)
+    # CANFD connection (choose one: serial number or device index)
+    canfd_serial_number: ""               # Serial number (stable after reboot/unplug; triggers scan then open)
+    canfd_device_id: 0                    # Device index (open once without scan; may change after reboot/unplug)
     canfd_channel_id: 0                   # CAN channel (0 or 1)
     
     # RS485 connection (O10 only, if connection_type is "rs485")
@@ -172,14 +172,14 @@ omnihand_2025_param_reader:
     hand_type: "left"
     hand_device_id: 1
     connection_type: "zlg_can"
-    canfd_serial_number: "12345678"       # Recommended: use serial number
+    canfd_serial_number: "12345678"       # By serial number
     canfd_channel_id: 0
     
     # Second hand (optional - dual-hand mode when set)
     second_hand_type: "right"
     second_hand_device_id: 1
     second_connection_type: "zlg_can"
-    second_canfd_serial_number: "87654321"  # Recommended: use serial number
+    second_canfd_serial_number: "87654321"  # By serial number
     second_canfd_channel_id: 1
 ```
 
@@ -195,5 +195,5 @@ Each hand can use a different connection type.
 
 With ZLG USBCANFD: **200U** has two CAN channels (can0, can1) for left/right hand; **100U / MINI** has a single channel, `canfd_channel_id` is always 0, single hand only.
 
-- **Recommended: Serial number** (`canfd_serial_number`) - Stable after reboot/unplug
-- **Alternative: Device index** (`canfd_device_id`) - May change after reboot/unplug
+- **By serial number** (`canfd_serial_number`): Stable after reboot/unplug; internally does a scan (open/close) then open for use.
+- **By device index** (`canfd_device_id`): Device opened once without scan; index may change after reboot/unplug.

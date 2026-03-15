@@ -29,8 +29,8 @@ ROS2 节点支持 YAML 配置文件，便于灵活管理参数。参数命名与
 | `hand_type` | string | "left" | 手类型："left" 或 "right" |
 | `hand_device_id` | int | 1 | 手设备 ID (1-255) |
 | `connection_type` | string | "zlg_can" | 连接类型："zlg_can"、"hcan" 或 "rs485" |
-| `canfd_serial_number` | string | "" | CANFD 适配器序列号（推荐，重启/插拔后稳定） |
-| `canfd_device_id` | int | 0 | CANFD 适配器设备索引（备选，重启/插拔后可能变化） |
+| `canfd_serial_number` | string | "" | CANFD 适配器序列号（重启/插拔后稳定；内部会先扫描再打开） |
+| `canfd_device_id` | int | 0 | CANFD 适配器设备索引（不扫直接打开，只 open 一次；重启/插拔后索引可能变） |
 | `canfd_channel_id` | int | 0 | CAN 通道索引 (0 或 1) |
 | `uart_port` | string | "/dev/ttyUSB0" | 串口路径（仅 rs485） |
 | `baudrate` | int | 460800 | 波特率（仅 rs485） |
@@ -44,15 +44,15 @@ ROS2 节点支持 YAML 配置文件，便于灵活管理参数。参数命名与
 | `second_hand_type` | string | "" | 第二只手类型："left" 或 "right" |
 | `second_hand_device_id` | int | 1 | 第二只手设备 ID |
 | `second_connection_type` | string | "zlg_can" | 第二只手连接类型 |
-| `second_canfd_serial_number` | string | "" | 第二只手 CANFD 适配器序列号（推荐） |
-| `second_canfd_device_id` | int | 0 | 第二只手 CANFD 适配器设备索引（备选） |
+| `second_canfd_serial_number` | string | "" | 第二只手 CANFD 适配器序列号 |
+| `second_canfd_device_id` | int | 0 | 第二只手 CANFD 适配器设备索引 |
 | `second_canfd_channel_id` | int | 1 | 第二只手 CAN 通道索引 |
 | `second_uart_port` | string | "/dev/ttyUSB1" | 第二只手串口路径（仅 rs485） |
 | `second_baudrate` | int | 460800 | 第二只手波特率（仅 rs485） |
 
-**注意**：
-- 推荐使用 `canfd_serial_number`（序列号），因为设备重启或插拔后序列号不会变化
-- `canfd_device_id` 作为备选方案，但可能在设备重启或插拔后发生变化
+**说明（ZLG CANFD 设备标识）**：
+- **按序列号**（`canfd_serial_number`）：重启/插拔后不变；内部会先扫描（open/close 读信息）再打开使用。
+- **按设备索引**（`canfd_device_id`）：不扫直接打开，设备只 open 一次；重启/插拔后索引可能变化。
 
 ### 使用示例
 
@@ -72,13 +72,13 @@ ros2 launch omnihand_node omnihand_2025_node.launch.py config_file:=config/omnih
 ros2 launch omnihand_node omnihand_2025_node.launch.py \
   config_file:=$(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_node.yaml
 
-# 通过参数覆盖配置（使用序列号，推荐）
+# 通过参数覆盖配置（按序列号）
 ros2 launch omnihand_node omnihand_2025_node.launch.py \
   hand_type:=left \
   canfd_serial_number:="12345678" \
   canfd_channel_id:=0
 
-# 通过参数覆盖配置（使用设备ID，备选）
+# 通过参数覆盖配置（按设备索引）
 ros2 launch omnihand_node omnihand_2025_node.launch.py \
   hand_type:=left \
   canfd_device_id:=0 \
@@ -106,7 +106,7 @@ ros2 run omnihand_node omnihand_2025_node
 ros2 run omnihand_node omnihand_2025_node --ros-args \
   --params-file $(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_node.yaml
 
-# 通过参数配置（使用序列号，推荐）
+# 通过参数配置（按序列号）
 ros2 run omnihand_node omnihand_2025_node --ros-args \
   -p hand_type:=left \
   -p connection_type:=zlg_can \
@@ -126,10 +126,9 @@ omnihand_2025_param_reader:
     hand_device_id: 1                  # Hand device ID (1-255)
     connection_type: "zlg_can"         # "zlg_can", "hcan", or "rs485"
     
-    # 方法1（推荐）：使用序列号（重启/插拔后稳定）
-    canfd_serial_number: "12345678"    # CANFD adapter serial number
-    # 方法2（备选）：使用设备ID（重启/插拔后可能变化）
-    # canfd_device_id: 0                # CANFD adapter device index
+    # 二选一：序列号 或 设备索引
+    canfd_serial_number: "12345678"    # 按序列号（稳定；内部会先扫描再打开）
+    # canfd_device_id: 0                # 按设备索引（不扫直接打开；重启/插拔后可能变）
     canfd_channel_id: 0                # CAN channel index (0 or 1)
     
     # 如果使用 rs485，取消注释并设置：
@@ -148,15 +147,15 @@ omnihand_2025_param_reader:
     hand_type: "left"
     hand_device_id: 1
     connection_type: "zlg_can"
-    canfd_serial_number: "12345678"    # 推荐：使用序列号
+    canfd_serial_number: "12345678"    # 按序列号
     canfd_channel_id: 0
     
     # 第二个手配置（如果配置了，会自动启动第二个手）
     second_hand_type: "right"
     second_hand_device_id: 1
     second_connection_type: "zlg_can"
-    second_canfd_serial_number: "87654321"  # 推荐：使用序列号
-    # second_canfd_device_id: 0        # 备选：使用设备ID
+    second_canfd_serial_number: "87654321"  # 按序列号
+    # second_canfd_device_id: 0         # 按设备索引
     second_canfd_channel_id: 1
 ```
 
@@ -172,5 +171,5 @@ omnihand_2025_param_reader:
 
 使用 ZLG USBCANFD 时：**200U** 有两个 CAN 通道（can0、can1），可分别接左右手；**100U / MINI** 仅单通道，`canfd_channel_id` 恒为 0，仅支持单手。
 
-- **推荐：使用序列号** (`canfd_serial_number`) - 设备序列号，重启/插拔后稳定不变
-- **备选：使用设备ID** (`canfd_device_id`) - 设备索引，重启/插拔后可能变化
+- **按序列号**（`canfd_serial_number`）：重启/插拔后不变；内部会先扫描再打开使用。
+- **按设备索引**（`canfd_device_id`）：不扫直接打开，只 open 一次；重启/插拔后索引可能变化。
