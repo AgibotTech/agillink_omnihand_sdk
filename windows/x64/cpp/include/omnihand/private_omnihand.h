@@ -141,13 +141,14 @@ class AGIBOT_EXPORT PrivateOmniHand {
    */
   virtual uint8_t GetPowerState() const = 0;
 
-  // 0x03: 设置当前位置为轴中间位置
+  // 0x03: 设置轴中间位置（标零）
   /**
-   * @brief Set current position as axis middle position (homing)
-   * @param axis_index 0=all axes, 1-12=axis index
+   * @brief Set axis homing (zero) position
+   * @param axis_index 0=all axes (pos ignored), 1-12=axis index
+   * @param pos target middle/zero position, range [-4095, 4095]; ignored when axis_index==0
    * @return true on success, false on failure
    */
-  virtual bool SetAxisHoming(uint8_t axis_index) = 0;
+  virtual bool SetAxisHoming(uint8_t axis_index, int16_t pos) = 0;
 
   // 0x04: 设置ID
   /**
