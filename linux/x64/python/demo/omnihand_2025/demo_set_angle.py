@@ -15,7 +15,7 @@ from omnihand import OmniHand2025, HandType
 
 def main():
     parser = argparse.ArgumentParser(description='OmniHand 2025 Joint Angle Control Demo')
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485'], default='zlgcan',
                         help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
     args = parser.parse_args()
     
@@ -26,6 +26,8 @@ def main():
     # 创建 OmniHand 2025 灵巧手实例 based on device type
     if args.device == 'hcan':
         hand = OmniHand2025.create_hand_by_hcan(hand_type=HandType.RIGHT)
+    elif args.device == 'rs485':
+        hand = OmniHand2025.create_hand_by_rs485(hand_type=HandType.RIGHT, hand_device_id=1, uart_port='/dev/ttyACM0')
     else:  # default: zlgcan
         hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.RIGHT)
     
@@ -35,6 +37,10 @@ def main():
         return
     
     print("[OK]: OmniHand 2025 hand initialized successfully!\n")
+
+    # Enable frame print for quick RS485/CAN troubleshooting
+    # (prints SND/RCV hex frames from underlying device implementation)
+    hand.show_data_details(True)
     
     # reset - 所有关节回到初始位置
     print("Setting all joints to reset position...")

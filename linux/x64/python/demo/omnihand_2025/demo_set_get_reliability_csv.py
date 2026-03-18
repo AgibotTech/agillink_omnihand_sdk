@@ -75,7 +75,8 @@ def main():
     time.sleep(1)
 
     csv_header = ["action", "elapsed_ms"] + [f"pos_{i}" for i in range(10)]
-    start_time = time.time()
+    # 使用高精度单调时钟计时，避免受系统时间调整影响；elapsed_ms 可能偶尔相同，但真实反映测量时间
+    start_time = time.perf_counter()
 
     try:
         with open(args.output, 'w', newline='', encoding='utf-8') as f:
@@ -87,7 +88,7 @@ def main():
                     target_positions[9] = iteration % 4096
 
                     actual_positions = hand.set_all_joint_positions(target_positions)
-                    elapsed_ms = (time.time() - start_time) * 1000.0
+                    elapsed_ms = (time.perf_counter() - start_time) * 1000.0
                     row_send = {"action": "set", "elapsed_ms": ""}
                     for i in range(10):
                         row_send[f"pos_{i}"] = target_positions[i] if i < len(target_positions) else ""
