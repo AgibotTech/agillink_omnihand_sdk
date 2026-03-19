@@ -105,6 +105,19 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
       const std::string& uart_port,
       int32_t baudrate = 460800);
 
+  /**
+   * @brief Factory method - USB communication (OmniHand 2025 only)
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param uart_port Serial port path (e.g., "/dev/ttyACM0" or "COM3")
+   * @param baudrate Baud rate (default 460800)
+   * @return A unique pointer to OmniHand2025 instance
+   */
+  static std::unique_ptr<OmniHand2025> createHandByUsb(
+      HandType hand_type,
+      unsigned char hand_device_id,
+      const std::string& uart_port,
+      int32_t baudrate = 460800);
 
 #ifdef __linux__
   /**
