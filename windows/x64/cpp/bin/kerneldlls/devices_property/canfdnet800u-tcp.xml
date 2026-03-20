@@ -345,43 +345,60 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>
-			<set_dynamic_cfg_by_json flag="0x0036">
+			</apply_dynamic_data>	
+			<filter_mode flag="0x0030" at_initcan="post">
 				<value>0</value>
 				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置动态配置</desc>
-				</meta>
-			</set_dynamic_cfg_by_json>	
-			<dev_ctrl flag="0x0037">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设备控制</desc>
-				</meta>
-			</dev_ctrl>	
-			<dev_time_set flag="0x0038">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置设备时间</desc>
-				</meta>
-            </dev_time_set>	 		
-			<lin_initenal_resistance flag="0x0039" at_initcan="post">
-				<value>0</value>
-				<meta>
-					<visible>false</visible>
 					<type>options.int32</type>
-					<desc>lin终端电阻</desc>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
 					<options>
-						<option type="int32" value="0" desc="disable"></option>
-						<option type="int32" value="1" desc="enable"></option>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
 					</options>
 				</meta>
-			</lin_initenal_resistance>	 		
+			</filter_mode>
+			<filter_start flag="0x0031" hex="1" at_initcan="post">
+				<value>ffbdd8</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0032" hex="1" at_initcan="post">
+				<value>ffbe28</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0033" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_clear flag="0x0034" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<set_dynamic_data flag="0x0035">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置数据</desc>
+				</meta>
+			</set_dynamic_data>			
 		</channel_0>
 		<channel_1 stream="channel_1" case="parent-value=1">
 			<protocol flag="0x0152" at_initcan="pre">
@@ -601,43 +618,60 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>
-			<set_dynamic_cfg_by_json flag="0x0136">
+			</apply_dynamic_data>	
+			<filter_mode flag="0x0130" at_initcan="post">
 				<value>0</value>
 				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置动态配置</desc>
-				</meta>
-			</set_dynamic_cfg_by_json>	
-			<dev_ctrl flag="0x0137">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设备控制</desc>
-				</meta>
-			</dev_ctrl>	
-			<dev_time_set flag="0x0138">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置设备时间</desc>
-				</meta>
-            </dev_time_set>	 		
-			<lin_initenal_resistance flag="0x0139" at_initcan="post">
-				<value>0</value>
-				<meta>
-					<visible>false</visible>
 					<type>options.int32</type>
-					<desc>lin终端电阻</desc>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
 					<options>
-						<option type="int32" value="0" desc="disable"></option>
-						<option type="int32" value="1" desc="enable"></option>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
 					</options>
 				</meta>
-			</lin_initenal_resistance>	 		
+			</filter_mode>
+			<filter_start flag="0x0131" hex="1" at_initcan="post">
+				<value>ffbdd8</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0132" hex="1" at_initcan="post">
+				<value>ffbe28</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0133" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_clear flag="0x0134" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<set_dynamic_data flag="0x0135">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置数据</desc>
+				</meta>
+			</set_dynamic_data>			
 		</channel_1>
 		<channel_2 stream="channel_2" case="parent-value=2">
 			<protocol flag="0x0252" at_initcan="pre">
@@ -857,43 +891,60 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>
-			<set_dynamic_cfg_by_json flag="0x0236">
+			</apply_dynamic_data>	
+			<filter_mode flag="0x0230" at_initcan="post">
 				<value>0</value>
 				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置动态配置</desc>
-				</meta>
-			</set_dynamic_cfg_by_json>	
-			<dev_ctrl flag="0x0237">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设备控制</desc>
-				</meta>
-			</dev_ctrl>	
-			<dev_time_set flag="0x0238">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置设备时间</desc>
-				</meta>
-            </dev_time_set>	 		
-			<lin_initenal_resistance flag="0x0239" at_initcan="post">
-				<value>0</value>
-				<meta>
-					<visible>false</visible>
 					<type>options.int32</type>
-					<desc>lin终端电阻</desc>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
 					<options>
-						<option type="int32" value="0" desc="disable"></option>
-						<option type="int32" value="1" desc="enable"></option>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
 					</options>
 				</meta>
-			</lin_initenal_resistance>	 		
+			</filter_mode>
+			<filter_start flag="0x0231" hex="1" at_initcan="post">
+				<value>ffbdd8</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0232" hex="1" at_initcan="post">
+				<value>ffbe28</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0233" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_clear flag="0x0234" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<set_dynamic_data flag="0x0235">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置数据</desc>
+				</meta>
+			</set_dynamic_data>			
 		</channel_2>
 		<channel_3 stream="channel_3" case="parent-value=3">
 			<protocol flag="0x0352" at_initcan="pre">
@@ -1113,43 +1164,60 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>
-			<set_dynamic_cfg_by_json flag="0x0336">
+			</apply_dynamic_data>	
+			<filter_mode flag="0x0330" at_initcan="post">
 				<value>0</value>
 				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置动态配置</desc>
-				</meta>
-			</set_dynamic_cfg_by_json>	
-			<dev_ctrl flag="0x0337">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设备控制</desc>
-				</meta>
-			</dev_ctrl>	
-			<dev_time_set flag="0x0338">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置设备时间</desc>
-				</meta>
-            </dev_time_set>	 		
-			<lin_initenal_resistance flag="0x0339" at_initcan="post">
-				<value>0</value>
-				<meta>
-					<visible>false</visible>
 					<type>options.int32</type>
-					<desc>lin终端电阻</desc>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
 					<options>
-						<option type="int32" value="0" desc="disable"></option>
-						<option type="int32" value="1" desc="enable"></option>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
 					</options>
 				</meta>
-			</lin_initenal_resistance>	 		
+			</filter_mode>
+			<filter_start flag="0x0331" hex="1" at_initcan="post">
+				<value>ffbdd8</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0332" hex="1" at_initcan="post">
+				<value>ffbe28</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0333" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_clear flag="0x0334" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<set_dynamic_data flag="0x0335">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置数据</desc>
+				</meta>
+			</set_dynamic_data>			
 		</channel_3>
 		<channel_4 stream="channel_4" case="parent-value=4">
 			<protocol flag="0x0452" at_initcan="pre">
@@ -1369,43 +1437,60 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>
-			<set_dynamic_cfg_by_json flag="0x0436">
+			</apply_dynamic_data>	
+			<filter_mode flag="0x0430" at_initcan="post">
 				<value>0</value>
 				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置动态配置</desc>
-				</meta>
-			</set_dynamic_cfg_by_json>	
-			<dev_ctrl flag="0x0437">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设备控制</desc>
-				</meta>
-			</dev_ctrl>	
-			<dev_time_set flag="0x0438">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置设备时间</desc>
-				</meta>
-            </dev_time_set>	 		
-			<lin_initenal_resistance flag="0x0439" at_initcan="post">
-				<value>0</value>
-				<meta>
-					<visible>false</visible>
 					<type>options.int32</type>
-					<desc>lin终端电阻</desc>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
 					<options>
-						<option type="int32" value="0" desc="disable"></option>
-						<option type="int32" value="1" desc="enable"></option>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
 					</options>
 				</meta>
-			</lin_initenal_resistance>	 		
+			</filter_mode>
+			<filter_start flag="0x0431" hex="1" at_initcan="post">
+				<value>ffbdd8</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0432" hex="1" at_initcan="post">
+				<value>ffbe28</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0433" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_clear flag="0x0434" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<set_dynamic_data flag="0x0435">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置数据</desc>
+				</meta>
+			</set_dynamic_data>			
 		</channel_4>
 		<channel_5 stream="channel_5" case="parent-value=5">
 			<protocol flag="0x0552" at_initcan="pre">
@@ -1625,43 +1710,60 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>
-			<set_dynamic_cfg_by_json flag="0x0536">
+			</apply_dynamic_data>	
+			<filter_mode flag="0x0530" at_initcan="post">
 				<value>0</value>
 				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置动态配置</desc>
-				</meta>
-			</set_dynamic_cfg_by_json>	
-			<dev_ctrl flag="0x0537">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设备控制</desc>
-				</meta>
-			</dev_ctrl>	
-			<dev_time_set flag="0x0538">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置设备时间</desc>
-				</meta>
-            </dev_time_set>	 		
-			<lin_initenal_resistance flag="0x0539" at_initcan="post">
-				<value>0</value>
-				<meta>
-					<visible>false</visible>
 					<type>options.int32</type>
-					<desc>lin终端电阻</desc>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
 					<options>
-						<option type="int32" value="0" desc="disable"></option>
-						<option type="int32" value="1" desc="enable"></option>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
 					</options>
 				</meta>
-			</lin_initenal_resistance>	 		
+			</filter_mode>
+			<filter_start flag="0x0531" hex="1" at_initcan="post">
+				<value>ffbdd8</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0532" hex="1" at_initcan="post">
+				<value>ffbe28</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0533" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_clear flag="0x0534" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<set_dynamic_data flag="0x0535">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置数据</desc>
+				</meta>
+			</set_dynamic_data>			
 		</channel_5>
 		<channel_6 stream="channel_6" case="parent-value=6">
 			<protocol flag="0x0652" at_initcan="pre">
@@ -1881,43 +1983,60 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>
-			<set_dynamic_cfg_by_json flag="0x0636">
+			</apply_dynamic_data>	
+			<filter_mode flag="0x0630" at_initcan="post">
 				<value>0</value>
 				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置动态配置</desc>
-				</meta>
-			</set_dynamic_cfg_by_json>	
-			<dev_ctrl flag="0x0637">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设备控制</desc>
-				</meta>
-			</dev_ctrl>	
-			<dev_time_set flag="0x0638">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置设备时间</desc>
-				</meta>
-            </dev_time_set>	 		
-			<lin_initenal_resistance flag="0x0639" at_initcan="post">
-				<value>0</value>
-				<meta>
-					<visible>false</visible>
 					<type>options.int32</type>
-					<desc>lin终端电阻</desc>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
 					<options>
-						<option type="int32" value="0" desc="disable"></option>
-						<option type="int32" value="1" desc="enable"></option>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
 					</options>
 				</meta>
-			</lin_initenal_resistance>	 		
+			</filter_mode>
+			<filter_start flag="0x0631" hex="1" at_initcan="post">
+				<value>ffbdd8</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0632" hex="1" at_initcan="post">
+				<value>ffbe28</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0633" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_clear flag="0x0634" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<set_dynamic_data flag="0x0635">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置数据</desc>
+				</meta>
+			</set_dynamic_data>			
 		</channel_6>
 		<channel_7 stream="channel_7" case="parent-value=7">
 			<protocol flag="0x0752" at_initcan="pre">
@@ -2137,43 +2256,60 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>
-			<set_dynamic_cfg_by_json flag="0x0736">
+			</apply_dynamic_data>	
+			<filter_mode flag="0x0730" at_initcan="post">
 				<value>0</value>
 				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置动态配置</desc>
-				</meta>
-			</set_dynamic_cfg_by_json>	
-			<dev_ctrl flag="0x0737">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设备控制</desc>
-				</meta>
-			</dev_ctrl>	
-			<dev_time_set flag="0x0738">
-				<value>0</value>
-				<meta>
-					<type>string</type>
-					<visible>false</visible>
-					<desc>设置设备时间</desc>
-				</meta>
-            </dev_time_set>	 		
-			<lin_initenal_resistance flag="0x0739" at_initcan="post">
-				<value>0</value>
-				<meta>
-					<visible>false</visible>
 					<type>options.int32</type>
-					<desc>lin终端电阻</desc>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
 					<options>
-						<option type="int32" value="0" desc="disable"></option>
-						<option type="int32" value="1" desc="enable"></option>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
 					</options>
 				</meta>
-			</lin_initenal_resistance>	 		
+			</filter_mode>
+			<filter_start flag="0x0731" hex="1" at_initcan="post">
+				<value>ffbdd8</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0732" hex="1" at_initcan="post">
+				<value>ffbe28</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0733" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_clear flag="0x0734" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<set_dynamic_data flag="0x0735">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置数据</desc>
+				</meta>
+			</set_dynamic_data>			
 		</channel_7>
 	</channel>
 </info>
