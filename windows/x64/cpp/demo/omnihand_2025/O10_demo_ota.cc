@@ -233,14 +233,8 @@ int main(int argc, char* argv[]) {
     // Compare versions
     if (vendor_info_before.softwareVersion != vendor_info_after.softwareVersion) {
       std::cout << "\n[SUCCESS]: Firmware version changed - Upgrade successful!" << std::endl;
-      std::cout << "  Before: " 
-                << static_cast<int>(vendor_info_before.softwareVersion.major) << "."
-                << static_cast<int>(vendor_info_before.softwareVersion.minor) << "."
-                << static_cast<int>(vendor_info_before.softwareVersion.patch) << std::endl;
-      std::cout << "  After:  " 
-                << static_cast<int>(vendor_info_after.softwareVersion.major) << "."
-                << static_cast<int>(vendor_info_after.softwareVersion.minor) << "."
-                << static_cast<int>(vendor_info_after.softwareVersion.patch) << std::endl;
+      std::cout << "  Before: " << vendor_info_before.softwareVersion.ToString() << std::endl;
+      std::cout << "  After:  " << vendor_info_after.softwareVersion.ToString() << std::endl;
     } else {
       std::cout << "\n[INFO]: Firmware version unchanged (same version or upgrade failed)" << std::endl;
     }

@@ -254,11 +254,11 @@ struct AGIBOT_EXPORT VendorInfo {
   std::string ToString() const {
     std::stringstream sstream;
     sstream << "[Product Model: " << productModel
-            << "][Serial Number: " << productSeqNum
-            << "][Hardware Version: " << hardwareVersion.ToString()
-            << "][Software Version: " << softwareVersion.ToString()
-            << "][Supply Voltage: " << voltage << "mV"
-            << "][Active Degrees of Freedom: " << static_cast<unsigned int>(dof) << "]";
+            << "]\n[Serial Number: " << productSeqNum
+            << "]\n[Hardware Version: " << hardwareVersion.ToString()
+            << "]\n[Software Version: " << softwareVersion.ToString()
+            << "]\n[Supply Voltage: " << voltage << "mV"
+            << "]\n[Active Degrees of Freedom: " << static_cast<unsigned int>(dof) << "]";
     return sstream.str();
   }
 };
@@ -273,11 +273,14 @@ struct AGIBOT_EXPORT CommuParams {
   uint8_t dsample_point{0};
 
   std::string ToString() const {
+    std::vector<std::string> vecBitrate = {"125Kbps", "500Kbps", "1Mbps", "5Mbps"};
+    std::vector<std::string> vecSamplePoint = {"75.0%", "80.0%", "87.5%"};
+    
     std::stringstream sstream;
-    sstream << "[Arbitration Bitrate: " << static_cast<unsigned int>(bitrate)
-            << "][Arbitration Sample Point: " << static_cast<unsigned int>(sample_point)
-            << "][Data Bitrate: " << static_cast<unsigned int>(dbitrate)
-            << "][Data Sample Point: " << static_cast<unsigned int>(dsample_point) << "]";
+    sstream << "[Arbitration Bitrate: " << (bitrate < vecBitrate.size() ? vecBitrate[bitrate] : "Unknown")
+            << "]\n[Arbitration Sample Point: " << (sample_point < vecSamplePoint.size() ? vecSamplePoint[sample_point] : "Unknown")
+            << "]\n[Data Bitrate: " << (dbitrate < vecBitrate.size() ? vecBitrate[dbitrate] : "Unknown")
+            << "]\n[Data Sample Point: " << (dsample_point < vecSamplePoint.size() ? vecSamplePoint[dsample_point] : "Unknown") << "]";
     return sstream.str();
   }
 };
@@ -291,7 +294,7 @@ struct AGIBOT_EXPORT DeviceInfo {
 
   std::string ToString() const {
     std::stringstream sstream;
-    sstream << "[Hand Device ID: " << static_cast<unsigned int>(hand_device_id) << "]";
+    sstream << "[Hand Device ID: " << static_cast<unsigned int>(hand_device_id) << "]\n";
     sstream << commu_params.ToString();
     return sstream.str();
   }
