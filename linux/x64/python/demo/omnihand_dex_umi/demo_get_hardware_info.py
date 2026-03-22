@@ -51,8 +51,8 @@ def main():
     vendor_info = hand.get_vendor_info()
     print(f"Product Model: {vendor_info.product_model}")
     print(f"Serial Number: {vendor_info.product_seq_num}")
-    print(f"Hardware Version: {vendor_info.hardware_version.major_}.{vendor_info.hardware_version.minor_}.{vendor_info.hardware_version.patch_}")
-    print(f"Software Version: {vendor_info.software_version.major_}.{vendor_info.software_version.minor_}.{vendor_info.software_version.patch_}")
+    print(f"Hardware Version: {vendor_info.hardware_version.major}.{vendor_info.hardware_version.minor}.{vendor_info.hardware_version.patch}")
+    print(f"Software Version: {vendor_info.software_version.major}.{vendor_info.software_version.minor}.{vendor_info.software_version.patch}")
     print(f"Voltage: {vendor_info.voltage} mV")
     print(f"DOF: {vendor_info.dof}")
     
@@ -63,10 +63,10 @@ def main():
     device_info = hand.get_device_info()
     print(f"Device ID: {device_info.hand_device_id}")
     print(f"Communication Parameters:")
-    print(f"  CAN FD Arbitration Bitrate: {device_info.commu_params.bitrate_}")
-    print(f"  CAN FD Arbitration Sample Point: {device_info.commu_params.sample_point_}")
-    print(f"  CAN FD Data Bitrate: {device_info.commu_params.dbitrate_}")
-    print(f"  CAN FD Data Sample Point: {device_info.commu_params.dsample_point_}")
+    print(f"  CAN FD Arbitration Bitrate: {device_info.commu_params.bitrate}")
+    print(f"  CAN FD Arbitration Sample Point: {device_info.commu_params.sample_point}")
+    print(f"  CAN FD Data Bitrate: {device_info.commu_params.dbitrate}")
+    print(f"  CAN FD Data Sample Point: {device_info.commu_params.dsample_point}")
     
     # 使用 toString() 方法显示完整信息
     print("\n" + "=" * 50)

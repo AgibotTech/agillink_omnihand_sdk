@@ -31,10 +31,10 @@ namespace omnihand {
  *       - serial[4]: 4 bytes serial number
  */
 struct AGIBOT_EXPORT ProductSerialNumber {
-  uint8_t supplier_code[3];   // 供应商暗码 (3 bytes)
-  uint8_t material_code[6];   // 物料暗码 (6 bytes)
-  uint8_t date[6];            // 日期 YYMMDD (6 bytes ASCII)
-  uint8_t serial[4];          // 流水号 (4 bytes)
+  uint8_t supplier_code[3];   // Supplier code (3 bytes)
+  uint8_t material_code[6];   // Material code (6 bytes)
+  uint8_t date[6];            // Date YYMMDD (6 bytes ASCII)
+  uint8_t serial[4];          // Serial number (4 bytes)
   
   ProductSerialNumber() {
     memset(supplier_code, 0, 3);
@@ -44,25 +44,30 @@ struct AGIBOT_EXPORT ProductSerialNumber {
   }
   
   /**
-   * @brief Convert to string representation
+   * @brief Convert to string representation (ASCII format)
+   * @note Device returns 19-byte ASCII string like "AXXX89..."
    */
   std::string ToString() const {
     std::ostringstream oss;
-    oss << std::hex << std::setfill('0');
     for (int i = 0; i < 3; i++) {
-      oss << std::setw(2) << static_cast<unsigned>(supplier_code[i]);
+      if (supplier_code[i] >= 0x20 && supplier_code[i] < 0x7F) {
+        oss << static_cast<char>(supplier_code[i]);
+      }
     }
-    oss << "-";
     for (int i = 0; i < 6; i++) {
-      oss << std::setw(2) << static_cast<unsigned>(material_code[i]);
+      if (material_code[i] >= 0x20 && material_code[i] < 0x7F) {
+        oss << static_cast<char>(material_code[i]);
+      }
     }
-    oss << "-";
     for (int i = 0; i < 6; i++) {
-      oss << static_cast<char>(date[i]);
+      if (date[i] >= 0x20 && date[i] < 0x7F) {
+        oss << static_cast<char>(date[i]);
+      }
     }
-    oss << "-";
     for (int i = 0; i < 4; i++) {
-      oss << std::setw(2) << static_cast<unsigned>(serial[i]);
+      if (serial[i] >= 0x20 && serial[i] < 0x7F) {
+        oss << static_cast<char>(serial[i]);
+      }
     }
     return oss.str();
   }
@@ -93,6 +98,28 @@ struct AGIBOT_EXPORT FirmwareVersionInfo {
   }
   
   /**
+   * @brief Convert to string representation
+   */
+  std::string ToString() const {
+    std::ostringstream oss;
+    oss << "[Device Type: " << static_cast<unsigned int>(device_type)
+        << "][Product Status: " << GetProductStatus()
+        << "][Software Version: " << software_version.ToString()
+        << "][Hardware Version: " << hardware_version.ToString()
+        << "][DOF: " << static_cast<unsigned int>(dof) << "]";
+    return oss.str();
+  }
+
+  ProductType GetProductType() const {
+    switch (device_type) {
+      case 2: return ProductType::OMNIHAND_2025;
+      // case 1: return ProductType::OMNIHAND_2025;
+      // case 4: return ProductType::OMNIHAND_3_LITE;
+      default: return ProductType::UNKNOWN;
+    }
+  }
+
+  /**
    * @brief Get product status as string
    */
   std::string GetProductStatus() const {
@@ -105,22 +132,59 @@ struct AGIBOT_EXPORT FirmwareVersionInfo {
  * @note 60-byte protocol: [0:20] 10×position (uint16 LE), [20:40] 10×velocity (uint16 LE), [40:50] 10×current (1 byte/axis).
  *       O10: all three filled (10 elements each). O4: positions.size()=4, velocities/currents empty or 4 if device returns them.
  */
- struct AGIBOT_EXPORT SetAllAxisPosResponse {
+struct AGIBOT_EXPORT SetAllAxisPosResponse {
   std::vector<uint16_t> positions;   ///< Position per axis (O10: 10, O4: 4)
-  std::vector<uint16_t> velocities; ///< Velocity per axis (same length as positions when present)
-  std::vector<uint16_t> currents;   ///< Current per axis, 1 byte in protocol zero-extended to uint16 (same length when present)
+  std::vector<int16_t> velocities; ///< Velocity per axis (same length as positions when present)
+  std::vector<int8_t> currents;   ///< Current per axis, 1 byte in protocol zero-extended to uint16 (same length when present)
+  std::vector<int8_t> error_codes;  ///< Error code per axis, 1 byte per axis (same length when present)
   bool empty() const { return positions.empty(); }
+
+  std::string ToString() const {
+    std::ostringstream oss;
+    for (size_t i = 0; i < positions.size(); i++) {
+      oss << "[Joint:" << i + 1 << "][Position:" << static_cast<unsigned int>(positions[i])
+          << "][Velocity:" << static_cast<int>(velocities[i])
+          << "][Current:" << static_cast<int>(currents[i])
+          << "][Error Code:" << static_cast<int>(error_codes[i]) << "]\n";
+    }
+    return oss.str();
+  } 
 };
 
 /**
- * @brief Private base class for internal implementations - StreamCmd protocol interface
- * @note This class is for internal software use. It provides all StreamCmd protocol functions
- *       directly, implementing the complete stream protocol command set.
- * @note Inherits from OmniHandBase to get all non-private interfaces (SetJointMotorPosi, etc.)
- *       and adds StreamCmd protocol functions for complete protocol implementation.
- * @note Tactile sensor interfaces (GetTactileSensorData, etc.) are declared here but should only
- *       be implemented by products that support them (e.g., O10). O4 does not support tactile sensors.
+ * @brief Position limits for all axes from GET_AXIS_LIMIT_POS (0x30).
+ * @note Wire format: first block = N×uint16 LE min (0–4095), second block = N×uint16 LE max.
+ *       O10: N=10 → 40 bytes total; O4: N=4 → 16 bytes.
  */
+struct AGIBOT_EXPORT AxisLimitPos {
+  std::vector<uint16_t> min_limits;
+  std::vector<uint16_t> max_limits;
+
+  bool empty() const {
+    return min_limits.empty() || max_limits.empty() || min_limits.size() != max_limits.size();
+  }
+
+  /** Parse raw payload: [0, half) = mins, [half, byte_len) = maxs, each uint16 little-endian. */
+  static AxisLimitPos DecodeLittleEndian(const uint8_t* data, size_t byte_len) {
+    AxisLimitPos out;
+    if (!data || byte_len < 4 || (byte_len % 4) != 0) {
+      return out;
+    }
+    const size_t half = byte_len / 2;
+    const size_t n_axes = half / 2;
+    out.min_limits.resize(n_axes);
+    out.max_limits.resize(n_axes);
+    for (size_t i = 0; i < n_axes; ++i) {
+      out.min_limits[i] = static_cast<uint16_t>(
+          static_cast<uint16_t>(data[2 * i]) | (static_cast<uint16_t>(data[2 * i + 1]) << 8));
+      out.max_limits[i] = static_cast<uint16_t>(
+          static_cast<uint16_t>(data[half + 2 * i]) |
+          (static_cast<uint16_t>(data[half + 2 * i + 1]) << 8));
+    }
+    return out;
+  }
+};
+
 class AGIBOT_EXPORT PrivateOmniHand {
  public:
   virtual ~PrivateOmniHand() = default;
@@ -433,10 +497,10 @@ class AGIBOT_EXPORT PrivateOmniHand {
 
   // 0x30: 读取所有轴限位值
   /**
-   * @brief Get all axes limit values
-   * @return Limit data (48 bytes: 20 bytes min limits, 20 bytes max limits)
+   * @brief Get all axes position limits (min/max per axis, 0–4095).
+   * @return Decoded limits; empty() on failure or timeout.
    */
-  virtual std::vector<uint8_t> GetAxisLimitPos() const = 0;
+  virtual AxisLimitPos GetAxisLimitPos() const = 0;
 
   // 0x31: 设置左手/右手
   /**
@@ -454,7 +518,7 @@ class AGIBOT_EXPORT PrivateOmniHand {
    * @param torques Vector of torques (10 bytes, 1 byte per axis, range 0-255)
    * @return Response data (60 bytes: positions, velocities, torques, fault states)
    */
-  virtual std::vector<uint8_t> SetPosSpeedCurData(const std::vector<uint16_t>& positions,
+  virtual SetAllAxisPosResponse SetPosSpeedCurData(const std::vector<uint16_t>& positions,
                                                    const std::vector<int16_t>& speeds,
                                                    const std::vector<uint8_t>& torques) = 0;
 

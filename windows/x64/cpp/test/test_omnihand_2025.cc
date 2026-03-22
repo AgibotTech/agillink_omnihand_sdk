@@ -79,7 +79,7 @@ TEST_F(OmniHand2025Test, GetVendorInfo) {
   if (hand_->Init()) {
     auto vendor_info = hand_->GetVendorInfo();
     std::cout << "[GetVendorInfo] Vendor Info:" << std::endl;
-    std::cout << vendor_info.toString() << std::endl;
+    std::cout << vendor_info.ToString() << std::endl;
     EXPECT_EQ(vendor_info.dof, 10);  // O10 has 10 DOF
   }
 }
@@ -89,7 +89,7 @@ TEST_F(OmniHand2025Test, GetDeviceInfo) {
   if (hand_->Init()) {
     auto device_info = hand_->GetDeviceInfo();
     std::cout << "[GetDeviceInfo] Device Info:" << std::endl;
-    std::cout << device_info.toString() << std::endl;
+    std::cout << device_info.ToString() << std::endl;
     // Only check deviceId if request succeeded (non-zero indicates success)
     if (device_info.hand_device_id != 0) {
       EXPECT_EQ(device_info.hand_device_id, 1);

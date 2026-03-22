@@ -53,10 +53,10 @@ def control_single_hand(hand, hand_name):
     device_info = hand.get_device_info()
     print(f"  Device ID: {device_info.hand_device_id}")
     print(f"  Communication Parameters:")
-    print(f"    Bitrate: {device_info.commu_params.bitrate_}")
-    print(f"    Sample Point: {device_info.commu_params.sample_point_}")
-    print(f"    D-Bitrate: {device_info.commu_params.dbitrate_}")
-    print(f"    D-Sample Point: {device_info.commu_params.dsample_point_}")
+    print(f"    Bitrate: {device_info.commu_params.bitrate}")
+    print(f"    Sample Point: {device_info.commu_params.sample_point}")
+    print(f"    D-Bitrate: {device_info.commu_params.dbitrate}")
+    print(f"    D-Sample Point: {device_info.commu_params.dsample_point}")
 
     # ============ 读取传感器数据 ============
     print("\n=== Reading Sensor Data ===")

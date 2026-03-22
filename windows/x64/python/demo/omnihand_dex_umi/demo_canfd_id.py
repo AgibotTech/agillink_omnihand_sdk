@@ -74,12 +74,12 @@ def read_single_hand(hand, hand_name):
     vendor_info = hand.get_vendor_info()
     print(f"  Model: {vendor_info.product_model}")
     print(f"  Serial: {vendor_info.product_seq_num}")
-    print(f"  Hardware Version: {vendor_info.hardware_version.major_}."
-          f"{vendor_info.hardware_version.minor_}."
-          f"{vendor_info.hardware_version.patch_}")
-    print(f"  Software Version: {vendor_info.software_version.major_}."
-          f"{vendor_info.software_version.minor_}."
-          f"{vendor_info.software_version.patch_}")
+    print(f"  Hardware Version: {vendor_info.hardware_version.major}."
+          f"{vendor_info.hardware_version.minor}."
+          f"{vendor_info.hardware_version.patch}")
+    print(f"  Software Version: {vendor_info.software_version.major}."
+          f"{vendor_info.software_version.minor}."
+          f"{vendor_info.software_version.patch}")
     print(f"  Voltage: {vendor_info.voltage} mV")
     print(f"  DOF: {vendor_info.dof}")
 
@@ -87,10 +87,10 @@ def read_single_hand(hand, hand_name):
     device_info = hand.get_device_info()
     print(f"  Device ID: {device_info.hand_device_id}")
     print(f"  Communication Parameters:")
-    print(f"    Bitrate: {device_info.commu_params.bitrate_}")
-    print(f"    Sample Point: {device_info.commu_params.sample_point_}")
-    print(f"    D-Bitrate: {device_info.commu_params.dbitrate_}")
-    print(f"    D-Sample Point: {device_info.commu_params.dsample_point_}")
+    print(f"    Bitrate: {device_info.commu_params.bitrate}")
+    print(f"    Sample Point: {device_info.commu_params.sample_point}")
+    print(f"    D-Bitrate: {device_info.commu_params.dbitrate}")
+    print(f"    D-Sample Point: {device_info.commu_params.dsample_point}")
 
     # ============ 读取传感器数据 ============
     print("\n=== Reading Sensor Data ===")

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025, Agibot Co., Ltd.
+// Copyright (c) 2025, Agibot Co., Ltd.
 // OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
 #include <gtest/gtest.h>
@@ -83,7 +83,7 @@ TEST_F(OmniHandPro2025Test, GetVendorInfo) {
   if (hand_->Init()) {
     auto vendor_info = hand_->GetVendorInfo();
     std::cout << "[GetVendorInfo] Vendor Info:" << std::endl;
-    std::cout << vendor_info.toString() << std::endl;
+    std::cout << vendor_info.ToString() << std::endl;
     
     // Check if request succeeded (non-zero dof indicates success)
     // If request failed (timeout), skip assertion to avoid false failure
@@ -101,7 +101,7 @@ TEST_F(OmniHandPro2025Test, GetDeviceInfo) {
   if (hand_->Init()) {
     auto device_info = hand_->GetDeviceInfo();
     std::cout << "[GetDeviceInfo] Device Info:" << std::endl;
-    std::cout << device_info.toString() << std::endl;
+    std::cout << device_info.ToString() << std::endl;
     // Only check deviceId if request succeeded (non-zero indicates success)
     if (device_info.hand_device_id != 0) {
       EXPECT_EQ(device_info.hand_device_id, 1);

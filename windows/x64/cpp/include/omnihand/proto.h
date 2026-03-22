@@ -11,6 +11,7 @@
 #ifndef AGILINK_PROTO_H
 #define AGILINK_PROTO_H
 
+#include <cstdint>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -203,39 +204,61 @@ struct AGIBOT_EXPORT TactileSensor3DData {
   unsigned char capa_approach_[4];      // 自电容接近
 };
 
-/**
- * @brief 版本信息
- */
 struct AGIBOT_EXPORT Version {
-  unsigned char major_;
-  unsigned char minor_;
-  unsigned char patch_;
-  unsigned char res_;
+  uint8_t major{0};
+  uint8_t minor{0};
+  uint8_t patch{0};
+  uint8_t res{0};
+
+  bool operator>=(const Version& other) const {
+    if (major < other.major) return false;
+    if (major > other.major) return true;
+    if (minor < other.minor) return false;
+    if (minor > other.minor) return true;
+    if (patch < other.patch) return false;
+    if (patch > other.patch) return true;
+    return res >= other.res;
+  }
+
+  bool operator==(const Version& other) const {
+    return major == other.major && minor == other.minor && patch == other.patch && res == other.res;
+  }
+
+  bool operator!=(const Version& other) const {
+    return !(*this == other);
+  }
+
+  std::string ToString() const {
+    std::stringstream sstream;
+    sstream << static_cast<unsigned int>(major) << "."
+            << static_cast<unsigned int>(minor) << "."
+            << static_cast<unsigned int>(patch);
+    if (res != 0) {
+      sstream << "." << static_cast<unsigned int>(res);
+    }
+    return sstream.str();
+  }
 };
 
 /**
- * @brief 厂商信息
+ * @brief Vendor Information
  */
 struct AGIBOT_EXPORT VendorInfo {
-  std::string productModel;   // 产品型号
-  std::string productSeqNum;  // 产品序列号
-  Version hardwareVersion;    // 硬件版本
-  Version softwareVersion;    // 软件版本
-  int16_t voltage;            // 供电电压(mV)
-  unsigned char dof;          // 主动自由度
+  std::string productModel;   // product model
+  std::string productSeqNum;  // product serial number
+  Version hardwareVersion;    // hardware version
+  Version softwareVersion;    // software version
+  int16_t voltage;            // supply voltage (mV)
+  unsigned char dof;          // active degrees of freedom
 
-  std::string toString() const {
+  std::string ToString() const {
     std::stringstream sstream;
-    sstream << "Product Model: " << productModel
-            << "\nSerial Number: " << productSeqNum
-            << "\nHardware Version: " << static_cast<unsigned int>(hardwareVersion.major_)
-            << "." << static_cast<unsigned int>(hardwareVersion.minor_)
-            << "." << static_cast<unsigned int>(hardwareVersion.patch_)
-            << "\nSoftware Version: " << static_cast<unsigned int>(softwareVersion.major_)
-            << "." << static_cast<unsigned int>(softwareVersion.minor_)
-            << "." << static_cast<unsigned int>(softwareVersion.patch_)
-            << "\nSupply Voltage: " << voltage << "mV"
-            << "\nActive Degrees of Freedom: " << static_cast<unsigned int>(dof);
+    sstream << "[Product Model: " << productModel
+            << "][Serial Number: " << productSeqNum
+            << "][Hardware Version: " << hardwareVersion.ToString()
+            << "][Software Version: " << softwareVersion.ToString()
+            << "][Supply Voltage: " << voltage << "mV"
+            << "][Active Degrees of Freedom: " << static_cast<unsigned int>(dof) << "]";
     return sstream.str();
   }
 };
@@ -244,56 +267,32 @@ struct AGIBOT_EXPORT VendorInfo {
  * @brief 通信参数
  */
 struct AGIBOT_EXPORT CommuParams {
-  unsigned char bitrate_;
-  unsigned char sample_point_;
-  unsigned char dbitrate_;
-  unsigned char dsample_point_;
+  uint8_t bitrate{0};
+  uint8_t sample_point{0};
+  uint8_t dbitrate{0};
+  uint8_t dsample_point{0};
+
+  std::string ToString() const {
+    std::stringstream sstream;
+    sstream << "[Arbitration Bitrate: " << static_cast<unsigned int>(bitrate)
+            << "][Arbitration Sample Point: " << static_cast<unsigned int>(sample_point)
+            << "][Data Bitrate: " << static_cast<unsigned int>(dbitrate)
+            << "][Data Sample Point: " << static_cast<unsigned int>(dsample_point) << "]";
+    return sstream.str();
+  }
 };
 
 /**
  * @brief 设备信息
  */
 struct AGIBOT_EXPORT DeviceInfo {
-  unsigned char hand_device_id;   // 手部设备ID
-  CommuParams commu_params;  // 通信参数
+  uint8_t hand_device_id;
+  CommuParams commu_params;
 
-  std::string toString() const {
-    std::vector<std::string> vecBitrate = {"125Kbps", "500Kbps", "1Mbps", "5Mbps"};
-    std::vector<std::string> vecSamplePoint = {"75.0%", "80.0%", "87.5%"};
-
+  std::string ToString() const {
     std::stringstream sstream;
-    sstream << "Device ID: " << static_cast<unsigned int>(hand_device_id);
-    
-    // Add bounds checking to prevent array out-of-bounds access
-    unsigned char bitrate_idx = commu_params.bitrate_;
-    unsigned char sample_point_idx = commu_params.sample_point_;
-    unsigned char dbitrate_idx = commu_params.dbitrate_;
-    unsigned char dsample_point_idx = commu_params.dsample_point_;
-    
-    if (bitrate_idx < vecBitrate.size()) {
-      sstream << "\nArbitration Bitrate: " << vecBitrate[bitrate_idx];
-    } else {
-      sstream << "\nArbitration Bitrate: Invalid(" << static_cast<unsigned int>(bitrate_idx) << ")";
-    }
-    
-    if (sample_point_idx < vecSamplePoint.size()) {
-      sstream << "\nArbitration Sample Point: " << vecSamplePoint[sample_point_idx];
-    } else {
-      sstream << "\nArbitration Sample Point: Invalid(" << static_cast<unsigned int>(sample_point_idx) << ")";
-    }
-    
-    if (dbitrate_idx < vecBitrate.size()) {
-      sstream << "\nData Bitrate: " << vecBitrate[dbitrate_idx];
-    } else {
-      sstream << "\nData Bitrate: Invalid(" << static_cast<unsigned int>(dbitrate_idx) << ")";
-    }
-    
-    if (dsample_point_idx < vecSamplePoint.size()) {
-      sstream << "\nData Sample Point: " << vecSamplePoint[dsample_point_idx];
-    } else {
-      sstream << "\nData Sample Point: Invalid(" << static_cast<unsigned int>(dsample_point_idx) << ")";
-    }
-
+    sstream << "[Hand Device ID: " << static_cast<unsigned int>(hand_device_id) << "]";
+    sstream << commu_params.ToString();
     return sstream.str();
   }
 };

@@ -26,9 +26,9 @@ from omnihand import OmniHand2025, HandType
 # 创建手部实例
 hand = OmniHand2025.create_hand_by_zlgcan(
     hand_type=HandType.LEFT,
-    device_id=1,
-    canfd_id=0,
-    channel_id=0
+    hand_device_id=1,
+    canfd_device_id=0,
+    canfd_channel_id=0,
 )
 
 if not hand.init():
@@ -70,9 +70,9 @@ from omnihand import OmniHandDexUMI, HandType
 # 创建手部实例
 hand = OmniHandDexUMI.create_hand_by_zlgcan(
     hand_type=HandType.LEFT,
-    device_id=1,
-    canfd_id=0,
-    channel_id=0
+    hand_device_id=1,
+    canfd_device_id=0,
+    canfd_channel_id=0,
 )
 
 if not hand.init():

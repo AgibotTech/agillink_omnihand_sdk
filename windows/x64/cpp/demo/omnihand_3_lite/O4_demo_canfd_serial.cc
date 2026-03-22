@@ -41,14 +41,10 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
   std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
 
   auto vendor_info = hand->GetVendorInfo();
-  std::cout << "\nVendor Info:" << std::endl;
-  std::cout << "  Model: " << vendor_info.productModel << std::endl;
-  std::cout << "  Serial: " << vendor_info.productSeqNum << std::endl;
-  std::cout << "  DOF: " << static_cast<int>(vendor_info.dof) << std::endl;
+  std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
 
   auto device_info = hand->GetDeviceInfo();
-  std::cout << "\nDevice Info: Device ID " << static_cast<int>(device_info.hand_device_id)
-            << std::endl;
+  std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
 
   std::cout << "\nTemperature Reports: [";
   auto temperatures = hand->GetAllTemperatureReport();

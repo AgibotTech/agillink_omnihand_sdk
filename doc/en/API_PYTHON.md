@@ -1,4 +1,4 @@
-﻿# OmniHand 2025 SDK Python API
+# OmniHand 2025 SDK Python API
 
 ## Overview
 
@@ -53,13 +53,13 @@ Finger.UNKNOWN = 255
 from omnihand import ControlMode
 
 # Values
-ControlMode.POSITIONTION = 0
+ControlMode.POSITION = 0
 ControlMode.SERVO = 1            # Servo mode
-ControlMode.VELOCITYCITY = 2
+ControlMode.VELOCITY = 2
 ControlMode.TORQUE = 3           # Not supported (use mixed modes instead)
-ControlMode.POSITIONTION_TORQUE = 4  # Mixed control
-ControlMode.VELOCITYCITY_TORQUE = 5  # Mixed control
-ControlMode.POSITIONTION_VELOCITYCITY_TORQUE = 6  # Mixed control
+ControlMode.POSITION_TORQUE = 4  # Mixed control
+ControlMode.VELOCITY_TORQUE = 5  # Mixed control
+ControlMode.POSITION_VELOCITY_TORQUE = 6  # Mixed control
 ControlMode.UNKNOWN = 10
 ```
 
@@ -77,9 +77,9 @@ from omnihand import OmniHand2025, HandType
 # Create hand instance
 hand = OmniHand2025.create_hand_by_zlgcan(
     hand_type=HandType.LEFT,
-    device_id=1,
-    canfd_id=0,
-    channel_id=0
+    hand_device_id=1,
+    canfd_device_id=0,
+    canfd_channel_id=0,
 )
 
 if not hand.init():
@@ -99,9 +99,9 @@ from omnihand import OmniHandPro2025, HandType
 # Create hand instance
 hand = OmniHandPro2025.create_hand_by_zlgcan(
     hand_type=HandType.LEFT,
-    device_id=1,
-    canfd_id=0,
-    channel_id=0
+    hand_device_id=1,
+    canfd_device_id=0,
+    canfd_channel_id=0,
 )
 
 if not hand.init():
@@ -121,9 +121,9 @@ from omnihand import OmniHandDexUMI, HandType
 # Create hand instance
 hand = OmniHandDexUMI.create_hand_by_zlgcan(
     hand_type=HandType.LEFT,
-    device_id=1,
-    canfd_id=0,
-    channel_id=0
+    hand_device_id=1,
+    canfd_device_id=0,
+    canfd_channel_id=0,
 )
 
 if not hand.init():
