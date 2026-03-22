@@ -83,7 +83,7 @@ TEST_F(OmniHand2025CanfdTest, GetVendorInfo) {
   RequireDevice();
   
   auto vendor_info = hand_->GetVendorInfo();
-  std::cout << vendor_info.toString() << std::endl;
+  std::cout << vendor_info.ToString() << std::endl;
   
   if (vendor_info.dof == 0) {
     GTEST_SKIP() << "GetVendorInfo timeout";
@@ -100,7 +100,7 @@ TEST_F(OmniHand2025CanfdTest, GetDeviceInfo) {
   RequireDevice();
   
   auto device_info = hand_->GetDeviceInfo();
-  std::cout << device_info.toString() << std::endl;
+  std::cout << device_info.ToString() << std::endl;
   
   if (device_info.hand_device_id == 0) {
     GTEST_SKIP() << "GetDeviceInfo timeout";
@@ -212,7 +212,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllTemperatureReport) {
   auto temps = hand_->GetAllTemperatureReport();
   std::cout << "[GetAllTemperatureReport] ";
   for (size_t i = 0; i < temps.size(); ++i) {
-    std::cout << "J" << (i+1) << ":" << temps[i] << "°C";
+    std::cout << "J" << (i+1) << ":" << temps[i] << " degC";
     if (i < temps.size() - 1) std::cout << ", ";
   }
   std::cout << std::endl;
@@ -223,7 +223,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllTemperatureReport) {
   
   EXPECT_EQ(temps.size(), 10);
 
-  // Temperature is int8_t (-128 to 127°C), typical motor temp: 30-80°C
+  // Temperature is int8_t (-128 to 127 degC), typical motor temp: 30-80 degC
   for (auto temp : temps) {
     EXPECT_GE(temp, -40);   // Extreme cold environment
     EXPECT_LE(temp, 127);   // int8_t max

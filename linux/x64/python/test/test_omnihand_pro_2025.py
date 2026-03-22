@@ -139,16 +139,7 @@ def test_get_vendor_info(hand):
     
     # Print vendor info similar to gtest (avoid UnicodeDecodeError by printing fields individually)
     print(f"\n[get_vendor_info] Vendor Info:")
-    print(f"  Product Model: {vendor_info.product_model}")
-    print(f"  Serial Number: {vendor_info.product_seq_num}")
-    print(f"  Hardware Version: {vendor_info.hardware_version.major}."
-          f"{vendor_info.hardware_version.minor}."
-          f"{vendor_info.hardware_version.patch}")
-    print(f"  Software Version: {vendor_info.software_version.major}."
-          f"{vendor_info.software_version.minor}."
-          f"{vendor_info.software_version.patch}")
-    print(f"  Supply Voltage: {vendor_info.voltage}mV")
-    print(f"  Active Degrees of Freedom: {vendor_info.dof}")
+    print(f"{vendor_info}")
     assert vendor_info.dof == 12  # O12 has 12 DOF
 
 
@@ -158,7 +149,7 @@ def test_get_device_info(hand):
     
     device_info = hand.get_device_info()
     print(f"\n[get_device_info] Device Info:")
-    print(str(device_info))
+    print(f"{device_info}")
     # Only check deviceId if request succeeded (non-zero indicates success)
     if device_info.hand_device_id != 0:
         assert device_info.hand_device_id == 1

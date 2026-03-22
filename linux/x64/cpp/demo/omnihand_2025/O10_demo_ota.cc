@@ -104,18 +104,7 @@ int main(int argc, char* argv[]) {
   // Get vendor info before upgrade
   std::cout << "\n=== Device Information (Before Upgrade) ===" << std::endl;
   auto vendor_info_before = hand->GetVendorInfo();
-  std::cout << "Product Model: " << vendor_info_before.productModel << std::endl;
-  std::cout << "Serial Number: " << vendor_info_before.productSeqNum << std::endl;
-  std::cout << "Hardware Version: " 
-            << static_cast<int>(vendor_info_before.hardwareVersion.major_) << "."
-            << static_cast<int>(vendor_info_before.hardwareVersion.minor_) << "."
-            << static_cast<int>(vendor_info_before.hardwareVersion.patch_) << std::endl;
-  std::cout << "Software Version: " 
-            << static_cast<int>(vendor_info_before.softwareVersion.major_) << "."
-            << static_cast<int>(vendor_info_before.softwareVersion.minor_) << "."
-            << static_cast<int>(vendor_info_before.softwareVersion.patch_) << std::endl;
-  std::cout << "Voltage: " << vendor_info_before.voltage << " mV" << std::endl;
-  std::cout << "DOF: " << static_cast<int>(vendor_info_before.dof) << std::endl;
+  std::cout << "Vendor Info: " << vendor_info_before.ToString() << std::endl;
 
   // Confirm upgrade
   std::cout << "\n=== Warning ===" << std::endl;
@@ -239,30 +228,13 @@ int main(int argc, char* argv[]) {
     // Get vendor info after upgrade
     std::cout << "\n=== Device Information (After Upgrade) ===" << std::endl;
     auto vendor_info_after = hand->GetVendorInfo();
-    std::cout << "Product Model: " << vendor_info_after.productModel << std::endl;
-    std::cout << "Serial Number: " << vendor_info_after.productSeqNum << std::endl;
-    std::cout << "Hardware Version: " 
-              << static_cast<int>(vendor_info_after.hardwareVersion.major_) << "."
-              << static_cast<int>(vendor_info_after.hardwareVersion.minor_) << "."
-              << static_cast<int>(vendor_info_after.hardwareVersion.patch_) << std::endl;
-    std::cout << "Software Version: " 
-              << static_cast<int>(vendor_info_after.softwareVersion.major_) << "."
-              << static_cast<int>(vendor_info_after.softwareVersion.minor_) << "."
-              << static_cast<int>(vendor_info_after.softwareVersion.patch_) << std::endl;
+    std::cout << "Vendor Info: " << vendor_info_after.ToString() << std::endl;
     
     // Compare versions
-    if (vendor_info_before.softwareVersion.major_ != vendor_info_after.softwareVersion.major_ ||
-        vendor_info_before.softwareVersion.minor_ != vendor_info_after.softwareVersion.minor_ ||
-        vendor_info_before.softwareVersion.patch_ != vendor_info_after.softwareVersion.patch_) {
+    if (vendor_info_before.softwareVersion != vendor_info_after.softwareVersion) {
       std::cout << "\n[SUCCESS]: Firmware version changed - Upgrade successful!" << std::endl;
-      std::cout << "  Before: " 
-                << static_cast<int>(vendor_info_before.softwareVersion.major_) << "."
-                << static_cast<int>(vendor_info_before.softwareVersion.minor_) << "."
-                << static_cast<int>(vendor_info_before.softwareVersion.patch_) << std::endl;
-      std::cout << "  After:  " 
-                << static_cast<int>(vendor_info_after.softwareVersion.major_) << "."
-                << static_cast<int>(vendor_info_after.softwareVersion.minor_) << "."
-                << static_cast<int>(vendor_info_after.softwareVersion.patch_) << std::endl;
+      std::cout << "  Before: " << vendor_info_before.softwareVersion.ToString() << std::endl;
+      std::cout << "  After:  " << vendor_info_after.softwareVersion.ToString() << std::endl;
     } else {
       std::cout << "\n[INFO]: Firmware version unchanged (same version or upgrade failed)" << std::endl;
     }

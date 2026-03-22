@@ -87,10 +87,7 @@ int main(int argc, char** argv) {
 
   // Vendor info
   auto vendor_info = hand->GetVendorInfo();
-  std::cout << "\nVendor Info:" << std::endl;
-  std::cout << "  Model: " << vendor_info.productModel << std::endl;
-  std::cout << "  Serial: " << vendor_info.productSeqNum << std::endl;
-  std::cout << "  DOF: " << static_cast<int>(vendor_info.dof) << std::endl;
+  std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
 
   // Device info
   auto device_info = hand->GetDeviceInfo();

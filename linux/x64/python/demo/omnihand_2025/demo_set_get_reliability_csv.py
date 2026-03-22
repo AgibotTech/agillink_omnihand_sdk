@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser(
         description='OmniHand 2025 Set+Get reliability test (set position + get position), log results to CSV'
     )
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485', 'zlgcan_tcp'], default='zlgcan',
                         help='CAN device type (default: zlgcan)')
     parser.add_argument('-i', '--interval_ms', type=int, default=0,
                         help='Request interval in ms (default: 10)')
@@ -51,6 +51,17 @@ def main():
                 hand_device_id=1,
                 canfd_device_id=0,
                 canfd_channel_id=0,
+            )
+        elif args.device == 'rs485':
+            hand = OmniHand2025.create_hand_by_rs485(
+                hand_type=HandType.RIGHT,
+                uart_port='/dev/ttyACM0'
+            )
+        elif args.device == 'zlgcan_tcp':
+            hand = OmniHand2025.create_hand_by_zlgcan_tcp(
+                hand_type=HandType.RIGHT,
+                host='192.168.0.178', 
+                port=8000
             )
         else:
             hand = OmniHand2025.create_hand_by_zlgcan(

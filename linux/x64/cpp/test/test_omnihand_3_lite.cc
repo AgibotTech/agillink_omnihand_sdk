@@ -81,7 +81,7 @@ TEST_F(OmniHand3LiteTest, GetVendorInfo) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   auto vendor_info = hand_->GetVendorInfo();
   std::cout << "[GetVendorInfo] Vendor Info:" << std::endl;
-  std::cout << vendor_info.toString() << std::endl;
+  std::cout << vendor_info.ToString() << std::endl;
   EXPECT_EQ(vendor_info.dof, 4);  // O4 has 4 DOF
 }
 
@@ -90,7 +90,7 @@ TEST_F(OmniHand3LiteTest, GetDeviceInfo) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   auto device_info = hand_->GetDeviceInfo();
   std::cout << "[GetDeviceInfo] Device Info:" << std::endl;
-  std::cout << device_info.toString() << std::endl;
+  std::cout << device_info.ToString() << std::endl;
   EXPECT_EQ(device_info.hand_device_id, 1);
 }
 

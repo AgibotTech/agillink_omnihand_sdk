@@ -41,29 +41,10 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
 
   // ============ 获取设备信息 ============
   auto vendor_info = hand->GetVendorInfo();
-  std::cout << "\nVendor Info:" << std::endl;
-  std::cout << "  Model: " << vendor_info.productModel << std::endl;
-  std::cout << "  Serial: " << vendor_info.productSeqNum << std::endl;
-  std::cout << "  Hardware Version: " << static_cast<int>(vendor_info.hardwareVersion.major_)
-            << "." << static_cast<int>(vendor_info.hardwareVersion.minor_)
-            << "." << static_cast<int>(vendor_info.hardwareVersion.patch_) << std::endl;
-  std::cout << "  Software Version: " << static_cast<int>(vendor_info.softwareVersion.major_)
-            << "." << static_cast<int>(vendor_info.softwareVersion.minor_)
-            << "." << static_cast<int>(vendor_info.softwareVersion.patch_) << std::endl;
-  std::cout << "  Voltage: " << vendor_info.voltage << " mV" << std::endl;
-  std::cout << "  DOF: " << static_cast<int>(vendor_info.dof) << std::endl;
+  std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
 
   auto device_info = hand->GetDeviceInfo();
-  std::cout << "\nDevice Info:" << std::endl;
-  std::cout << "  Device ID: " << static_cast<int>(device_info.hand_device_id) << std::endl;
-  std::cout << "  Communication Parameters:" << std::endl;
-  std::cout << "    Bitrate: " << static_cast<int>(device_info.commu_params.bitrate_) << std::endl;
-  std::cout << "    Sample Point: " << static_cast<int>(device_info.commu_params.sample_point_)
-            << std::endl;
-  std::cout << "    D-Bitrate: " << static_cast<int>(device_info.commu_params.dbitrate_)
-            << std::endl;
-  std::cout << "    D-Sample Point: "
-            << static_cast<int>(device_info.commu_params.dsample_point_) << std::endl;
+  std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
 
   // ============ 读取传感器数据（O4 无触觉，仅温度/电流/错误）============
   std::cout << "\n=== Reading Sensor Data ===" << std::endl;
