@@ -253,12 +253,12 @@ struct AGIBOT_EXPORT VendorInfo {
 
   std::string ToString() const {
     std::stringstream sstream;
-    sstream << "[Product Model: " << productModel
-            << "]\n[Serial Number: " << productSeqNum
-            << "]\n[Hardware Version: " << hardwareVersion.ToString()
-            << "]\n[Software Version: " << softwareVersion.ToString()
-            << "]\n[Supply Voltage: " << voltage << "mV"
-            << "]\n[Active Degrees of Freedom: " << static_cast<unsigned int>(dof) << "]";
+    sstream << "\t[Product Model: " << productModel
+            << "]\n\t[Serial Number: " << productSeqNum
+            << "]\n\t[Hardware Version: " << hardwareVersion.ToString()
+            << "]\n\t[Software Version: " << softwareVersion.ToString()
+            << "]\n\t[Supply Voltage: " << voltage << "mV"
+            << "]\n\t[Active Degrees of Freedom: " << static_cast<unsigned int>(dof) << "]\n";
     return sstream.str();
   }
 };
@@ -277,10 +277,10 @@ struct AGIBOT_EXPORT CommuParams {
     std::vector<std::string> vecSamplePoint = {"75.0%", "80.0%", "87.5%"};
     
     std::stringstream sstream;
-    sstream << "[Arbitration Bitrate: " << (bitrate < vecBitrate.size() ? vecBitrate[bitrate] : "Unknown")
-            << "]\n[Arbitration Sample Point: " << (sample_point < vecSamplePoint.size() ? vecSamplePoint[sample_point] : "Unknown")
-            << "]\n[Data Bitrate: " << (dbitrate < vecBitrate.size() ? vecBitrate[dbitrate] : "Unknown")
-            << "]\n[Data Sample Point: " << (dsample_point < vecSamplePoint.size() ? vecSamplePoint[dsample_point] : "Unknown") << "]";
+    sstream << "\t[Arbitration Bitrate: " << (bitrate < vecBitrate.size() ? vecBitrate[bitrate] : "Unknown")
+            << "]\n\t[Arbitration Sample Point: " << (sample_point < vecSamplePoint.size() ? vecSamplePoint[sample_point] : "Unknown")
+            << "]\n\t[Data Bitrate: " << (dbitrate < vecBitrate.size() ? vecBitrate[dbitrate] : "Unknown")
+            << "]\n\t[Data Sample Point: " << (dsample_point < vecSamplePoint.size() ? vecSamplePoint[dsample_point] : "Unknown") << "]\n";
     return sstream.str();
   }
 };
@@ -294,7 +294,7 @@ struct AGIBOT_EXPORT DeviceInfo {
 
   std::string ToString() const {
     std::stringstream sstream;
-    sstream << "[Hand Device ID: " << static_cast<unsigned int>(hand_device_id) << "]\n";
+    sstream << "\t[Hand Device ID: " << static_cast<unsigned int>(hand_device_id) << "]\n";
     sstream << commu_params.ToString();
     return sstream.str();
   }

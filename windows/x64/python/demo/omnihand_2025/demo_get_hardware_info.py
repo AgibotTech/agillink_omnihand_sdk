@@ -21,7 +21,7 @@ def main():
     elif args.device == 'rs485':
         hand = OmniHand2025.create_hand_by_rs485(
             hand_type=HandType.RIGHT,
-            uart_port='COM7'
+            uart_port='COM6'
         )
     elif args.device == 'zlgcan_tcp':
         hand = OmniHand2025.create_hand_by_zlgcan_tcp(
