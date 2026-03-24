@@ -53,23 +53,23 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
   try {
     auto thumb_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::THUMB);
     std::cout << "  Thumb:" << std::endl;
-    std::cout << "    Online State: " << (thumb_sensor.online_state_ ? "Online" : "Offline") << std::endl;
-    std::cout << "    Normal Force: " << thumb_sensor.normal_force_ << " (0.1N, max: 3000)" << std::endl;
-    std::cout << "    Tangent Force: " << thumb_sensor.tangent_force_ << std::endl;
-    std::cout << "    Tangent Force Angle: " << thumb_sensor.tangent_force_angle_ << "°" << std::endl;
+    std::cout << "    Online State: " << (thumb_sensor.online_state ? "Online" : "Offline") << std::endl;
+    std::cout << "    Normal Force: " << thumb_sensor.normal_force << " (0.1N, max: 3000)" << std::endl;
+    std::cout << "    Tangent Force: " << thumb_sensor.tangent_force << std::endl;
+    std::cout << "    Tangent Force Angle: " << thumb_sensor.tangent_force_angle << "°" << std::endl;
     std::cout << "    Channel Values: [";
     for (int i = 0; i < 9; ++i) {
-      std::cout << thumb_sensor.channel_value_[i];
+      std::cout << thumb_sensor.channel_value[i];
       if (i < 8) std::cout << ", ";
     }
     std::cout << "]" << std::endl;
     
     auto index_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::INDEX);
     std::cout << "  Index:" << std::endl;
-    std::cout << "    Online State: " << (index_sensor.online_state_ ? "Online" : "Offline") << std::endl;
-    std::cout << "    Normal Force: " << index_sensor.normal_force_ << " (0.1N, max: 3000)" << std::endl;
-    std::cout << "    Tangent Force: " << index_sensor.tangent_force_ << std::endl;
-    std::cout << "    Tangent Force Angle: " << index_sensor.tangent_force_angle_ << "°" << std::endl;
+    std::cout << "    Online State: " << (index_sensor.online_state ? "Online" : "Offline") << std::endl;
+    std::cout << "    Normal Force: " << index_sensor.normal_force << " (0.1N, max: 3000)" << std::endl;
+    std::cout << "    Tangent Force: " << index_sensor.tangent_force << std::endl;
+    std::cout << "    Tangent Force Angle: " << index_sensor.tangent_force_angle << "°" << std::endl;
   } catch (const std::exception& e) {
     std::cout << "  Warning: " << e.what() << std::endl;
   }

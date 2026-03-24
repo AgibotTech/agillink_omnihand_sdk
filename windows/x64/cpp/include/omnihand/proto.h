@@ -193,15 +193,33 @@ struct AGIBOT_EXPORT JointMotorErrorReport {
 };
 
 /**
- * @brief 触觉传感器数据 (O12专用)
+ * @brief data structure for 3D tactile sensor data (O12 only)
  */
 struct AGIBOT_EXPORT TactileSensor3DData {
-  unsigned char online_state_;          // 1~传感器在线; 0~传感器不在线
-  unsigned short channel_value_[9];     // 各通道值
-  unsigned short normal_force_;         // 法向力: (0-3000, 0.1N)
-  unsigned short tangent_force_;        // 切向力
-  unsigned short tangent_force_angle_;  // 切向力角度，指尖向上为0度，顺时针旋转: (0~359)
-  unsigned char capa_approach_[4];      // 自电容接近
+  uint8_t online_state;          // 1: online, 0: offline
+  uint16_t channel_value[9];     // raw channel values
+  uint16_t normal_force;         // force normal to the sensor surface (0.1N, max: 2000)
+  uint16_t tangent_force;        // force tangential to the sensor surface (0.1N, max: 2000)
+  uint16_t tangent_force_angle;  // angle of the tangent force in degrees, zero degrees is up (0-359)
+  uint8_t capa_approach[4];      // self-capacitance approach
+
+  std::string ToString() const {
+    std::stringstream sstream;
+    sstream << "\t[Online State: " << static_cast<unsigned int>(online_state) << "]\n";
+    sstream << "\t[Channel Values: ";
+    for (size_t i = 0; i < 9; ++i) {
+      sstream << static_cast<unsigned int>(channel_value[i]) << " ";
+    }
+    sstream << "]\n\t[Normal Force: " << static_cast<unsigned int>(normal_force) << "]\n";
+    sstream << "\t[Tangent Force: " << static_cast<unsigned int>(tangent_force) << "]\n";
+    sstream << "\t[Tangent Force Angle: " << static_cast<unsigned int>(tangent_force_angle) << " degrees]\n";
+    sstream << "\t[Capacitance Approach: ";
+    for (size_t i = 0; i < 4; ++i) {
+      sstream << static_cast<unsigned int>(capa_approach[i]) << " ";
+    }
+    sstream << "]\n";
+    return sstream.str();
+  }
 };
 
 struct AGIBOT_EXPORT Version {
@@ -264,7 +282,7 @@ struct AGIBOT_EXPORT VendorInfo {
 };
 
 /**
- * @brief 通信参数
+ * @brief Communication parameters for CANFD communication
  */
 struct AGIBOT_EXPORT CommuParams {
   uint8_t bitrate{0};
@@ -273,14 +291,18 @@ struct AGIBOT_EXPORT CommuParams {
   uint8_t dsample_point{0};
 
   std::string ToString() const {
-    std::vector<std::string> vecBitrate = {"125Kbps", "500Kbps", "1Mbps", "5Mbps"};
-    std::vector<std::string> vecSamplePoint = {"75.0%", "80.0%", "87.5%"};
-    
+    static std::vector<std::string> vecBitrate = {"125Kbps", "500Kbps", "1Mbps", "5Mbps"};
+    static std::vector<std::string> vecSamplePoint = {"75.0%", "80.0%", "87.5%"};
+
     std::stringstream sstream;
-    sstream << "\t[Arbitration Bitrate: " << (bitrate < vecBitrate.size() ? vecBitrate[bitrate] : "Unknown")
-            << "]\n\t[Arbitration Sample Point: " << (sample_point < vecSamplePoint.size() ? vecSamplePoint[sample_point] : "Unknown")
-            << "]\n\t[Data Bitrate: " << (dbitrate < vecBitrate.size() ? vecBitrate[dbitrate] : "Unknown")
-            << "]\n\t[Data Sample Point: " << (dsample_point < vecSamplePoint.size() ? vecSamplePoint[dsample_point] : "Unknown") << "]\n";
+    sstream << "\t[Arbitration Bitrate: "
+            << (bitrate < vecBitrate.size() ? vecBitrate[bitrate] : "Unknown")
+            << "]\n\t[Arbitration Sample Point: "
+            << (sample_point < vecSamplePoint.size() ? vecSamplePoint[sample_point] : "Unknown")
+            << "]\n\t[Data Bitrate: "
+            << (dbitrate < vecBitrate.size() ? vecBitrate[dbitrate] : "Unknown")
+            << "]\n\t[Data Sample Point: "
+            << (dsample_point < vecSamplePoint.size() ? vecSamplePoint[dsample_point] : "Unknown") << "]\n";
     return sstream.str();
   }
 };

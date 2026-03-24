@@ -98,12 +98,12 @@ struct DeviceInfo {
 
 ```cpp
 struct TactileSensor3DData {
-    unsigned char online_state_;          // 1=online, 0=offline
-    unsigned short channel_value_[9];     // Channel values (9 channels)
-    unsigned short normal_force_;         // Normal force (0-3000, unit: 0.1N)
-    unsigned short tangent_force_;       // Tangent force
-    unsigned short tangent_force_angle_; // Tangent force angle (0-359 degrees, fingertip up = 0°, clockwise)
-    unsigned char capa_approach_[4];      // Capacitive approach values (4 channels)
+    unsigned char online_state;          // 1=online, 0=offline
+    unsigned short channel_value[9];     // Channel values (9 channels)
+    unsigned short normal_force;         // Normal force (0-3000, unit: 0.1N)
+    unsigned short tangent_force;       // Tangent force
+    unsigned short tangent_force_angle; // Tangent force angle (0-359 degrees, fingertip up = 0°, clockwise)
+    unsigned char capa_approach[4];      // Capacitive approach values (4 channels)
 };
 ```
 
@@ -639,7 +639,7 @@ int main() {
 
     // Get 3D tactile sensor data
     auto thumb_data = hand->GetTactileSensor3DData(Finger::THUMB);
-    std::cout << "Thumb normal force: " << thumb_data.normal_force_ << " (0.1N)" << std::endl;
+    std::cout << "Thumb normal force: " << thumb_data.normal_force << " (0.1N)" << std::endl;
 
     return 0;
 }

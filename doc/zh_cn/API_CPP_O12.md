@@ -353,7 +353,7 @@ int main() {
 
     // 获取 3D 触觉传感器数据
     auto thumb_data = hand->GetTactileSensor3DData(Finger::THUMB);
-    std::cout << "拇指法向力: " << thumb_data.normal_force_ << " (0.1N)" << std::endl;
+    std::cout << "拇指法向力: " << thumb_data.normal_force << " (0.1N)" << std::endl;
 
     return 0;
 }
