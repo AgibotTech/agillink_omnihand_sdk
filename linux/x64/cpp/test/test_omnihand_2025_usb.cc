@@ -505,12 +505,11 @@ TEST_F(OmniHand2025UsbTest, KinematicsSolver) {
 }
 
 // ============================================================================
-// StreamCmd Full Coverage Smoke (0x01..0xCD)
+// StreamCmd Tests - Split by functionality
 // ============================================================================
-// Note:
-// - Read commands are always executed.
-// - Some write/action commands are guarded by `--dangerous` to reduce hardware risk.
-TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
+
+// 0x01/0x02: Power state
+TEST_F(OmniHand2025UsbTest, StreamCmdPowerState) {
   RequireDevice();
 
   EXPECT_EQ(hand_->GetRequestInterval(), g_request_interval);
@@ -526,8 +525,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
   // EXPECT_TRUE(hand_->SetAxisHoming(0, 0));
   // EXPECT_TRUE(hand_->SetId(0));
   // EXPECT_TRUE(hand_->SaveParam()); // no work
+}
 
-  // 0x06/0x07 single axis pos (dangerous for set)
+// 0x06/0x07: Single axis position
+TEST_F(OmniHand2025UsbTest, StreamCmdSingleAxisPos) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing single axis pos commands(0x06/0x07):" << std::endl;
   for (int i = 1; i <= agilink::omnihand::PrivateOmniHand2025::kDegreesOfActiveFreedom; ++i) {
     uint16_t origin_pos = hand_->GetSingleAxisPos(i);
@@ -537,9 +540,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
     uint16_t read_pos = hand_->GetSingleAxisPos(i);
     std::cout << "  Joint " << i << ": origin=" << origin_pos << ", set=" << target_pos << ", reply=" << reply_pos << ", read=" << read_pos << std::endl;
   }
+}
 
-  // 0x08/0x09 all axis pos
-  // 0x08 reply payload is 60 bytes: 10xpos(u16 LE) + 10xvel(i16 LE) + 10xcurrent(i8) + 10xerr(i8)
+// 0x08/0x09: All axis position
+TEST_F(OmniHand2025UsbTest, StreamCmdAllAxisPos) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis pos commands(0x08/0x09):" << std::endl;
   std::vector<uint16_t> positions(10, 1024);
   const auto resp = hand_->SetAllAxisPos(positions);
@@ -555,8 +561,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
               << ", read_pos=" << all_pos[i] << std::endl;
   }
   std::cout << "  0x08 reply: \n" << resp.ToString() << std::endl;
+}
 
-  // 0x0A/0x0B/0x0C
+// 0x0A/0x0B/0x0C: Current, velocity, temperature
+TEST_F(OmniHand2025UsbTest, StreamCmdCurrentVelTemp) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis current commands(0x0A):" << std::endl;
   const auto all_current = hand_->GetAllAxisCurrent();
   if (all_current.empty()) GTEST_SKIP() << "GetAllAxisCurrent timeout";
@@ -586,8 +596,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
     std::cout << static_cast<int>(all_temp[i]) << " ";
   }
   std::cout << std::endl;
+}
 
-  // 0x0D/0x0E
+// 0x0D/0x0E/0x0F: Error code, clear error, play action
+TEST_F(OmniHand2025UsbTest, StreamCmdErrorAndAction) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis error code commands(0x0D):" << std::endl;
   EXPECT_GE(hand_->GetErrorCode(), 0u);
   (void)hand_->ClearError();
@@ -595,8 +609,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
   // 0x0F (dangerous action)
   std::cout << "[StreamCmd] Testing all axis action commands(0x0F):" << std::endl;
   (void)hand_->PlayAction(1);
+}
 
-  // 0x10
+// 0x10: Position range
+TEST_F(OmniHand2025UsbTest, StreamCmdPosRange) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis pos range commands(0x10):" << std::endl;
   const auto pos_range = hand_->GetAllAxisPosRange();
   if (pos_range.empty()) GTEST_SKIP() << "GetAllAxisPosRange timeout";
@@ -607,8 +625,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
     if (i < pos_range.size() - 1) std::cout << ", ";
   }
   std::cout << std::endl;
+}
 
-  // 0x11~0x14 tactile sensors
+// 0x11~0x14: Tactile sensors
+TEST_F(OmniHand2025UsbTest, StreamCmdTactileSensors) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis tactile sensors commands(0x11):" << std::endl;
   for (int i = 1; i <= 7; ++i) {
     const auto fingertip0 = hand_->GetFingertipSensor(i);
@@ -634,8 +656,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
   const auto fingertipC = hand_->GetAllFingertipSensorC();
   if (fingertipC.empty()) GTEST_SKIP() << "GetAllFingertipSensorC timeout";
   EXPECT_EQ(fingertipC.size(), 50u);
+}
 
-  // 0x15 run mode (dangerous)
+// 0x15: Run mode
+TEST_F(OmniHand2025UsbTest, StreamCmdRunMode) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing control mode commands(0x15):" << std::endl;
   EXPECT_TRUE(hand_->SetRunMode(1, static_cast<uint8_t>(agilink::omnihand::ControlMode::SERVO)));
 
@@ -645,8 +671,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
   // std::vector<uint16_t> actual_positions(10, 2048);
   // const auto actual_resp = hand_->SetAllActualAxisPos(actual_positions);
   // EXPECT_EQ(actual_resp.size(), 10u);
+}
 
-  // 0x1A load data
+// 0x1A: Load data
+TEST_F(OmniHand2025UsbTest, StreamCmdLoadData) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis load data commands(0x1A):" << std::endl;
   const auto load = hand_->GetAllLoadData();
   if (load.empty()) GTEST_SKIP() << "GetAllLoadData timeout";
@@ -666,8 +696,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
   // EXPECT_TRUE(hand_->SetProtectedTorque(1, 0));
   // EXPECT_TRUE(hand_->SetMinTorque(1, 0));
   // EXPECT_TRUE(hand_->SetProtectiveCurrent(1, 0));
+}
 
-  // 0x26~0x27 IDs
+// 0x26/0x27: Motor and sensor IDs
+TEST_F(OmniHand2025UsbTest, StreamCmdMotorSensorIds) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis ID commands(0x26):" << std::endl;
   const auto motor_ids = hand_->GetAllElectricMotorId();
   if (motor_ids.empty()) GTEST_SKIP() << "GetAllElectricMotorId timeout";
@@ -693,17 +727,25 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
   // 0x28 set all axis CVP upload interval (dangerous)
   std::cout << "[StreamCmd] Skipping all axis CVP upload interval command (0x28) due to potential hardware risk." << std::endl;
   // EXPECT_TRUE(hand_->SetAllAxisCvpUploadInterval(100));
+}
 
-  // 0x29 get all axis CVP
+// 0x29: CVP data
+TEST_F(OmniHand2025UsbTest, StreamCmdCVP) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis CVP commands(0x29):" << std::endl;
   const auto cvp = hand_->GetAllAxisCvp();
   if (cvp.empty()) GTEST_SKIP() << "GetAllAxisCvp timeout";
   EXPECT_EQ(cvp.size(), 60u);
+}
 
-  // 0x30 get axis limit positions
+// 0x30: Axis limit positions
+TEST_F(OmniHand2025UsbTest, StreamCmdAxisLimits) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis limit position commands(0x30):" << std::endl;
   const auto axis_limits = hand_->GetAxisLimitPos();
-  if (axis_limits.empty()) GTEST_SKIP() << "GetAxisLimitPos timeout";
+  if (axis_limits.min_limits.empty()) GTEST_SKIP() << "GetAxisLimitPos timeout";
   EXPECT_EQ(axis_limits.min_limits.size(), 10u);
   EXPECT_EQ(axis_limits.max_limits.size(), 10u);
   std::cout << "  Axis Limits (min/max per joint, 0-4095): ";
@@ -716,8 +758,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
   // 0x31 set right/left hand type (dangerous)
   std::cout << "[StreamCmd] Skipping right/left hand type command (0x31) due to potential hardware risk." << std::endl;
   // EXPECT_TRUE(hand_->SetRightOrLeft(0));
-  
-  // 0x32 set pos/speed/cur
+}
+
+// 0x32: Pos/speed/cur data
+TEST_F(OmniHand2025UsbTest, StreamCmdPosSpeedCur) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing all axis pos/speed/cur commands(0x32):" << std::endl;
   std::vector<uint16_t> ps_positions(10, 2048);
   std::vector<int16_t> ps_speeds(10, 0);
@@ -750,8 +796,12 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
   // 0x80 set control source (dangerous)
   std::cout << "[StreamCmd] Skipping control source command (0x80) due to potential hardware risk." << std::endl;
   // (void)hand_->SetControlSource(0);
+}
 
-  // 0x81 control source query
+// 0x81: Control source query
+TEST_F(OmniHand2025UsbTest, StreamCmdControlSource) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing control source query command(0x81):" << std::endl;
   EXPECT_EQ(hand_->GetControlSource(), 0u);
   std::cout << "  Control Source: " << static_cast<int>(hand_->GetControlSource()) << std::endl;
@@ -761,14 +811,22 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllFunctionsSmoke) {
   std::cout << "[StreamCmd] Skipping set product serial number command (0xC1) due to potential hardware risk." << std::endl;
   // std::vector<uint8_t> serial_number(19, 0);
   // (void)hand_->SetProductSerialNumber(serial_number);
+}
 
-  // 0xC2 get product serial number
+// 0xC2: Product serial number
+TEST_F(OmniHand2025UsbTest, StreamCmdProductSerialNumber) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing get product serial number command(0xC2):" << std::endl;
   const auto prod_serial = hand_->GetProductSerialNumber();
   EXPECT_FALSE(prod_serial.ToString().empty());
   std::cout << "  Product Serial Number: " << prod_serial.ToString() << std::endl;
+}
 
-  // 0xCD get firmware version
+// 0xCD: Firmware version
+TEST_F(OmniHand2025UsbTest, StreamCmdFirmwareVersion) {
+  RequireDevice();
+
   std::cout << "[StreamCmd] Testing get firmware version command(0xCD):" << std::endl;
   const auto fw = hand_->GetFwVersion();
   EXPECT_EQ(fw.dof, 10);

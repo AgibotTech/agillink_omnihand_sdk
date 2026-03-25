@@ -1,29 +1,14 @@
-﻿// Copyright (c) 2025, Agibot Co., Ltd.
+// Copyright (c) 2025, Agibot Co., Ltd.
 // OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
-/**
- * @file O12_demo_canfd_serial.cc
- * @brief OmniHand Pro 2025 控制示例 - CANFD 通信（通过 serial_number）
- * 
- * 此示例演示如何使用设备序列号创建和控制 OmniHand Pro 2025 灵巧手
- * 支持单手（left/right）和双手（both）控制
- * 
- * 编译: cmake .. && make
- * 运行: 
- *   ./demo_omnihand_pro_2025_canfd_serial left    # 控制左手
- *   ./demo_omnihand_pro_2025_canfd_serial right   # 控制右手
- *   ./demo_omnihand_pro_2025_canfd_serial both    # 同时控制左右手
- * 
- * 注意：代码中的序列号需要根据实际情况修改
- */
-
-#include <iostream>
-#include <iomanip>
-#include <vector>
-#include <thread>
-#include <chrono>
-#include <string>
 #include <algorithm>
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 #include "omnihand/omnihand_pro_2025.h"
 
 void printUsage(const char* program_name) {
@@ -38,32 +23,29 @@ void printUsage(const char* program_name) {
 void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand, const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
 
-  // ============ 获取设备信息 ============
   auto vendor_info = hand->GetVendorInfo();
   std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
 
   auto device_info = hand->GetDeviceInfo();
   std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
 
-  // ============ 读取传感器数据 ============
   std::cout << "\n=== Reading Sensor Data ===" << std::endl;
-  
-  // 读取 3D 触觉传感器数据（O12 特有）
+
   std::cout << "\n3D Tactile Sensor Data (O12 only):" << std::endl;
   try {
     auto thumb_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::THUMB);
     std::cout << "  Thumb:" << std::endl;
-    std::cout << "    Online State: " << (thumb_sensor.online_state_ ? "Online" : "Offline") << std::endl;
-    std::cout << "    Normal Force: " << thumb_sensor.normal_force_ << " (0.1N, max: 3000)" << std::endl;
-    std::cout << "    Tangent Force: " << thumb_sensor.tangent_force_ << std::endl;
-    std::cout << "    Tangent Force Angle: " << thumb_sensor.tangent_force_angle_ << "°" << std::endl;
+    std::cout << "    Online State: " << (thumb_sensor.online_state ? "Online" : "Offline") << std::endl;
+    std::cout << "    Normal Force: " << thumb_sensor.normal_force << " (0.1N, max: 3000)" << std::endl;
+    std::cout << "    Tangent Force: " << thumb_sensor.tangent_force << std::endl;
+    std::cout << "    Tangent Force Angle: " << thumb_sensor.tangent_force_angle << "°" << std::endl;
     
     auto index_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::INDEX);
     std::cout << "  Index:" << std::endl;
-    std::cout << "    Online State: " << (index_sensor.online_state_ ? "Online" : "Offline") << std::endl;
-    std::cout << "    Normal Force: " << index_sensor.normal_force_ << " (0.1N, max: 3000)" << std::endl;
-    std::cout << "    Tangent Force: " << index_sensor.tangent_force_ << std::endl;
-    std::cout << "    Tangent Force Angle: " << index_sensor.tangent_force_angle_ << "°" << std::endl;
+    std::cout << "    Online State: " << (index_sensor.online_state ? "Online" : "Offline") << std::endl;
+    std::cout << "    Normal Force: " << index_sensor.normal_force << " (0.1N, max: 3000)" << std::endl;
+    std::cout << "    Tangent Force: " << index_sensor.tangent_force << std::endl;
+    std::cout << "    Tangent Force Angle: " << index_sensor.tangent_force_angle << "°" << std::endl;
   } catch (const std::exception& e) {
     std::cout << "  Warning: " << e.what() << std::endl;
   }

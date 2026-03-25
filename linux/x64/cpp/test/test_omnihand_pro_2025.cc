@@ -221,21 +221,15 @@ TEST_F(OmniHandPro2025Test, TactileSensor3D) {
     // Test single sensor
     auto thumb_tactile = hand_->GetTactileSensor3DData(agilink::omnihand::Finger::THUMB);
     std::cout << "[GetTactileSensor3DData] Thumb 3D Tactile Data:" << std::endl;
-    std::cout << "  Online State: " << static_cast<int>(thumb_tactile.online_state_) << std::endl;
-    std::cout << "  Normal Force: " << thumb_tactile.normal_force_ << std::endl;
-    std::cout << "  Tangent Force: " << thumb_tactile.tangent_force_ << std::endl;
-    std::cout << "  Tangent Force Angle: " << thumb_tactile.tangent_force_angle_ << std::endl;
-    EXPECT_GE(thumb_tactile.normal_force_, 0);
-    
+    std::cout << thumb_tactile.ToString() << std::endl;
+    EXPECT_GE(thumb_tactile.normal_force, 0);
+
     // Test multiple sensors
     std::vector<agilink::omnihand::Finger> fingers = {agilink::omnihand::Finger::INDEX, agilink::omnihand::Finger::MIDDLE, agilink::omnihand::Finger::RING, agilink::omnihand::Finger::LITTLE};
     for (const auto& finger : fingers) {
       auto tactile_data = hand_->GetTactileSensor3DData(finger);
       std::cout << "[GetTactileSensor3DData] " << static_cast<int>(finger) << " 3D Tactile Data:" << std::endl;
-      std::cout << "  Online State: " << static_cast<int>(tactile_data.online_state_) << std::endl;
-      std::cout << "  Normal Force: " << tactile_data.normal_force_ << std::endl;
-      std::cout << "  Tangent Force: " << tactile_data.tangent_force_ << std::endl;
-      std::cout << "  Tangent Force Angle: " << tactile_data.tangent_force_angle_ << std::endl;
+      std::cout << tactile_data.ToString() << std::endl;
     }
   }
 }
