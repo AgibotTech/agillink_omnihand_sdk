@@ -58,9 +58,14 @@ def main():
                     print(f"Finger Data: {joints}")
                     set_hand_position(args.hand, joints, args.hal_ip, args.hal_port)
 
-    while True:
-        update()
-        time.sleep(0.05)
+    try:
+        while True:
+            update()
+            time.sleep(0.05)
+    except KeyboardInterrupt:
+        print("\n已中断，正在退出...")
+    finally:
+        sdk.end_listening()
 
 
 if __name__ == "__main__":

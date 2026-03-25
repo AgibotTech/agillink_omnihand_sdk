@@ -64,16 +64,26 @@ class GloveReceiver:
             return
         self.cur_status = ServerStatus.IN_LISTENING
         print("GloveReceiver Start Listening..")
-        self.recv_thread = Thread(target=self.recv_func)
+        # daemon=True：主线程退出时不无限等待；仍须调用 end_listening 关闭套接字以唤醒 recvfrom
+        self.recv_thread = Thread(target=self.recv_func, daemon=True)
         self.recv_thread.start()
 
     def end_listening(self):
         """
-        停止监听，关闭线程
+        停止监听并结束接收线程。
+
+        必须先结束状态并关闭 UDP 套接字，使阻塞在 recvfrom 上的线程被唤醒；
+        否则仅 join 会永久等待，Ctrl+C 后主进程无法退出。
         """
-        if self.recv_thread and self.recv_thread.is_alive():
-            self.recv_thread.join()
         self.cur_status = ServerStatus.END
+        if self.sock is not None:
+            try:
+                self.sock.close()
+            except OSError:
+                pass
+            self.sock = None
+        if self.recv_thread is not None and self.recv_thread.is_alive():
+            self.recv_thread.join(timeout=3.0)
         print("GloveReceiver Stopped Listening")
 
     def recv_func(self):
@@ -82,14 +92,18 @@ class GloveReceiver:
         """
         while self.cur_status == ServerStatus.IN_LISTENING:
             if self.sock is None:
-                print("Socket 未初始化")
                 break
             try:
                 data, addr = self.sock.recvfrom(1024 * 1024)
                 self.process_data(data.decode("utf-8"))
             except socket.timeout:
                 continue
+            except OSError:
+                # 其它线程调用 sock.close() 退出时常见
+                break
             except Exception as e:
+                if self.cur_status != ServerStatus.IN_LISTENING:
+                    break
                 print(f"Error receiving data: {e}")
 
     def process_data(self, data: str):
