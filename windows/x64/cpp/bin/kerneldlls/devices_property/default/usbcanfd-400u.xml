@@ -510,6 +510,26 @@
 					</options>
 				</meta>
 			</get_device_lin_uds_support>
+			<script_load flag="0x002E">
+				<value>.</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>下载脚本</desc>
+				</meta>
+			</script_load>
+			<script_en flag="0x002F">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>脚本使能</desc>
+					<options>
+						<option type="int32" value="0" desc="no"></option>
+						<option type="int32" value="1" desc="yes"></option>
+					</options>
+				</meta>
+			</script_en>
 		</channel_0>
 		<channel_1 stream="channel_1" case="parent-value=1">
 			<protocol flag="0x0152" at_initcan="pre">
@@ -966,6 +986,26 @@
 					</options>
 				</meta>
 			</get_device_lin_uds_support>
+			<script_load flag="0x012E">
+				<value>.</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>下载脚本</desc>
+				</meta>
+			</script_load>
+			<script_en flag="0x012F">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>脚本使能</desc>
+					<options>
+						<option type="int32" value="0" desc="no"></option>
+						<option type="int32" value="1" desc="yes"></option>
+					</options>
+				</meta>
+			</script_en>
 		</channel_1>
 		<channel_2 stream="channel_2" case="parent-value=2">
 			<protocol flag="0x0252" at_initcan="pre">
@@ -1422,6 +1462,26 @@
 					</options>
 				</meta>
 			</get_device_lin_uds_support>
+			<script_load flag="0x022E">
+				<value>.</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>下载脚本</desc>
+				</meta>
+			</script_load>
+			<script_en flag="0x022F">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>脚本使能</desc>
+					<options>
+						<option type="int32" value="0" desc="no"></option>
+						<option type="int32" value="1" desc="yes"></option>
+					</options>
+				</meta>
+			</script_en>
 		</channel_2>
 		<channel_3 stream="channel_3" case="parent-value=3">
 			<protocol flag="0x0352" at_initcan="pre">
@@ -1878,6 +1938,26 @@
 					</options>
 				</meta>
 			</get_device_lin_uds_support>
+			<script_load flag="0x032E">
+				<value>.</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>下载脚本</desc>
+				</meta>
+			</script_load>
+			<script_en flag="0x032F">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>脚本使能</desc>
+					<options>
+						<option type="int32" value="0" desc="no"></option>
+						<option type="int32" value="1" desc="yes"></option>
+					</options>
+				</meta>
+			</script_en>
 		</channel_3>
 	</channel>
 </info>

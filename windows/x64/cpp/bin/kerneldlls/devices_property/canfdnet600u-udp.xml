@@ -330,6 +330,30 @@
 					<desc>动态配置数据生效</desc>
 				</meta>
 			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0036">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0037">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0038">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 	
 		</channel_0>
 		<channel_1 stream="channel_1" case="parent-value=1">
 			<protocol flag="0x0152" at_initcan="pre">
@@ -536,6 +560,30 @@
 					<desc>动态配置数据生效</desc>
 				</meta>
 			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0136">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0137">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0138">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 	
 		</channel_1>
 		<channel_2 stream="channel_2" case="parent-value=2">
 			<protocol flag="0x0252" at_initcan="pre">
@@ -742,6 +790,30 @@
 					<desc>动态配置数据生效</desc>
 				</meta>
 			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0236">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0237">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0238">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 	
 		</channel_2>
 		<channel_3 stream="channel_3" case="parent-value=3">
 			<protocol flag="0x0352" at_initcan="pre">
@@ -947,7 +1019,31 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>			
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0336">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0337">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0338">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 				
 		</channel_3>
 		<channel_4 stream="channel_4" case="parent-value=4">
 			<protocol flag="0x0452" at_initcan="pre">
@@ -1153,7 +1249,31 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>			
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0436">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0437">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0438">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 				
 		</channel_4>
 		<channel_5 stream="channel_5" case="parent-value=5">
 			<protocol flag="0x0552" at_initcan="pre">
@@ -1360,6 +1480,30 @@
 					<desc>动态配置数据生效</desc>
 				</meta>
 			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0536">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0537">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0538">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 	
 		</channel_5>
 	</channel>
 </info>

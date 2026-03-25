@@ -327,7 +327,31 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>	
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0036">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0037">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0038">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
 			<filter_mode flag="0x0030" at_initcan="post">
 				<value>0</value>
 				<meta>
@@ -586,7 +610,31 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>	
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0136">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0137">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0138">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
 			<filter_mode flag="0x0130" at_initcan="post">
 				<value>0</value>
 				<meta>
@@ -845,7 +893,31 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>	
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0236">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0237">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0238">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
 			<filter_mode flag="0x0230" at_initcan="post">
 				<value>0</value>
 				<meta>
@@ -1104,7 +1176,31 @@
 					<visible>false</visible>
 					<desc>动态配置数据生效</desc>
 				</meta>
-			</apply_dynamic_data>	
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0336">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0337">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0338">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
 			<filter_mode flag="0x0330" at_initcan="post">
 				<value>0</value>
 				<meta>

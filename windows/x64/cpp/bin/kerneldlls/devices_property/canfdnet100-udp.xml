@@ -293,6 +293,46 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+            <add_dynamic_data flag="0x002E">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x002F">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0036">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0037">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0038">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 	
 		</channel_0>
 	</channel>
 </info>

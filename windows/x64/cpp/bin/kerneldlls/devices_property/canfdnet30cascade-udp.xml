@@ -338,6 +338,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x002e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x002f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0036">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0037">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0038">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0039" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_0>
 		<channel_1 stream="channel_1" case="parent-value=1">
 			<protocol flag="0x0152" at_initcan="pre">
@@ -528,6 +580,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x012e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x012f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0136">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0137">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0138">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0139" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_1>
 		<channel_2 stream="channel_2" case="parent-value=2">
 			<protocol flag="0x0252" at_initcan="pre">
@@ -718,6 +822,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x022e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x022f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0236">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0237">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0238">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0239" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_2>
 		<channel_3 stream="channel_3" case="parent-value=3">
 			<protocol flag="0x0352" at_initcan="pre">
@@ -908,6 +1064,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x032e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x032f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0336">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0337">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0338">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0339" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_3>
 		<channel_4 stream="channel_4" case="parent-value=4">
 			<protocol flag="0x0452" at_initcan="pre">
@@ -1098,6 +1306,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x042e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x042f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0436">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0437">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0438">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0439" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_4>
 		<channel_5 stream="channel_5" case="parent-value=5">
 			<protocol flag="0x0552" at_initcan="pre">
@@ -1288,6 +1548,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x052e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x052f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0536">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0537">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0538">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0539" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_5>
 		<channel_6 stream="channel_6" case="parent-value=6">
 			<protocol flag="0x0652" at_initcan="pre">
@@ -1478,6 +1790,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x062e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x062f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0636">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0637">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0638">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0639" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_6>
 		<channel_7 stream="channel_7" case="parent-value=7">
 			<protocol flag="0x0752" at_initcan="pre">
@@ -1668,6 +2032,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x072e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x072f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0736">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0737">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0738">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0739" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_7>
 		<channel_8 stream="channel_8" case="parent-value=8">
 			<protocol flag="0x0852" at_initcan="pre">
@@ -1858,6 +2274,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x082e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x082f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0836">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0837">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0838">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0839" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_8>
 		<channel_9 stream="channel_9" case="parent-value=9">
 			<protocol flag="0x0952" at_initcan="pre">
@@ -2048,6 +2516,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x092e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x092f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0936">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0937">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0938">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0939" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_9>
 		<channel_10 stream="channel_10" case="parent-value=10">
 			<protocol flag="0x0a52" at_initcan="pre">
@@ -2238,6 +2758,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x0a2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x0a2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0a36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0a37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0a38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0a39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_10>
 		<channel_11 stream="channel_11" case="parent-value=11">
 			<protocol flag="0x0b52" at_initcan="pre">
@@ -2428,6 +3000,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x0b2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x0b2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0b36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0b37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0b38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0b39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_11>
 		<channel_12 stream="channel_12" case="parent-value=12">
 			<protocol flag="0x0c52" at_initcan="pre">
@@ -2618,6 +3242,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x0c2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x0c2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0c36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0c37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0c38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0c39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_12>
 		<channel_13 stream="channel_13" case="parent-value=13">
 			<protocol flag="0x0d52" at_initcan="pre">
@@ -2808,7 +3484,59 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
-		</channel_13>
+			<add_dynamic_data flag="0x0d2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x0d2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0d36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0d37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0d38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0d39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
+		</channel_13>	
 		<channel_14 stream="channel_14" case="parent-value=14">
 			<protocol flag="0x0e52" at_initcan="pre">
 				<value>1</value>
@@ -2998,6 +3726,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x0e2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x0e2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0e36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0e37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0e38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0e39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_14>
 		<channel_15 stream="channel_15" case="parent-value=15">
 			<protocol flag="0x0f52" at_initcan="pre">
@@ -3188,7 +3968,59 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
-		</channel_15>
+			<add_dynamic_data flag="0x0f2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x0f2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x0f36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x0f37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x0f38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x0f39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
+		</channel_15>	
 		<channel_16 stream="channel_16" case="parent-value=16">
 			<protocol flag="0x1052" at_initcan="pre">
 				<value>1</value>
@@ -3378,6 +4210,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x102e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x102f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1036">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1037">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1038">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1039" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_16>
 		<channel_17 stream="channel_17" case="parent-value=17">
 			<protocol flag="0x1152" at_initcan="pre">
@@ -3568,6 +4452,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x112e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x112f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1136">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1137">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1138">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1139" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_17>
 		<channel_18 stream="channel_18" case="parent-value=18">
 			<protocol flag="0x1252" at_initcan="pre">
@@ -3758,6 +4694,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x122e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x122f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1236">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1237">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1238">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1239" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_18>
 		<channel_19 stream="channel_19" case="parent-value=19">
 			<protocol flag="0x1352" at_initcan="pre">
@@ -3948,6 +4936,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x132e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x132f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1336">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1337">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1338">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1339" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_19>
 		<channel_20 stream="channel_20" case="parent-value=20">
 			<protocol flag="0x1452" at_initcan="pre">
@@ -4138,6 +5178,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x142e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x142f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1436">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1437">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1438">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1439" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_20>
 		<channel_21 stream="channel_21" case="parent-value=21">
 			<protocol flag="0x1552" at_initcan="pre">
@@ -4328,6 +5420,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x152e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x152f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1536">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1537">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1538">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1539" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_21>
 		<channel_22 stream="channel_22" case="parent-value=22">
 			<protocol flag="0x1652" at_initcan="pre">
@@ -4518,6 +5662,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x162e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x162f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1636">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1637">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1638">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1639" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_22>
 		<channel_23 stream="channel_23" case="parent-value=23">
 			<protocol flag="0x1752" at_initcan="pre">
@@ -4708,6 +5904,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x172e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x172f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1736">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1737">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1738">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1739" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_23>
 		<channel_24 stream="channel_24" case="parent-value=24">
 			<protocol flag="0x1852" at_initcan="pre">
@@ -4898,6 +6146,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x182e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x182f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1836">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1837">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1838">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1839" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_24>
 		<channel_25 stream="channel_25" case="parent-value=25">
 			<protocol flag="0x1952" at_initcan="pre">
@@ -5088,6 +6388,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x192e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x192f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1936">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1937">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1938">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1939" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_25>
 		<channel_26 stream="channel_26" case="parent-value=26">
 			<protocol flag="0x1a52" at_initcan="pre">
@@ -5278,6 +6630,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x1a2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x1a2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1a36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1a37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1a38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1a39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_26>
 		<channel_27 stream="channel_27" case="parent-value=27">
 			<protocol flag="0x1b52" at_initcan="pre">
@@ -5468,6 +6872,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x1b2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x1b2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1b36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1b37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1b38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1b39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_27>
 		<channel_28 stream="channel_28" case="parent-value=28">
 			<protocol flag="0x1c52" at_initcan="pre">
@@ -5658,6 +7114,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<add_dynamic_data flag="0x1c2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x1c2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1c36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1c37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1c38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1c39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
 		</channel_28>
 		<channel_29 stream="channel_29" case="parent-value=29">
 			<protocol flag="0x1d52" at_initcan="pre">
@@ -5848,6 +7356,58 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
-		</channel_29>		
+			<add_dynamic_data flag="0x1d2e">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>添加动态配置数据</desc>
+				</meta>
+			</add_dynamic_data>
+			<apply_dynamic_data flag="0x1d2f">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>动态配置数据生效</desc>
+				</meta>
+			</apply_dynamic_data>
+			<set_dynamic_cfg_by_json flag="0x1d36">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置动态配置</desc>
+				</meta>
+			</set_dynamic_cfg_by_json>	
+			<dev_ctrl flag="0x1d37">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设备控制</desc>
+				</meta>
+			</dev_ctrl>	
+			<dev_time_set flag="0x1d38">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>设置设备时间</desc>
+				</meta>
+			</dev_time_set>	 		
+			<lin_initenal_resistance flag="0x1d39" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>lin终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>	 	
+		</channel_29>	
 	</channel>
 </info>

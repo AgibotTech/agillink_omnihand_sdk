@@ -228,6 +228,20 @@ struct AGIBOT_EXPORT Version {
   uint8_t patch{0};
   uint8_t res{0};
 
+  Version() = default;
+  Version(uint8_t major, uint8_t minor, uint8_t patch, uint8_t res = 0)
+      : major(major), minor(minor), patch(patch), res(res) {}
+
+  bool operator>(const Version& other) const {
+    if (major > other.major) return true;
+    if (major < other.major) return false;
+    if (minor > other.minor) return true;
+    if (minor < other.minor) return false;
+    if (patch > other.patch) return true;
+    if (patch < other.patch) return false;
+    return res > other.res;
+  }
+
   bool operator>=(const Version& other) const {
     if (major < other.major) return false;
     if (major > other.major) return true;

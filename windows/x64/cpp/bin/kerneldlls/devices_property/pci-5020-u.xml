@@ -69,6 +69,14 @@
 					</options>
 				</meta>
 			</work_mode>
+			<tx_timeout flag="0x0051" at_initcan="post">
+				<value>3000</value>
+				<meta>
+					<type>uint32</type>
+					<visible>false</visible>
+					<desc>发送超时</desc>
+				</meta>
+			</tx_timeout>
 			<auto_send flag="0x0034">
 				<value>0</value>
 				<meta>
@@ -179,6 +187,14 @@
 					</options>
 				</meta>
 			</work_mode>
+			<tx_timeout flag="0x0151" at_initcan="post">
+				<value>1000</value>
+				<meta>
+					<type>uint32</type>
+					<visible>false</visible>
+					<desc>发送超时</desc>
+				</meta>
+			</tx_timeout>
 			<auto_send flag="0x0134">
 				<value>0</value>
 				<meta>

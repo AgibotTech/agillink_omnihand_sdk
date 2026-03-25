@@ -67,6 +67,14 @@
 					</options>
 				</meta>
 			</work_mode>
+			<tx_timeout flag="0x0051" at_initcan="post">
+				<value>3000</value>
+				<meta>
+					<type>uint32</type>
+					<visible>false</visible>
+					<desc>发送超时</desc>
+				</meta>
+			</tx_timeout>
 			<filter_clear flag="0x0049" at_initcan="post">
 				<value>0</value>
 				<meta>

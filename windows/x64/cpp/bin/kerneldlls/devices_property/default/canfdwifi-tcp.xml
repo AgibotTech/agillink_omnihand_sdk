@@ -211,6 +211,14 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<get_bus_usage flag="0x001C">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>获取总线利用率</desc>
+				</meta>
+			</get_bus_usage>
 		</channel_0>
 	</channel>
 </info>

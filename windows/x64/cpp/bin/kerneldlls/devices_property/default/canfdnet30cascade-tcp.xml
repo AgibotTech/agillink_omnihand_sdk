@@ -352,6 +352,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0029" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_0>
 		<channel_1 stream="channel_1" case="parent-value=1">
 			<protocol flag="0x0152" at_initcan="pre">
@@ -556,6 +568,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0129" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_1>
 		<channel_2 stream="channel_2" case="parent-value=2">
 			<protocol flag="0x0252" at_initcan="pre">
@@ -760,6 +784,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0229" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_2>
 		<channel_3 stream="channel_3" case="parent-value=3">
 			<protocol flag="0x0352" at_initcan="pre">
@@ -964,6 +1000,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0329" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_3>
 		<channel_4 stream="channel_4" case="parent-value=4">
 			<protocol flag="0x0452" at_initcan="pre">
@@ -1168,6 +1216,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0429" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_4>
 		<channel_5 stream="channel_5" case="parent-value=5">
 			<protocol flag="0x0552" at_initcan="pre">
@@ -1372,6 +1432,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0529" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_5>
 		<channel_6 stream="channel_6" case="parent-value=6">
 			<protocol flag="0x0652" at_initcan="pre">
@@ -1576,6 +1648,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0629" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_6>
 		<channel_7 stream="channel_7" case="parent-value=7">
 			<protocol flag="0x0752" at_initcan="pre">
@@ -1780,6 +1864,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0729" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_7>
 		<channel_8 stream="channel_8" case="parent-value=8">
 			<protocol flag="0x0852" at_initcan="pre">
@@ -1984,6 +2080,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0829" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_8>
 		<channel_9 stream="channel_9" case="parent-value=9">
 			<protocol flag="0x0952" at_initcan="pre">
@@ -2188,6 +2296,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0929" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_9>
 		<channel_10 stream="channel_10" case="parent-value=10">
 			<protocol flag="0x0a52" at_initcan="pre">
@@ -2392,6 +2512,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0a29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_10>
 		<channel_11 stream="channel_11" case="parent-value=11">
 			<protocol flag="0x0b52" at_initcan="pre">
@@ -2596,6 +2728,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0b29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_11>
 		<channel_12 stream="channel_12" case="parent-value=12">
 			<protocol flag="0x0c52" at_initcan="pre">
@@ -2800,6 +2944,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0c29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_12>
 		<channel_13 stream="channel_13" case="parent-value=13">
 			<protocol flag="0x0d52" at_initcan="pre">
@@ -3004,6 +3160,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0d29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_13>	
 		<channel_14 stream="channel_14" case="parent-value=14">
 			<protocol flag="0x0e52" at_initcan="pre">
@@ -3208,6 +3376,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0e29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_14>
 		<channel_15 stream="channel_15" case="parent-value=15">
 			<protocol flag="0x0f52" at_initcan="pre">
@@ -3412,6 +3592,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x0f29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_15>	
 		<channel_16 stream="channel_16" case="parent-value=16">
 			<protocol flag="0x1052" at_initcan="pre">
@@ -3616,6 +3808,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1029" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_16>
 		<channel_17 stream="channel_17" case="parent-value=17">
 			<protocol flag="0x1152" at_initcan="pre">
@@ -3820,6 +4024,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1129" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_17>
 		<channel_18 stream="channel_18" case="parent-value=18">
 			<protocol flag="0x1252" at_initcan="pre">
@@ -4024,6 +4240,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1229" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_18>
 		<channel_19 stream="channel_19" case="parent-value=19">
 			<protocol flag="0x1352" at_initcan="pre">
@@ -4228,6 +4456,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1329" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_19>
 		<channel_20 stream="channel_20" case="parent-value=20">
 			<protocol flag="0x1452" at_initcan="pre">
@@ -4432,6 +4672,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1429" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_20>
 		<channel_21 stream="channel_21" case="parent-value=21">
 			<protocol flag="0x1552" at_initcan="pre">
@@ -4636,6 +4888,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1529" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_21>
 		<channel_22 stream="channel_22" case="parent-value=22">
 			<protocol flag="0x1652" at_initcan="pre">
@@ -4840,6 +5104,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1629" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_22>
 		<channel_23 stream="channel_23" case="parent-value=23">
 			<protocol flag="0x1752" at_initcan="pre">
@@ -5044,6 +5320,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1729" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_23>
 		<channel_24 stream="channel_24" case="parent-value=24">
 			<protocol flag="0x1852" at_initcan="pre">
@@ -5248,6 +5536,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1829" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_24>
 		<channel_25 stream="channel_25" case="parent-value=25">
 			<protocol flag="0x1952" at_initcan="pre">
@@ -5452,6 +5752,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1929" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_25>
     	<channel_26 stream="channel_26" case="parent-value=26">
 			<protocol flag="0x1a52" at_initcan="pre">
@@ -5656,6 +5968,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1a29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_26>
 		<channel_27 stream="channel_27" case="parent-value=27">
 			<protocol flag="0x1b52" at_initcan="pre">
@@ -5860,6 +6184,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1b29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_27>
 		<channel_28 stream="channel_28" case="parent-value=28">
 			<protocol flag="0x1c52" at_initcan="pre">
@@ -6064,6 +6400,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1c29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_28>
 		<channel_29 stream="channel_29" case="parent-value=29">
 			<protocol flag="0x1d52" at_initcan="pre">
@@ -6268,6 +6616,18 @@
 					<desc>获取设备发送回显状态</desc>
 				</meta>
 			</get_device_tx_echo>
+			<lin_initenal_resistance flag="0x1d29" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>options.int32</type>
+					<desc>LIN终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</lin_initenal_resistance>
 		</channel_29>	
 	</channel>
 </info>
