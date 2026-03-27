@@ -1,7 +1,7 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
 # OmniHand 2025 SDK is licensed under Mulan PSL v2
 
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 
 # Option to enable/disable tests
 option(BUILD_CPP_TESTS "Build C++ unit tests" ON)
@@ -10,16 +10,28 @@ if(NOT BUILD_CPP_TESTS)
   return()
 endif()
 
-# Find GoogleTest
+# GoogleTest：优先使用仓库内 cpp/third_party/googletest-1.14.0，直接 add_subdirectory，
+# 避免 FetchContent 生成 googletest-subbuild；工程整体迁移路径后 _deps 里 CMakeCache 绝对路径不一致会报错。
+get_filename_component(_gtest_vendor_default "${CMAKE_CURRENT_LIST_DIR}/../third_party/googletest-1.14.0" ABSOLUTE)
+if(NOT googletest_LOCAL_SOURCE AND EXISTS "${_gtest_vendor_default}/CMakeLists.txt")
+  set(googletest_LOCAL_SOURCE "${_gtest_vendor_default}" CACHE PATH "Local googletest source (skips FetchContent)")
+endif()
+
 include(FetchContent)
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        v1.14.0
-)
 # For Windows: Prevent overriding the parent project's compiler settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+
+if(googletest_LOCAL_SOURCE)
+  get_filename_component(_gtest_src "${googletest_LOCAL_SOURCE}" ABSOLUTE)
+  add_subdirectory("${_gtest_src}" "${CMAKE_BINARY_DIR}/_deps/googletest-build" EXCLUDE_FROM_ALL)
+else()
+  FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        v1.14.0
+  )
+  FetchContent_MakeAvailable(googletest)
+endif()
 
 # Enable testing
 enable_testing()

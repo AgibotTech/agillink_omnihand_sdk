@@ -21,11 +21,15 @@ set_target_properties(demo_omnihand_2025_canfd_serial PROPERTIES
 )
 
 # ZLG CAN over TCP (e.g. WiFi/Ethernet adapter as server)
-add_executable(demo_omnihand_2025_zlgcan_tcp O10_demo_zlgcan_tcp.cc)
-target_link_libraries(demo_omnihand_2025_zlgcan_tcp PRIVATE ${OMNIHAND_TARGET})
-set_target_properties(demo_omnihand_2025_zlgcan_tcp PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${DEMO_OUTPUT_DIR}"
-)
+if(OMNIHAND_ZLG_TCP_SUPPORTED)
+  add_executable(demo_omnihand_2025_zlgcan_tcp O10_demo_zlgcan_tcp.cc)
+  target_link_libraries(demo_omnihand_2025_zlgcan_tcp PRIVATE ${OMNIHAND_TARGET})
+  set_target_properties(demo_omnihand_2025_zlgcan_tcp PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${DEMO_OUTPUT_DIR}"
+  )
+else()
+  message(STATUS "Skip demo_omnihand_2025_zlgcan_tcp: OMNIHAND_ZLG_TCP_SUPPORTED=0 on this platform")
+endif()
 
 # RS485
 add_executable(demo_omnihand_2025_rs485 O10_demo_rs485.cc)
