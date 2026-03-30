@@ -94,7 +94,7 @@ class DeviceInfo:
 ```python
 class TactileSensor3DData:
     online_state: int             # 1=online, 0=offline
-    channel_values: List[int]      # 9 channels
+    channel_values: List[int]      # Six native channel values
     normal_force: int              # Normal force (0-3000, unit: 0.1N)
     tangent_force: int             # Tangent force
     tangent_force_angle: int       # Tangent force angle (0-359 degrees)
@@ -492,7 +492,7 @@ def get_tactile_sensor_3d_data(self, eFinger: Finger) -> TactileSensor3DData:
     Returns:
         TactileSensor3DData: 3D tactile sensor data structure containing:
                            - online_state: Sensor online status
-                           - channel_values: Raw sensor channel values (9 channels)
+                           - channel_values: Six native sampled channel values
                            - normal_force: Normal force (0-3000, unit: 0.1N)
                            - tangent_force: Tangent force
                            - tangent_force_angle: Tangent force angle (0-359 degrees)

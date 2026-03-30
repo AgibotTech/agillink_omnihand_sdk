@@ -58,9 +58,9 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::cout << "    Tangent Force: " << thumb_sensor.tangent_force << std::endl;
     std::cout << "    Tangent Force Angle: " << thumb_sensor.tangent_force_angle << "°" << std::endl;
     std::cout << "    Channel Values: [";
-    for (int i = 0; i < 9; ++i) {
-      std::cout << thumb_sensor.channel_value[i];
-      if (i < 8) std::cout << ", ";
+    for (size_t i = 0; i < agilink::omnihand::TactileSensor3DData::kChannelCount; ++i) {
+      std::cout << thumb_sensor.GetChannelValue(i);
+      if (i + 1 < agilink::omnihand::TactileSensor3DData::kChannelCount) std::cout << ", ";
     }
     std::cout << "]" << std::endl;
     

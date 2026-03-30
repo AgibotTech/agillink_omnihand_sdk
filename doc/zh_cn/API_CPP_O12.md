@@ -247,7 +247,7 @@ std::vector<int16_t> GetAllJointMotorPosi() const;
  * @param eFinger 手指枚举值（O12 仅支持手指，不支持手心/手背）
  * @return TactileSensor3DData 结构，包含：
  *         - online_state: 传感器在线状态
- *         - channel_value[9]: 通道值（9 个通道）
+ *         - channel_value[6]: 六个原生通道值
  *         - normal_force: 法向力（0-3000，单位：0.1N）
  *         - tangent_force: 切向力
  *         - tangent_force_angle: 切向力角度（0-359 度）

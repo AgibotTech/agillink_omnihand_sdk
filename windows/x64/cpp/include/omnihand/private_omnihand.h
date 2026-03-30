@@ -476,9 +476,9 @@ class AGIBOT_EXPORT PrivateOmniHand {
    * @param torques Vector of torques (10 bytes, 1 byte per axis, range 0-255)
    * @return Response data (60 bytes: positions, velocities, torques, fault states)
    */
-  virtual SetAllAxisPosResponse SetPosSpeedCurData(const std::vector<uint16_t>& positions,
-                                                   const std::vector<int16_t>& speeds,
-                                                   const std::vector<uint8_t>& torques) = 0;
+  virtual SetAllAxisPosResponse SetPosSpeedTorqueData(const std::vector<uint16_t>& positions,
+                                                      const std::vector<int16_t>& speeds,
+                                                      const std::vector<uint8_t>& torques) = 0;
 
   /**
    * @brief 0x33: Get finger tactile force summary data

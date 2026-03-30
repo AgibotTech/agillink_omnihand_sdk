@@ -28,8 +28,8 @@ def main():
                         help='Request interval in ms (default: 10)')
     parser.add_argument('-n', '--iterations', type=int, default=1000,
                         help='Number of set+get iterations (default: 1000)')
-    parser.add_argument('-o', '--output', type=str, default='set_get_reliability.csv',
-                        help='Output CSV path (default: set_get_reliability.csv)')
+    parser.add_argument('-o', '--output', type=str, default='same_set_get_reliability.csv',
+                        help='Output CSV path (default: same_set_get_reliability.csv)')
     parser.add_argument('--timeout_ms', type=int, default=30,
                         help='Frame receive timeout in ms (default: 30)')
     parser.add_argument('--positions', type=str, default='2048,0,0,0,0,0,0,0,0,4095',
@@ -80,7 +80,7 @@ def main():
 
     hand.set_request_interval(interval_ms)
     hand.set_frame_recv_timeout(frame_recv_timeout_ms)
-    hand.show_data_details(True)
+    # hand.show_data_details(True)
     open_target_positions = [4087, 18, 3963, 2026, 4094, 4094, 2072, 4094, 39, 4093]
     fist_target_positions = [4087, 4085, 1634, 2040, 3, 3, 2035, 2, 9, 3]
     hand.set_all_joint_positions(open_target_positions)

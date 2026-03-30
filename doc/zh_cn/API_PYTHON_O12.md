@@ -210,7 +210,7 @@ def get_tactile_sensor_3d_data(self, eFinger: Finger) -> TactileSensor3DData:
     Returns:
         TactileSensor3DData: 3D 触觉传感器数据结构，包含：
                            - online_state: 传感器在线状态
-                           - channel_values: 原始传感器通道值（9 个通道）
+                           - channel_values: 六个原生通道值
                            - normal_force: 法向力（0-3000，单位：0.1N）
                            - tangent_force: 切向力
                            - tangent_force_angle: 切向力角度（0-359 度）

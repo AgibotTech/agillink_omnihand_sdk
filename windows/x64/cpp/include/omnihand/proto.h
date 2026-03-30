@@ -196,8 +196,9 @@ struct AGIBOT_EXPORT JointMotorErrorReport {
  * @brief data structure for 3D tactile sensor data (O12 only)
  */
 struct AGIBOT_EXPORT TactileSensor3DData {
+  static constexpr size_t kChannelCount = 6;
   uint8_t online_state;          // 1: online, 0: offline
-  uint16_t channel_value[9];     // raw channel values
+  uint32_t channel_value[kChannelCount];  // 6 decoded 24-bit channel values
   uint16_t normal_force;         // force normal to the sensor surface (0.1N, max: 2000)
   uint16_t tangent_force;        // force tangential to the sensor surface (0.1N, max: 2000)
   uint16_t tangent_force_angle;  // angle of the tangent force in degrees, zero degrees is up (0-359)
@@ -207,8 +208,8 @@ struct AGIBOT_EXPORT TactileSensor3DData {
     std::stringstream sstream;
     sstream << "\t[Online State: " << static_cast<unsigned int>(online_state) << "]\n";
     sstream << "\t[Channel Values: ";
-    for (size_t i = 0; i < 9; ++i) {
-      sstream << static_cast<unsigned int>(channel_value[i]) << " ";
+    for (size_t i = 0; i < kChannelCount; ++i) {
+      sstream << channel_value[i] << " ";
     }
     sstream << "]\n\t[Normal Force: " << static_cast<unsigned int>(normal_force) << "]\n";
     sstream << "\t[Tangent Force: " << static_cast<unsigned int>(tangent_force) << "]\n";

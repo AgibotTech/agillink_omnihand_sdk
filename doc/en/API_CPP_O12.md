@@ -99,7 +99,7 @@ struct DeviceInfo {
 ```cpp
 struct TactileSensor3DData {
     unsigned char online_state;          // 1=online, 0=offline
-    unsigned short channel_value[9];     // Channel values (9 channels)
+    unsigned int channel_value[6];       // Six native channel values
     unsigned short normal_force;         // Normal force (0-3000, unit: 0.1N)
     unsigned short tangent_force;       // Tangent force
     unsigned short tangent_force_angle; // Tangent force angle (0-359 degrees, fingertip up = 0°, clockwise)
@@ -407,7 +407,7 @@ OmniHand Pro 2025 (O12) uses **3D tactile sensors** with the following character
  * @param eFinger Finger enum value (O12 supports fingers only, not palm/dorsum)
  * @return TactileSensor3DData structure containing:
  *         - online_state: Sensor online status (1=online, 0=offline)
- *         - channel_value[9]: Channel values (9 channels)
+ *         - channel_value[6]: Six native channel values
  *         - normal_force: Normal force (0-3000, unit: 0.1N)
  *         - tangent_force: Tangent force
  *         - tangent_force_angle: Tangent force angle (0-359 degrees, fingertip up = 0°, clockwise)
