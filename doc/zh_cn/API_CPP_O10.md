@@ -571,15 +571,13 @@ void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);
 ```cpp
 JointMotorErrorReport GetErrorReport(unsigned char joint_motor_index) const;
 std::vector<JointMotorErrorReport> GetAllErrorReport() const;
-void SetErrorReportPeriod(unsigned char joint_motor_index, uint16_t period);
-void SetAllErrorReportPeriod(std::vector<uint16_t> vec_period);
 ```
 
 ## 温度监控
 
 ```cpp
-uint16_t GetTemperatureReport(unsigned char joint_motor_index) const;
-std::vector<uint16_t> GetAllTemperatureReport() const;
+int16_t GetTemperatureReport(unsigned char joint_motor_index) const;
+std::vector<int16_t> GetAllTemperatureReport() const;
 ```
 
 **注意**：OmniHand 2025 (O10) 不支持设置温度上报周期。此功能仅适用于 OmniHand Pro 2025 (O12)。
@@ -588,7 +586,7 @@ std::vector<uint16_t> GetAllTemperatureReport() const;
 
 ```cpp
 int16_t GetCurrentReport(unsigned char joint_motor_index) const;
-std::vector<uint16_t> GetAllCurrentReport() const;
+std::vector<int16_t> GetAllCurrentReport() const;
 ```
 
 **注意**：OmniHand 2025 (O10) 不支持设置电流上报周期。此功能仅适用于 OmniHand Pro 2025 (O12)。

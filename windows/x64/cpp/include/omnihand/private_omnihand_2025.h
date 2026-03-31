@@ -35,10 +35,6 @@ namespace omnihand {
  */
 class AGIBOT_EXPORT PrivateOmniHand2025 : public OmniHand2025, public PrivateOmniHand {
  public:
-  // Constants
-  static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // O10 has 10 active degrees of freedom (DoA)
-  static constexpr unsigned char kDegreesOfPassiveFreedom = 6;  // O10 has 6 passive degrees of freedom (DoP)
-
   virtual ~PrivateOmniHand2025() = default;
 
   // ============ Factory Methods ============

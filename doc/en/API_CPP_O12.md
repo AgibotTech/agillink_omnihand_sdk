@@ -541,13 +541,13 @@ void SetAllErrorReportPeriod(std::vector<uint16_t> vec_period);
  * @param joint_motor_index The index of the joint motor (1-12).
  * @return The current temperature value in degrees Celsius.
  */
-uint16_t GetTemperatureReport(unsigned char joint_motor_index) const;
+int16_t GetTemperatureReport(unsigned char joint_motor_index) const;
 
 /**
  * @brief Gets the temperature reports for all joint motors.
  * @return A vector of temperature values. Returns 12 values.
  */
-std::vector<uint16_t> GetAllTemperatureReport() const;
+std::vector<int16_t> GetAllTemperatureReport() const;
 
 /**
  * @brief Sets the temperature report period for a single joint motor (O12 only).
@@ -577,7 +577,7 @@ int16_t GetCurrentReport(unsigned char joint_motor_index) const;
  * @brief Gets the current reports for all joint motors.
  * @return A vector of current values. Returns 12 values.
  */
-std::vector<uint16_t> GetAllCurrentReport() const;
+std::vector<int16_t> GetAllCurrentReport() const;
 
 /**
  * @brief Sets the current report period for a single joint motor (O12 only).

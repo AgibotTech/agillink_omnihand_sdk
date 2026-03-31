@@ -532,7 +532,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdSingleAxisPos) {
   RequireDevice();
 
   std::cout << "[StreamCmd] Testing single axis pos commands(0x06/0x07):" << std::endl;
-  for (int i = 1; i <= agilink::omnihand::PrivateOmniHand2025::kDegreesOfActiveFreedom; ++i) {
+  for (int i = 1; i <= agilink::omnihand::OmniHand2025::kDegreesOfActiveFreedom; ++i) {
     uint16_t origin_pos = hand_->GetSingleAxisPos(i);
     uint16_t target_pos = 512;
     uint16_t reply_pos = hand_->SetSingleAxisPos(i, target_pos);

@@ -235,28 +235,13 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    */
   virtual std::vector<JointMotorErrorReport> GetAllErrorReport() const { return {}; }
   
-  /**
-   * @brief Sets error report period of a single joint motor.
-   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
-   * @param period Report period (unit: milliseconds)
-   */
-  virtual void SetErrorReportPeriod(unsigned char joint_motor_index, uint16_t period) { (void)joint_motor_index; (void)period; }
-  
-  /**
-   * @brief Sets error report periods of all joint motors in batch.
-   * @param vec_period Report period vector. Length depends on product type:
-   *                   - OmniHand 2025 (O10): 10 values
-   *                   - OmniHand Pro 2025 (O12): 12 values
-   */
-  virtual void SetAllErrorReportPeriod(std::vector<uint16_t> vec_period) { (void)vec_period; }
-
   // ============ Temperature Report ============
   /**
    * @brief Gets temperature report of a single joint motor.
    * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
    * @return Current temperature value (unit: Celsius)
    */
-  virtual uint16_t GetTemperatureReport(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
+  virtual int16_t GetTemperatureReport(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
   
   /**
    * @brief Gets temperature reports of all joint motors in batch.
@@ -264,23 +249,8 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *         - OmniHand 2025 (O10): 10 values
    *         - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual std::vector<uint16_t> GetAllTemperatureReport() const { return {}; }
+  virtual std::vector<int16_t> GetAllTemperatureReport() const { return {}; }
   
-  /**
-   * @brief Sets temperature report period of a single joint motor (O12 only).
-   * @param joint_motor_index Joint motor index (1-12)
-   * @param period Report period (unit: milliseconds)
-   * @note OmniHand 2025 (O10) does not support this interface.
-   */
-  virtual void SetTemperReportPeriod(unsigned char joint_motor_index, uint16_t period) { (void)joint_motor_index; (void)period; }
-  
-  /**
-   * @brief Sets temperature report periods of all joint motors in batch (O12 only).
-   * @param vec_period Report period vector, length 12
-   * @note OmniHand 2025 (O10) does not support this interface.
-   */
-  virtual void SetAllTemperReportPeriod(std::vector<uint16_t> vec_period) { (void)vec_period; }
-
   // ============ Current Report ============
   /**
    * @brief Gets current report of a single joint motor.
@@ -295,23 +265,8 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
    *         - OmniHand 2025 (O10): 10 values
    *         - OmniHand Pro 2025 (O12): 12 values
    */
-  virtual std::vector<uint16_t> GetAllCurrentReport() const { return {}; }
+  virtual std::vector<int16_t> GetAllCurrentReport() const { return {}; }
   
-  /**
-   * @brief Sets current report period of a single joint motor (O12 only).
-   * @param joint_motor_index Joint motor index (1-12)
-   * @param period Report period (unit: milliseconds)
-   * @note OmniHand 2025 (O10) does not support this interface.
-   */
-  virtual void SetCurrentReportPeriod(unsigned char joint_motor_index, uint16_t period) { (void)joint_motor_index; (void)period; }
-  
-  /**
-   * @brief Sets current report periods of all joint motors in batch (O12 only).
-   * @param vec_period Report period vector, length 12
-   * @note OmniHand 2025 (O10) does not support this interface.
-   */
-  virtual void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period) { (void)vec_period; }
-
   // ============ Gesture Control ============
   /**
    * @brief Sets the hand to a predefined gesture.

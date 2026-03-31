@@ -305,13 +305,13 @@ void SetAllErrorReportPeriod(std::vector<uint16_t> vec_period);               //
 ### 温度与电流监控
 
 ```cpp
-uint16_t GetTemperatureReport(unsigned char joint_motor_index) const;   // 索引 1-12，单位 ℃
-std::vector<uint16_t> GetAllTemperatureReport() const;                  // 返回 12 个值
+int16_t GetTemperatureReport(unsigned char joint_motor_index) const;   // 索引 1-12，单位 ℃
+std::vector<int16_t> GetAllTemperatureReport() const;                  // 返回 12 个值
 void SetTemperReportPeriod(unsigned char joint_motor_index, uint16_t period);   // O12 可设置上报周期
 void SetAllTemperReportPeriod(std::vector<uint16_t> vec_period);               // 12 个值
 
 int16_t GetCurrentReport(unsigned char joint_motor_index) const;
-std::vector<uint16_t> GetAllCurrentReport() const;                       // 返回 12 个值
+std::vector<int16_t> GetAllCurrentReport() const;                       // 返回 12 个值
 void SetCurrentReportPeriod(unsigned char joint_motor_index, uint16_t period);  // O12 可设置上报周期
 void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period);               // 12 个值
 ```
