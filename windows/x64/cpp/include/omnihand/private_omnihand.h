@@ -254,15 +254,15 @@ class AGIBOT_EXPORT PrivateOmniHand {
 
   /**
    * @brief 0x0A: Get all axes current information
-   * @return Current data (20 bytes, unit: 0.01A)
+   * @return Current per axis (0.01A units, int16, signed)
    */
-  virtual std::vector<uint16_t> GetAllAxisCurrent() const = 0;
+  virtual std::vector<int16_t> GetAllAxisCurrent() const = 0;
 
   /**
-   * @brief 0x0B: Get all axes velocity information
-   * @return Velocity data (20 bytes)
+   * @brief 0x0B: Get all axes velocity information (CAN: 0x0B stream; USB may use CVP)
+   * @return Velocity per axis (int16, signed)
    */
-  virtual std::vector<uint16_t> GetAllAxisVelocity() const = 0;
+  virtual std::vector<int16_t> GetAllAxisVelocity() const = 0;
 
   /**
    * @brief 0x0C: Get all axes temperature data

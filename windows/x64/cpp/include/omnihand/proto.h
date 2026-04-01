@@ -26,7 +26,7 @@ namespace omnihand {
 /**
  * @brief Hand type enumeration
  */
-enum class AGIBOT_EXPORT HandType : unsigned char {
+enum class AGIBOT_EXPORT HandType : uint8_t {
   LEFT = 0,      // Left hand
   RIGHT = 1,     // Right hand
   UNKNOWN = 255  // Unknown hand type
@@ -74,19 +74,6 @@ inline std::string ToString(ProductType product_type) {
 }
 
 /**
- * @brief CAN frame format for createHandByZlgcan / createHandByHcan (interface layer)
- * @see docs/REFACTOR_SDK_PROTOCOL.md
- */
-enum class AGIBOT_EXPORT CanFrameFormat : unsigned char {
-  Extended = 0,  ///< 29-bit ID, command in ID (default, backward compatible)
-  Standard = 1   ///< 11-bit ID, command in D0, same data format as USB/RS485
-};
-
-inline std::string ToString(CanFrameFormat f) {
-  return f == CanFrameFormat::Standard ? "Standard" : "Extended";
-}
-
-/**
  * @brief Finger enumeration (Unified for O10 and O12)
  * @note O12 does not support PALM and DORSUM sensors, using these will result in runtime error
  */
@@ -126,17 +113,17 @@ inline std::string ToString(Finger finger) {
  * @note According to protocol specification:
  *       - POSITION (0): Position control mode - supported
  *       - SERVO (1): Servo control mode - supported
- *       - VELOCITY (2): Velocity control mode - marked as "暂不支持" (not yet supported) in protocol
+ *       - VELOCITY (2): Velocity control mode - not yet supported in protocol
  *       - TORQUE (3): Torque control mode - defined in protocol but may not be fully supported
- *       - POSITION_TORQUE (4): Position-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
- *       - VELOCITY_TORQUE (5): Velocity-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
- *       - POSITION_VELOCITY_TORQUE (6): Position-Velocity-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
+ *       - POSITION_TORQUE (4): Position-Torque mixed control - not yet supported in protocol
+ *       - VELOCITY_TORQUE (5): Velocity-Torque mixed control - not yet supported in protocol
+ *       - POSITION_VELOCITY_TORQUE (6): Position-Velocity-Torque mixed control - not yet supported in protocol
  */
 enum class AGIBOT_EXPORT ControlMode : unsigned char {
-  POSITION = 0,                    // Position control mode
-  SERVO = 1,                       // Servo control mode
+  POSITION = 0,                    // Position control mode (supported, default mode)
+  SERVO = 1,                       // Servo control mode (supported)
   VELOCITY = 2,                    // Velocity control mode (not yet supported)
-  TORQUE = 3,                      // Torque control mode
+  TORQUE = 3,                      // Torque control mode (not yet supported)
   POSITION_TORQUE = 4,             // Position-Torque mixed control (not yet supported)
   VELOCITY_TORQUE = 5,             // Velocity-Torque mixed control (not yet supported)
   POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mixed control (not yet supported)

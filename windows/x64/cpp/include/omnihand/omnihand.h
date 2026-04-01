@@ -32,16 +32,16 @@ namespace omnihand {
 class AGIBOT_EXPORT OmniHand {
  public:
   /**
-   * @brief 获取产品类型
-   * @return 产品类型枚举值（ProductType::OMNIHAND_2025 或 ProductType::OMNIHAND_PRO_2025）
+   * @brief Gets product type.
+   * @return Product type enum value， see @ref ProductType
    */
   ProductType GetProductType() const {
     return product_type_;
   }
 
   /**
-   * @brief 检查初始化状态
-   * @return true表示初始化成功，false表示初始化失败
+   * @brief Checks if the hand is initialized.
+   * @return true if initialized successfully, false otherwise
    */
   bool Init() const {
     return is_init_;
