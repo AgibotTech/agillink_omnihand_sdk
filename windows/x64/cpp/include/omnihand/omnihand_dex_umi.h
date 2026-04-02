@@ -21,6 +21,7 @@
 #include "omnihand/io10_tactile_sensor_1d.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/proto.h"
+#include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"
 
 namespace agilink {
 namespace omnihand {
@@ -175,6 +176,11 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
 
  protected:
   /**
+   * @brief Kinematics solver for OmniHand 2025 (O10)
+   */
+  std::unique_ptr<o10::OmniHand2025Solver> kinematics_solver_;
+
+  /**
    * @brief Initialize base class members
    * @param device_id Device ID
    * @param hand_type Hand type (left/right)
@@ -182,6 +188,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_DEX_UMI, device_id, hand_type);
+    kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(is_left_hand_);
   }
 };
 
