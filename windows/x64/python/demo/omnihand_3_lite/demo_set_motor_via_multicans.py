@@ -25,30 +25,30 @@ def main():
     args = parser.parse_args()
 
     # Create O4 hands by CAN device serial number (replace with your actual serials)
-    # hand_device_id=1, canfd_channel_id=0 per device
+    # hand_device_id=kDefaultHandDeviceId, canfd_channel_id=0 per device
     if args.device == 'hcan':
         left_hand = OmniHand3Lite.create_hand_by_hcan(
             HandType.LEFT,  # hand_type
-            1,  # hand_device_id
+            OmniHand3Lite.kDefaultHandDeviceId,  # hand_device_id
             0,  # canfd_device_id
             0  # canfd_channel_id
         )
         right_hand = OmniHand3Lite.create_hand_by_hcan(
             HandType.RIGHT,  # hand_type
-            1,  # hand_device_id
+            OmniHand3Lite.kDefaultHandDeviceId,  # hand_device_id
             1,  # canfd_device_id
             0  # canfd_channel_id
         )
     else:  # default: zlgcan
         left_hand = OmniHand3Lite.create_hand_by_zlgcan(
             HandType.LEFT,  # hand_type
-            1,  # hand_device_id
+            OmniHand3Lite.kDefaultHandDeviceId,  # hand_device_id
             0,  # canfd_device_id
             0  # canfd_channel_id
         )
         right_hand = OmniHand3Lite.create_hand_by_zlgcan(
             HandType.RIGHT,  # hand_type
-            1,  # hand_device_id
+            OmniHand3Lite.kDefaultHandDeviceId,  # hand_device_id
             1,  # canfd_device_id
             0  # canfd_channel_id
         )
@@ -87,8 +87,8 @@ def main():
     print("All joint positions of right hand (O4): ", real_right)
 
     # Alternatively, create by canfd_device_id when you have two devices (e.g. id 0 and 1):
-    # left_hand = OmniHand3Lite.create_hand_by_zlgcan(HandType.LEFT, 1, 0, 0)   # device 0, channel 0
-    # right_hand = OmniHand3Lite.create_hand_by_zlgcan(HandType.RIGHT, 1, 1, 0)  # device 1, channel 0
+    # left_hand = OmniHand3Lite.create_hand_by_zlgcan(HandType.LEFT, OmniHand3Lite.kDefaultHandDeviceId, 0, 0)   # device 0, channel 0
+    # right_hand = OmniHand3Lite.create_hand_by_zlgcan(HandType.RIGHT, OmniHand3Lite.kDefaultHandDeviceId, 1, 0)  # device 1, channel 0
 
 
 if __name__ == "__main__":

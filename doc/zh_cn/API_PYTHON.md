@@ -10,6 +10,8 @@ OmniHand 2025 SDK 为三种不同的产品提供了**产品特定的接口**：
 
 每个产品都有自己的接口类（`OmniHand2025`、`OmniHandPro2025`、`OmniHandDexUMI`），具有产品特定的工厂方法和 API。与使用 `ProductType` 的统一接口相比，这种设计提供了更好的类型安全性和更清晰的 API 组织。
 
+**说明：** **OmniHand 2025 (O10)** 与 **OmniHand Dex UMI** 的工厂方法中，`hand_device_id` 与 `canfd_*` 在 Python 侧为 `int`，绑定层以 `uint8_t` 传入 C++，与头文件一致。
+
 ## 产品特定 API 文档
 
 - **[OmniHand 2025 (O10) Python API](API_PYTHON_O10.md)** - 10 自由度，1D 触觉传感器，支持 CAN 和 RS485

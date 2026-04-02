@@ -48,7 +48,7 @@ def main():
         if args.device == 'hcan':
             hand = OmniHand2025.create_hand_by_hcan(
                 hand_type=HandType.LEFT,
-                hand_device_id=1,
+                hand_device_id=OmniHand2025.kDefaultHandDeviceId,
                 canfd_device_id=0,
                 canfd_channel_id=0,
             )
@@ -66,7 +66,7 @@ def main():
         else:
             hand = OmniHand2025.create_hand_by_zlgcan(
                 hand_type=HandType.LEFT,
-                hand_device_id=1,
+                hand_device_id=OmniHand2025.kDefaultHandDeviceId,
                 canfd_device_id=0,
                 canfd_channel_id=0,
             )

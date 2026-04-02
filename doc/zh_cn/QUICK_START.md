@@ -151,6 +151,7 @@ int main() {
     //   hand_device_id: 灵巧手 CAN ID（1-254，通常为 1）
     //   canfd_device_id: ZLG 适配器索引（0 = 第一个适配器）
     //   canfd_channel_id: 通道（双通道适配器为 0 或 1）
+    //   （omnihand_2025.h 中 hand_device_id / canfd_device_id / canfd_channel_id 均为 std::uint8_t。）
     auto hand = OmniHand2025::createHandByZlgcan(HandType::LEFT, 1, 0, 0);
     
     if (!hand || !hand->Init()) {

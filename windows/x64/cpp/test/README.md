@@ -1,5 +1,7 @@
 # OmniHand 2025 SDK C++ Unit Tests
 
+**API note:** For **OmniHand 2025 (O10)** and **OmniHand Dex UMI**, factory and broadcast APIs in the C++ headers use `std::uint8_t` for `hand_device_id` and `canfd_*` indices; tests use integer literals with implicit conversion. See `release/doc/en/API_CPP_O10.md` and `API_CPP_O10_UMI.md`.
+
 This directory contains GoogleTest-based unit tests for all three OmniHand products:
 - **OmniHand 2025 (O10)** - 10 DOF with 1D tactile sensors
 - **OmniHand Pro 2025 (O12)** - 12 DOF with 3D tactile sensors

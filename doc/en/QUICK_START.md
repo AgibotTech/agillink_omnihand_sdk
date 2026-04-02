@@ -151,6 +151,7 @@ int main() {
     //   hand_device_id: Hand CAN ID (1-254, usually 1)
     //   canfd_device_id: ZLG adapter index (0 = first adapter)
     //   canfd_channel_id: Channel (0 or 1 for dual-channel adapters)
+    //   (In omnihand_2025.h, hand_device_id / canfd_device_id / canfd_channel_id are std::uint8_t.)
     auto hand = OmniHand2025::createHandByZlgcan(HandType::LEFT, 1, 0, 0);
     
     if (!hand || !hand->Init()) {

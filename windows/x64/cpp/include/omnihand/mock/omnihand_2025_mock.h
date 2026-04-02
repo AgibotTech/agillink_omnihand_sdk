@@ -16,6 +16,7 @@
 #ifndef AGILINK_OMNIHAND_2025_MOCK_H
 #define AGILINK_OMNIHAND_2025_MOCK_H
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include "omnihand/omnihand_2025.h"
@@ -44,18 +45,18 @@ class AGIBOT_EXPORT OmniHand2025Mock {
    */
   static std::unique_ptr<OmniHand2025> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
    */
   static std::unique_ptr<OmniHand2025> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - RS485 communication
@@ -67,7 +68,7 @@ class AGIBOT_EXPORT OmniHand2025Mock {
    */
   static std::unique_ptr<OmniHand2025> createHandByRs485(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& uart_port,
       int32_t baudrate = 460800);
 
@@ -81,7 +82,7 @@ class AGIBOT_EXPORT OmniHand2025Mock {
    */
   static std::unique_ptr<OmniHand2025> createHandByUsb(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& uart_port,
       int32_t baudrate = 460800);
 
@@ -95,7 +96,7 @@ class AGIBOT_EXPORT OmniHand2025Mock {
    */
   static std::unique_ptr<OmniHand2025> createHandSocketCan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& can_interface = "can0");
 #endif
 
@@ -109,15 +110,15 @@ class AGIBOT_EXPORT OmniHand2025Mock {
    */
   static std::unique_ptr<OmniHand2025> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   static std::unique_ptr<OmniHand2025> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Get device information from broadcast address (mock implementation)
@@ -126,8 +127,8 @@ class AGIBOT_EXPORT OmniHand2025Mock {
    * @return Mock DeviceInfo structure
    */
   static DeviceInfo GetDeviceInfoFromBroadcast(
-      unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Get device information from broadcast address by serial number (mock implementation)
@@ -137,7 +138,7 @@ class AGIBOT_EXPORT OmniHand2025Mock {
    */
   static DeviceInfo GetDeviceInfoFromBroadcast(
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
 #ifdef __linux__
   /**

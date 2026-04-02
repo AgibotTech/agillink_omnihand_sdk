@@ -17,7 +17,10 @@
 
 ```cpp
 #include "omnihand/omnihand_dex_umi.h"
+#include <cstdint>  // std::uint8_t for factory parameters (also pulled in by the header)
 ```
+
+**Note:** Factory methods use **`std::uint8_t`** for `hand_device_id` and CAN adapter indices (`canfd_device_id`, `canfd_channel_id`), consistent with `omnihand_dex_umi.h`.
 
 ## Enums
 
@@ -105,9 +108,9 @@ struct TactileSensorData {
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
     HandType hand_type,
-    unsigned char hand_device_id = 1,
-    unsigned char canfd_device_id = 0,
-    unsigned char canfd_channel_id = 0);
+    uint8_t hand_device_id = 1,
+    uint8_t canfd_device_id = 0,
+    uint8_t canfd_channel_id = 0);
 ```
 
 **Example:**
@@ -133,9 +136,9 @@ auto hand = OmniHandDexUMI::createHandByZlgcan(
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& usbcanfd_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 ```
 
 ### HCAN USB CANFD
@@ -151,9 +154,9 @@ static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
     HandType hand_type,
-    unsigned char hand_device_id,
-    unsigned char canfd_device_id,
-    unsigned char canfd_channel_id = 0);
+    uint8_t hand_device_id,
+    uint8_t canfd_device_id,
+    uint8_t canfd_channel_id = 0);
 ```
 
 **Example:**
@@ -179,9 +182,9 @@ auto hand = OmniHandDexUMI::createHandByHcan(
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& hcan_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 ```
 
 ### Advanced: SocketCAN (Linux Only)
@@ -198,7 +201,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
  */
 static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& can_interface = "can0");
 #endif
 ```

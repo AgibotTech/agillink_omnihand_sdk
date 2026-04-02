@@ -17,7 +17,10 @@
 
 ```cpp
 #include "omnihand/omnihand_dex_umi.h"
+#include <cstdint>  // std::uint8_t：工厂参数（头文件也会间接包含）
 ```
+
+**说明：** 工厂方法中 `hand_device_id` 与 CAN 适配器索引（`canfd_device_id`、`canfd_channel_id`）使用 **`std::uint8_t`**，与 `omnihand_dex_umi.h` 一致。
 
 ## 枚举类型
 
@@ -67,9 +70,9 @@ enum class Finger : unsigned char {
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
     HandType hand_type,
-    unsigned char hand_device_id = 1,
-    unsigned char canfd_device_id = 0,
-    unsigned char canfd_channel_id = 0);
+    uint8_t hand_device_id = 1,
+    uint8_t canfd_device_id = 0,
+    uint8_t canfd_channel_id = 0);
 ```
 
 **示例：**
@@ -95,9 +98,9 @@ auto hand = OmniHandDexUMI::createHandByZlgcan(
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& usbcanfd_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 ```
 
 ### HCAN USB CANFD
@@ -113,9 +116,9 @@ static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
     HandType hand_type,
-    unsigned char hand_device_id,
-    unsigned char canfd_device_id,
-    unsigned char canfd_channel_id = 0);
+    uint8_t hand_device_id,
+    uint8_t canfd_device_id,
+    uint8_t canfd_channel_id = 0);
 ```
 
 **示例：**
@@ -141,9 +144,9 @@ auto hand = OmniHandDexUMI::createHandByHcan(
  */
 static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& hcan_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 ```
 
 ### SocketCAN（仅 Linux）
@@ -152,7 +155,7 @@ static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
 #ifdef __linux__
 static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& can_interface = "can0");
 #endif
 ```

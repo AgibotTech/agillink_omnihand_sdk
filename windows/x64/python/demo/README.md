@@ -1,5 +1,7 @@
 # Python Examples
 
+**API:** O10 and Dex UMI examples pass `hand_device_id` / `canfd_*` as integers; these match the Python binding (native side uses `uint8_t`). See `release/doc/en/API_PYTHON_O10.md`.
+
 ## OmniHand 2025 (10 DOF) Examples
 - `omnihand_2025/demo_get_hardware_info.py` - Get hardware information
 - `omnihand_2025/demo_monitor_current.py` - Monitor motor current

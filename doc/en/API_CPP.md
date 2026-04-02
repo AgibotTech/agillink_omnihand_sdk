@@ -10,6 +10,8 @@ The OmniHand 2025 SDK provides **product-specific interfaces** for three differe
 
 Each product has its own interface class (`OmniHand2025`, `OmniHandPro2025`, `OmniHandDexUMI`) with product-specific factory methods and APIs. This design provides better type safety and clearer API organization compared to a unified interface with `ProductType`.
 
+**C++ typing note:** For **OmniHand 2025 (O10)** and **OmniHand Dex UMI**, factory methods and CAN broadcast discovery use **`std::uint8_t`** for `hand_device_id` and CAN adapter indices (`canfd_device_id`, `canfd_channel_id`). See the product-specific C++ API pages for full signatures.
+
 ## Product-Specific API Documentation
 
 - **[OmniHand 2025 (O10) C++ API](API_CPP_O10.md)** - 10 DOF, 1D tactile sensors, supports CAN and RS485

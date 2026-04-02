@@ -17,6 +17,8 @@
 from omnihand import OmniHand2025, HandType, Finger, ControlMode
 ```
 
+**说明：** 工厂方法中的 `hand_device_id`、`canfd_device_id`、`canfd_channel_id` 在 Python 侧为 `int`；绑定层传入 C++ 时为 `uint8_t`，与 `omnihand_2025.h` 一致。
+
 ## 工厂方法
 
 ### 推荐：ZLG USB CANFD（零配置）
@@ -25,7 +27,7 @@ from omnihand import OmniHand2025, HandType, Finger, ControlMode
 @staticmethod
 def create_hand_by_zlgcan(hand_type: HandType = HandType.LEFT,
                 hand_device_id: int = 1,
-                canfd_id: int = 0,
+                canfd_device_id: int = 0,
                 canfd_channel_id: int = 0) -> 'OmniHand2025':
     """创建灵巧手对象（推荐：零配置）。
 
@@ -50,7 +52,7 @@ def create_hand_by_zlgcan(hand_type: HandType = HandType.LEFT,
 def create_hand_by_hcan(hand_type: HandType = HandType.LEFT,
                 hand_device_id: int = 1,
                 canfd_device_id: int = 0,
-                canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
+                canfd_channel_id: int = 0) -> 'OmniHand2025':
     """创建灵巧手对象（HCAN USB CANFD，通过设备 ID）。
 
     Args:
@@ -70,7 +72,7 @@ hand = OmniHand2025.create_hand_by_hcan(
     hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
-    canfd_canfd_channel_id=0
+    canfd_channel_id=0
 )
 ```
 
@@ -80,8 +82,8 @@ hand = OmniHand2025.create_hand_by_hcan(
 @staticmethod
 def create_hand_by_hcan(hand_type: HandType,
                 hand_device_id: int,
-                hcan_usbcanfd_serial_number: str,
-                canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
+                hcan_serial_number: str,
+                canfd_channel_id: int = 0) -> 'OmniHand2025':
     """创建灵巧手对象（HCAN USB CANFD，通过序列号）。
 
     Args:

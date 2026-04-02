@@ -1,4 +1,4 @@
-﻿# OmniHand 2025 (O10) Python API
+# OmniHand 2025 (O10) Python API
 
 ## Overview
 
@@ -16,6 +16,8 @@
 ```python
 from omnihand import OmniHand2025, HandType, Finger, ControlMode
 ```
+
+**Note:** Factory arguments `hand_device_id`, `canfd_device_id`, and `canfd_channel_id` are exposed as Python `int` values; the extension passes them to C++ as `uint8_t`, consistent with `omnihand_2025.h`.
 
 ## Enumerations
 
@@ -101,9 +103,9 @@ class TactileSensorData:
 ```python
 @staticmethod
 def create_hand_by_zlgcan(hand_type: HandType = HandType.LEFT,
-                hand_hand_device_id: int = 1,
+                hand_device_id: int = 1,
                 canfd_device_id: int = 0,
-                canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
+                canfd_channel_id: int = 0) -> 'OmniHand2025':
     """Creates a dexterous hand object (Recommended: Zero configuration).
 
     Args:
@@ -138,7 +140,7 @@ hand = OmniHand2025.create_hand_by_zlgcan(
 def create_hand_by_zlgcan(hand_type: HandType,
                 hand_device_id: int,
                 usbcanfd_serial_number: str,
-                canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
+                canfd_channel_id: int = 0) -> 'OmniHand2025':
     """Creates a dexterous hand object by serial number.
 
     Args:
@@ -157,14 +159,14 @@ def create_hand_by_zlgcan(hand_type: HandType,
 ```python
 @staticmethod
 def create_hand_by_hcan(hand_type: HandType = HandType.LEFT,
-                hand_hand_device_id: int = 1,
+                hand_device_id: int = 1,
                 canfd_device_id: int = 0,
-                canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
+                canfd_channel_id: int = 0) -> 'OmniHand2025':
     """Creates a dexterous hand object via HCAN USB CANFD (by device ID).
 
     Args:
         hand_type: The hand type, defaults to the left hand.
-        hand_hand_device_id: Hand device ID, defaults to 1.
+        hand_device_id: Hand device ID, defaults to 1.
         canfd_device_id: HCAN device index, defaults to 0.
         canfd_channel_id: CAN channel index, defaults to 0. For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0.
     
@@ -179,7 +181,7 @@ hand = OmniHand2025.create_hand_by_hcan(
     hand_type=HandType.LEFT,
     hand_device_id=1,
     canfd_device_id=0,
-    canfd_canfd_channel_id=0
+    canfd_channel_id=0
 )
 ```
 
@@ -189,13 +191,13 @@ hand = OmniHand2025.create_hand_by_hcan(
 @staticmethod
 def create_hand_by_hcan(hand_type: HandType,
                 hand_device_id: int,
-                hcan_usbcanfd_serial_number: str,
-                canfd_canfd_channel_id: int = 0) -> 'OmniHand2025':
+                hcan_serial_number: str,
+                canfd_channel_id: int = 0) -> 'OmniHand2025':
     """Creates a dexterous hand object via HCAN USB CANFD (by serial number).
 
     Args:
         hand_type: The hand type.
-        hand_hand_device_id: Hand device ID.
+        hand_device_id: Hand device ID.
         hcan_serial_number: HCAN device serial number (supports partial matching).
         canfd_channel_id: CAN channel index, defaults to 0. For dual-channel adapters (USBCANFD-200U): can0=0, can1=1. For single-channel adapters (USBCANFD-100U): always 0.
     
@@ -216,7 +218,7 @@ def create_hand_by_rs485(hand_type: HandType,
 
     Args:
         hand_type: The hand type.
-        hand_hand_device_id: Hand device ID.
+        hand_device_id: Hand device ID.
         uart_port: Serial port path (e.g., "/dev/ttyUSB0").
         baudrate: Baud rate, defaults to 460800.
     
@@ -230,7 +232,7 @@ def create_hand_by_rs485(hand_type: HandType,
 ```python
 @staticmethod
 def create_hand_socketcan(hand_type: HandType = HandType.LEFT,
-                          hand_hand_device_id: int = 1,
+                          hand_device_id: int = 1,
                           can_interface: str = "can0") -> 'OmniHand2025':
     """Creates a dexterous hand object using SocketCAN (Linux only, advanced usage).
     

@@ -36,7 +36,8 @@ namespace omnihand {
 class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSensor1D {
  public:
   // Constants
-  static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // O10 UMI has 10 active degrees of freedom (DoA)
+  static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // DoA
+  static constexpr uint8_t kDefaultHandDeviceId = 1u;
 
   virtual ~OmniHandDexUMI() = default;
 
@@ -53,9 +54,9 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -69,9 +70,9 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
 #ifdef __linux__
   /**
@@ -83,7 +84,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& can_interface = "can0");
 #endif
 
@@ -99,9 +100,9 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -115,9 +116,9 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Get sensor data length for a specific finger

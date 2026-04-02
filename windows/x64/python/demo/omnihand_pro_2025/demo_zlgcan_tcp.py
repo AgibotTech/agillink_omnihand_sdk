@@ -41,8 +41,8 @@ def main():
     parser.add_argument(
         "--hand_device_id",
         type=int,
-        default=1,
-        help="Hand device ID (default: 1)",
+        default=OmniHandPro2025.kDefaultHandDeviceId,
+        help="Hand device ID (default: OmniHandPro2025.kDefaultHandDeviceId)",
     )
     parser.add_argument(
         "--canfd_channel_id",

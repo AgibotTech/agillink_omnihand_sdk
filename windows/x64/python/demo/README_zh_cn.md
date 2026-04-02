@@ -1,5 +1,7 @@
 # Python 示例
 
+**说明：** O10、Dex UMI 示例中 `hand_device_id`、`canfd_*` 以整数传入，与 Python 绑定一致（底层为 `uint8_t`）。详见 `release/doc/zh_cn/API_PYTHON_O10.md`。
+
 ## OmniHand 2025（10 自由度）示例
 - `omnihand_2025/demo_get_hardware_info.py` - 获取硬件信息
 - `omnihand_2025/demo_monitor_current.py` - 监控电机电流

@@ -15,8 +15,11 @@
 
 ```cpp
 #include "omnihand/omnihand_2025.h"
+#include <cstdint>  // std::uint8_t：工厂/广播参数（头文件也会间接包含）
 using namespace agilink::omnihand;
 ```
+
+**说明：** 工厂方法与广播发现中，`hand_device_id` 与 CAN 适配器索引（`canfd_device_id`、`canfd_channel_id`）使用 **`std::uint8_t`**。关节索引与 `SetDeviceId` 等仍为头文件中的 **`unsigned char`**。
 
 ## 枚举类型
 
@@ -125,9 +128,9 @@ struct TactileSensorData {
  */
 static std::unique_ptr<OmniHand2025> createHandByZlgcan(
     HandType hand_type,
-    unsigned char hand_device_id = 1,
-    unsigned char canfd_device_id = 0,
-    unsigned char canfd_channel_id = 0);
+    uint8_t hand_device_id = 1,
+    uint8_t canfd_device_id = 0,
+    uint8_t canfd_channel_id = 0);
 ```
 
 **示例：*
@@ -153,9 +156,9 @@ auto hand = OmniHand2025::createHandByZlgcan(
  */
 static std::unique_ptr<OmniHand2025> createHandByZlgcan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& usbcanfd_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 ```
 
 ### HCAN USB CANFD
@@ -171,9 +174,9 @@ static std::unique_ptr<OmniHand2025> createHandByZlgcan(
  */
 static std::unique_ptr<OmniHand2025> createHandByHcan(
     HandType hand_type,
-    unsigned char hand_device_id,
-    unsigned char canfd_device_id,
-    unsigned char canfd_channel_id = 0);
+    uint8_t hand_device_id,
+    uint8_t canfd_device_id,
+    uint8_t canfd_channel_id = 0);
 ```
 
 **示例：*
@@ -199,9 +202,9 @@ auto hand = OmniHand2025::createHandByHcan(
  */
 static std::unique_ptr<OmniHand2025> createHandByHcan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& hcan_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 ```
 
 ### RS485 通信（仅 O10）
@@ -217,7 +220,7 @@ static std::unique_ptr<OmniHand2025> createHandByHcan(
  */
 static std::unique_ptr<OmniHand2025> createHandByRs485(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& uart_port,
     int32_t baudrate = 460800);
 ```
@@ -236,7 +239,7 @@ static std::unique_ptr<OmniHand2025> createHandByRs485(
  */
 static std::unique_ptr<OmniHand2025> createHandSocketCan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& can_interface = "can0");
 #endif
 ```
@@ -289,8 +292,8 @@ void SetDeviceId(unsigned char hand_device_id);
  * @note 仅适用于 CAN 通信，RS485 不支持
  */
 static DeviceInfo GetDeviceInfoFromBroadcast(
-    unsigned char canfd_device_id,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_device_id,
+    uint8_t canfd_channel_id = 0);
 
 /**
  * @brief 从广播地址（hand_device_id = 0x00）通过序列号获取设备信息
@@ -302,7 +305,7 @@ static DeviceInfo GetDeviceInfoFromBroadcast(
  */
 static DeviceInfo GetDeviceInfoFromBroadcast(
     const std::string& usbcanfd_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 
 #ifdef __linux__
 /**

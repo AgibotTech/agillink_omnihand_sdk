@@ -15,8 +15,11 @@
 
 ```cpp
 #include "omnihand/omnihand_2025.h"
+#include <cstdint>  // std::uint8_t for factory/broadcast parameters (also pulled in by the header)
 using namespace agilink::omnihand;
 ```
+
+**Note:** Factory methods and broadcast discovery use **`std::uint8_t`** for `hand_device_id` and CAN adapter indices (`canfd_device_id`, `canfd_channel_id`). Joint motor indices and `SetDeviceId` still use `unsigned char` as in the SDK headers.
 
 ## Enums
 
@@ -117,9 +120,9 @@ struct TactileSensorData {
  */
 static std::unique_ptr<OmniHand2025> createHandByZlgcan(
     HandType hand_type,
-    unsigned char hand_device_id = 1,
-    unsigned char canfd_device_id = 0,
-    unsigned char canfd_channel_id = 0);
+    uint8_t hand_device_id = 1,
+    uint8_t canfd_device_id = 0,
+    uint8_t canfd_channel_id = 0);
 ```
 
 **Example:**
@@ -145,9 +148,9 @@ auto hand = OmniHand2025::createHandByZlgcan(
  */
 static std::unique_ptr<OmniHand2025> createHandByZlgcan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& usbcanfd_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 ```
 
 ### HCAN USB CANFD
@@ -163,9 +166,9 @@ static std::unique_ptr<OmniHand2025> createHandByZlgcan(
  */
 static std::unique_ptr<OmniHand2025> createHandByHcan(
     HandType hand_type,
-    unsigned char hand_device_id,
-    unsigned char canfd_device_id,
-    unsigned char canfd_channel_id = 0);
+    uint8_t hand_device_id,
+    uint8_t canfd_device_id,
+    uint8_t canfd_channel_id = 0);
 ```
 
 **Example:**
@@ -191,9 +194,9 @@ auto hand = OmniHand2025::createHandByHcan(
  */
 static std::unique_ptr<OmniHand2025> createHandByHcan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& hcan_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 ```
 
 ### RS485 Communication (O10 Only)
@@ -209,7 +212,7 @@ static std::unique_ptr<OmniHand2025> createHandByHcan(
  */
 static std::unique_ptr<OmniHand2025> createHandByRs485(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& uart_port,
     int32_t baudrate = 460800);
 ```
@@ -228,7 +231,7 @@ static std::unique_ptr<OmniHand2025> createHandByRs485(
  */
 static std::unique_ptr<OmniHand2025> createHandSocketCan(
     HandType hand_type,
-    unsigned char hand_device_id,
+    uint8_t hand_device_id,
     const std::string& can_interface = "can0");
 #endif
 ```
@@ -281,8 +284,8 @@ void SetDeviceId(unsigned char hand_device_id);
  * @note Only works with CAN communication, not supported for RS485
  */
 static DeviceInfo GetDeviceInfoFromBroadcast(
-    unsigned char canfd_device_id,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_device_id,
+    uint8_t canfd_channel_id = 0);
 
 /**
  * @brief Get device information from broadcast address (hand_device_id = 0x00) by serial number
@@ -294,7 +297,7 @@ static DeviceInfo GetDeviceInfoFromBroadcast(
  */
 static DeviceInfo GetDeviceInfoFromBroadcast(
     const std::string& usbcanfd_serial_number,
-    unsigned char canfd_channel_id = 0);
+    uint8_t canfd_channel_id = 0);
 
 #ifdef __linux__
 /**
