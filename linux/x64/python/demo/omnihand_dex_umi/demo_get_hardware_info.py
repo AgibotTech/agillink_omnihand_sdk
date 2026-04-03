@@ -25,14 +25,14 @@ def main():
     if args.device == 'hcan':
         hand = OmniHandDexUMI.create_hand_by_hcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHandDexUMI.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )
     else:  # default: zlgcan
         hand = OmniHandDexUMI.create_hand_by_zlgcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHandDexUMI.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )

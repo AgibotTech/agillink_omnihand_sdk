@@ -34,12 +34,8 @@ namespace omnihand {
 class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
  public:
   // Constants
-  static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // O20 has 20 active degrees of freedom (DoA)
-  /**
-   * @brief CAN 总线侧手设备 ID 默认值（O20 协议约定为 9；O10/O4 等为 1）。
-   * @see 工厂方法 hand_device_id 未显式传入时使用本常量。
-   */
-  static constexpr unsigned char kDefaultHandDeviceId = 9u;
+  static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // DoA
+  static constexpr uint8_t kDefaultHandDeviceId = 9u;
 
   virtual ~OmniHand3Ultra() = default;
 
@@ -49,19 +45,18 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id = kDefaultHandDeviceId,
-      unsigned char canfd_device_id = 0,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
-   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入（C++ 默认参数规则：后续参数不可无默认）。
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -73,14 +68,13 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    * @param tcp_port TCP server port (e.g. 8000)
    * @param canfd_channel_id CAN channel index (0 or 1, default 0)
    * @return A unique pointer to OmniHand3Ultra instance
-   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入（TCP 主机/端口无默认）。
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByZlgCanTcp(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& tcp_host,
       uint16_t tcp_port,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 #endif  // OMNIHAND_ZLG_TCP_SUPPORTED
 
 #ifdef __linux__
@@ -89,7 +83,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    */
   static std::unique_ptr<OmniHand3Ultra> createHandSocketCan(
       HandType hand_type,
-      unsigned char hand_device_id = kDefaultHandDeviceId,
+      uint8_t hand_device_id,
       const std::string& can_interface = "can0");
 #endif
 
@@ -98,33 +92,32 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id = kDefaultHandDeviceId,
-      unsigned char canfd_device_id = 0,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
-   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入。
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
    */
   static DeviceInfo GetDeviceInfoFromBroadcast(
-      unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Get device information from broadcast address by serial number
    */
   static DeviceInfo GetDeviceInfoFromBroadcast(
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
 #ifdef __linux__
   /**
@@ -149,7 +142,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    * @param hand_type Hand type (left/right)
    * @note Product type is fixed to ProductType::OMNIHAND_3_ULTRA for this class
    */
-  void Reset(unsigned char device_id, HandType hand_type);
+  void Reset(uint8_t device_id, HandType hand_type);
 };
 
 }  // namespace omnihand

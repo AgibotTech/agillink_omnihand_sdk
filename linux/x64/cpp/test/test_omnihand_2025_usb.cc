@@ -532,7 +532,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdSingleAxisPos) {
   RequireDevice();
 
   std::cout << "[StreamCmd] Testing single axis pos commands(0x06/0x07):" << std::endl;
-  for (int i = 1; i <= agilink::omnihand::PrivateOmniHand2025::kDegreesOfActiveFreedom; ++i) {
+  for (int i = 1; i <= agilink::omnihand::OmniHand2025::kDegreesOfActiveFreedom; ++i) {
     uint16_t origin_pos = hand_->GetSingleAxisPos(i);
     uint16_t target_pos = 512;
     uint16_t reply_pos = hand_->SetSingleAxisPos(i, target_pos);
@@ -768,20 +768,20 @@ TEST_F(OmniHand2025UsbTest, StreamCmdPosSpeedCur) {
   std::vector<uint16_t> ps_positions(10, 2048);
   std::vector<int16_t> ps_speeds(10, 0);
   std::vector<uint8_t> ps_torques(10, 0);
-  const agilink::omnihand::SetAllAxisPosResponse pos_speed_cur_resp = hand_->SetPosSpeedCurData(ps_positions, ps_speeds, ps_torques);
-  if (pos_speed_cur_resp.positions.empty()) GTEST_SKIP() << "SetPosSpeedCurData failed";
-  EXPECT_EQ(pos_speed_cur_resp.positions.size(), 10u);
+  const agilink::omnihand::SetAllAxisPosResponse pos_speed_torque_resp = hand_->SetPosSpeedTorqueData(ps_positions, ps_speeds, ps_torques);
+  if (pos_speed_torque_resp.positions.empty()) GTEST_SKIP() << "SetPosSpeedTorqueData failed";
+  EXPECT_EQ(pos_speed_torque_resp.positions.size(), 10u);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   const auto all_pos_after_ps = hand_->GetAllAxisPos();
-  if (all_pos_after_ps.empty()) GTEST_SKIP() << "GetAllAxisPos after SetPosSpeedCurData timeout";
+  if (all_pos_after_ps.empty()) GTEST_SKIP() << "GetAllAxisPos after SetPosSpeedTorqueData timeout";
   EXPECT_EQ(all_pos_after_ps.size(), 10u);
-  for (size_t i = 0; i < pos_speed_cur_resp.positions.size(); ++i) {
+  for (size_t i = 0; i < pos_speed_torque_resp.positions.size(); ++i) {
     std::cout << "  J" << (i + 1) << ": set_pos=" << ps_positions[i]
               << ", set_speed=" << static_cast<int16_t>(ps_speeds[i]) << ", set_torque=" << static_cast<int>(ps_torques[i])
-              << ", reply_pos=" << pos_speed_cur_resp.positions[i]
+              << ", reply_pos=" << pos_speed_torque_resp.positions[i]
               << ", read_pos=" << all_pos_after_ps[i] << std::endl;
   }
-  std::cout << "  0x32 reply:\n " << pos_speed_cur_resp.ToString() << std::endl;
+  std::cout << "  0x32 reply:\n " << pos_speed_torque_resp.ToString() << std::endl;
 
   // 0x33 finger tactile force + threshold: no work
   std::cout << "[StreamCmd] Skipping finger tactile force command (0x33) due to no response." << std::endl;

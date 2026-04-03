@@ -175,7 +175,7 @@ def main():
     print(f"Mode: {mode}")
     print("=" * 60)
 
-    hand_device_id= 1
+    hand_device_id= OmniHand2025.kDefaultHandDeviceId
     left_interface = "can0"
     right_interface = "can1"
 

@@ -31,7 +31,7 @@ def hand():
     """Create OmniHand 2025 via ZLG CAN over TCP."""
     hand = OmniHand2025.create_hand_by_zlgcan_tcp(
         hand_type=HandType.LEFT,
-        hand_device_id=1,
+        hand_device_id=OmniHand2025.kDefaultHandDeviceId,
         host=TCP_HOST,
         port=TCP_PORT,
         canfd_channel_id=0,

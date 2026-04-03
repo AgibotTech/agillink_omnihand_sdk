@@ -2,6 +2,8 @@
 
 本目录包含 OmniHand 2025 SDK Python 接口的单元测试，使用 pytest 框架。
 
+**说明：** O10 / Dex UMI 工厂参数中的 `hand_device_id`、`canfd_device_id`、`canfd_channel_id` 在 Python 中为 `int`，绑定层传入 C++ 时为 `uint8_t`（见 `release/doc/zh_cn/API_PYTHON_O10.md`）。
+
 ## 要求
 
 安装 pytest：

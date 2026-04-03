@@ -174,7 +174,7 @@ def main():
     print(f"Device: {device_type}")
     print("=" * 60)
 
-    hand_device_id= 1
+    hand_device_id= OmniHandDexUMI.kDefaultHandDeviceId
     # 注意：序列号需要根据实际情况修改
     # 序列号支持部分匹配（例如 "201BFF2A" 可以匹配 "201BFF2AF01202D44690USBCANFD-200U"）
     left_serial = "201BFF2A"   # 左手适配器序列号（部分匹配）

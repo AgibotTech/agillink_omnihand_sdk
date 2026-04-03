@@ -22,6 +22,9 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 import os
 
+# Default hand bus ID; must stay in sync with agilink::omnihand::OmniHand2025::kDefaultHandDeviceId (1u).
+_DEFAULT_HAND_DEVICE_ID = '1'
+
 
 def generate_launch_description():
     # Declare launch arguments (names match Python API)
@@ -33,8 +36,8 @@ def generate_launch_description():
     
     hand_device_id_arg = DeclareLaunchArgument(
         'hand_device_id',
-        default_value='1',
-        description='Hand device ID (1-255)'
+        default_value=_DEFAULT_HAND_DEVICE_ID,
+        description='Hand device ID (1-255); default matches OmniHand2025::kDefaultHandDeviceId'
     )
     
     connection_type_arg = DeclareLaunchArgument(
@@ -81,8 +84,8 @@ def generate_launch_description():
     
     second_hand_device_id_arg = DeclareLaunchArgument(
         'second_hand_device_id',
-        default_value='1',
-        description='Second hand device ID'
+        default_value=_DEFAULT_HAND_DEVICE_ID,
+        description='Second hand device ID; default matches OmniHand2025::kDefaultHandDeviceId'
     )
     
     second_connection_type_arg = DeclareLaunchArgument(

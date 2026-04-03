@@ -254,15 +254,15 @@ class AGIBOT_EXPORT PrivateOmniHand {
 
   /**
    * @brief 0x0A: Get all axes current information
-   * @return Current data (20 bytes, unit: 0.01A)
+   * @return Current per axis (0.01A units, int16, signed)
    */
-  virtual std::vector<uint16_t> GetAllAxisCurrent() const = 0;
+  virtual std::vector<int16_t> GetAllAxisCurrent() const = 0;
 
   /**
-   * @brief 0x0B: Get all axes velocity information
-   * @return Velocity data (20 bytes)
+   * @brief 0x0B: Get all axes velocity information (CAN: 0x0B stream; USB may use CVP)
+   * @return Velocity per axis (int16, signed)
    */
-  virtual std::vector<uint16_t> GetAllAxisVelocity() const = 0;
+  virtual std::vector<int16_t> GetAllAxisVelocity() const = 0;
 
   /**
    * @brief 0x0C: Get all axes temperature data
@@ -476,9 +476,9 @@ class AGIBOT_EXPORT PrivateOmniHand {
    * @param torques Vector of torques (10 bytes, 1 byte per axis, range 0-255)
    * @return Response data (60 bytes: positions, velocities, torques, fault states)
    */
-  virtual SetAllAxisPosResponse SetPosSpeedCurData(const std::vector<uint16_t>& positions,
-                                                   const std::vector<int16_t>& speeds,
-                                                   const std::vector<uint8_t>& torques) = 0;
+  virtual SetAllAxisPosResponse SetPosSpeedTorqueData(const std::vector<uint16_t>& positions,
+                                                      const std::vector<int16_t>& speeds,
+                                                      const std::vector<uint8_t>& torques) = 0;
 
   /**
    * @brief 0x33: Get finger tactile force summary data

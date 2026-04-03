@@ -87,7 +87,7 @@ def hand():
     if DEVICE_TYPE == "hcan":
         hand = OmniHandPro2025.create_hand_by_hcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHandPro2025.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )
@@ -96,7 +96,7 @@ def hand():
         # Default: ZLG CAN
         hand = OmniHandPro2025.create_hand_by_zlgcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHandPro2025.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )
@@ -152,7 +152,7 @@ def test_get_device_info(hand):
     print(f"{device_info}")
     # Only check deviceId if request succeeded (non-zero indicates success)
     if device_info.hand_device_id != 0:
-        assert device_info.hand_device_id == 1
+        assert device_info.hand_device_id == OmniHandPro2025.kDefaultHandDeviceId
 
 
 def test_set_device_id(hand):
@@ -186,7 +186,9 @@ def test_set_device_id(hand):
     
     # Verify reset
     device_info1 = hand.get_device_info()
-    assert device_info1.hand_device_id == 1, f"Expected device ID 1, got {device_info1.hand_device_id}"
+    assert device_info1.hand_device_id == original_id, (
+        f"Expected device ID {original_id}, got {device_info1.hand_device_id}"
+    )
 
 
 def test_joint_angle_control(hand):

@@ -177,7 +177,7 @@ def main():
     print(f"Device: {device_type}")
     print("=" * 60)
 
-    hand_device_id= 1
+    hand_device_id= OmniHandPro2025.kDefaultHandDeviceId
     canfd_device_id= 0
 
     # Helper function to create hand instance

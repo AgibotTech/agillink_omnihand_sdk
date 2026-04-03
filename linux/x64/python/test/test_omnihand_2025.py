@@ -86,14 +86,14 @@ def hand():
     if DEVICE_TYPE == "hcan":
         hand = OmniHand2025.create_hand_by_hcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHand2025.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )
     else:  # default: zlgcan
         hand = OmniHand2025.create_hand_by_zlgcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHand2025.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )
@@ -133,7 +133,7 @@ def test_get_device_info(hand):
         print(device_info)  # Use __str__ method
         # Only check deviceId if request succeeded (non-zero indicates success)
         if device_info.hand_device_id != 0:
-            assert device_info.hand_device_id == 1
+            assert device_info.hand_device_id == OmniHand2025.kDefaultHandDeviceId
 
 
 def test_set_device_id(hand):
@@ -159,15 +159,15 @@ def test_set_device_id(hand):
     if device_info.hand_device_id != 0:
         assert device_info.hand_device_id == 2
     
-    # Reset to original
-    original_id = 1
+    # Reset to SDK default bus ID (protocol default 1)
+    original_id = OmniHand2025.kDefaultHandDeviceId
     hand.set_device_id(original_id)
     print(f"[set_device_id] Reset Device ID: {original_id}")
     
     device_info1 = hand.get_device_info()
     # Check if request succeeded (non-zero indicates success)
     if device_info1.hand_device_id != 0:
-        assert device_info1.hand_device_id == 1
+        assert device_info1.hand_device_id == OmniHand2025.kDefaultHandDeviceId
 
 
 def test_motor_position_control(hand):

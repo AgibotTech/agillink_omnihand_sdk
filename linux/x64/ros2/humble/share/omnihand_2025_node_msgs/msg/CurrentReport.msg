@@ -1,2 +1,2 @@
 std_msgs/Header header
-uint16[] current_reports
+int16[] current_reports

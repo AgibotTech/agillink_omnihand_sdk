@@ -13,9 +13,9 @@ export CMAKE_PREFIX_PATH="$_AMENT_CURRENT_PREFIX:${CMAKE_PREFIX_PATH}"
 
 # Set LD_LIBRARY_PATH (include both lib and lib/omnihand_node for third-party libraries)
 if [ -z "$LD_LIBRARY_PATH" ]; then
-  export LD_LIBRARY_PATH="$_AMENT_CURRENT_PREFIX/lib/omnihand_node:$_AMENT_CURRENT_PREFIX/lib"
+  export LD_LIBRARY_PATH="$_AMENT_CURRENT_PREFIX/lib/omnihand_node:$_AMENT_CURRENT_PREFIX/lib:$_AMENT_CURRENT_PREFIX/lib/python3.10/site-packages/omnihand_2025_node_msgs:$_AMENT_CURRENT_PREFIX/lib/python3.10/site-packages/omnihand_pro_2025_node_msgs"
 else
-  export LD_LIBRARY_PATH="$_AMENT_CURRENT_PREFIX/lib/omnihand_node:$_AMENT_CURRENT_PREFIX/lib:$LD_LIBRARY_PATH"
+  export LD_LIBRARY_PATH="$_AMENT_CURRENT_PREFIX/lib/omnihand_node:$_AMENT_CURRENT_PREFIX/lib:$_AMENT_CURRENT_PREFIX/lib/python3.10/site-packages/omnihand_2025_node_msgs:$_AMENT_CURRENT_PREFIX/lib/python3.10/site-packages/omnihand_pro_2025_node_msgs:$LD_LIBRARY_PATH"
 fi
 
 # Set PATH

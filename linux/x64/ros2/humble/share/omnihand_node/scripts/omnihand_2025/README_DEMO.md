@@ -54,6 +54,7 @@ Demo会自动执行以下步骤：
 ```python
 import rclpy
 from rclpy.node import Node
+from omnihand import OmniHand2025
 from omnihand_2025_node_msgs.srv import OpenHand, SetPosition, GetState
 
 class HandController(Node):
@@ -75,7 +76,7 @@ class HandController(Node):
         """打开手"""
         request = OpenHand.Request()
         request.hand_type = 'left'
-        request.hand_device_id = 1
+        request.hand_device_id = OmniHand2025.kDefaultHandDeviceId
         request.canfd_device_id = 0
         request.canfd_channel_id = 0
         
@@ -133,9 +134,10 @@ if __name__ == '__main__':
 ## 注意事项
 
 1. **确保节点运行**：运行demo前必须启动手部节点
-2. **检查硬件连接**：确保手部硬件已连接
-3. **权限问题**：如果使用USB设备，可能需要权限设置
-4. **超时设置**：根据实际移动速度调整timeout参数
+2. **Python 示例中的 `OmniHand2025.kDefaultHandDeviceId`**：需安装 OmniHand Python 绑定（`omnihand` 包），与 C++ `OmniHand2025::kDefaultHandDeviceId` 一致；若未安装，可改为与节点参数一致的整型默认值（通常为 `1`）
+3. **检查硬件连接**：确保手部硬件已连接
+4. **权限问题**：如果使用USB设备，可能需要权限设置
+5. **超时设置**：根据实际移动速度调整timeout参数
 
 ## 故障排除
 

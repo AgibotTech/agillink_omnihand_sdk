@@ -12,7 +12,7 @@ omnihand_pro_2025_param_reader:
   ros__parameters:
     # First hand configuration
     hand_type: "left"                  # "left" or "right"
-    hand_device_id: 1                  # Hand device ID (1-255)
+    hand_device_id: 1                  # Bus ID (1-255); 1 = OmniHandPro2025::kDefaultHandDeviceId
     connection_type: "zlg_can"         # "zlg_can" or "hcan" (O12 only supports CANFD)
     
     # For zlg_can or hcan - two ways to specify device:
@@ -26,7 +26,7 @@ omnihand_pro_2025_param_reader:
     # 默认不配置第二个手，只启动第一个手
     # 如需启动两个手，取消注释并配置以下参数：
     # second_hand_type: "right"
-    # second_hand_device_id: 1
+    # second_hand_device_id: 1          # default: OmniHandPro2025::kDefaultHandDeviceId
     # second_connection_type: "zlg_can"
     # second_canfd_serial_number: ""     # CANFD adapter serial number (recommended)
     # second_canfd_channel_id: 1         # CAN channel index (0 or 1)

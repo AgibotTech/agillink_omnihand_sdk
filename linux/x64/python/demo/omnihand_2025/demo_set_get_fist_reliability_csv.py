@@ -28,8 +28,8 @@ def main():
                         help='Request interval in ms (default: 10)')
     parser.add_argument('-n', '--iterations', type=int, default=1000,
                         help='Number of set+get iterations (default: 1000)')
-    parser.add_argument('-o', '--output', type=str, default='set_get_reliability.csv',
-                        help='Output CSV path (default: set_get_reliability.csv)')
+    parser.add_argument('-o', '--output', type=str, default='same_set_get_reliability.csv',
+                        help='Output CSV path (default: same_set_get_reliability.csv)')
     parser.add_argument('--timeout_ms', type=int, default=30,
                         help='Frame receive timeout in ms (default: 30)')
     parser.add_argument('--positions', type=str, default='2048,0,0,0,0,0,0,0,0,4095',
@@ -80,45 +80,59 @@ def main():
 
     hand.set_request_interval(interval_ms)
     hand.set_frame_recv_timeout(frame_recv_timeout_ms)
-    hand.set_hand_gesture(0) 
-    time.sleep(1)
-    target_positions = hand.get_all_joint_positions()
-    time.sleep(1)
+    # hand.show_data_details(True)
+    open_target_positions = [4087, 18, 3963, 2026, 4094, 4094, 2072, 4094, 39, 4093]
+    fist_target_positions = [4087, 4085, 1634, 2040, 3, 3, 2035, 2, 9, 3]
+    hand.set_all_joint_positions(open_target_positions)
+    time.sleep(2)
+    init_positions = hand.get_all_joint_positions()
+    print("init_positions:", init_positions)
+    # time.sleep(1)
 
     csv_header = ["action", "elapsed_ms"] + [f"pos_{i}" for i in range(10)]
     # 使用高精度单调时钟计时，避免受系统时间调整影响；elapsed_ms 可能偶尔相同，但真实反映测量时间
-    start_time = time.perf_counter()
+    # start_time = time.perf_counter()
 
     try:
         with open(args.output, 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=csv_header)
             writer.writeheader()
+            start_time = time.perf_counter()
             for iteration in range(total_iterations):
                 # --- Set position ---
                 try:
-                    target_positions[9] = iteration % 4096
-
-                    actual_positions = hand.set_all_joint_positions(target_positions)
+                    acutual_fist_positions = hand.set_all_joint_positions(fist_target_positions)
                     elapsed_ms = (time.perf_counter() - start_time) * 1000.0
                     row_send = {"action": "set", "elapsed_ms": ""}
                     for i in range(10):
-                        row_send[f"pos_{i}"] = target_positions[i] if i < len(target_positions) else ""
+                        row_send[f"pos_{i}"] = fist_target_positions[i] if i < len(fist_target_positions) else ""
                     writer.writerow(row_send)
                     row_reply = {"action": "reply", "elapsed_ms": elapsed_ms}
                     for i in range(10):
-                        row_reply[f"pos_{i}"] = actual_positions[i] if actual_positions and i < len(actual_positions) else ""
+                        row_reply[f"pos_{i}"] = acutual_fist_positions[i] if acutual_fist_positions and i < len(acutual_fist_positions) else ""
                     writer.writerow(row_reply)
                 except Exception:
                     pass
 
-                # # --- Get position ---
-                # try:
-                #     positions = hand.get_all_joint_positions()
-                #     if positions is not None:
-                #         t_ms = (time.time() - start_time) * 1000.0
-                #         writer.writerow({"elapsed_ms": t_ms, "action": "get"})
-                # except Exception:
-                #     pass
+            row_send = {"action": "rest", "elapsed_ms": ""   }
+            writer.writerow(row_send)
+            start_time = time.perf_counter()
+            for iteration in range(total_iterations):
+                # --- Set position ---
+                try:
+                    # actual_positions = hand.set_all_joint_positions(target_positions)
+                    acutual_open_positions = hand.set_all_joint_positions(open_target_positions)
+                    elapsed_ms = (time.perf_counter() - start_time) * 1000.0
+                    row_send = {"action": "set", "elapsed_ms": ""}
+                    for i in range(10):
+                        row_send[f"pos_{i}"] = open_target_positions[i] if i < len(open_target_positions) else ""
+                    writer.writerow(row_send)
+                    row_reply = {"action": "reply", "elapsed_ms": elapsed_ms}
+                    for i in range(10):
+                        row_reply[f"pos_{i}"] = acutual_open_positions[i] if acutual_open_positions and i < len(acutual_open_positions) else ""
+                    writer.writerow(row_reply)
+                except Exception:
+                    pass
 
     except KeyboardInterrupt:
         pass

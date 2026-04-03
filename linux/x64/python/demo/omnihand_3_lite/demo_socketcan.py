@@ -21,7 +21,7 @@ def main():
     # Create O4 hand instance using SocketCAN
     hand = OmniHand3Lite.create_hand_socketcan(
         hand_type=HandType.LEFT,
-        hand_device_id=1,
+        hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
         can_interface="can0"  # CAN interface name
     )
     

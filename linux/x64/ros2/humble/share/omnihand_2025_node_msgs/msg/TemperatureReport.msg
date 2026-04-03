@@ -1,2 +1,2 @@
 std_msgs/Header header
-uint16[] temperature_reports
+int16[] temperature_reports

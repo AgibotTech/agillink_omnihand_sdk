@@ -21,14 +21,14 @@ def main():
     if args.device == 'hcan':
         hand = OmniHand3Lite.create_hand_by_hcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
             canfd_device_id=0,  # First CANFD device
             canfd_channel_id=0  # First channel
         )
     else:  # default: zlgcan
         hand = OmniHand3Lite.create_hand_by_zlgcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
             canfd_device_id=0,  # First CANFD device
             canfd_channel_id=0  # First channel
         )
