@@ -35,6 +35,11 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // O4 has 4 active degrees of freedom (DoA)
+  /**
+   * @brief CAN 总线侧手设备 ID 默认值（O4 等与 O10 一致为 1）。
+   * @see 工厂方法中在符合 C++ 默认参数规则处使用本常量作为默认实参。
+   */
+  static constexpr unsigned char kDefaultHandDeviceId = 1u;
 
   virtual ~OmniHand3Lite() = default;
 
@@ -51,12 +56,13 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
    */
   static std::unique_ptr<OmniHand3Lite> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
+      unsigned char hand_device_id = kDefaultHandDeviceId,
+      unsigned char canfd_device_id = 0,
       unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
+   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入。
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
@@ -100,7 +106,7 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
    */
   static std::unique_ptr<OmniHand3Lite> createHandSocketCan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      unsigned char hand_device_id = kDefaultHandDeviceId,
       const std::string& can_interface = "can0");
 #endif
 
@@ -116,12 +122,13 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
    */
   static std::unique_ptr<OmniHand3Lite> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
+      unsigned char hand_device_id = kDefaultHandDeviceId,
+      unsigned char canfd_device_id = 0,
       unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
+   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入。
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param hcan_serial_number HCAN device serial number (supports partial matching)

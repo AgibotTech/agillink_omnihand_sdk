@@ -21,6 +21,7 @@
 #include "omnihand/io10_tactile_sensor_1d.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/proto.h"
+#include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"
 
 namespace agilink {
 namespace omnihand {
@@ -36,6 +37,11 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // O10 UMI has 10 active degrees of freedom (DoA)
+  /**
+   * @brief CAN 总线侧手设备 ID 默认值（与 O10 一致为 1）。
+   * @see 工厂方法中在符合 C++ 默认参数规则处使用本常量作为默认实参。
+   */
+  static constexpr unsigned char kDefaultHandDeviceId = 1u;
 
   virtual ~OmniHandDexUMI() = default;
 
@@ -52,12 +58,13 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
+      unsigned char hand_device_id = kDefaultHandDeviceId,
+      unsigned char canfd_device_id = 0,
       unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
+   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入。
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
@@ -82,7 +89,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      unsigned char hand_device_id = kDefaultHandDeviceId,
       const std::string& can_interface = "can0");
 #endif
 
@@ -98,12 +105,13 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   static std::unique_ptr<OmniHandDexUMI> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
+      unsigned char hand_device_id = kDefaultHandDeviceId,
+      unsigned char canfd_device_id = 0,
       unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
+   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入。
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param hcan_serial_number HCAN device serial number (supports partial matching)
@@ -175,6 +183,11 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
 
  protected:
   /**
+   * @brief Kinematics solver for OmniHand 2025 (O10)
+   */
+  std::unique_ptr<o10::OmniHand2025Solver> kinematics_solver_;
+
+  /**
    * @brief Initialize base class members
    * @param device_id Device ID
    * @param hand_type Hand type (left/right)
@@ -182,6 +195,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSens
    */
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_DEX_UMI, device_id, hand_type);
+    kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(is_left_hand_);
   }
 };
 

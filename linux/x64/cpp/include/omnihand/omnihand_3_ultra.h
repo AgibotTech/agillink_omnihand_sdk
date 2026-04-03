@@ -35,6 +35,11 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // O20 has 20 active degrees of freedom (DoA)
+  /**
+   * @brief CAN 总线侧手设备 ID 默认值（O20 协议约定为 9；O10/O4 等为 1）。
+   * @see 工厂方法 hand_device_id 未显式传入时使用本常量。
+   */
+  static constexpr unsigned char kDefaultHandDeviceId = 9u;
 
   virtual ~OmniHand3Ultra() = default;
 
@@ -44,12 +49,13 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
+      unsigned char hand_device_id = kDefaultHandDeviceId,
+      unsigned char canfd_device_id = 0,
       unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
+   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入（C++ 默认参数规则：后续参数不可无默认）。
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByZlgcan(
       HandType hand_type,
@@ -67,6 +73,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    * @param tcp_port TCP server port (e.g. 8000)
    * @param canfd_channel_id CAN channel index (0 or 1, default 0)
    * @return A unique pointer to OmniHand3Ultra instance
+   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入（TCP 主机/端口无默认）。
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByZlgCanTcp(
       HandType hand_type,
@@ -82,7 +89,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    */
   static std::unique_ptr<OmniHand3Ultra> createHandSocketCan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      unsigned char hand_device_id = kDefaultHandDeviceId,
       const std::string& can_interface = "can0");
 #endif
 
@@ -91,12 +98,13 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
+      unsigned char hand_device_id = kDefaultHandDeviceId,
+      unsigned char canfd_device_id = 0,
       unsigned char canfd_channel_id = 0);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
+   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入。
    */
   static std::unique_ptr<OmniHand3Ultra> createHandByHcan(
       HandType hand_type,
