@@ -1,7 +1,7 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
 # OmniHand 2025 SDK is licensed under Mulan PSL v2
 
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.24)
 project(omnihand_demo)
 
 # Support both: building together (as subdirectory) and building separately (after installation)

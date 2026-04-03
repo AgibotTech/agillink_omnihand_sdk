@@ -183,45 +183,6 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    */
   virtual TactileSensor3DData GetTactileSensor3DData(Finger eFinger) const = 0;
 
-  /**
-   * @brief Sets error report period of a single joint motor.
-   * @param joint_motor_index Joint motor index (1-12)
-   * @param period Report period (unit: milliseconds)
-   */
-  virtual void SetErrorReportPeriod(unsigned char joint_motor_index, uint16_t period) = 0;
-
-  /**
-   * @brief Sets error report periods of all joint motors in batch.
-   * @param vec_period Report period vector, length 12
-   */
-  virtual void SetAllErrorReportPeriod(std::vector<uint16_t> vec_period) = 0;
-
-  /**
-   * @brief Sets temperature report period of a single joint motor.
-   * @param joint_motor_index Joint motor index (1-12)
-   * @param period Report period (unit: milliseconds)
-   */
-  virtual void SetTemperReportPeriod(unsigned char joint_motor_index, uint16_t period) = 0;
-
-  /**
-   * @brief Sets temperature report periods of all joint motors in batch.
-   * @param vec_period Report period vector, length 12
-   */
-  virtual void SetAllTemperReportPeriod(std::vector<uint16_t> vec_period) = 0;
-
-  /**
-   * @brief Sets current report period of a single joint motor.
-   * @param joint_motor_index Joint motor index (1-12)
-   * @param period Report period (unit: milliseconds)
-   */
-  virtual void SetCurrentReportPeriod(unsigned char joint_motor_index, uint16_t period) = 0;
-
-  /**
-   * @brief Sets current report periods of all joint motors in batch.
-   * @param vec_period Report period vector, length 12
-   */
-  virtual void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period) = 0;
-
   // ============ Gesture Control ============
   /**
    * @brief Sets the hand to a predefined gesture.

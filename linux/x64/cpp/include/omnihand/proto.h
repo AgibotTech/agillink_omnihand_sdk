@@ -196,35 +196,19 @@ struct AGIBOT_EXPORT JointMotorErrorReport {
  * @brief data structure for 3D tactile sensor data (O12 only)
  */
 struct AGIBOT_EXPORT TactileSensor3DData {
-  static constexpr size_t kChannelCount = 6;
-
   uint8_t online_state;          // 1: online, 0: offline
-  uint8_t channel_value[kChannelCount][3];  // 6 raw 24-bit channel values (little-endian)
+  uint16_t channel_value[9];     // raw channel values
   uint16_t normal_force;         // force normal to the sensor surface (0.1N, max: 2000)
   uint16_t tangent_force;        // force tangential to the sensor surface (0.1N, max: 2000)
   uint16_t tangent_force_angle;  // angle of the tangent force in degrees, zero degrees is up (0-359)
   uint8_t capa_approach[4];      // self-capacitance approach
 
-  /**
-   * @brief Convert one packed 24-bit channel sample into uint32_t.
-   * @param index Channel index in range [0, kChannelCount).
-   * @return Decoded 24-bit value, or 0 when index is out of range.
-   */
-  uint32_t GetChannelValue(size_t index) const {
-    if (index >= kChannelCount) {
-      return 0;
-    }
-    return static_cast<uint32_t>(channel_value[index][0]) |
-           (static_cast<uint32_t>(channel_value[index][1]) << 8) |
-           (static_cast<uint32_t>(channel_value[index][2]) << 16);
-  }
-
   std::string ToString() const {
     std::stringstream sstream;
     sstream << "\t[Online State: " << static_cast<unsigned int>(online_state) << "]\n";
     sstream << "\t[Channel Values: ";
-    for (size_t i = 0; i < kChannelCount; ++i) {
-      sstream << GetChannelValue(i) << " ";
+    for (size_t i = 0; i < 9; ++i) {
+      sstream << static_cast<unsigned int>(channel_value[i]) << " ";
     }
     sstream << "]\n\t[Normal Force: " << static_cast<unsigned int>(normal_force) << "]\n";
     sstream << "\t[Tangent Force: " << static_cast<unsigned int>(tangent_force) << "]\n";
@@ -243,20 +227,6 @@ struct AGIBOT_EXPORT Version {
   uint8_t minor{0};
   uint8_t patch{0};
   uint8_t res{0};
-
-  Version() = default;
-  Version(uint8_t major, uint8_t minor, uint8_t patch, uint8_t res = 0)
-      : major(major), minor(minor), patch(patch), res(res) {}
-
-  bool operator>(const Version& other) const {
-    if (major > other.major) return true;
-    if (major < other.major) return false;
-    if (minor > other.minor) return true;
-    if (minor < other.minor) return false;
-    if (patch > other.patch) return true;
-    if (patch < other.patch) return false;
-    return res > other.res;
-  }
 
   bool operator>=(const Version& other) const {
     if (major < other.major) return false;

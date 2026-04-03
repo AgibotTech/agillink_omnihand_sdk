@@ -24,8 +24,6 @@
 // ZLG CANFD over TCP (WiFi/Ethernet): supported on Windows and Linux x64, not on Linux aarch64/arm64
 #if defined(_WIN32) || (defined(__linux__) && (defined(__x86_64__) || defined(__amd64__)))
   #define OMNIHAND_ZLG_TCP_SUPPORTED 1
-#else
-  #define OMNIHAND_ZLG_TCP_SUPPORTED 0
 #endif
 
 #endif  // AGILINK_EXPORT_SYMBOLS_H

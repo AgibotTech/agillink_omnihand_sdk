@@ -4,8 +4,6 @@ import time
 
 def main():
     parser = argparse.ArgumentParser(description='机械手控制主程序')
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='hcan',
-                        help='CAN设备类型：zlgcan（ZLG USB CANFD）或 hcan（HCAN USB CANFD），默认 zlgcan')
     parser.add_argument('--mode', choices=['o10', 'o10_hal'], default='o10', help='选择机械手类型')
     parser.add_argument('--ip', help='输入udp信息传输的ip地址，默认为127.0.0.1', default='127.0.0.1')
     parser.add_argument('--port', type=int, help='输入udp信息传输的端口号，默认为7777', default=7777)
@@ -25,9 +23,9 @@ def main():
     if args.mode == 'o10':
         from Omnihand_o10_yudie import init_hand, set_hand_position
         if args.hand == 'both':
-            left_hand, right_hand = init_hand(args.hand, args.device)
+            left_hand, right_hand = init_hand(args.hand)
         else:
-            hand = init_hand(args.hand, args.device)
+            hand = init_hand(args.hand)
         def update():
             role_list = sdk.get_role_name_list()
             if len(role_list) > 0:
