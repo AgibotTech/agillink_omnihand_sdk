@@ -1,260 +1,133 @@
-﻿# SocketCAN Setup Guide
+# SocketCAN User Guide
 
-> ⚠️ **Linux Only**: SocketCAN is a Linux kernel feature and is not available on Windows.
+[简体中文](../zh_cn/SOCKETCAN_SETUP.md)
 
-**Applicable scenarios:**
-- You already have a SocketCAN environment on Linux (onboard CAN, PCIe CAN, or other SocketCAN-compatible devices), or
-- You need to map ZLG USBCANFD-200U and similar USB devices to `can0` for unified SocketCAN access.
-
-For most users who only use ZLG USB-to-CANFD devices, **we recommend using the ZLG library method directly**, and you don't need the steps in this file.
+> **Linux only.** SocketCAN is a Linux kernel feature; it is **not** available on Windows.  
+> If you use the **ZLG USBCANFD library**, you **do not** need this guide.
 
 ---
 
-## 1. Overview
+## 1. Download and install the SocketCAN driver from the vendor
 
-- SocketCAN abstracts CAN devices as network interfaces (e.g., `can0`, `can1`) in the kernel.
-- The SDK uses product-specific factory methods:
-  - C++: `OmniHand2025::createHandSocketCan(...)`, `OmniHandPro2025::createHandSocketCan(...)`, `OmniHandDexUMI::createHandSocketCan(...)`
-  - Python: `OmniHand2025.create_hand_socketcan(...)`, `OmniHandPro2025.create_hand_socketcan(...)`, `OmniHandDexUMI.create_hand_socketcan(...)`
-  
-  to communicate directly using these interface names.
+Follow the **vendor PDF or package instructions** exactly (dependencies, build/install module, `insmod`/`modprobe`, USB checks).  
 
-**Note:**
-- When using SocketCAN, the underlying driver is a kernel driver, no longer using the ZLG userspace library;
-- The same USB device **cannot be used simultaneously** by the ZLG library and SocketCAN driver; they are mutually exclusive.
+**Note:** Driver packages must match your kernel version. If the vendor provides an install script, prefer that. After this step, a CAN network interface should appear (see next section).
 
 ---
 
-## 2. Check if SocketCAN Interface Already Exists
+## 2. Check interfaces with `ip link show`
+
+Run:
 
 ```bash
-ip link show | grep -E "can[0-9]"
-ls /sys/class/net | grep -E "^can"
+ip link show
 ```
 
-If you already see interfaces like `can0`, `can1`, and can use `candump can0` to send/receive messages, you can skip to "Section 4: Using SocketCAN in the SDK".
+Look for **`can0`**, **`can1`**, etc. (or `ip link show can0` for one interface).
+
+- If interfaces exist, continue to **Section 3** to set OmniHand bit timings.  
+- If **no** `can` interface appears, go back to **Section 1** (driver, USB enumeration) or the vendor troubleshooting guide.
+
+Optional:
+
+```bash
+ls /sys/class/net | grep -E '^can'
+```
 
 ---
 
-## 3. Enable SocketCAN for ZLG USBCANFD Devices (Optional, Advanced)
+## 3. Set the bus parameters of OmniHand
 
-If you are using ZLG USBCANFD-200U or similar USB devices and want to access them via SocketCAN, you can use the kernel driver example included in the repository (located at `cpp/third_party/zlgcan/socketcan`).
+Typical OmniHand CANFD settings:
 
-### 3.1 Install Build Dependencies
-
-```bash
-sudo apt-get update
-sudo apt-get install -y gcc-12 build-essential linux-headers-$(uname -r) can-utils
-```
-
-### 3.2 Compile Kernel Module
+- **Arbitration:** 1 Mbps, **80%** sample point  
+- **Data:** 5 Mbps, **75%** sample point  
 
 ```bash
-cd cpp/third_party/zlgcan/socketcan
-make clean
-make
+sudo ip link set can0 down
+sudo ip link set can0 type can fd on bitrate 1000000 dbitrate 5000000 sample-point 0.8 dsample-point 0.75
+sudo ip link set can0 up
 ```
 
-The generated `usbcanfd.ko` is the SocketCAN driver module.
-
-### 3.3 Load Driver and Create `can0`/`can1`
-
-It is recommended to use the vendor script:
+Verify:
 
 ```bash
-cd cpp/third_party/zlgcan/socketcan
-sudo bash driver_load.sh
+ip -details link show can0
 ```
-
-The script will:
-- Unload old `usbcanfd` / `can_dev` drivers (if any);
-- Load `can_dev` and the newly compiled `usbcanfd.ko`;
-- Create and configure `can0`, `can1` interfaces for the device (default bitrate 500 kbps, data bitrate 2 Mbps);
-- Set interfaces to `UP` state.
-
-After that, you can use:
-
-```bash
-ip link show can0
-candump can0
-```
-
-to verify that SocketCAN is working properly.
-
-> If you want to use different bitrates, refer to the examples in `driver_load.sh` or `readme.txt` and adjust the `ip link set can0 type can ...` parameters accordingly.
 
 ---
 
-## 4. Using SocketCAN in the SDK
+## 4. First program
 
-### 4.1 C++: `createHandSocketCan`
+Prerequisite: `can0` (or your interface) is configured per Section 3 and **UP**.
 
-Prerequisites:
-- SDK is installed (e.g., installed to `/usr/local`);
-- `can0` has been properly configured via SocketCAN and is `up`.
+**C++:**
 
-Example for OmniHand 2025 (O10):
+```cmake
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  add_executable(demo_omnihand_2025_socketcan O10_demo_socketcan.cc)
+  target_link_libraries(demo_omnihand_2025_socketcan PRIVATE ${OMNIHAND_TARGET})
+endif()
+```
 
 ```cpp
 #include "omnihand/omnihand_2025.h"
-
-int main() {
-    // SocketCAN example: using can0 interface for OmniHand 2025 (O10)
-    // hand_type    : HandType::LEFT / HandType::RIGHT
-    // device_id    : Device ID configured in hand firmware (usually 1)
-    // can0         : Linux SocketCAN interface name
-    auto hand = OmniHand2025::createHandSocketCan(
-        HandType::LEFT,
-        1,
-        "can0"
-    );
-
-    if (!hand || !hand->Init()) {
-        std::cerr << "[Error]: Failed to initialize SocketCAN device (can0)." << std::endl;
-        std::cerr << "Please check:" << std::endl;
-        std::cerr << "  1. ip link show can0" << std::endl;
-        std::cerr << "  2. sudo ip link set can0 type can bitrate 1000000 dbitrate 5000000 fd on" << std::endl;
-        std::cerr << "  3. sudo ip link set can0 up" << std::endl;
-        return -1;
-    }
-
-    // Read vendor information
-    auto vendor = hand->GetVendorInfo();
-    std::cout << vendor.toString() << std::endl;
-
-    // Set motor positions for all joints (range: 0-4096 for O10)
-    std::vector<int16_t> positions{500, 2081, 4094, 2029, 4094, 4094, 2048, 4094, 4000, 4094};
-    hand->SetAllJointMotorPosi(positions);
-
-    return 0;
-}
+#include <vector>
+// ...
+auto hand = OmniHand2025::createHandSocketCan(HandType::LEFT, 1, "can0");
+if (!hand || !hand->Init()) { /* verify Sections 2–3 */ }
+hand->SetAllActiveJointAngles(std::vector<double>(10, 0.0));  // O10, radians
 ```
 
-Example for OmniHand Pro 2025 (O12):
-
-```cpp
-#include "omnihand/omnihand_pro_2025.h"
-
-int main() {
-    // SocketCAN example: using can0 interface for OmniHand Pro 2025 (O12)
-    auto hand = OmniHandPro2025::createHandSocketCan(
-        HandType::LEFT,
-        1,
-        "can0"
-    );
-
-    if (!hand || !hand->Init()) {
-        std::cerr << "[Error]: Failed to initialize SocketCAN device (can0)." << std::endl;
-        return -1;
-    }
-
-    // Set motor positions for all joints (range: 0-2000 for O12)
-    std::vector<int16_t> positions{500, 1000, 1500, 2000, 1000, 1500, 500, 1000, 1500, 2000, 1000, 1500};
-    hand->SetAllJointMotorPosi(positions);
-
-    return 0;
-}
-```
-
-### 4.2 Python: `create_hand_socketcan`
-
-Same prerequisites: `can0` must be configured.
-
-Example for OmniHand 2025 (O10):
+**Python:**
 
 ```python
 from omnihand import OmniHand2025, HandType
-
-def main():
-    # SocketCAN example for OmniHand 2025 (O10)
-    hand = OmniHand2025.create_hand_socketcan(
-        hand_type=HandType.LEFT,
-        device_id=1,       # Device ID in hand firmware
-        can_interface="can0"
-    )
-
-    if not hand.init():
-        print("[Error]: Failed to initialize SocketCAN device (can0).")
-        print("Please check:")
-        print("  1. ip link show can0")
-        print("  2. sudo ip link set can0 type can bitrate 1000000 dbitrate 5000000 fd on")
-        print("  3. sudo ip link set can0 up")
-        return
-
-    vendor = hand.get_vendor_info()
-    print(vendor)
-
-    # Set motor positions (range: 0-4096 for O10)
-    positions = [500, 2081, 4094, 2029, 4094, 4094, 2048, 4094, 4000, 4094]
-    hand.set_all_joint_positions(positions)
-
-if __name__ == "__main__":
-    main()
+hand = OmniHand2025.create_hand_socketcan(
+    hand_type=HandType.LEFT, hand_device_id=1, can_interface="can0")
+if not hand.init():
+    ...
+hand.set_all_active_joint_angles([0.0] * 10)  # O10, radians
 ```
 
-Example for OmniHand Pro 2025 (O12):
+## 5. API documentation
 
-```python
-from omnihand import OmniHandPro2025, HandType
+**C++**
 
-def main():
-    # SocketCAN example for OmniHand Pro 2025 (O12)
-    hand = OmniHandPro2025.create_hand_socketcan(
-        hand_type=HandType.LEFT,
-        device_id=1,
-        can_interface="can0"
-    )
+- [C++ API index](API_CPP.md)  
+- [OmniHand 2025 (O10) C++ API](API_CPP_O10.md)  
+- [OmniHand Pro 2025 (O12) C++ API](API_CPP_O12.md)  
+- [OmniHand Dex UMI C++ API](API_CPP_O10_UMI.md)
 
-    if not hand.init():
-        print("[Error]: Failed to initialize SocketCAN device (can0).")
-        return
+**Python**
 
-    # Set motor positions (range: 0-2000 for O12)
-    positions = [500, 1000, 1500, 2000, 1000, 1500, 500, 1000, 1500, 2000, 1000, 1500]
-    hand.set_all_joint_positions(positions)
+- [Python API index](API_PYTHON.md)  
+- [OmniHand 2025 (O10) Python API](API_PYTHON_O10.md)  
+- [OmniHand Pro 2025 (O12) Python API](API_PYTHON_O12.md)  
+- [OmniHand Dex UMI Python API](API_PYTHON_UMI.md)
 
-if __name__ == "__main__":
-    main()
-```
+**ROS2 (Linux only)**
 
-> For more complete Python examples, refer to `python/demo/omnihand_2025/demo_socketcan.py` or `python/demo/omnihand_pro_2025/demo_socketcan.py`.
+- [ROS2 API index](API_ROS2.md)  
+- [OmniHand 2025 (O10) ROS2](API_ROS2_O10.md)  
+- [OmniHand Pro 2025 (O12) ROS2](API_ROS2_O12.md)
+
+See also [Quick Start](QUICK_START.md) and [Troubleshooting](TROUBLESHOOTING.md).
 
 ---
 
-## 5. Switching Between ZLG Library and SocketCAN
+## 6. Unload Socketcan kernel modules
 
-For the same ZLG USB device:
-- **When using ZLG library method (recommended)**: Do not load `usbcanfd.ko`, use product-specific factory methods like `OmniHand2025::createHandByZlgcan(..., canfd_device_id, canfd_channel_id)` / `OmniHand2025.create_hand_by_zlgcan(..., canfd_device_id, canfd_channel_id)` directly;
-- **When using SocketCAN method**: First ensure the kernel driver is loaded and `can0` is created, then use product-specific factory methods like `OmniHand2025::createHandSocketCan` / `OmniHand2025.create_hand_socketcan`.
-
-Switching approach:
-- If `usbcanfd.ko` is currently loaded and you want to return to ZLG library method:
+To **stop** using the SocketCAN kernel driver:
 
 ```bash
 sudo rmmod usbcanfd
-sudo rmmod can_dev   # Ignore if no error
 ```
 
-Then rerun examples or your own programs that use `canfd_device_id` / `canfd_channel_id`.
-
----
-
-## 6. Quick Configuration Commands
-
-For onboard CAN or other SocketCAN devices, configure the interface:
+If you need to remove `can_dev` as well (depends on your system):
 
 ```bash
-# Configure CAN interface
-sudo ip link set can0 type can bitrate 1000000 dbitrate 5000000 fd on
-
-# Bring interface up
-sudo ip link set can0 up
-
-# Verify interface status
-ip link show can0
-
-# Test with candump (optional)
-candump can0
+sudo rmmod can_dev
 ```
 
-For USB CANFD devices using the kernel driver, use the vendor script as described in Section 3.3.
+Harmless messages if a module is not loaded are normal. After removal, `can0` disappears; use Sections 1–3 again or the vendor script to restore SocketCAN.
