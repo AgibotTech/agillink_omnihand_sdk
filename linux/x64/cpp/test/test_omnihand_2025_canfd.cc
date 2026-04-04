@@ -3,18 +3,22 @@
 
 /**
  * @file test_omnihand_2025_canfd.cc
- * @brief CANFD-specific tests for OmniHand 2025
- * 
+ * @brief CANFD-specific tests for OmniHand 2025 (public factory APIs, non-private)
+ *
  * Usage:
- *   ./test_omnihand_2025_canfd [-c CHANNEL] [-i CANFD_ID] [-f INTERVAL]
- *   
- *   Options:
- *     -c CHANNEL   CAN channel ID (default: 0)
- *     -i CANFD_ID  CANFD device ID (default: 0)
- *     -f INTERVAL  Request interval in ms (default: 5, max: 100)
+ *   ./test_omnihand_2025_canfd [-t TRANSPORT] [-c CHANNEL] [-i CANFD_ID] [-f INTERVAL] [--can-if IF] [--tcp-host H] [--tcp-port P]
+ *
+ *   -t TRANSPORT  Backend: zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)
+ *   --can-if IF   SocketCAN interface name, socketcan only (default: can0)
+ *   --tcp-host H  ZLG CANFD-over-TCP peer host, zlgcantcp only (default: 192.168.0.178)
+ *   --tcp-port P  TCP port, zlgcantcp only (default: 8000)
+ *   -c CHANNEL   CAN channel index for zlgcan / hcan / zlgcantcp (default: 0)
+ *   -i CANFD_ID  Adapter device index for zlgcan / hcan (default: 0)
+ *   -f INTERVAL  Request interval in ms (default: 5, max: 100)
  */
 
 #include <gtest/gtest.h>
+#include "omnihand/export_symbols.h"
 #include "omnihand/omnihand_2025.h"
 #include <memory>
 #include <vector>
@@ -23,22 +27,77 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <cctype>
+#include <algorithm>
 
-// Global configuration
+enum class CanfdTransport {
+  kZlgcan,
+  kHcan,
+  kSocketCan,
+  kZlgCanTcp,
+};
+
+static CanfdTransport g_transport = CanfdTransport::kZlgcan;
 static int g_channel_id = 0;
 static int g_canfd_id = 0;
 static int g_request_interval = 5;  // CANFD default: 5ms
+static std::string g_can_if = "can0";
+static std::string g_tcp_host = "192.168.0.178";
+static uint16_t g_tcp_port = 8000;
+
+static CanfdTransport ParseTransport(std::string s) {
+  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+  if (s == "zlgcan") return CanfdTransport::kZlgcan;
+  if (s == "hcan") return CanfdTransport::kHcan;
+  if (s == "socketcan") return CanfdTransport::kSocketCan;
+  if (s == "zlgcantcp" || s == "zlg_tcp" || s == "zlgcan_tcp") return CanfdTransport::kZlgCanTcp;
+  std::cerr << "[Warning] unknown -t " << s << ", using zlgcan\n";
+  return CanfdTransport::kZlgcan;
+}
 
 class OmniHand2025CanfdTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    hand_ = agilink::omnihand::OmniHand2025::createHandByZlgcan(
-        agilink::omnihand::HandType::LEFT,        // hand_type: left hand
-        1,                       // hand_device_id: hand device ID
-        g_canfd_id,              // canfd_device_id: USB CANFD adapter device index
-        g_channel_id             // canfd_channel_id: CAN channel index (0=can0, 1=can1)
-    );
-    
+    using agilink::omnihand::HandType;
+    using agilink::omnihand::OmniHand2025;
+    constexpr uint8_t kHandDeviceId = 1;
+
+    switch (g_transport) {
+      case CanfdTransport::kZlgcan:
+        hand_ = OmniHand2025::createHandByZlgcan(
+            HandType::LEFT, kHandDeviceId,
+            static_cast<uint8_t>(g_canfd_id),
+            static_cast<uint8_t>(g_channel_id));
+        break;
+      case CanfdTransport::kHcan:
+        hand_ = OmniHand2025::createHandByHcan(
+            HandType::LEFT, kHandDeviceId,
+            static_cast<uint8_t>(g_canfd_id),
+            static_cast<uint8_t>(g_channel_id));
+        break;
+      case CanfdTransport::kSocketCan:
+#if defined(__linux__)
+        hand_ = OmniHand2025::createHandSocketCan(HandType::LEFT, kHandDeviceId, g_can_if);
+#else
+        std::cout << "[Warning] SocketCAN requires Linux; skipping hand creation.\n";
+        hand_ = nullptr;
+#endif
+        break;
+      case CanfdTransport::kZlgCanTcp:
+#if OMNIHAND_ZLG_TCP_SUPPORTED
+        hand_ = OmniHand2025::createHandByZlgCanTcp(
+            HandType::LEFT, kHandDeviceId, g_tcp_host, g_tcp_port,
+            static_cast<uint8_t>(g_channel_id));
+#else
+        std::cout << "[Warning] ZLG CANFD over TCP not supported on this platform.\n";
+        hand_ = nullptr;
+#endif
+        break;
+      default:
+        hand_ = nullptr;
+        break;
+    }
+
     if (hand_) {
       hand_->SetRequestInterval(g_request_interval);
       device_available_ = hand_->Init();
@@ -432,7 +491,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor) {
   // POSITION_VELOCITY_TORQUE mode: max 8 joints
   std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
   for (int i = 1; i <= 8; ++i) {
-    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
+    agilink::omnihand::MixCtrl ctrl;  // Default ctor zero-initializes bitfields
     ctrl.joint_index_ = static_cast<unsigned char>(i);
     ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_VELOCITY_TORQUE);
     ctrl.tgt_posi_ = safe_pos[i - 1];
@@ -461,7 +520,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_VeloTorque) {
   std::cout << "[MixCtrlJointMotor] VELOCITY_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
     std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
-    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
+    agilink::omnihand::MixCtrl ctrl;  // Default ctor zero-initializes bitfields
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
     ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::VELOCITY_TORQUE);
     ctrl.tgt_posi_ = std::nullopt;
@@ -485,7 +544,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_PosiTorque) {
   std::cout << "[MixCtrlJointMotor] POSITION_TORQUE mode for all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
     std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
-    agilink::omnihand::MixCtrl ctrl;  // 默认构造函数确保位域自动初始化为0
+    agilink::omnihand::MixCtrl ctrl;  // Default ctor zero-initializes bitfields
     ctrl.joint_index_ = static_cast<unsigned char>(joint);
     ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_TORQUE);
     ctrl.tgt_posi_ = safe_pos[joint - 1];
@@ -569,30 +628,58 @@ int main(int argc, char** argv) {
   
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
-    
-    if (arg == "-c" && i + 1 < argc) {
+
+    if ((arg == "-t" || arg == "--transport") && i + 1 < argc) {
+      g_transport = ParseTransport(argv[++i]);
+    } else if (arg == "-c" && i + 1 < argc) {
       g_channel_id = std::stoi(argv[++i]);
     } else if (arg == "-i" && i + 1 < argc) {
       g_canfd_id = std::stoi(argv[++i]);
     } else if (arg == "-f" && i + 1 < argc) {
       g_request_interval = std::stoi(argv[++i]);
       if (g_request_interval > 100) g_request_interval = 100;
+    } else if ((arg == "--can-if") && i + 1 < argc) {
+      g_can_if = argv[++i];
+    } else if ((arg == "--tcp-host") && i + 1 < argc) {
+      g_tcp_host = argv[++i];
+    } else if ((arg == "--tcp-port") && i + 1 < argc) {
+      g_tcp_port = static_cast<uint16_t>(std::stoi(argv[++i]));
     } else if (arg == "--help" || arg == "-h") {
       std::cout << "OmniHand 2025 CANFD Test\n\n";
       std::cout << "Usage: " << argv[0] << " [options]\n\n";
       std::cout << "Options:\n";
-      std::cout << "  -c CHANNEL   CAN channel ID (default: 0)\n";
-      std::cout << "  -i CANFD_ID  CANFD device ID (default: 0)\n";
-      std::cout << "  -f INTERVAL  Request interval in ms (default: 5, max: 100)\n";
-      std::cout << "\nExample:\n";
-      std::cout << "  " << argv[0] << " -c 0 -i 0 -f 5\n";
+      std::cout << "  -t, --transport NAME   zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)\n";
+      std::cout << "  -c CHANNEL             CAN channel (zlgcan/hcan/zlgcantcp), default 0\n";
+      std::cout << "  -i CANFD_ID             device index (zlgcan/hcan), default 0\n";
+      std::cout << "  --can-if IFACE         SocketCAN iface (socketcan), default can0\n";
+      std::cout << "  --tcp-host HOST        ZLG TCP host (zlgcantcp), default 192.168.0.178\n";
+      std::cout << "  --tcp-port PORT        ZLG TCP port (zlgcantcp), default 8000\n";
+      std::cout << "  -f INTERVAL            Request interval ms, default 5, max 100\n";
+      std::cout << "\nExamples:\n";
+      std::cout << "  " << argv[0] << " -t zlgcan -c 0 -i 0\n";
+      std::cout << "  " << argv[0] << " -t socketcan --can-if can0\n";
+      std::cout << "  " << argv[0] << " -t zlgcantcp --tcp-host 192.168.0.178 --tcp-port 8000\n";
       return 0;
     } else {
       gtest_args.push_back(argv[i]);
     }
   }
-  
+
   std::cout << "=== OmniHand 2025 CANFD Test ===" << std::endl;
+  switch (g_transport) {
+    case CanfdTransport::kZlgcan:
+      std::cout << "Transport: zlgcan\n";
+      break;
+    case CanfdTransport::kHcan:
+      std::cout << "Transport: hcan\n";
+      break;
+    case CanfdTransport::kSocketCan:
+      std::cout << "Transport: socketcan  can_if=" << g_can_if << "\n";
+      break;
+    case CanfdTransport::kZlgCanTcp:
+      std::cout << "Transport: zlgcantcp  " << g_tcp_host << ":" << g_tcp_port << "\n";
+      break;
+  }
   std::cout << "Channel ID: " << g_channel_id << std::endl;
   std::cout << "CANFD ID: " << g_canfd_id << std::endl;
   std::cout << "Request Interval: " << g_request_interval << " ms" << std::endl;
