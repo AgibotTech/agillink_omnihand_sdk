@@ -55,7 +55,7 @@ def main():
         elif args.device == 'rs485':
             hand = OmniHand2025.create_hand_by_rs485(
                 hand_type=HandType.RIGHT,
-                uart_port='COM14'
+                uart_port='/dev/ttyACM0'
             )
         elif args.device == 'zlgcan_tcp':
             hand = OmniHand2025.create_hand_by_zlgcan_tcp(
@@ -68,7 +68,7 @@ def main():
                 hand_type=HandType.LEFT,
                 hand_device_id=OmniHand2025.kDefaultHandDeviceId,
                 canfd_device_id=0,
-                canfd_channel_id=1,
+                canfd_channel_id=0,
             )
     except Exception as e:
         print(f"Failed to create hand: {e}")
