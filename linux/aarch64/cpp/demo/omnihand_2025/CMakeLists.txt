@@ -6,6 +6,16 @@
 
 # Variables are inherited from parent scope automatically
 
+if(NOT DEFINED OMNIHAND_ZLG_TCP_SUPPORTED)
+  if(WIN32)
+    set(OMNIHAND_ZLG_TCP_SUPPORTED 1)
+  elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+    set(OMNIHAND_ZLG_TCP_SUPPORTED 1)
+  else()
+    set(OMNIHAND_ZLG_TCP_SUPPORTED 0)
+  endif()
+endif()
+
 # CANFD (by canfd_id)
 add_executable(demo_omnihand_2025_canfd_id O10_demo_canfd_id.cc)
 target_link_libraries(demo_omnihand_2025_canfd_id PRIVATE ${OMNIHAND_TARGET})

@@ -204,9 +204,10 @@ TEST_F(OmniHand2025CanfdTest, SetGetSingleAxisPos) {
   std::cout << "[SetGetSingleAxisPos] Testing all 10 joints:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
     int16_t target_pos = safe_pos[joint - 1];
-    hand_->SetJointMotorPosi(joint, target_pos);
+    auto set_result = hand_->SetJointMotorPosi(joint, target_pos);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     auto pos = hand_->GetJointMotorPosi(joint);
-    std::cout << "  J" << joint << ": set=" << target_pos << ", get=" << pos << std::endl;
+    std::cout << "  J" << joint << ": target_pos=" << target_pos << ", set_result=" << set_result << ", get_pos=" << pos << std::endl;
     EXPECT_GE(pos, 0);
     EXPECT_LE(pos, 4096);
   }
@@ -216,7 +217,7 @@ TEST_F(OmniHand2025CanfdTest, SetGetAllAxisPos) {
   RequireDevice();
 
   // Safe positions from Python demo (not all-zero to avoid limit issues)
-  std::vector<int16_t> positions = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
+  std::vector<int16_t> positions = {2048, 2048, 4096, 0, 4096, 4096, 0, 4096, 0, 4096};
   
   // Test SetAllJointMotorPosi - returns actual positions
   auto set_result = hand_->SetAllJointMotorPosi(positions);
@@ -227,6 +228,7 @@ TEST_F(OmniHand2025CanfdTest, SetGetAllAxisPos) {
   }
   std::cout << std::endl;
   EXPECT_EQ(set_result.size(), 10);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   // Test GetAllJointMotorPosi separately
   auto get_result = hand_->GetAllJointMotorPosi();
@@ -271,7 +273,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllTemperatureReport) {
   auto temps = hand_->GetAllTemperatureReport();
   std::cout << "[GetAllTemperatureReport] ";
   for (size_t i = 0; i < temps.size(); ++i) {
-    std::cout << "J" << (i+1) << ":" << temps[i] << " degC";
+    std::cout << "J" << (i+1) << ":" << temps[i];
     if (i < temps.size() - 1) std::cout << ", ";
   }
   std::cout << std::endl;
@@ -297,7 +299,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllErrorReport) {
   RequireDevice();
   
   auto errors = hand_->GetAllErrorReport();
-  std::cout << "[GetAllErrorReport] ";
+  std::cout << "[GetAllErrorReport] S:stalled, H:overheat, C:over current, M:motor exception, X: communicate exception." << std::endl;
   for (size_t i = 0; i < errors.size(); ++i) {
     std::cout << "J" << (i+1) << ":[";
     if (errors[i].bits.stalled_) std::cout << "S";
@@ -437,6 +439,7 @@ TEST_F(OmniHand2025CanfdTest, SetGetAllJointMotorVelo) {
   hand_->SetAllJointMotorVelo(velocities);
   std::cout << "[SetAllJointMotorVelo] All joints -> 100" << std::endl;
   
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   auto current_velo = hand_->GetAllJointMotorVelo();
   std::cout << "[GetAllJointMotorVelo] ";
   for (size_t i = 0; i < current_velo.size(); ++i) {
@@ -503,6 +506,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor) {
   hand_->MixCtrlJointMotor(mix_ctrls);
   std::cout << "[MixCtrlJointMotor] POSITION_VELOCITY_TORQUE mode for 8 joints" << std::endl;
   
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   auto positions = hand_->GetAllJointMotorPosi();
   std::cout << "[GetAllJointMotorPosi] ";
   for (size_t i = 0; i < positions.size(); ++i) {
@@ -530,6 +534,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_VeloTorque) {
     
     hand_->MixCtrlJointMotor(mix_ctrls);
     std::cout << "  J" << joint << ": velo=100" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
   
   SUCCEED();
@@ -554,6 +559,7 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_PosiTorque) {
     
     hand_->MixCtrlJointMotor(mix_ctrls);
     std::cout << "  J" << joint << ": posi=" << safe_pos[joint - 1] << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
   
   SUCCEED();
@@ -570,6 +576,7 @@ TEST_F(OmniHand2025CanfdTest, SetGetAllActiveJointAngles) {
   hand_->SetAllActiveJointAngles(angles);
   std::cout << "[SetAllActiveJointAngles] All joints -> 0.0 rad" << std::endl;
   
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   auto current_angles = hand_->GetAllActiveJointAngles();
   std::cout << "[GetAllActiveJointAngles] ";
   for (size_t i = 0; i < current_angles.size(); ++i) {
@@ -629,7 +636,7 @@ int main(int argc, char** argv) {
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
 
-    if ((arg == "-t" || arg == "--transport") && i + 1 < argc) {
+    if ((arg == "-d" || arg == "--device") && i + 1 < argc) {
       g_transport = ParseTransport(argv[++i]);
     } else if (arg == "-c" && i + 1 < argc) {
       g_channel_id = std::stoi(argv[++i]);
@@ -648,7 +655,7 @@ int main(int argc, char** argv) {
       std::cout << "OmniHand 2025 CANFD Test\n\n";
       std::cout << "Usage: " << argv[0] << " [options]\n\n";
       std::cout << "Options:\n";
-      std::cout << "  -t, --transport NAME   zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)\n";
+      std::cout << "  -d, --device NAME   zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)\n";
       std::cout << "  -c CHANNEL             CAN channel (zlgcan/hcan/zlgcantcp), default 0\n";
       std::cout << "  -i CANFD_ID             device index (zlgcan/hcan), default 0\n";
       std::cout << "  --can-if IFACE         SocketCAN iface (socketcan), default can0\n";
