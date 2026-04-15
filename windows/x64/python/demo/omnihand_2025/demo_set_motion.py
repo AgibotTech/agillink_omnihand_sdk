@@ -75,7 +75,7 @@ def get_gesture_positions(gesture):
 def main():
     import argparse
     parser = argparse.ArgumentParser(description='OmniHand 2025 Gesture Control Demo')
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485', 'zlgcan_tcp'], default='zlgcan',
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485', 'zlgcan_tcp', 'tj'], default='zlgcan',
                         help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
     args = parser.parse_args()
     
@@ -86,6 +86,8 @@ def main():
         hand = OmniHand2025.create_hand_by_rs485(hand_type=HandType.RIGHT, uart_port='/dev/ttyACM0')
     elif args.device == 'zlgcan_tcp':
         hand = OmniHand2025.create_hand_by_zlgcan_tcp(hand_type=HandType.RIGHT, host='192.168.0.178', port=8000)
+    elif args.device == 'tj':
+        hand = OmniHand2025.create_hand_by_tj(hand_type=HandType.LEFT, marvin_controller_ip="192.168.10.190")
     else:  # default: zlgcan
         hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.RIGHT, canfd_channel_id=1)
     

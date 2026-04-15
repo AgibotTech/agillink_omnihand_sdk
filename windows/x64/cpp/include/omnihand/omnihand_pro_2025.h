@@ -136,6 +136,16 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0);
 
+#ifdef OMNIHAND_TJ_MARVIN_SDK
+  /**
+   * @brief 天机 MARVIN 控制器 TJ SDK 末端 CAN/CANFD 透传（O12）
+   */
+  static std::unique_ptr<OmniHandPro2025> createHandByTJ(
+      HandType hand_type,
+      uint8_t hand_device_id,
+      const std::string& marvin_controller_ip);
+#endif
+
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
    * @param canfd_device_id USB CANFD adapter device index
