@@ -20,7 +20,7 @@ from collections import defaultdict
 def main():
     # Configuration parameters
     total_iterations = 10000
-    interval_ms = 3  # Request interval in milliseconds (0 = no limit, since we use getAllTactileSensorDataRaw which is a single request)
+    interval_ms = 20  # Request interval in milliseconds (0 = no limit, since we use getAllTactileSensorDataRaw which is a single request)
     frame_recv_timeout_ms = 30
 
     print("=" * 60)
@@ -30,7 +30,7 @@ def main():
 
     import argparse
     parser = argparse.ArgumentParser(description='OmniHand 2025 Set Angle and Tactile Sensor Reliability Test')
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485', 'zlgcan_tcp'], default='zlgcan',
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485', 'zlgcan_tcp', 'tj'], default='zlgcan',
                         help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
     args = parser.parse_args()
     
@@ -55,6 +55,8 @@ def main():
                 host='192.168.0.178', 
                 port=8000
             )
+        elif args.device == 'tj':
+            hand = OmniHand2025.create_hand_by_tj(hand_type=HandType.LEFT, marvin_controller_ip="192.168.10.190")
         else:  # default: zlgcan
             hand = OmniHand2025.create_hand_by_zlgcan(
                 hand_type=HandType.LEFT,

@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser(
         description='OmniHand 2025 Set+Get reliability test (set position + get position), log results to CSV'
     )
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485', 'zlgcan_tcp'], default='zlgcan',
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485', 'zlgcan_tcp', 'tj'], default='zlgcan',
                         help='CAN device type (default: zlgcan)')
     parser.add_argument('-i', '--interval_ms', type=int, default=0,
                         help='Request interval in ms (default: 10)')
@@ -30,8 +30,8 @@ def main():
                         help='Number of set+get iterations (default: 1000)')
     parser.add_argument('-o', '--output', type=str, default='set_get_reliability.csv',
                         help='Output CSV path (default: set_get_reliability.csv)')
-    parser.add_argument('--timeout_ms', type=int, default=30,
-                        help='Frame receive timeout in ms (default: 30)')
+    parser.add_argument('--timeout_ms', type=int, default=100,
+                        help='Frame receive timeout in ms (default: 100; TJ recommended >= 200)')
     parser.add_argument('--positions', type=str, default='2048,0,0,0,0,0,0,0,0,4095',
                         help='Comma-separated target motor positions for set, 0-4096 (default: 0 for 10 joints)')
     args = parser.parse_args()
@@ -39,10 +39,13 @@ def main():
     interval_ms = max(0, args.interval_ms)
     total_iterations = max(1, args.iterations)
     frame_recv_timeout_ms = max(10, min(1000, args.timeout_ms))
-    target_positions = [int(x.strip()) for x in args.positions.split(',')]
-    # if len(target_positions) < 10:
-    #     target_positions.extend([2048] * (10 - len(target_positions)))
-    # target_positions = target_positions[:10]
+    # TJ 链路（UDP + 控制器调度 + 末端总线）一般比直连 CAN 慢，默认拉高超时避免误报超时
+    if args.device == 'tj' and frame_recv_timeout_ms < 200:
+        frame_recv_timeout_ms = 200
+
+    raw_positions = [int(x.strip()) for x in args.positions.split(',') if x.strip() != ""]
+    # O10 固定 10 关节：不足补默认值，超出截断
+    base_positions = (raw_positions + [2048] * 10)[:10]
 
     try:
         if args.device == 'hcan':
@@ -63,6 +66,8 @@ def main():
                 host='192.168.0.178', 
                 port=8000
             )
+        elif args.device == 'tj':
+            hand = OmniHand2025.create_hand_by_tj(hand_type=HandType.LEFT, marvin_controller_ip="192.168.10.190")
         else:
             hand = OmniHand2025.create_hand_by_zlgcan(
                 hand_type=HandType.LEFT,
@@ -82,7 +87,11 @@ def main():
     hand.set_frame_recv_timeout(frame_recv_timeout_ms)
     hand.set_hand_gesture(0) 
     time.sleep(1)
-    target_positions = hand.get_all_joint_positions()
+    read_back_positions = hand.get_all_joint_positions()
+    if read_back_positions is not None and len(read_back_positions) >= 10:
+        target_positions = [int(x) for x in read_back_positions[:10]]
+    else:
+        target_positions = list(base_positions)
     time.sleep(1)
 
     csv_header = ["action", "elapsed_ms"] + [f"pos_{i}" for i in range(10)]
@@ -96,6 +105,8 @@ def main():
             for iteration in range(total_iterations):
                 # --- Set position ---
                 try:
+                    # 每轮都强制修正长度，避免偶发空列表/短列表导致索引越界
+                    target_positions = (list(target_positions) + [2048] * 10)[:10]
                     target_positions[9] = iteration % 4096
 
                     actual_positions = hand.set_all_joint_positions(target_positions)
@@ -108,8 +119,8 @@ def main():
                     for i in range(10):
                         row_reply[f"pos_{i}"] = actual_positions[i] if actual_positions and i < len(actual_positions) else ""
                     writer.writerow(row_reply)
-                except Exception:
-                    pass
+                except Exception as ex:
+                    print(f"Failed to set position: {ex}")
 
                 # # --- Get position ---
                 # try:
