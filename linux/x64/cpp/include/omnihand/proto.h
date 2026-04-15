@@ -54,6 +54,7 @@ enum class AGIBOT_EXPORT ProductType : unsigned char {
   OMNIHAND_DEX_UMI = 2,     // OmniHand Dex UMI (O10 UMI, 10 DOF)
   OMNIHAND_3_LITE = 3,      // OmniHand 3 Lite S (O4, 4 DOF)
   OMNIHAND_3_ULTRA = 4,     // OmniHand 3 Ultra (O20, 20 DOF)
+  OMNI_PICKER_3 = 5,        // OmniPicker 3 (1 DOF)
   UNKNOWN = 255             // Unknown product type
 };
 
