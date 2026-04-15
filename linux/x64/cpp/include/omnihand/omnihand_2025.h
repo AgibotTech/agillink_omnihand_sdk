@@ -164,6 +164,20 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0);
 
+#ifdef OMNIHAND_TJ_MARVIN_SDK
+  /**
+   * @brief Factory method - 天机 MARVIN 控制器 TJ SDK 末端 CAN/CANFD 透传（O10 与 USB-CAN/SocketCAN 并列的另一路）
+   * @param hand_type 灵巧手左右：LEFT→TJ 左臂末端通道（OnSetChDataA），RIGHT→右臂（OnSetChDataB）。与常见「左/右手装在同侧机械臂」一致
+   * @param hand_device_id Hand device ID on the OmniHand bus
+   * @param marvin_controller_ip 机械臂控制器 IP（UDP，与 TJ SDK OnLinkTo 一致）
+   * @note TJ 末端固定走 CAN/CANFD 透传（set_ch=1）；COM 透传不走本接口
+   */
+  static std::unique_ptr<OmniHand2025> createHandByTJ(
+      HandType hand_type,
+      uint8_t hand_device_id,
+      const std::string& marvin_controller_ip);
+#endif
+
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
    * @param canfd_device_id USB CANFD adapter device index
