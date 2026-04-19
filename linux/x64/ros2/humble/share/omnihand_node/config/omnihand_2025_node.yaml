@@ -1,34 +1,17 @@
 # OmniHand 2025 (O10) Configuration
-# Usage: ros2 launch omnihand_node omnihand_2025_node.launch.py config_file:=config/omnihand_2025_node.yaml
-# 
-# Configure one or two hands:
-#   - One hand: set enable_both_hands: false (or omit second hand parameters)
-#   - Two hands: set enable_both_hands: true and configure second hand parameters
-#   - Each hand can use different connection types: zlg_can, hcan, or rs485
+# connection_type: "zlgcan", "hcan", "rs485", or "usb"
+# 取消注释 right_hand 以启用双手模式
 
 omnihand_2025_param_reader:
   ros__parameters:
-    # First hand configuration
-    hand_type: "left"                  # "left" or "right"
-    hand_device_id: 1                  # Bus ID (1-255); 1 = OmniHand2025::kDefaultHandDeviceId
-    connection_type: "zlg_can"         # "zlg_can", "hcan", or "rs485"
-    
-    # For zlg_can or hcan - two ways to specify device:
-    # Method 1 (recommended): Use serial number (stable after reboot/plug-unplug)
-    canfd_serial_number: ""            # CANFD adapter serial number (recommended)
-    # Method 2 (alternative): Use device ID (may change after reboot/plug-unplug)
-    # canfd_device_id: 0                # CANFD adapter device index (alternative)
-    canfd_channel_id: 0                # CAN channel index (0 or 1)
-    
-    # For rs485 (uncomment and set if using rs485):
-    # uart_port: "/dev/ttyUSB0"        # Serial port path
-    # baudrate: 460800                 # Baud rate
-    
-    # Second hand configuration (optional - if configured, second hand will be started)
-    # 默认不配置第二个手，只启动第一个手
-    # 如需启动两个手，取消注释并配置以下参数：
-    # second_hand_type: "right"
-    # second_hand_device_id: 1          # default: OmniHand2025::kDefaultHandDeviceId
-    # second_connection_type: "zlg_can"
-    # second_canfd_serial_number: ""     # CANFD adapter serial number (recommended)
-    # second_canfd_channel_id: 1         # CAN channel index (0 or 1)
+    left_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_device_id: 0
+      canfd_channel_id: 0
+
+    right_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_device_id: 0
+      canfd_channel_id: 1

@@ -1,0 +1,17 @@
+# OmniHand 3 Ultra (O20) Configuration
+# connection_type: "zlgcan" or "hcan"
+# 取消注释 right_hand 以启用双手模式
+
+omnihand_3_ultra_param_reader:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 9
+      connection_type: "zlgcan"
+      canfd_device_id: 0
+      canfd_channel_id: 0
+
+    right_hand:
+      hand_device_id: 9
+      connection_type: "zlgcan"
+      canfd_device_id: 0
+      canfd_channel_id: 1

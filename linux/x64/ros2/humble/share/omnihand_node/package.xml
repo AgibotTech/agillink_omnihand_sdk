@@ -14,6 +14,7 @@
   <depend>builtin_interfaces</depend>
   <depend>omnihand_2025_node_msgs</depend>
   <depend>omnihand_pro_2025_node_msgs</depend>
+  <depend>omnihand_3_ultra_node_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
