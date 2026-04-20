@@ -145,6 +145,49 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    */
   void SetHandGesture(int gesture_num = 1) override;
 
+  // ============ O20 Extended API ============
+
+  // Pn8 (0x08): Motor min limit (for calibration)
+  // int16_t, unit: 0.1 degree, range: -1800 ~ 1800 (i.e. -180.0° ~ 180.0°), default: 0
+  // e.g. 900 means 90.0°, -900 means -90.0°
+  // Write returns the current value; read returns the current value.
+  virtual int16_t SetMotorMinLimit(unsigned char joint_motor_index, int16_t min_limit) { (void)joint_motor_index; (void)min_limit; return 0; }
+  virtual int16_t GetMotorMinLimit(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
+  virtual std::vector<int16_t> SetAllMotorMinLimit(const std::vector<int16_t>& vec_min_limit) { (void)vec_min_limit; return {}; }
+  virtual std::vector<int16_t> GetAllMotorMinLimit() const { return {}; }
+
+  // Pn7 (0x07): Motor max limit (for calibration)
+  // int16_t, unit: 0.1 degree, range: -1800 ~ 1800 (i.e. -180.0° ~ 180.0°), default: 0
+  virtual int16_t SetMotorMaxLimit(unsigned char joint_motor_index, int16_t max_limit) { (void)joint_motor_index; (void)max_limit; return 0; }
+  virtual int16_t GetMotorMaxLimit(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
+  virtual std::vector<int16_t> SetAllMotorMaxLimit(const std::vector<int16_t>& vec_max_limit) { (void)vec_max_limit; return {}; }
+  virtual std::vector<int16_t> GetAllMotorMaxLimit() const { return {}; }
+
+  // Pn9 (0x09): Set motor current position as zero point
+  // Returns true on success, false on failure.
+  virtual bool SetJointMotorZeroPoint(unsigned char joint_motor_index) { (void)joint_motor_index; return false; }
+
+  // Pn10 (0x0A): Save parameters to flash
+  // Parameters set via Pn7~Pn9 are NOT persisted until this command is sent.
+  // Returns true on success, false on failure.
+  virtual bool SaveParameters() { return false; }
+
+  // Pn11 (0x0B): Tactile sensor zero calibration
+  // Returns true on success, false on failure.
+  virtual bool CalibrateTactileSensor() { return false; }
+
+  // Pn23 (0x17): Motor actual position (for calibration)
+  // int16_t, unit: 0.1 degree, range: -1800 ~ 1800 (i.e. -180.0° ~ 180.0°), default: 0
+  // Write sets target position, returns current actual position; read returns current actual position.
+  virtual int16_t SetMotorActualPos(unsigned char joint_motor_index, int16_t pos) { (void)joint_motor_index; (void)pos; return 0; }
+  virtual int16_t GetMotorActualPos(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
+  virtual std::vector<int16_t> SetAllMotorActualPos(const std::vector<int16_t>& vec_pos) { (void)vec_pos; return {}; }
+  virtual std::vector<int16_t> GetAllMotorActualPos() const { return {}; }
+
+  // Pn24 (0x18): Start auto calibration for all motors
+  // Returns true on success, false on failure.
+  virtual bool StartAutoCalibration() { return false; }
+
  protected:
   /**
    * @brief Initialize base class members
