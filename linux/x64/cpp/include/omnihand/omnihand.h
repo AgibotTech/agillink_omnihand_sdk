@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
@@ -61,6 +62,18 @@ class AGIBOT_EXPORT OmniHand {
    *       RS485 implementation returns an empty DeviceInfo structure.
    */
   virtual DeviceInfo GetDeviceInfo() const = 0;
+
+  // ============ Joint Naming Interface ============
+  /**
+   * @brief Gets the ordered joint names for this hand product.
+   * @return Vector of joint names, whose length and order must match the product's
+   *         motor index ordering used by SetAllJointMotorPosi / GetAllJointMotorPosi.
+   *         Default returns an empty vector, meaning the product has not declared
+   *         a ROS-friendly joint naming (e.g. kinematics / URDF not yet integrated).
+   * @note Consumers (e.g. ROS2 node) can treat an empty result as "not provided" and
+   *       fall back to their own naming scheme if needed.
+   */
+  virtual std::vector<std::string> GetJointNames() const { return {}; }
 
   // ============ Debug Interface ============
   /**

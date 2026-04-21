@@ -1,14 +1,17 @@
 # OmniHand 3 Ultra (O20) Configuration
 # connection_type: "zlgcan" or "hcan"
 # 取消注释 right_hand 以启用双手模式
+#
+# 用 "/**" 通配任意 namespace 下该节点，避免 launch 改 namespace（如加 'h3u'）后
+# 顶级 key 与节点 FQN（/h3u/omnihand_3_ultra_param_reader）不匹配导致参数全部走默认值。
 
-omnihand_3_ultra_param_reader:
+/**:
   ros__parameters:
-    left_hand:
-      hand_device_id: 9
-      connection_type: "zlgcan"
-      canfd_device_id: 0
-      canfd_channel_id: 0
+    # left_hand:
+    #   hand_device_id: 9
+    #   connection_type: "zlgcan"
+    #   canfd_device_id: 0
+    #   canfd_channel_id: 0
 
     right_hand:
       hand_device_id: 9

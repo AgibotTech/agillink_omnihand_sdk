@@ -137,6 +137,23 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
       const std::string& can_interface);
 #endif
 
+  // ============ Joint Naming ============
+  /**
+   * @brief Returns the 20 joint names of O20 in motor-index order.
+   * @note Order MUST match SetAllJointMotorPosi / GetAllJointMotorPosi index layout.
+   *       This is the single source of truth for "motor index <-> ROS joint name"
+   *       binding; ROS2 node code should call this instead of hard-coding the list.
+   */
+  std::vector<std::string> GetJointNames() const override {
+    return {
+        "pinky_abad_joint",  "pinky_mcp_joint",  "pinky_pip_joint",  "pinky_dip_joint",
+        "ring_abad_joint",   "ring_mcp_joint",   "ring_pip_joint",   "ring_dip_joint",
+        "middle_abad_joint", "middle_mcp_joint", "middle_pip_joint", "middle_dip_joint",
+        "index_abad_joint",  "index_mcp_joint",  "index_pip_joint",  "index_dip_joint",
+        "thumb_abad_joint",  "thumb_mcp_joint",  "thumb_pip_joint",  "thumb_dip_joint",
+    };
+  }
+
   // ============ Gesture Control ============
   /**
    * @brief Sets the hand to a predefined gesture.

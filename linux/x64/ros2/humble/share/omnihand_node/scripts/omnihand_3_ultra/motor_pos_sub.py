@@ -1,76 +1,54 @@
 #!/usr/bin/env python3
 """
 @Author: huangshiheng@agibot.com
-@Date: 2025-11-06
-@Description: Python node to subscribe to motor_pos topic (OmniHand3Ultra O20)
-Usage: python3 motor_pos_sub.py [left|right]
+@Description: Subscribe to motor position state of OmniHand3Ultra (O20) via sensor_msgs/JointState.
+
+Usage:  python3 motor_pos_sub.py [left|right] [product]
+        默认 side=left, product=h3u
+Topic:  /<product>/<side>/motor_pos_state
 """
 
 import sys
-import os
-
-try:
-    from omnihand_3_ultra_node_msgs.msg import MotorPos
-except ImportError:
-    print("Error: Cannot import omnihand_3_ultra_node_msgs.msg")
-    print("")
-    print("Please make sure you have sourced the ROS2 setup script:")
-    print("  source ros2/humble/setup.bash")
-    print("  # or")
-    print("  source ros2/setup.bash")
-    print("")
-    print("Current PYTHONPATH:", os.environ.get('PYTHONPATH', 'Not set'))
-    print("")
-    sys.exit(1)
 
 import rclpy
 from rclpy.node import Node
+from sensor_msgs.msg import JointState
 
 
 class MotorPosSubscriber(Node):
-    def __init__(self, hand_side):
-        super().__init__(f'{hand_side}_motor_pos_subscriber')
-
+    def __init__(self, hand_side: str, product: str):
+        super().__init__(f'{product}_{hand_side}_motor_pos_subscriber')
         self.hand_side = hand_side
+        self.product = product
         self.subscription = self.create_subscription(
-            MotorPos,
-            f'/omnihand/omnihand_3_ultra/{hand_side}/motor_pos',
+            JointState,
+            f'/{product}/{hand_side}/motor_pos_state',
             self.motor_pos_callback,
-            10
+            10,
         )
-
-        self.get_logger().info(f'{hand_side.capitalize()} Motor Position Subscriber Node started (O20, 20 DOF)')
-
-    def motor_pos_callback(self, msg):
         self.get_logger().info(
-            f'Received {self.hand_side} motor positions: {msg.pos}, '
-            f'frame_id: {msg.header.frame_id}, '
-            f'timestamp: {msg.header.stamp.sec}.{msg.header.stamp.nanosec}'
+            f'{product}/{hand_side} motor_pos_state subscriber started (O20, 20 DOF)'
         )
+
+    def motor_pos_callback(self, msg: JointState):
+        self.get_logger().info(
+            f'{self.product}/{self.hand_side} motor_pos_state '
+            f'(stamp={msg.header.stamp.sec}.{msg.header.stamp.nanosec:09d}): '
+            f'{[round(p, 2) for p in msg.position]}'
+        )
+
 
 def main(args=None):
     rclpy.init(args=args)
-
-    hand_side = 'left'
-    if len(sys.argv) > 1:
-        hand_side = sys.argv[1].lower()
-
-    node = MotorPosSubscriber(hand_side)
-
+    hand_side = sys.argv[1].lower() if len(sys.argv) > 1 else 'left'
+    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'h3u'
+    node = MotorPosSubscriber(hand_side, product)
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
-    except Exception as e:
-        try:
-            node.get_logger().error(f'Error: {str(e)}')
-        except Exception:
-            print(f'Error: {str(e)}')
     finally:
-        try:
-            node.destroy_node()
-        except Exception:
-            pass
+        node.destroy_node()
         try:
             rclpy.shutdown()
         except Exception:
