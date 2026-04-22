@@ -18,7 +18,7 @@
     #   connection_type: "zlgcan"
     #   canfd_device_id: 0
     #   canfd_channel_id: 0
-    #   request_interval_ms: 2
+    #   request_interval_ms: 0
     #   frame_send_timeout_ms: 20
     #   frame_recv_timeout_ms: 50
     #
@@ -27,7 +27,7 @@
     #   connection_type: "zlgcan"
     #   canfd_device_id: 0
     #   canfd_channel_id: 1
-    #   request_interval_ms: 2
+    #   request_interval_ms: 0
     #   frame_send_timeout_ms: 20
     #   frame_recv_timeout_ms: 50
     # socketcan example
@@ -35,12 +35,12 @@
     #   hand_device_id: 9
     #   connection_type: "socketcan"
     #   can_interface: "can0"
-    #   request_interval_ms: 2
+    #   request_interval_ms: 0
     #   frame_recv_timeout_ms: 50
 
     right_hand:
       hand_device_id: 9
       connection_type: "socketcan"
       can_interface: "can1"
-      request_interval_ms: 2
+      request_interval_ms: 0
       frame_recv_timeout_ms: 50
