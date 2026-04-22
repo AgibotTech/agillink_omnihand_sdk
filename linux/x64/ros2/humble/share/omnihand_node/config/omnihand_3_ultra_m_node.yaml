@@ -5,8 +5,10 @@
 # request_interval_ms: min gap between requests, SDK default 0 = no throttling, range 0..100
 # frame_send_timeout_ms: send timeout, SDK default 20 = driver default, only ZLG CANFD supported
 # frame_recv_timeout_ms: single-frame reply wait, SDK default 50, range 10..1000
-# wall_timer_ms: /joint_states publish period, unit ms, default 100 (10 Hz)
-#                           value > 0; want 50 Hz write 20, want 2 Hz write 500
+#
+# /joint_states is driven entirely by /joint_cmd (one echoed frame per cmd);
+# there is no self-driven publish rate to configure. For periodic state
+# without active control, have the publisher repeat the last position.
 
 /**:
   ros__parameters:
@@ -16,20 +18,18 @@
     #   connection_type: "zlgcan"
     #   canfd_device_id: 0
     #   canfd_channel_id: 0
-      # request_interval_ms: 2
-      # frame_send_timeout_ms: 20
-      # frame_recv_timeout_ms: 50
-      # wall_timer_ms: 100
-    # 
+    #   request_interval_ms: 2
+    #   frame_send_timeout_ms: 20
+    #   frame_recv_timeout_ms: 50
+    #
     # right_hand:
-      # hand_device_id: 9
-      # connection_type: "zlgcan"
-      # canfd_device_id: 0
-      # canfd_channel_id: 1
-      # request_interval_ms: 2
-      # frame_send_timeout_ms: 20
-      # frame_recv_timeout_ms: 50
-      # wall_timer_ms: 100
+    #   hand_device_id: 9
+    #   connection_type: "zlgcan"
+    #   canfd_device_id: 0
+    #   canfd_channel_id: 1
+    #   request_interval_ms: 2
+    #   frame_send_timeout_ms: 20
+    #   frame_recv_timeout_ms: 50
     # socketcan example
     # left_hand:
     #   hand_device_id: 9
@@ -37,7 +37,6 @@
     #   can_interface: "can0"
     #   request_interval_ms: 2
     #   frame_recv_timeout_ms: 50
-    #   wall_timer_ms: 100
 
     right_hand:
       hand_device_id: 9
@@ -45,4 +44,3 @@
       can_interface: "can1"
       request_interval_ms: 2
       frame_recv_timeout_ms: 50
-      wall_timer_ms: 100

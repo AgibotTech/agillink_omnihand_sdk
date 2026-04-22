@@ -1,8 +1,8 @@
-# OmniHand 2025 SDK Python API
+# OmniHand SDK Python API
 
 ## 概述
 
-OmniHand 2025 SDK 为三种不同的产品提供了**产品特定的接口**：
+OmniHand SDK 为三种不同的产品提供了**产品特定的接口**：
 
 - **OmniHand 2025 (O10)**: 10 自由度灵巧手，配备 1D 触觉传感器
 - **OmniHand Pro 2025 (O12)**: 12 自由度灵巧手，配备 3D 触觉传感器

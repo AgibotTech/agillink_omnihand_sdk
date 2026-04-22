@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2.
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
 OmniHand 3 Lite S (O4) Set + Get Position Reliability Test with CSV Logging

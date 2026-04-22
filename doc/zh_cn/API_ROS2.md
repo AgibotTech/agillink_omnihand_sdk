@@ -1,10 +1,10 @@
-# OmniHand 2025 SDK ROS2 接口
+# OmniHand SDK ROS2 接口
 
 > ⚠️ **仅限 Linux**：ROS2 接口仅在 Linux 上可用，不支持 Windows。
 
 ## 概述
 
-OmniHand 2025 SDK 为两种产品型号提供 ROS2 接口：
+OmniHand SDK 为两种产品型号提供 ROS2 接口：
 
 - **OmniHand 2025 (O10)**：10 自由度灵巧手，配备 1D 触觉传感器
 - **OmniHand Pro 2025 (O12)**：12 自由度灵巧手，配备 3D 触觉传感器

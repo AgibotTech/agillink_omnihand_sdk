@@ -2,7 +2,7 @@
 
 [English](../en/QUICK_START.md)
 
-本指南帮助您在 5 分钟内开始使用 OmniHand 2025 SDK。
+本指南帮助您在 5 分钟内开始使用 OmniHand SDK。
 
 ## 环境要求
 

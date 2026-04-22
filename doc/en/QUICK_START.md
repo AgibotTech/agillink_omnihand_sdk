@@ -2,7 +2,7 @@
 
 [中文](../zh_cn/QUICK_START.md)
 
-This guide helps you get started with the OmniHand 2025 SDK in 5 minutes.
+This guide helps you get started with the OmniHand SDK in 5 minutes.
 
 ## Requirements
 
