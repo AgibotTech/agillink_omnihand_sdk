@@ -43,6 +43,19 @@ Typical OmniHand CANFD settings:
 - **Arbitration:** 1 Mbps, **80%** sample point  
 - **Data:** 5 Mbps, **75%** sample point  
 
+The bundled helper `setup_socketcan.sh` (shipped next to `install.sh`)
+enumerates every `canN` under `/sys/class/net/` and applies the three
+`ip link` commands for each. Run once after driver install, or whenever
+the interface is re-created:
+
+```bash
+sudo ./setup_socketcan.sh              # every canN on the system
+sudo ./setup_socketcan.sh can0 can3    # only the listed interfaces
+     ./setup_socketcan.sh --dry-run    # preview, no changes
+```
+
+Equivalent raw commands if you prefer the long form (single interface):
+
 ```bash
 sudo ip link set can0 down
 sudo ip link set can0 type can fd on bitrate 1000000 dbitrate 5000000 sample-point 0.8 dsample-point 0.75

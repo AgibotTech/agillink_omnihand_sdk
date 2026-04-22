@@ -43,6 +43,18 @@ OmniHand 典型 CAN FD 配置：
 - **仲裁段**：1 Mbps，采样点 **80%**  
 - **数据段**：5 Mbps，采样点 **75%**
 
+release 包自带的 `setup_socketcan.sh`（与 `install.sh` 同级）会枚举
+`/sys/class/net/` 下的所有 `canN`，对每一个执行 `ip link` 三连。驱动
+安装完成后、或接口被重建后执行一次即可：
+
+```bash
+sudo ./setup_socketcan.sh              # 配置系统上所有 canN
+sudo ./setup_socketcan.sh can0 can3    # 仅配置列出的接口
+     ./setup_socketcan.sh --dry-run    # 预览命令，不做任何修改
+```
+
+也可手动执行等价命令（只想改单个接口时更直接）：
+
 ```bash
 sudo ip link set can0 down
 sudo ip link set can0 type can fd on bitrate 1000000 dbitrate 5000000 sample-point 0.8 dsample-point 0.75
