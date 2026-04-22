@@ -2,13 +2,13 @@
 // OmniHand 2025 SDK is licensed under Mulan PSL v2.
 
 /**
- * @file omnihand_3_ultra.h
+ * @file omnihand_3_ultra_m.h
  * @brief OmniHand 3 Ultra (O20) interface class - 20 DOF
  * @note This is the public interface for OmniHand 3 Ultra product
  */
 
-#ifndef AGILINK_OMNIHAND_3_ULTRA_H
-#define AGILINK_OMNIHAND_3_ULTRA_H
+#ifndef AGILINK_OMNIHAND_3_ULTRA_M_H
+#define AGILINK_OMNIHAND_3_ULTRA_M_H
 
 #include <cstdint>
 #include <memory>
@@ -41,19 +41,19 @@ namespace omnihand {
  * TODO(O20): 运动学求解器（含被动关节）未接入：SetHandGesture、按单关节名/索引
  *   访问被动关节的接口仍为占位实现。
  */
-class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
+class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // DoA
   static constexpr uint8_t kDefaultHandDeviceId = 9u;
 
-  virtual ~OmniHand3Ultra() = default;
+  virtual ~OmniHand3UltraM() = default;
 
   // ============ Factory Methods ============
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by canfd_device_id
    */
-  static std::unique_ptr<OmniHand3Ultra> createHandByZlgcan(
+  static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
@@ -62,7 +62,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
    */
-  static std::unique_ptr<OmniHand3Ultra> createHandByZlgcan(
+  static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
@@ -77,9 +77,9 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    * @param tcp_host TCP server IP or hostname (e.g. "192.168.0.178")
    * @param tcp_port TCP server port (e.g. 8000)
    * @param canfd_channel_id CAN channel index (0 or 1, default 0)
-   * @return A unique pointer to OmniHand3Ultra instance
+   * @return A unique pointer to OmniHand3UltraM instance
    */
-  static std::unique_ptr<OmniHand3Ultra> createHandByZlgCanTcp(
+  static std::unique_ptr<OmniHand3UltraM> createHandByZlgCanTcp(
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& tcp_host,
@@ -91,7 +91,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
   /**
    * @brief Factory method - SocketCAN communication (Linux native CAN interface)
    */
-  static std::unique_ptr<OmniHand3Ultra> createHandSocketCan(
+  static std::unique_ptr<OmniHand3UltraM> createHandSocketCan(
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& can_interface = "can0");
@@ -100,7 +100,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
   /**
    * @brief Factory method - HCAN USB CANFD communication (by canfd_device_id)
    */
-  static std::unique_ptr<OmniHand3Ultra> createHandByHcan(
+  static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
@@ -109,7 +109,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
    */
-  static std::unique_ptr<OmniHand3Ultra> createHandByHcan(
+  static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& hcan_serial_number,
@@ -119,7 +119,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
   /**
    * @brief 天机 MARVIN 控制器 TJ SDK 末端 CAN/CANFD 透传（O20）
    */
-  static std::unique_ptr<OmniHand3Ultra> createHandByTJ(
+  static std::unique_ptr<OmniHand3UltraM> createHandByTJ(
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& marvin_controller_ip);
@@ -221,7 +221,7 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
    * @brief Initialize base class members and per-joint rad <-> tick solver.
    * @param device_id Device ID
    * @param hand_type Hand type (left/right)
-   * @note Product type is fixed to ProductType::OMNIHAND_3_ULTRA for this class.
+   * @note Product type is fixed to ProductType::OMNIHAND_3_ULTRA_M for this class.
    *       Solver is built here so derived impls (CAN / Serial / ...) can use
    *       joint_motor_solver_ directly without re-implementing init logic.
    */
@@ -238,4 +238,4 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
 }  // namespace omnihand
 }  // namespace agilink
 
-#endif  // AGILINK_OMNIHAND_3_ULTRA_H
+#endif  // AGILINK_OMNIHAND_3_ULTRA_M_H

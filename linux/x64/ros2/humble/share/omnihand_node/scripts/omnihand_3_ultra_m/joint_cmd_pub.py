@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 @Author: huangshiheng@agibot.com
-@Description: Publish joint-position commands to OmniHand3Ultra (O20)
+@Description: Publish joint-position commands to OmniHand3UltraM (O20)
               via sensor_msgs/JointState (position field = rad, per ROS /
               REP-103 convention for revolute joints).
 
@@ -10,13 +10,13 @@ Topic:
 
 Conventions:
   - position[0..19] follows SDK joint index order. Name field is ignored
-    by the node; source-of-truth is OmniHand3Ultra::GetJointNames(), which
+    by the node; source-of-truth is OmniHand3UltraM::GetJointNames(), which
     also populates /<product>/<side>/joint_states.
   - Out-of-URDF-range values are clamped per joint inside the SDK solver,
     so the demo values below are safe even for thumb_abad etc.
 
 Usage:  python3 joint_cmd_pub.py [left|right] [product]
-        default: side=left, product=h3u
+        default: side=left, product=h3u_m
 """
 
 import sys
@@ -55,10 +55,10 @@ class JointCmdPublisher(Node):
     def publish_joint_cmd(self):
         # Open pose (~ extended): 0 rad for every joint. SDK solver clamps
         # out-of-range joints (e.g. thumb_abad on right hand clamps to -0.1745).
-        pose_open = [0.0] * NUM_JOINTS
+        pose_open = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         # Partial close: ~35 deg of flexion across the board. Abad joints get
         # clamped as needed.
-        pose_close = [0.6] * NUM_JOINTS
+        pose_close = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.6]
 
         self.publisher.publish(self._make_msg(pose_open))
         time.sleep(0.5)
@@ -68,7 +68,7 @@ class JointCmdPublisher(Node):
 def main(args=None):
     rclpy.init(args=args)
     hand_side = sys.argv[1].lower() if len(sys.argv) > 1 else 'left'
-    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'h3u'
+    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'h3u_m'
     node = JointCmdPublisher(hand_side, product)
     try:
         rclpy.spin(node)

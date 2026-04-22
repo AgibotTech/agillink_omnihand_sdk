@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 @Author: huangshiheng@agibot.com
-@Description: Subscribe to joint-position state of OmniHand3Ultra (O20)
+@Description: Subscribe to joint-position state of OmniHand3UltraM (O20)
               via sensor_msgs/JointState (position field = rad).
 
 Topic:  /<product>/<side>/joint_states  (JointState, 10 Hz)
 
 Usage:  python3 joint_state_sub.py [left|right] [product]
-        default: side=left, product=h3u
+        default: side=left, product=h3u_m
 """
 
 import sys
@@ -44,7 +44,7 @@ class JointStateSubscriber(Node):
 def main(args=None):
     rclpy.init(args=args)
     hand_side = sys.argv[1].lower() if len(sys.argv) > 1 else 'left'
-    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'h3u'
+    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'h3u_m'
     node = JointStateSubscriber(hand_side, product)
     try:
         rclpy.spin(node)

@@ -85,8 +85,9 @@ class AGIBOT_EXPORT OmniHand {
   // ============ Request Interval Control ============
   /**
    * @brief Set request interval to control CAN bus communication rate
-   * @param milliseconds Minimum interval between requests in milliseconds (range: 0-100ms, default: 30ms)
-   * @note 0 = no limit (no throttling), 1-100ms = throttled requests
+   * @param milliseconds Minimum interval between requests in milliseconds (range: 0-100ms, default: 0ms = no throttling)
+   * @note 0 = no limit (no throttling, matches CanBusDeviceBase / SerialDevice default),
+   *       1-100ms = throttled requests
    * @note This helps prevent CAN bus congestion and device timeout issues.
    *       Higher interval = more stable but slower response.
    *       Lower interval = faster but may cause timeouts if device is busy.
