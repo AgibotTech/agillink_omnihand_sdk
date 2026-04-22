@@ -216,6 +216,11 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase {
   // Returns true on success, false on failure.
   virtual bool StartAutoCalibration() { return false; }
 
+  // Clear error report. Write ERROR_REPORT register with no data payload to reset error flags.
+  // Returns true on success, false on failure.
+  virtual bool ClearAllErrorReport() { return false; }
+  virtual bool ClearErrorReport(unsigned char joint_motor_index) { (void)joint_motor_index; return false; }
+
  protected:
   /**
    * @brief Initialize base class members and per-joint rad <-> tick solver.
