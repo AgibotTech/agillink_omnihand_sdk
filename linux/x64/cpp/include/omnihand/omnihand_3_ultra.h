@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
+#include "omnihand/kinematics/omnihand_3_ultra_m/omnihand_3_ultra_m_solver.h"
 #include "omnihand/omnihand_base.h"
 #include "omnihand/proto.h"
 
@@ -27,9 +28,18 @@ namespace omnihand {
  * This class provides the public interface for OmniHand 3 Ultra product.
  * It supports 20 active degrees of freedom.
  *
- * TODO(O20): 运动学求解器未接入。SetAllActiveJointAngles / GetAllActiveJointAngles /
- * GetAllJointAngles / GetAllJointPos / SetHandGesture 当前为占位实现，请使用
- * SetAllJointMotorPosi / GetAllJointMotorPosi 等电机位置接口直接控制。
+ * 角度 <-> 电机位置约定：
+ *   - SetAllJointMotorPosi / GetAllJointMotorPosi 中 int16_t 值域为 [0, 4095]
+ *     （12-bit，与标定寄存器 Pn7/Pn8 的 0.1° 编码无关）。
+ *   - URDF 主动关节角 (rad) 与 tick 是 **按关节独立的线性映射**，不同关节系数不同、
+ *     可能反向；O20 不需要 O10 那种多项式修正。
+ *   - 实际换算与标定表见
+ *       kinematics/omnihand_3_ultra_m/omnihand_3_ultra_m_solver.{h,cc}
+ *     SetAll/GetAllActiveJointAngles 内部即转发给 OmniHand3UltraMSolver，
+ *     上层（含 ROS2 节点 / Python 绑定）只需用 rad 单位即可。
+ *
+ * TODO(O20): 运动学求解器（含被动关节）未接入：SetHandGesture、按单关节名/索引
+ *   访问被动关节的接口仍为占位实现。
  */
 class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
  public:
@@ -158,7 +168,8 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
   /**
    * @brief Sets the hand to a predefined gesture.
    * @param gesture_num Gesture number
-   * TODO(O20): 待运动学接入后实现；当前为 no-op，请用 SetAllJointMotorPosi 控制
+   * TODO(O20): 待手势库接入后实现；当前为 no-op。上层请用 SetAllActiveJointAngles(rad)
+   * 下发整手关节目标，或 SetAllJointMotorPosi(0-4095 ticks) 走原始 actuator 通道。
    */
   void SetHandGesture(int gesture_num = 1) override;
 
@@ -207,12 +218,21 @@ class AGIBOT_EXPORT OmniHand3Ultra : public OmniHandBase {
 
  protected:
   /**
-   * @brief Initialize base class members
+   * @brief Initialize base class members and per-joint rad <-> tick solver.
    * @param device_id Device ID
    * @param hand_type Hand type (left/right)
-   * @note Product type is fixed to ProductType::OMNIHAND_3_ULTRA for this class
+   * @note Product type is fixed to ProductType::OMNIHAND_3_ULTRA for this class.
+   *       Solver is built here so derived impls (CAN / Serial / ...) can use
+   *       joint_motor_solver_ directly without re-implementing init logic.
    */
   void Reset(uint8_t device_id, HandType hand_type);
+
+  /**
+   * @brief Per-joint linear rad <-> motor-tick solver for OmniHand 3 Ultra.
+   *        Bound to kLeft / kRight inside Reset() based on is_left_hand_.
+   *        Shared by every transport implementation.
+   */
+  std::unique_ptr<h3um::OmniHand3UltraMSolver> joint_motor_solver_;
 };
 
 }  // namespace omnihand
