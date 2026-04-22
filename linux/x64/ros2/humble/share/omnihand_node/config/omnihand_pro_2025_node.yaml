@@ -1,6 +1,16 @@
 # OmniHand Pro 2025 (O12) Configuration
-# connection_type: "zlgcan" or "hcan"
+# connection_type: "zlgcan" | "hcan" | "socketcan"
 # 取消注释 right_hand 以启用双手模式
+#
+# SocketCAN 示例（Linux only；需要先 `sudo ip link set can0 up type can ...`）:
+#   left_hand:
+#     hand_device_id: 1
+#     connection_type: "socketcan"
+#     can_interface: "can0"
+#   right_hand:
+#     hand_device_id: 1
+#     connection_type: "socketcan"
+#     can_interface: "can1"
 
 omnihand_pro_2025_param_reader:
   ros__parameters:
