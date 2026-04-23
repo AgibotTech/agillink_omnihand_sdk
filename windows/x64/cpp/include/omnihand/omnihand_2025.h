@@ -1,5 +1,5 @@
 // Copyright (c) 2025, Agibot Co., Ltd.
-// OmniHand 2025 SDK is licensed under Mulan PSL v2.
+// AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
  * @file omnihand_2025.h
@@ -242,6 +242,30 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    * @return Vector of tactile sensor data vector
    */
   virtual std::vector<TactileSensorData> GetAllTactileSensorData() const = 0;
+
+  // ============ Joint Naming ============
+  /**
+   * @brief Returns the 10 active joint names of O10 in motor-index order.
+   * @note Order MUST match the OmnihandActiveJoint enum used by the kinematics
+   *       solver and SetAllJointMotorPosi / GetAllJointMotorPosi. Names are
+   *       prefixed with "L_"/"R_" to match the URDF in
+   *       `omnihand_sdk/assets/omnihand_description`.
+   */
+  std::vector<std::string> GetJointNames() const override {
+    const std::string p = is_left_hand_ ? "L_" : "R_";
+    return {
+        p + "thumb_roll_joint",
+        p + "thumb_abad_joint",
+        p + "thumb_mcp_joint",
+        p + "index_abad_joint",
+        p + "index_pip_joint",
+        p + "middle_pip_joint",
+        p + "ring_abad_joint",
+        p + "ring_pip_joint",
+        p + "pinky_abad_joint",
+        p + "pinky_pip_joint",
+    };
+  }
 
   // ============ Gesture Control ============
   /**

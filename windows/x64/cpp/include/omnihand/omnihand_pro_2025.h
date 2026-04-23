@@ -1,5 +1,5 @@
 // Copyright (c) 2025, Agibot Co., Ltd.
-// OmniHand 2025 SDK is licensed under Mulan PSL v2.
+// AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
  * @file omnihand_pro_2025.h
@@ -232,6 +232,32 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @param vec_period Report period vector, length 12
    */
   virtual void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period) = 0;
+
+  // ============ Joint Naming ============
+  /**
+   * @brief Returns the 12 active joint names of O12 in motor-index order.
+   * @note Order MUST match the ActiveJointID enum used by the kinematics solver
+   *       and SetAllJointMotorPosi / GetAllJointMotorPosi. Names are prefixed
+   *       with "L_"/"R_" to match the URDF in
+   *       `omnihand_sdk/assets/o12_hand_description`.
+   */
+  std::vector<std::string> GetJointNames() const override {
+    const std::string p = is_left_hand_ ? "L_" : "R_";
+    return {
+        p + "thumb_roll_joint",
+        p + "thumb_abad_joint",
+        p + "thumb_mcp_joint",
+        p + "thumb_pip_joint",
+        p + "index_abad_joint",
+        p + "index_mcp_joint",
+        p + "index_pip_joint",
+        p + "middle_abad_joint",
+        p + "middle_mcp_joint",
+        p + "middle_pip_joint",
+        p + "ring_mcp_joint",
+        p + "pinky_mcp_joint",
+    };
+  }
 
   // ============ Gesture Control ============
   /**

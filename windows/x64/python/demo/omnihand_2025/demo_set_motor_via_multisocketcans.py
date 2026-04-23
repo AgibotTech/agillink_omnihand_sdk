@@ -1,5 +1,5 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2.
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 from omnihand import OmniHand2025, Finger, ControlMode, HandType
 import time

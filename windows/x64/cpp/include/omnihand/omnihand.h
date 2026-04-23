@@ -1,5 +1,5 @@
 // Copyright (c) 2025, Agibot Co., Ltd.
-// OmniHand 2025 SDK is licensed under Mulan PSL v2.
+// AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
  * @file omnihand.h
@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
@@ -62,6 +63,18 @@ class AGIBOT_EXPORT OmniHand {
    */
   virtual DeviceInfo GetDeviceInfo() const = 0;
 
+  // ============ Joint Naming Interface ============
+  /**
+   * @brief Gets the ordered joint names for this hand product.
+   * @return Vector of joint names, whose length and order must match the product's
+   *         motor index ordering used by SetAllJointMotorPosi / GetAllJointMotorPosi.
+   *         Default returns an empty vector, meaning the product has not declared
+   *         a ROS-friendly joint naming (e.g. kinematics / URDF not yet integrated).
+   * @note Consumers (e.g. ROS2 node) can treat an empty result as "not provided" and
+   *       fall back to their own naming scheme if needed.
+   */
+  virtual std::vector<std::string> GetJointNames() const { return {}; }
+
   // ============ Debug Interface ============
   /**
    * @brief Shows send/receive data details.
@@ -72,8 +85,9 @@ class AGIBOT_EXPORT OmniHand {
   // ============ Request Interval Control ============
   /**
    * @brief Set request interval to control CAN bus communication rate
-   * @param milliseconds Minimum interval between requests in milliseconds (range: 0-100ms, default: 30ms)
-   * @note 0 = no limit (no throttling), 1-100ms = throttled requests
+   * @param milliseconds Minimum interval between requests in milliseconds (range: 0-100ms, default: 0ms = no throttling)
+   * @note 0 = no limit (no throttling, matches CanBusDeviceBase / SerialDevice default),
+   *       1-100ms = throttled requests
    * @note This helps prevent CAN bus congestion and device timeout issues.
    *       Higher interval = more stable but slower response.
    *       Lower interval = faster but may cause timeouts if device is busy.
