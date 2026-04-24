@@ -108,26 +108,25 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3UltraM>& hand
   // ============ O20 Extended API ============
   std::cout << "\n=== O20 Extended API ===" << std::endl;
 
-  std::cout << "\nMotor Max Limits (Pn7):" << std::endl;
-  auto max_limits = hand->GetAllMotorMaxLimit();
-  std::cout << "  [";
-  for (size_t i = 0; i < max_limits.size(); ++i) {
-    std::cout << max_limits[i];
-    if (i < max_limits.size() - 1) std::cout << ", ";
+  std::cout << "\nAxis Limit Positions (Pn7 & Pn8):" << std::endl;
+  auto limits = hand->GetAxisLimitPos();
+  if (!limits.empty()) {
+    std::cout << "  Max: [";
+    for (size_t i = 0; i < limits.max_limits.size(); ++i) {
+      std::cout << limits.max_limits[i];
+      if (i < limits.max_limits.size() - 1) std::cout << ", ";
+    }
+    std::cout << "]" << std::endl;
+    std::cout << "  Min: [";
+    for (size_t i = 0; i < limits.min_limits.size(); ++i) {
+      std::cout << limits.min_limits[i];
+      if (i < limits.min_limits.size() - 1) std::cout << ", ";
+    }
+    std::cout << "]" << std::endl;
   }
-  std::cout << "]" << std::endl;
 
-  std::cout << "\nMotor Min Limits (Pn8):" << std::endl;
-  auto min_limits = hand->GetAllMotorMinLimit();
-  std::cout << "  [";
-  for (size_t i = 0; i < min_limits.size(); ++i) {
-    std::cout << min_limits[i];
-    if (i < min_limits.size() - 1) std::cout << ", ";
-  }
-  std::cout << "]" << std::endl;
-
-  std::cout << "\nMotor Actual Positions (Pn23):" << std::endl;
-  auto actual_pos = hand->GetAllMotorActualPos();
+  std::cout << "\nActual Axis Positions (Pn23):" << std::endl;
+  auto actual_pos = hand->GetAllActualAxisPos();
   std::cout << "  [";
   for (size_t i = 0; i < actual_pos.size(); ++i) {
     std::cout << actual_pos[i];

@@ -17,6 +17,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include "omnihand/i_omnihand_calibrator.h"
 #include "omnihand/proto.h"
 
 namespace agilink {
@@ -151,41 +152,7 @@ struct AGIBOT_EXPORT SetAllAxisPosResponse {
   } 
 };
 
-/**
- * @brief Position limits for all axes from GET_AXIS_LIMIT_POS (0x30).
- * @note Wire format: first block = N×uint16 LE min (0–4095), second block = N×uint16 LE max.
- *       O10: N=10 → 40 bytes total; O4: N=4 → 16 bytes.
- */
-struct AGIBOT_EXPORT AxisLimitPos {
-  std::vector<uint16_t> min_limits;
-  std::vector<uint16_t> max_limits;
-
-  bool empty() const {
-    return min_limits.empty() || max_limits.empty() || min_limits.size() != max_limits.size();
-  }
-
-  /** Parse raw payload: [0, half) = mins, [half, byte_len) = maxs, each uint16 little-endian. */
-  static AxisLimitPos DecodeLittleEndian(const uint8_t* data, size_t byte_len) {
-    AxisLimitPos out;
-    if (!data || byte_len < 4 || (byte_len % 4) != 0) {
-      return out;
-    }
-    const size_t half = byte_len / 2;
-    const size_t n_axes = half / 2;
-    out.min_limits.resize(n_axes);
-    out.max_limits.resize(n_axes);
-    for (size_t i = 0; i < n_axes; ++i) {
-      out.min_limits[i] = static_cast<uint16_t>(
-          static_cast<uint16_t>(data[2 * i]) | (static_cast<uint16_t>(data[2 * i + 1]) << 8));
-      out.max_limits[i] = static_cast<uint16_t>(
-          static_cast<uint16_t>(data[half + 2 * i]) |
-          (static_cast<uint16_t>(data[half + 2 * i + 1]) << 8));
-    }
-    return out;
-  }
-};
-
-class AGIBOT_EXPORT PrivateOmniHand {
+class AGIBOT_EXPORT PrivateOmniHand : public IOmniHandCalibrator {
  public:
   virtual ~PrivateOmniHand() = default;
 
@@ -205,11 +172,9 @@ class AGIBOT_EXPORT PrivateOmniHand {
 
   /**
    * @brief 0x03: Set axis homing (zero reference) position
-   * @param axis_index 0=all axes (pos ignored), 1-12=axis index
-   * @param pos target middle/zero position, range [-4095, 4095]; ignored when axis_index==0
-   * @return true on success, false on failure
+   * @note Inherited from IOmniHandCalibrator. O10/O4: axis_index 0=all axes, 1-12=axis index;
+   *       pos range [-4095, 4095]; ignored when axis_index==0.
    */
-  virtual bool SetAxisHoming(uint8_t axis_index, int16_t pos) = 0;
 
   /**
    * @brief 0x04: Set device ID
@@ -220,9 +185,8 @@ class AGIBOT_EXPORT PrivateOmniHand {
 
   /**
    * @brief 0x05: Save persistent parameters
-   * @return true on success, false on failure
+   * @note Inherited from IOmniHandCalibrator.
    */
-  virtual bool SaveParam() = 0;
 
   /**
    * @brief 0x06: Set single axis target position
@@ -329,32 +293,9 @@ class AGIBOT_EXPORT PrivateOmniHand {
   virtual bool SetRunMode(uint8_t motor_id, uint8_t mode) = 0;
 
   /**
-   * @brief 0x16: Set single axis calibration position
-   * @param axis_index Axis index (1-10)
-   * @param position Target position (0-4096)
-   * @return Current position (0-4096)
+   * @brief 0x16~0x19: Actual axis position operations
+   * @note Inherited from IOmniHandCalibrator. O10: axis_index 1-10, O4: 1-4; position range 0-4095.
    */
-  virtual uint16_t SetSingleActualAxisPos(uint8_t axis_index, uint16_t position) = 0;
-
-  /**
-   * @brief 0x17: Get single axis calibration position
-   * @param axis_index Axis index (1-10)
-   * @return Current position (0-4096)
-   */
-  virtual uint16_t GetSingleActualAxisPos(uint8_t axis_index) const = 0;
-
-  /**
-   * @brief 0x18: Set all axes calibration positions
-   * @param positions Target positions; length = axis count (O10: 10, O4: 4), each 0-4096
-   * @return Actual position list after set; length = axis count (same as input), empty on failure
-   */
-  virtual std::vector<uint16_t> SetAllActualAxisPos(const std::vector<uint16_t>& positions) = 0;
-
-  /**
-   * @brief 0x19: Get all axes calibration positions
-   * @return Position list; length = axis count (O10: 10, O4: 4), each 0-4096
-   */
-  virtual std::vector<uint16_t> GetAllActualAxisPos() const = 0;
 
   /**
    * @brief 0x1A: Get all axes load data
@@ -363,26 +304,9 @@ class AGIBOT_EXPORT PrivateOmniHand {
   virtual std::vector<uint16_t> GetAllLoadData() const = 0;
 
   /**
-   * @brief 0x1B: Set single axis minimum position limit
-   * @param axis_index Axis index
-   * @param min_pos Minimum position (0-4096)
-   * @return true on success, false on failure
+   * @brief 0x1B~0x1D: Axis min/max position limits and clear
+   * @note Inherited from IOmniHandCalibrator. O10/O4: position range 0-4095.
    */
-  virtual bool SetAxisMinPos(uint8_t axis_index, uint16_t min_pos) = 0;
-
-  /**
-   * @brief 0x1C: Set single axis maximum position limit
-   * @param axis_index Axis index
-   * @param max_pos Maximum position (0-4096)
-   * @return true on success, false on failure
-   */
-  virtual bool SetAxisMaxPos(uint8_t axis_index, uint16_t max_pos) = 0;
-
-  /**
-   * @brief 0x1D: Clear all axis position limits
-   * @return true on success, false on failure
-   */
-  virtual bool ClearAllLimitPos() = 0;
 
   /**
    * @brief 0x20: Set run speed of all motors
@@ -458,9 +382,8 @@ class AGIBOT_EXPORT PrivateOmniHand {
 
   /**
    * @brief 0x30: Get all axis position limits
-   * @return Decoded limits; empty() on failure or timeout.
+   * @note Inherited from IOmniHandCalibrator.
    */
-  virtual AxisLimitPos GetAxisLimitPos() const = 0;
 
   /**
    * @brief 0x31: Set left-hand or right-hand configuration

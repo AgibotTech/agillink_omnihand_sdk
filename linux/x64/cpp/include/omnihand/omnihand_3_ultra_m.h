@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
+#include "omnihand/i_omnihand_calibrator.h"
 #include "omnihand/kinematics/omnihand_3_ultra_m/omnihand_3_ultra_m_solver.h"
 #include "omnihand/omnihand_base.h"
 #include "omnihand/proto.h"
@@ -41,7 +42,7 @@ namespace omnihand {
  * TODO(O20): 运动学求解器（含被动关节）未接入：SetHandGesture、按单关节名/索引
  *   访问被动关节的接口仍为占位实现。
  */
-class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase {
+class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase, public IOmniHandCalibrator {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // DoA
@@ -175,49 +176,48 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase {
 
   // ============ O20 Extended API ============
 
-  // Pn8 (0x08): Motor min limit (for calibration)
-  // int16_t, unit: 0.1 degree, range: -1800 ~ 1800 (i.e. -180.0° ~ 180.0°), default: 0
-  // e.g. 900 means 90.0°, -900 means -90.0°
-  // Write returns the current value; read returns the current value.
-  virtual int16_t SetMotorMinLimit(unsigned char joint_motor_index, int16_t min_limit) { (void)joint_motor_index; (void)min_limit; return 0; }
-  virtual int16_t GetMotorMinLimit(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
-  virtual std::vector<int16_t> SetAllMotorMinLimit(const std::vector<int16_t>& vec_min_limit) { (void)vec_min_limit; return {}; }
-  virtual std::vector<int16_t> GetAllMotorMinLimit() const { return {}; }
+  // ---- IOmniHandCalibrator interface ----
 
-  // Pn7 (0x07): Motor max limit (for calibration)
+  // Pn23 (0x17): Single axis actual (calibration) position
   // int16_t, unit: 0.1 degree, range: -1800 ~ 1800 (i.e. -180.0° ~ 180.0°), default: 0
-  virtual int16_t SetMotorMaxLimit(unsigned char joint_motor_index, int16_t max_limit) { (void)joint_motor_index; (void)max_limit; return 0; }
-  virtual int16_t GetMotorMaxLimit(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
-  virtual std::vector<int16_t> SetAllMotorMaxLimit(const std::vector<int16_t>& vec_max_limit) { (void)vec_max_limit; return {}; }
-  virtual std::vector<int16_t> GetAllMotorMaxLimit() const { return {}; }
+  int16_t SetSingleActualAxisPos(uint8_t axis_index, int16_t position) override { (void)axis_index; (void)position; return 0; }
+  int16_t GetSingleActualAxisPos(uint8_t axis_index) const override { (void)axis_index; return 0; }
 
-  // Pn9 (0x09): Set motor current position as zero point
-  // Returns true on success, false on failure.
-  virtual bool SetJointMotorZeroPoint(unsigned char joint_motor_index) { (void)joint_motor_index; return false; }
+  // Pn23 (0x17): All axes actual (calibration) positions
+  std::vector<int16_t> SetAllActualAxisPos(const std::vector<int16_t>& positions) override { (void)positions; return {}; }
+  std::vector<int16_t> GetAllActualAxisPos() const override { return {}; }
+
+  // Pn9 (0x09): Set axis homing (zero reference) position
+  // axis_index: 0=all axes (pos ignored), 1-20=single axis
+  bool SetAxisHoming(uint8_t axis_index, int16_t pos) override { (void)axis_index; (void)pos; return false; }
+
+  // Pn8 (0x08): Set single axis minimum position limit
+  // int16_t, unit: 0.1 degree, range: -1800 ~ 1800, default: 0
+  bool SetAxisMinPos(uint8_t axis_index, int16_t min_pos) override { (void)axis_index; (void)min_pos; return false; }
+
+  // Pn7 (0x07): Set single axis maximum position limit
+  // int16_t, unit: 0.1 degree, range: -1800 ~ 1800, default: 0
+  bool SetAxisMaxPos(uint8_t axis_index, int16_t max_pos) override { (void)axis_index; (void)max_pos; return false; }
+
+  // Get all axes position limits (Pn7 & Pn8)
+  AxisLimitPos GetAxisLimitPos() const override { return {}; }
+
+  // Clear all axis position limits (not supported on O20, always returns false)
+  bool ClearAllLimitPos() override { return false; }
 
   // Pn10 (0x0A): Save parameters to flash
   // Parameters set via Pn7~Pn9 are NOT persisted until this command is sent.
-  // Returns true on success, false on failure.
-  virtual bool SaveParameters() { return false; }
+  bool SaveParam() override { return false; }
+
+  // ---- O20-specific extensions (not in IOmniHandCalibrator) ----
 
   // Pn11 (0x0B): Tactile sensor zero calibration
-  // Returns true on success, false on failure.
   virtual bool CalibrateTactileSensor() { return false; }
 
-  // Pn23 (0x17): Motor actual position (for calibration)
-  // int16_t, unit: 0.1 degree, range: -1800 ~ 1800 (i.e. -180.0° ~ 180.0°), default: 0
-  // Write sets target position, returns current actual position; read returns current actual position.
-  virtual int16_t SetMotorActualPos(unsigned char joint_motor_index, int16_t pos) { (void)joint_motor_index; (void)pos; return 0; }
-  virtual int16_t GetMotorActualPos(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
-  virtual std::vector<int16_t> SetAllMotorActualPos(const std::vector<int16_t>& vec_pos) { (void)vec_pos; return {}; }
-  virtual std::vector<int16_t> GetAllMotorActualPos() const { return {}; }
-
   // Pn24 (0x18): Start auto calibration for all motors
-  // Returns true on success, false on failure.
   virtual bool StartAutoCalibration() { return false; }
 
-  // Clear error report. Write ERROR_REPORT register with no data payload to reset error flags.
-  // Returns true on success, false on failure.
+  // Clear error report
   virtual bool ClearAllErrorReport() { return false; }
   virtual bool ClearErrorReport(unsigned char joint_motor_index) { (void)joint_motor_index; return false; }
 

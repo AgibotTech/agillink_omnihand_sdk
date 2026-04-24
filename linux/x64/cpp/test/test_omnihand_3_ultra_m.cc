@@ -228,54 +228,38 @@ TEST_F(OmniHand3UltraMTest, VelocityControl) {
   }
 }
 
-TEST_F(OmniHand3UltraMTest, MotorMinLimit) {
+TEST_F(OmniHand3UltraMTest, AxisLimitPos) {
   if (hand_->Init()) {
-    auto min_limits = hand_->GetAllMotorMinLimit();
-    if (min_limits.empty()) {
-      std::cout << "[GetAllMotorMinLimit] Failed: empty result" << std::endl;
+    auto limits = hand_->GetAxisLimitPos();
+    if (limits.empty()) {
+      std::cout << "[GetAxisLimitPos] Failed: empty result" << std::endl;
       return;
     }
-    std::cout << "[GetAllMotorMinLimit] Min Limits (0.1 deg): ";
-    for (size_t i = 0; i < min_limits.size(); ++i) {
-      std::cout << min_limits[i];
-      if (i < min_limits.size() - 1) std::cout << ", ";
+    std::cout << "[GetAxisLimitPos] Min Limits (0.1 deg): ";
+    for (size_t i = 0; i < limits.min_limits.size(); ++i) {
+      std::cout << limits.min_limits[i];
+      if (i < limits.min_limits.size() - 1) std::cout << ", ";
     }
     std::cout << std::endl;
-    EXPECT_EQ(min_limits.size(), 20);
-
-    auto single = hand_->GetMotorMinLimit(1);
-    std::cout << "[GetMotorMinLimit] Joint 1: " << single << std::endl;
+    std::cout << "[GetAxisLimitPos] Max Limits (0.1 deg): ";
+    for (size_t i = 0; i < limits.max_limits.size(); ++i) {
+      std::cout << limits.max_limits[i];
+      if (i < limits.max_limits.size() - 1) std::cout << ", ";
+    }
+    std::cout << std::endl;
+    EXPECT_EQ(limits.min_limits.size(), 20);
+    EXPECT_EQ(limits.max_limits.size(), 20);
   }
 }
 
-TEST_F(OmniHand3UltraMTest, MotorMaxLimit) {
+TEST_F(OmniHand3UltraMTest, ActualAxisPos) {
   if (hand_->Init()) {
-    auto max_limits = hand_->GetAllMotorMaxLimit();
-    if (max_limits.empty()) {
-      std::cout << "[GetAllMotorMaxLimit] Failed: empty result" << std::endl;
-      return;
-    }
-    std::cout << "[GetAllMotorMaxLimit] Max Limits (0.1 deg): ";
-    for (size_t i = 0; i < max_limits.size(); ++i) {
-      std::cout << max_limits[i];
-      if (i < max_limits.size() - 1) std::cout << ", ";
-    }
-    std::cout << std::endl;
-    EXPECT_EQ(max_limits.size(), 20);
-
-    auto single = hand_->GetMotorMaxLimit(1);
-    std::cout << "[GetMotorMaxLimit] Joint 1: " << single << std::endl;
-  }
-}
-
-TEST_F(OmniHand3UltraMTest, MotorActualPos) {
-  if (hand_->Init()) {
-    auto actual_pos = hand_->GetAllMotorActualPos();
+    auto actual_pos = hand_->GetAllActualAxisPos();
     if (actual_pos.empty()) {
-      std::cout << "[GetAllMotorActualPos] Failed: empty result" << std::endl;
+      std::cout << "[GetAllActualAxisPos] Failed: empty result" << std::endl;
       return;
     }
-    std::cout << "[GetAllMotorActualPos] Actual Positions (0.1 deg): ";
+    std::cout << "[GetAllActualAxisPos] Actual Positions (0.1 deg): ";
     for (size_t i = 0; i < actual_pos.size(); ++i) {
       std::cout << actual_pos[i];
       if (i < actual_pos.size() - 1) std::cout << ", ";
@@ -283,15 +267,15 @@ TEST_F(OmniHand3UltraMTest, MotorActualPos) {
     std::cout << std::endl;
     EXPECT_EQ(actual_pos.size(), 20);
 
-    auto single = hand_->GetMotorActualPos(1);
-    std::cout << "[GetMotorActualPos] Joint 1: " << single << std::endl;
+    auto single = hand_->GetSingleActualAxisPos(1);
+    std::cout << "[GetSingleActualAxisPos] Joint 1: " << single << std::endl;
   }
 }
 
-TEST_F(OmniHand3UltraMTest, SaveParameters) {
+TEST_F(OmniHand3UltraMTest, SaveParam) {
   if (hand_->Init()) {
-    bool result = hand_->SaveParameters();
-    std::cout << "[SaveParameters] Result: " << (result ? "OK" : "FAILED") << std::endl;
+    bool result = hand_->SaveParam();
+    std::cout << "[SaveParam] Result: " << (result ? "OK" : "FAILED") << std::endl;
   }
 }
 
