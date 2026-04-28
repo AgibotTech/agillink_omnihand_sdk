@@ -1,0 +1,27 @@
+# OmniHand 2025 (O10) Configuration
+# connection_type: "zlgcan" | "hcan" | "socketcan" | "rs485" | "usb"
+# 取消注释 right_hand 以启用双手模式
+#
+# SocketCAN 示例（Linux only；需要先 `sudo ip link set can0 up type can ...`）:
+#   left_hand:
+#     hand_device_id: 1
+#     connection_type: "socketcan"
+#     can_interface: "can0"
+#   right_hand:
+#     hand_device_id: 1
+#     connection_type: "socketcan"
+#     can_interface: "can1"
+
+omnihand_2025_param_reader:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_device_id: 0
+      canfd_channel_id: 0
+
+    right_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_device_id: 0
+      canfd_channel_id: 1
