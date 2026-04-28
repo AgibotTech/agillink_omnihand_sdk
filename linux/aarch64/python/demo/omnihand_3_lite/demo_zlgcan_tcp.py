@@ -1,5 +1,5 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2.
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
 OmniHand 3 Lite S (O4) demo - ZLG CAN over TCP (e.g. WiFi/Ethernet adapter as server).
@@ -41,8 +41,8 @@ def main():
     parser.add_argument(
         "--hand_device_id",
         type=int,
-        default=1,
-        help="Hand device ID (default: 1)",
+        default=OmniHand3Lite.kDefaultHandDeviceId,
+        help="Hand device ID (default: OmniHand3Lite.kDefaultHandDeviceId)",
     )
     parser.add_argument(
         "--canfd_channel_id",

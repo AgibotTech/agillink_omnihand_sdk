@@ -1,5 +1,5 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2.
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
 OmniHand Dex UMI 硬件信息获取示例
@@ -25,14 +25,14 @@ def main():
     if args.device == 'hcan':
         hand = OmniHandDexUMI.create_hand_by_hcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHandDexUMI.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )
     else:  # default: zlgcan
         hand = OmniHandDexUMI.create_hand_by_zlgcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHandDexUMI.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )

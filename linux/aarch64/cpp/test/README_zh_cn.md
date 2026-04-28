@@ -1,5 +1,7 @@
 # OmniHand 2025 SDK C++ 单元测试
 
+**说明：** **OmniHand 2025 (O10)** 与 **OmniHand Dex UMI** 的工厂方法及广播发现接口在 C++ 头文件中使用 `std::uint8_t` 表示 `hand_device_id` 与 `canfd_*` 索引；测试代码使用整型字面量，依赖隐式转换。详见 `release/doc/zh_cn/API_CPP_O10.md` 与 `API_CPP_O10_UMI.md`。
+
 本目录包含基于 GoogleTest 的单元测试，涵盖所有三种 OmniHand 产品：
 - **OmniHand 2025 (O10)** - 10 自由度，1D 触觉传感器
 - **OmniHand Pro 2025 (O12)** - 12 自由度，3D 触觉传感器

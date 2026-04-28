@@ -1,5 +1,5 @@
 // Copyright (c) 2025, Agibot Co., Ltd.
-// OmniHand 2025 SDK is licensed under Mulan PSL v2.
+// AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
  * @file omnihand_2025.h
@@ -34,13 +34,10 @@ namespace omnihand {
 class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor1D {
  public:
   // Constants
-  static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // O10 has 10 active degrees of freedom (DoA)
-  static constexpr unsigned char kDegreesOfPassiveFreedom = 6;  // O10 has 6 passive degrees of freedom (DoP)
-  /**
-   * @brief CAN/串口侧手设备 ID 默认值（O10 协议约定为 1）。
-   * @see 工厂方法中在符合 C++ 默认参数规则处使用本常量；串口路径需显式传入或使用本常量。
-   */
-  static constexpr unsigned char kDefaultHandDeviceId = 1u;
+  static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // DoA
+  static constexpr unsigned char kDegreesOfPassiveFreedom = 6;  // DoP
+  /** @brief Default hand device ID on the bus for O10 (protocol value 1). Pass explicitly to factories. */
+  static constexpr uint8_t kDefaultHandDeviceId = 1u;
 
   virtual ~OmniHand2025() = default;
 
@@ -57,13 +54,12 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    */
   static std::unique_ptr<OmniHand2025> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id = kDefaultHandDeviceId,
-      unsigned char canfd_device_id = 0,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
-   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入。
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
@@ -74,9 +70,9 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    */
   static std::unique_ptr<OmniHand2025> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -91,15 +87,14 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    */
   static std::unique_ptr<OmniHand2025> createHandByZlgCanTcp(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& host,
       uint16_t port,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 #endif  // OMNIHAND_ZLG_TCP_SUPPORTED
 
   /**
    * @brief Factory method - RS485 communication (OmniHand 2025 only)
-   * @note 默认设备 ID 请使用 `kDefaultHandDeviceId` 显式传入（`uart_port` 无默认，无法为 `hand_device_id` 单独设默认实参）。
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param uart_port Serial port path (e.g., "/dev/ttyUSB0")
@@ -108,13 +103,13 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    */
   static std::unique_ptr<OmniHand2025> createHandByRs485(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& uart_port,
       int32_t baudrate = 460800);
 
   /**
    * @brief Factory method - USB communication (OmniHand 2025 only)
-   * @note 默认设备 ID 请使用 `kDefaultHandDeviceId` 显式传入（`uart_port` 无默认）。
+   * @note Pass `kDefaultHandDeviceId` explicitly; `uart_port` has no default.
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param uart_port Serial port path (e.g., "/dev/ttyACM0" or "COM3")
@@ -123,7 +118,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    */
   static std::unique_ptr<OmniHand2025> createHandByUsb(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& uart_port,
       int32_t baudrate = 460800);
 
@@ -137,7 +132,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    */
   static std::unique_ptr<OmniHand2025> createHandSocketCan(
       HandType hand_type,
-      unsigned char hand_device_id = kDefaultHandDeviceId,
+      uint8_t hand_device_id,
       const std::string& can_interface = "can0");
 #endif
 
@@ -151,13 +146,12 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    */
   static std::unique_ptr<OmniHand2025> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id = kDefaultHandDeviceId,
-      unsigned char canfd_device_id = 0,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
-   * @note 若需默认设备 ID，请使用 `kDefaultHandDeviceId` 显式传入。
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param hcan_serial_number HCAN device serial number (supports partial matching)
@@ -166,9 +160,23 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    */
   static std::unique_ptr<OmniHand2025> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
+
+#ifdef OMNIHAND_TJ_MARVIN_SDK
+  /**
+   * @brief Factory method - 天机 MARVIN 控制器 TJ SDK 末端 CAN/CANFD 透传（O10 与 USB-CAN/SocketCAN 并列的另一路）
+   * @param hand_type 灵巧手左右：LEFT→TJ 左臂末端通道（OnSetChDataA），RIGHT→右臂（OnSetChDataB）。与常见「左/右手装在同侧机械臂」一致
+   * @param hand_device_id Hand device ID on the OmniHand bus
+   * @param marvin_controller_ip 机械臂控制器 IP（UDP，与 TJ SDK OnLinkTo 一致）
+   * @note TJ 末端固定走 CAN/CANFD 透传（set_ch=1）；COM 透传不走本接口
+   */
+  static std::unique_ptr<OmniHand2025> createHandByTJ(
+      HandType hand_type,
+      uint8_t hand_device_id,
+      const std::string& marvin_controller_ip);
+#endif
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
@@ -181,8 +189,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    * @note Only works with CAN communication, not supported for RS485
    */
   static DeviceInfo GetDeviceInfoFromBroadcast(
-      unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00) by serial number
@@ -196,7 +204,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    */
   static DeviceInfo GetDeviceInfoFromBroadcast(
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
 #ifdef __linux__
   /**
@@ -234,6 +242,30 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    * @return Vector of tactile sensor data vector
    */
   virtual std::vector<TactileSensorData> GetAllTactileSensorData() const = 0;
+
+  // ============ Joint Naming ============
+  /**
+   * @brief Returns the 10 active joint names of O10 in motor-index order.
+   * @note Order MUST match the OmnihandActiveJoint enum used by the kinematics
+   *       solver and SetAllJointMotorPosi / GetAllJointMotorPosi. Names are
+   *       prefixed with "L_"/"R_" to match the URDF in
+   *       `omnihand_sdk/assets/omnihand_description`.
+   */
+  std::vector<std::string> GetJointNames() const override {
+    const std::string p = is_left_hand_ ? "L_" : "R_";
+    return {
+        p + "thumb_roll_joint",
+        p + "thumb_abad_joint",
+        p + "thumb_mcp_joint",
+        p + "index_abad_joint",
+        p + "index_pip_joint",
+        p + "middle_pip_joint",
+        p + "ring_abad_joint",
+        p + "ring_pip_joint",
+        p + "pinky_abad_joint",
+        p + "pinky_pip_joint",
+    };
+  }
 
   // ============ Gesture Control ============
   /**

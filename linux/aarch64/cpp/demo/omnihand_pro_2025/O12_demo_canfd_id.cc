@@ -1,5 +1,5 @@
 // Copyright (c) 2025, Agibot Co., Ltd.
-// OmniHand 2025 SDK is licensed under Mulan PSL v2.
+// AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
  * @file O12_demo_canfd_id.cc
@@ -59,7 +59,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::cout << "    Tangent Force Angle: " << thumb_sensor.tangent_force_angle << "°" << std::endl;
     std::cout << "    Channel Values: [";
     for (size_t i = 0; i < agilink::omnihand::TactileSensor3DData::kChannelCount; ++i) {
-      std::cout << thumb_sensor.GetChannelValue(i);
+      std::cout << thumb_sensor.channel_value[i];
       if (i + 1 < agilink::omnihand::TactileSensor3DData::kChannelCount) std::cout << ", ";
     }
     std::cout << "]" << std::endl;

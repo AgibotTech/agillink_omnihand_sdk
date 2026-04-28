@@ -1,5 +1,5 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2.
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 import argparse
 import time
@@ -7,27 +7,33 @@ from omnihand import OmniHand2025, Finger, ControlMode, HandType
 
 def main():
     parser = argparse.ArgumentParser(description='Control multiple hands via multiple CAN devices')
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'tj'], default='zlgcan',
                         help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
     args = parser.parse_args()
     
     # 创建 hand 的两种方式（按设备类型选择）：
     # - canfd_device_id：按设备索引，不触发扫描，设备只 open 一次；插拔/重启后索引可能变。
     # - usbcanfd_serial_number：按序列号，需先扫描再 open，多一次 open/close；序列号稳定。
-    if args.device == 'hcan':
-        left_hand = OmniHand2025.create_hand_by_hcan(HandType.LEFT, 1, "201BFF2AF01202D44690")
-        right_hand = OmniHand2025.create_hand_by_hcan(HandType.RIGHT, 1, "A029A58630B30D14DBB")
+    if args.device == 'tj':
+        left_hand = OmniHand2025.create_hand_by_tj(hand_type=HandType.LEFT, marvin_controller_ip="192.168.10.190")
+        right_hand = OmniHand2025.create_hand_by_tj(hand_type=HandType.RIGHT, marvin_controller_ip="192.168.10.190")
+        # 底层 TjMarvinCanBusDevice 已默认 200ms；现场仍超时可适当加大（UDP+机械臂调度+CAN 链较长）
+        for _h in (left_hand, right_hand):
+            _h.set_frame_recv_timeout(200)
+    elif args.device == 'hcan':
+        left_hand = OmniHand2025.create_hand_by_hcan(HandType.LEFT, OmniHand2025.kDefaultHandDeviceId, "201BFF2AF01202D44690")
+        right_hand = OmniHand2025.create_hand_by_hcan(HandType.RIGHT, OmniHand2025.kDefaultHandDeviceId, "A029A58630B30D14DBB")
     else:  # default: zlgcan
-        left_hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.LEFT, hand_device_id=1, usbcanfd_serial_number="201BFF2AF01202D44690", canfd_channel_id=0)
-        right_hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.RIGHT, hand_device_id=1, usbcanfd_serial_number="201BFF2AF01202D44690", canfd_channel_id=1)
+        left_hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.LEFT, hand_device_id=OmniHand2025.kDefaultHandDeviceId, usbcanfd_serial_number="201BFF2AF01202D44690", canfd_channel_id=0)
+        right_hand = OmniHand2025.create_hand_by_zlgcan(hand_type=HandType.RIGHT, hand_device_id=OmniHand2025.kDefaultHandDeviceId, usbcanfd_serial_number="201BFF2AF01202D44690", canfd_channel_id=1)
     
     if left_hand is None or right_hand is None:
         print("Cannot find CANFD devices by serial numbers!")
         return
     
     # 或者如果已知 canfd_id，可以直接使用：
-    # left_hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, 1, 0)  # canfd_device_id= 0
-    # right_hand = OmniHand2025.create_hand_by_zlgcan(HandType.RIGHT, 1, 1)  # canfd_device_id= 1
+    # left_hand = OmniHand2025.create_hand_by_zlgcan(HandType.LEFT, OmniHand2025.kDefaultHandDeviceId, 0)  # canfd_device_id= 0
+    # right_hand = OmniHand2025.create_hand_by_zlgcan(HandType.RIGHT, OmniHand2025.kDefaultHandDeviceId, 1)  # canfd_device_id= 1
     
     # 启用详细日志查看 CAN 通信
     left_hand.show_data_details(True)

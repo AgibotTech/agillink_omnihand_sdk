@@ -1,5 +1,5 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2
 
 cmake_minimum_required(VERSION 3.22)
 project(omnihand_demo)
@@ -41,4 +41,7 @@ if(BUILD_OMNIHAND_3_LITE)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/omnihand_3_lite")
     add_subdirectory(omnihand_3_lite)
   endif()
+endif()
+if(BUILD_OMNIHAND_3_ULTRA_M)
+  add_subdirectory(omnihand_3_ultra_m)
 endif()
