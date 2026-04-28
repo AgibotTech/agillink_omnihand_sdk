@@ -122,13 +122,14 @@ inline std::string ToString(Finger finger) {
  *       - POSITION_VELOCITY_TORQUE (6): Position-Velocity-Torque mixed control - not yet supported in protocol
  */
 enum class AGIBOT_EXPORT ControlMode : unsigned char {
-  POSITION = 0,                    // Position control mode (supported, default mode)
+  POSITION = 0,                    // Position control mode (supported, default mode, CSP)
   SERVO = 1,                       // Servo control mode (supported)
   VELOCITY = 2,                    // Velocity control mode (not yet supported)
   TORQUE = 3,                      // Torque control mode (not yet supported)
   POSITION_TORQUE = 4,             // Position-Torque mixed control (not yet supported)
   VELOCITY_TORQUE = 5,             // Velocity-Torque mixed control (not yet supported)
   POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mixed control (not yet supported)
+  PROFILE_POSITION = 7,            // Profile-Position control mode (only h3u_m supported, PP)
   UNKNOWN = 10                     // Unknown control mode
 };
 
@@ -154,7 +155,6 @@ inline std::string ToString(ControlMode mode) {
  * @brief 关节电机错误上报
  */
 struct AGIBOT_EXPORT JointMotorErrorReport {
-  // 使用命名 union（匿名 union 不能包含命名结构体），但使用简洁的访问路径
   union {
     struct {
       unsigned char stalled_ : 1;
@@ -165,6 +165,7 @@ struct AGIBOT_EXPORT JointMotorErrorReport {
       unsigned char res1_ : 3;
       unsigned char res2_;
     } bits;
+    uint16_t value_;
     unsigned char res_[2];
   };
 

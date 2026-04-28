@@ -23,6 +23,55 @@
 namespace agilink {
 namespace omnihand {
 
+enum class H3UMErrorBit : uint16_t {
+  H3U_M_ERR_ENCODER_COMM_TIMEOUT = 1 << 0,
+  H3U_M_ERR_CALIBRATION          = 1 << 1,
+  H3U_M_ERR_OVER_VOLTAGE         = 1 << 2,
+  H3U_M_ERR_UNDER_VOLTAGE        = 1 << 3,
+  H3U_M_ERR_OVER_TEMPERATURE     = 1 << 4,
+  H3U_M_ERR_TORQUE_SATURATION    = 1 << 5,
+  H3U_M_ERR_PARAM_CRC            = 1 << 6,
+  H3U_M_ERR_HOMING               = 1 << 7,
+  H3U_M_ERR_POSITION_FOLLOWING   = 1 << 8,
+  H3U_M_ERR_VELOCITY_FOLLOWING   = 1 << 9,
+  H3U_M_ERR_OVER_CURRENT         = 1 << 10,
+  H3U_M_ERR_INNER_ENCODER_CRC    = 1 << 11,
+  H3U_M_ERR_OUTER_ENCODER_CRC    = 1 << 12,
+  H3U_M_ERR_ENCODER_MULTI_TURN   = 1 << 13,
+  H3U_M_ERR_ANGLE_IDENTIFY_FAIL  = 1 << 14,
+  H3U_M_ERR_RESERVED             = 1 << 15,
+};
+
+inline std::string H3UMErrorReportToString(const JointMotorErrorReport& report) {
+  if (report.value_ == 0) return "0";
+  static const char* names[] = {
+      "encoder_comm_timeout",
+      "calibration_error",
+      "over_voltage",
+      "under_voltage",
+      "over_temperature",
+      "torque_saturation",
+      "param_crc_error",
+      "homing_error",
+      "position_following_error",
+      "velocity_following_error",
+      "over_current",
+      "inner_encoder_crc_error",
+      "outer_encoder_crc_error",
+      "encoder_multi_turn_error",
+      "angle_identify_fail",
+      "bi15_reserved",
+  };
+  std::string s;
+  for (int i = 0; i < 16; ++i) {
+    if (report.value_ & (1 << i)) {
+      if (!s.empty()) s += ",";
+      s += names[i];
+    }
+  }
+  return s;
+}
+
 /**
  * @brief OmniHand 3 Ultra (O20) interface class - 20 DOF
  *
@@ -218,8 +267,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase, public IOmniHandCalib
   virtual bool StartAutoCalibration() { return false; }
 
   // Clear error report
-  virtual bool ClearAllErrorReport() { return false; }
-  virtual bool ClearErrorReport(unsigned char joint_motor_index) { (void)joint_motor_index; return false; }
+  virtual void ClearAllErrorReport() {}
+  virtual void ClearErrorReport(unsigned char joint_motor_index) { (void)joint_motor_index; }
 
  protected:
   /**
