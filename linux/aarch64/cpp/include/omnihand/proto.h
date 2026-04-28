@@ -1,5 +1,5 @@
 // Copyright (c) 2025, Agibot Co., Ltd.
-// OmniHand 2025 SDK is licensed under Mulan PSL v2.
+// AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
  * @file proto.h
@@ -26,7 +26,7 @@ namespace omnihand {
 /**
  * @brief Hand type enumeration
  */
-enum class AGIBOT_EXPORT HandType : unsigned char {
+enum class AGIBOT_EXPORT HandType : uint8_t {
   LEFT = 0,      // Left hand
   RIGHT = 1,     // Right hand
   UNKNOWN = 255  // Unknown hand type
@@ -53,7 +53,8 @@ enum class AGIBOT_EXPORT ProductType : unsigned char {
   OMNIHAND_PRO_2025 = 1,    // OmniHand Pro 2025 (O12, 12 DOF)
   OMNIHAND_DEX_UMI = 2,     // OmniHand Dex UMI (O10 UMI, 10 DOF)
   OMNIHAND_3_LITE = 3,      // OmniHand 3 Lite S (O4, 4 DOF)
-  OMNIHAND_3_ULTRA = 4,     // OmniHand 3 Ultra (O20, 20 DOF)
+  OMNIHAND_3_ULTRA_M = 4,     // OmniHand 3 Ultra M(O20, 20 DOF)
+  OMNI_PICKER_3 = 5,        // OmniPicker 3 (1 DOF)
   UNKNOWN = 255             // Unknown product type
 };
 
@@ -68,22 +69,10 @@ inline std::string ToString(ProductType product_type) {
     case ProductType::OMNIHAND_PRO_2025: return "OmniHand Pro 2025";
     case ProductType::OMNIHAND_DEX_UMI: return "OmniHand Dex UMI";
     case ProductType::OMNIHAND_3_LITE: return "OmniHand 3 Lite";
-    case ProductType::OMNIHAND_3_ULTRA: return "OmniHand 3 Ultra";
+    case ProductType::OMNIHAND_3_ULTRA_M: return "OmniHand 3 Ultra M";
+    case ProductType::OMNI_PICKER_3: return "OmniPicker 3";
     default: return "Unknown";
   }
-}
-
-/**
- * @brief CAN frame format for createHandByZlgcan / createHandByHcan (interface layer)
- * @see docs/REFACTOR_SDK_PROTOCOL.md
- */
-enum class AGIBOT_EXPORT CanFrameFormat : unsigned char {
-  Extended = 0,  ///< 29-bit ID, command in ID (default, backward compatible)
-  Standard = 1   ///< 11-bit ID, command in D0, same data format as USB/RS485
-};
-
-inline std::string ToString(CanFrameFormat f) {
-  return f == CanFrameFormat::Standard ? "Standard" : "Extended";
 }
 
 /**
@@ -126,17 +115,17 @@ inline std::string ToString(Finger finger) {
  * @note According to protocol specification:
  *       - POSITION (0): Position control mode - supported
  *       - SERVO (1): Servo control mode - supported
- *       - VELOCITY (2): Velocity control mode - marked as "暂不支持" (not yet supported) in protocol
+ *       - VELOCITY (2): Velocity control mode - not yet supported in protocol
  *       - TORQUE (3): Torque control mode - defined in protocol but may not be fully supported
- *       - POSITION_TORQUE (4): Position-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
- *       - VELOCITY_TORQUE (5): Velocity-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
- *       - POSITION_VELOCITY_TORQUE (6): Position-Velocity-Torque mixed control - marked as "暂不支持" (not yet supported) in protocol
+ *       - POSITION_TORQUE (4): Position-Torque mixed control - not yet supported in protocol
+ *       - VELOCITY_TORQUE (5): Velocity-Torque mixed control - not yet supported in protocol
+ *       - POSITION_VELOCITY_TORQUE (6): Position-Velocity-Torque mixed control - not yet supported in protocol
  */
 enum class AGIBOT_EXPORT ControlMode : unsigned char {
-  POSITION = 0,                    // Position control mode
-  SERVO = 1,                       // Servo control mode
+  POSITION = 0,                    // Position control mode (supported, default mode)
+  SERVO = 1,                       // Servo control mode (supported)
   VELOCITY = 2,                    // Velocity control mode (not yet supported)
-  TORQUE = 3,                      // Torque control mode
+  TORQUE = 3,                      // Torque control mode (not yet supported)
   POSITION_TORQUE = 4,             // Position-Torque mixed control (not yet supported)
   VELOCITY_TORQUE = 5,             // Velocity-Torque mixed control (not yet supported)
   POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mixed control (not yet supported)
@@ -197,34 +186,19 @@ struct AGIBOT_EXPORT JointMotorErrorReport {
  */
 struct AGIBOT_EXPORT TactileSensor3DData {
   static constexpr size_t kChannelCount = 6;
-
   uint8_t online_state;          // 1: online, 0: offline
-  uint8_t channel_value[kChannelCount][3];  // 6 raw 24-bit channel values (little-endian)
+  uint32_t channel_value[kChannelCount];  // 6 decoded 24-bit channel values
   uint16_t normal_force;         // force normal to the sensor surface (0.1N, max: 2000)
   uint16_t tangent_force;        // force tangential to the sensor surface (0.1N, max: 2000)
   uint16_t tangent_force_angle;  // angle of the tangent force in degrees, zero degrees is up (0-359)
   uint8_t capa_approach[4];      // self-capacitance approach
-
-  /**
-   * @brief Convert one packed 24-bit channel sample into uint32_t.
-   * @param index Channel index in range [0, kChannelCount).
-   * @return Decoded 24-bit value, or 0 when index is out of range.
-   */
-  uint32_t GetChannelValue(size_t index) const {
-    if (index >= kChannelCount) {
-      return 0;
-    }
-    return static_cast<uint32_t>(channel_value[index][0]) |
-           (static_cast<uint32_t>(channel_value[index][1]) << 8) |
-           (static_cast<uint32_t>(channel_value[index][2]) << 16);
-  }
 
   std::string ToString() const {
     std::stringstream sstream;
     sstream << "\t[Online State: " << static_cast<unsigned int>(online_state) << "]\n";
     sstream << "\t[Channel Values: ";
     for (size_t i = 0; i < kChannelCount; ++i) {
-      sstream << GetChannelValue(i) << " ";
+      sstream << channel_value[i] << " ";
     }
     sstream << "]\n\t[Normal Force: " << static_cast<unsigned int>(normal_force) << "]\n";
     sstream << "\t[Tangent Force: " << static_cast<unsigned int>(tangent_force) << "]\n";

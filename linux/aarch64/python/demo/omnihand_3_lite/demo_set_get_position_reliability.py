@@ -1,5 +1,5 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2.
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
 OmniHand 3 Lite S (O4) Position Control Reliability Test
@@ -42,14 +42,14 @@ def main():
         if args.device == 'hcan':
             hand = OmniHand3Lite.create_hand_by_hcan(
                 hand_type=HandType.LEFT,
-                hand_device_id=1,
+                hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
                 canfd_device_id=0,
                 canfd_channel_id=0
             )
         else:  # default: zlgcan
             hand = OmniHand3Lite.create_hand_by_zlgcan(
                 hand_type=HandType.LEFT,
-                hand_device_id=1,
+                hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
                 canfd_device_id=0,
                 canfd_channel_id=0
             )

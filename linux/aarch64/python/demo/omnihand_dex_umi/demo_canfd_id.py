@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2.
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
 OmniHand Dex UMI 综合控制示例 - CANFD 通信（通过 canfd_id）
@@ -171,7 +171,7 @@ def main():
     print(f"Device: {device_type}")
     print("=" * 60)
 
-    hand_device_id= 1
+    hand_device_id= OmniHandDexUMI.kDefaultHandDeviceId
     canfd_device_id= 0
 
     # Helper function to create hand instance

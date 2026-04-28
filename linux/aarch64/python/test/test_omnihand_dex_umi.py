@@ -1,5 +1,5 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2.
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
 Unit tests for OmniHand Dex UMI
@@ -51,14 +51,14 @@ def hand():
     if DEVICE_TYPE == "hcan":
         hand = OmniHandDexUMI.create_hand_by_hcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHandDexUMI.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )
     else:  # default: zlgcan
         hand = OmniHandDexUMI.create_hand_by_zlgcan(
             hand_type=HandType.LEFT,
-            hand_device_id=1,
+            hand_device_id=OmniHandDexUMI.kDefaultHandDeviceId,
             canfd_device_id=0,
             canfd_channel_id=0
         )
@@ -93,7 +93,7 @@ def test_get_device_info(hand):
     print(str(device_info))
     # Only check deviceId if request succeeded (non-zero indicates success)
     if device_info.hand_device_id != 0:
-        assert device_info.hand_device_id == 1
+        assert device_info.hand_device_id == OmniHandDexUMI.kDefaultHandDeviceId
 
 
 def test_tactile_sensor_raw(hand):

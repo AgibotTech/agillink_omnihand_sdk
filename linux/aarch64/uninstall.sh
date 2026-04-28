@@ -15,6 +15,7 @@ sudo rm -f "$PREFIX/lib/libomnihand.so"*
 sudo rm -f "$PREFIX/lib/libusbcanfd.so"*
 sudo rm -f "$PREFIX/lib/libusb-1.0.so"*
 sudo rm -f "$PREFIX/lib/libcanbus.so"*
+sudo rm -f "$PREFIX/lib/libMarvinSDK.so"*
 sudo rm -rf "$PREFIX/share/cmake/omnihand"
 sudo ldconfig 2>/dev/null || true
 

@@ -1,5 +1,5 @@
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2
 
 cmake_minimum_required(VERSION 3.22)
 
@@ -144,4 +144,19 @@ if(BUILD_OMNIHAND_3_LITE)
     RUNTIME_OUTPUT_DIRECTORY "${TEST_OUTPUT_DIR}"
   )
   add_test(NAME OmniHand3LiteTest COMMAND test_omnihand_3_lite)
+endif()
+
+# OmniHand 3 Ultra M (O20) Tests
+if(BUILD_OMNIHAND_3_ULTRA_M)
+  add_executable(test_omnihand_3_ultra_m test_omnihand_3_ultra_m.cc)
+  target_link_libraries(
+    test_omnihand_3_ultra_m
+    PRIVATE
+    ${OMNIHAND_TARGET}
+    GTest::gtest
+  )
+  set_target_properties(test_omnihand_3_ultra_m PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${TEST_OUTPUT_DIR}"
+  )
+  add_test(NAME OmniHand3UltraMTest COMMAND test_omnihand_3_ultra_m)
 endif()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025, Agibot Co., Ltd.
-# OmniHand 2025 SDK is licensed under Mulan PSL v2.
+# AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
 UMI 到 O10 控制示例
@@ -58,8 +58,8 @@ def main():
     parser.add_argument(
         '--umi-device-id',
         type=int,
-        default=1,
-        help='UMI device ID (default: 1)'
+        default=OmniHandDexUMI.kDefaultHandDeviceId,
+        help='UMI device ID (default: OmniHandDexUMI.kDefaultHandDeviceId)'
     )
     parser.add_argument(
         '--umi-canfd-id',
@@ -76,8 +76,8 @@ def main():
     parser.add_argument(
         '--o10-device-id',
         type=int,
-        default=1,
-        help='O10 device ID (default: 1)'
+        default=OmniHand2025.kDefaultHandDeviceId,
+        help='O10 device ID (default: OmniHand2025.kDefaultHandDeviceId)'
     )
     parser.add_argument(
         '--o10-canfd-id',

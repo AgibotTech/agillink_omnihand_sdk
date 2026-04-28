@@ -1,5 +1,5 @@
 // Copyright (c) 2025, Agibot Co., Ltd.
-// OmniHand 2025 SDK is licensed under Mulan PSL v2.
+// AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
  * @file private_omnihand_3_lite.h
@@ -32,9 +32,6 @@ namespace omnihand {
  */
 class AGIBOT_EXPORT PrivateOmniHand3Lite : public OmniHand3Lite, public PrivateOmniHand {
  public:
-  // Constants
-  static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // O4 has 4 active degrees of freedom (DoA)
-
   virtual ~PrivateOmniHand3Lite() = default;
 
   // ============ Factory Methods ============
@@ -50,9 +47,9 @@ class AGIBOT_EXPORT PrivateOmniHand3Lite : public OmniHand3Lite, public PrivateO
    */
   static std::unique_ptr<PrivateOmniHand3Lite> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -66,9 +63,9 @@ class AGIBOT_EXPORT PrivateOmniHand3Lite : public OmniHand3Lite, public PrivateO
    */
   static std::unique_ptr<PrivateOmniHand3Lite> createHandByZlgcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -77,10 +74,10 @@ class AGIBOT_EXPORT PrivateOmniHand3Lite : public OmniHand3Lite, public PrivateO
    */
   static std::unique_ptr<PrivateOmniHand3Lite> createHandByZlgCanTcp(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& tcp_host,
       uint16_t tcp_port,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 #endif  // OMNIHAND_ZLG_TCP_SUPPORTED
 
 #ifdef __linux__
@@ -93,7 +90,7 @@ class AGIBOT_EXPORT PrivateOmniHand3Lite : public OmniHand3Lite, public PrivateO
    */
   static std::unique_ptr<PrivateOmniHand3Lite> createHandSocketCan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& can_interface = "can0");
 #endif
 
@@ -107,9 +104,9 @@ class AGIBOT_EXPORT PrivateOmniHand3Lite : public OmniHand3Lite, public PrivateO
    */
   static std::unique_ptr<PrivateOmniHand3Lite> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
-      unsigned char canfd_device_id,
-      unsigned char canfd_channel_id = 0);
+      uint8_t hand_device_id,
+      uint8_t canfd_device_id,
+      uint8_t canfd_channel_id = 0);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -121,9 +118,9 @@ class AGIBOT_EXPORT PrivateOmniHand3Lite : public OmniHand3Lite, public PrivateO
    */
   static std::unique_ptr<PrivateOmniHand3Lite> createHandByHcan(
       HandType hand_type,
-      unsigned char hand_device_id,
+      uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      unsigned char canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0);
 
  protected:
   /**
