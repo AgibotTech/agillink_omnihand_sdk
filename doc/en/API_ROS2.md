@@ -172,3 +172,53 @@ python3 joint_control_mode_pub.py 0 left h3u_m
 | socketcan | ✅ | ✅ | ✅ |
 | rs485 | ✅ | ❌ | ❌ |
 | usb | ✅ | ❌ | ❌ |
+
+## C++ Development Demo
+
+The release package includes a ROS2 C++ demo showing how to control OmniHand via standard ROS2 topics (without depending on the OmniHand C++ SDK).
+
+The demo is located at `ros2/humble/share/omnihand_node/demo/` and contains:
+- `ros2_joint_cmd_demo.cpp` — Uses `sensor_msgs/JointState` for position control + `omnihand_msgs` for temperature and current readback
+- `CMakeLists.txt` / `package.xml` — Standard ament_cmake package configuration
+
+### Quick Start
+
+```bash
+# 1. Source ROS2 and OmniHand release environment
+source /opt/ros/humble/setup.bash
+source /path/to/omnihand_sdk_release/ros2/setup.bash
+
+# 2. Create workspace and copy demo
+mkdir -p ~/omnihand_ws/src
+cp -r /path/to/omnihand_sdk_release/ros2/humble/share/omnihand_node/demo \
+      ~/omnihand_ws/src/omnihand_ros2_demo
+
+# 3. Build and run
+cd ~/omnihand_ws
+colcon build --packages-select omnihand_ros2_demo
+source install/setup.bash
+ros2 run omnihand_ros2_demo ros2_joint_cmd_demo left o10
+```
+
+### Custom Development
+
+To write your own ROS2 C++ package for OmniHand control, add the dependencies in `package.xml`:
+
+```xml
+<depend>rclcpp</depend>
+<depend>sensor_msgs</depend>
+<depend>omnihand_msgs</depend>
+```
+
+And in `CMakeLists.txt`:
+
+```cmake
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(omnihand_msgs REQUIRED)
+ament_target_dependencies(your_node rclcpp sensor_msgs omnihand_msgs)
+```
+
+> 💡 `source ros2/setup.bash` adds the `omnihand_msgs` CMake config, headers, and libraries to the search paths, so your package can be built in any workspace location.
+>
+> If you only need joint position control (no temperature/current/error readback), you can skip `omnihand_msgs` and use only `sensor_msgs`.
