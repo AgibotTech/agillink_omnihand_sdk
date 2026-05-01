@@ -39,6 +39,7 @@ ament_append_value CMAKE_PREFIX_PATH "$AMENT_CURRENT_PREFIX"
 
 # append to LD_LIBRARY_PATH
 ament_append_value LD_LIBRARY_PATH "$AMENT_CURRENT_PREFIX/lib/omnihand_node"
+ament_append_value LD_LIBRARY_PATH "$AMENT_CURRENT_PREFIX/lib"
 
 # append to PATH
 ament_append_value PATH "$AMENT_CURRENT_PREFIX/lib/omnihand_node"

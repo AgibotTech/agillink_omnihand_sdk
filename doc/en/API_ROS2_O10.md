@@ -2,161 +2,153 @@
 
 > ⚠️ **Linux Only**: ROS2 interface is only available on Linux. Windows is not supported.
 
+## Overview
+
+The O10 ROS2 node provides a unified topic interface for the 10 DOF dexterous hand, following the [Unified ROS2 Interface Specification](API_ROS2.md).
+
 ## ROS2 Topics
 
-| Topic Name                                           | Description                         | Node Action | Message Type                                                                                       | Notes |
-|:----------------------------------------------------|:------------------------------------|:-----------:|:---------------------------------------------------------------------------------------------------|:------|
-| `/omnihand/omnihand_2025/left/motor_angle`           | Joint motor angle                   |  Pub (You Sub)    | [omnihand_2025_node_msgs.msg.MotorAngle](#omnihand_2025_nodemsgsmsgmotorangle)                       |       |
-| `/omnihand/omnihand_2025/left/motor_angle_cmd`       | Joint motor angle command           |  Sub (You Pub)    | [omnihand_2025_node_msgs.msg.MotorAngle](#omnihand_2025_nodemsgsmsgmotorangle)                       |       |
-| `/omnihand/omnihand_2025/right/motor_angle`          | Joint motor angle                   |  Pub (You Sub)    | [omnihand_2025_node_msgs.msg.MotorAngle](#omnihand_2025_nodemsgsmsgmotorangle)                       |       |
-| `/omnihand/omnihand_2025/right/motor_angle_cmd`      | Joint motor angle command           |  Sub (You Pub)    | [omnihand_2025_node_msgs.msg.MotorAngle](#omnihand_2025_nodemsgsmsgmotorangle)                       |       |
+All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`.
 
-**Note**: O10 has 10 degrees of freedom. All arrays in messages contain 10 values.
+| Topic | Message Type | Direction | Description |
+|-------|-------------|-----------|-------------|
+| `joint_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | `position[0..9]` = rad, triggers control + readback |
+| `joint_states` | `sensor_msgs/JointState` | Publish (you sub) | `position[0..9]` = rad |
+| `joint_mix_control_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Position+torque mixed control (see below) |
+| `joint_error_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllErrorReport()` |
+| `joint_error_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = error bitmask (5 bit) |
+| `joint_temperature_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllTemperatureReport()` |
+| `joint_temperature_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = temperature |
+| `joint_current_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllCurrentReport()` |
+| `joint_current_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = current |
+| `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | Subscribe (you pub) | Write current threshold `data[0..9]` |
+| `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | Readback current threshold `data[0..9]` |
+| `motor_pos_cmd` | `omnihand_msgs/JointStateInt16` | Subscribe (you pub) | Write raw motor position `data[0..9]` (int16 tick) |
+| `motor_pos_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | Readback raw motor position `data[0..9]` (int16 tick) |
+| `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Trigger `GetAllTactileSensorData()` |
+| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile sensor data |
 
-## ROS2 Services
+**Note**: O10 has 10 degrees of freedom. All arrays contain 10 elements.
 
-| Service Name                                           | Description | Service Type                                                                                              | Notes |  
-|:----------------------------------------------|  :----:  |:--------:|-------------------------------------------------
-| `/omnihand/omnihand_2025/left/set_joint_angles`  | Set joint angles |    Service    | [omnihand_2025_node_msgs.srv.SetJointAngles](#omnihand_2025_node_msgs_srv_SetJointAngles) | 
-| `/omnihand/omnihand_2025/left/get_joint_angles`  | Get joint angles |    Service    | [omnihand_2025_node_msgs.srv.GetJointAngles](#omnihand_2025_node_msgs_srv_GetJointAngles) | 
-| `/omnihand/omnihand_2025/right/set_joint_angles`  | Set joint angles |    Service    | [omnihand_2025_node_msgs.srv.SetJointAngles](#omnihand_2025_node_msgs_srv_SetJointAngles) | 
-| `/omnihand/omnihand_2025/right/get_joint_angles`  | Get joint angles |    Service    | [omnihand_2025_node_msgs.srv.GetJointAngles](#omnihand_2025_node_msgs_srv_GetJointAngles) | 
+## Mixed Control
 
-**Note**:
-- Service interfaces use joint angles (radians), not motor positions
-- `SetJointAngles` waits for the hand to reach target angles, or returns on timeout
-- `GetJointAngles` returns current joint angles and hand ready status
-- O10 has 10 degrees of freedom, angle arrays contain 10 values
+`joint_mix_control_cmd` uses `sensor_msgs/JointState` for position+torque mixed control:
+
+- `position[]` = raw int16 motor position
+- `effort[]` = raw int16 motor torque
+
+The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No readback**.
+
+`joint_cmd` uses `position[]` in radians with automatic conversion. `joint_mix_control_cmd` uses raw int16 motor values.
+
+## Tactile Sensor (1D)
+
+O10 is equipped with 1D tactile sensors across 7 regions:
+
+| Region | Sensor Points |
+|--------|--------------|
+| THUMB | 16 |
+| INDEX | 18 |
+| MIDDLE | 18 |
+| RING | 18 |
+| LITTLE | 18 |
+| PALM | 78 |
+| DORSUM | 102 |
+
+Message type `omnihand_2025_node_msgs/TactileSensor`:
+- `header` (std_msgs/Header)
+- `tactile_datas[]` (TactileSensorData[])
+  - Each `TactileSensorData`: `uint8[] tactiles` (unit: 1g, max 255g)
+
+`tactile_datas` array is ordered by the regions listed above.
+
+## O10 Error Bitmask
+
+O10 error codes use a 5-bit bitmask:
+
+| Bit | Meaning |
+|-----|---------|
+| bit0 | stalled |
+| bit1 | overheat |
+| bit2 | over_current |
+| bit3 | motor_except |
+| bit4 | commu_except |
 
 ## Usage
 
-### Build
-
-See the root `README.md` for how to build the ROS2 node together with the SDK.
-
-### Run
+### Launch
 
 ```bash
-export LD_LIBRARY_PATH=$(pwd)/build/install/lib/:$LD_LIBRARY_PATH
-cd build/install/bin/
-./omnihand_2025_node
+ros2 launch omnihand_node omnihand_2025_node.launch.py
 ```
 
-After starting the node, you can use the Service interfaces to control the hand.
+### Python Script Examples
 
-## Message Definitions
+```bash
+# Send position command + subscribe to readback (10 DOF, rad)
+python3 scripts/omnihand_2025/joint_cmd.py left
 
-### `omnihand_2025_node_msgs.msg.MotorAngle`
+# Trigger and view error report (1Hz)
+python3 scripts/omnihand_2025/joint_error.py left 1
 
-```python
-std_msgs/Header header
-float64[] angles  # 10 values for O10 (in radians)
+# Trigger and view temperature
+python3 scripts/omnihand_2025/joint_temperature.py left
+
+# Trigger and view current
+python3 scripts/omnihand_2025/joint_current.py left
+
+# Set current threshold
+python3 scripts/omnihand_2025/joint_current_threshold_pub.py 500 left
+
+# Send raw motor position (int16 tick) + subscribe to readback
+python3 scripts/omnihand_2025/motor_pos.py left
+
+# Mixed control (position + torque)
+python3 scripts/omnihand_2025/mix_control_pub.py left
+
+# Trigger and view tactile sensor
+python3 scripts/omnihand_2025/tactile.py left
 ```
 
-## Service Definitions
+### CLI Examples
 
-### `omnihand_2025_node_msgs.srv.SetJointAngles`
+```bash
+# Send position command
+ros2 topic pub --once /o10/left/joint_cmd sensor_msgs/msg/JointState \
+  "{position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
 
-Set target angles for all joints and wait for the hand to reach the target position.
+# View readback
+ros2 topic echo /o10/left/joint_states
 
-**Request**:
-```python
-# Target joint angles (radians), 10 values for O10
-float64[] target_angles
-# Timeout in seconds (0 means use default: 5.0)
-float64 timeout
+# Trigger error report query
+ros2 topic pub --once /o10/left/joint_error_cmd std_msgs/msg/Empty '{}'
+
+# View error reports
+ros2 topic echo /o10/left/joint_error_states
+
+# Mixed control: position + torque (raw int16)
+ros2 topic pub --once /o10/left/joint_mix_control_cmd sensor_msgs/msg/JointState \
+  "{position: [2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000], effort: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]}"
 ```
 
-**Response**:
-```python
-# Whether the movement was successful
-bool success
-# Final joint angles reached (radians), 10 values for O10
-float64[] final_angles
-# Error message if failed
-string error_message
+## Configuration
+
+O10 supports: zlgcan, hcan, socketcan, rs485, usb.
+
+Example:
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "hcan"
+      canfd_serial_number: "12345678"
+      canfd_channel_id: 0
 ```
 
-**Usage Example**:
-```python
-from omnihand_2025_node_msgs.srv import SetJointAngles
-import rclpy
-from rclpy.node import Node
+See [Unified ROS2 Interface Specification](API_ROS2.md) for full configuration details.
 
-# Create service client
-client = node.create_client(SetJointAngles, '/omnihand/omnihand_2025/left/set_joint_angles')
+## Related Documentation
 
-# Wait for service to be available
-client.wait_for_service()
-
-# Create request
-request = SetJointAngles.Request()
-request.target_angles = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # 10 values
-request.timeout = 5.0
-
-# Call service
-future = client.call_async(request)
-rclpy.spin_until_future_complete(node, future)
-response = future.result()
-
-if response.success:
-    print(f"Successfully moved to target angles: {response.final_angles}")
-else:
-    print(f"Failed: {response.error_message}")
-```
-
-**Note**:
-- Angles are in radians
-- If target angles exceed joint limits, the service will return failure
-- Timeout is calculated from service call start. If the hand does not reach target angles within timeout, it returns failure
-
-### `omnihand_2025_node_msgs.srv.GetJointAngles`
-
-Get current joint angles and hand ready status.
-
-**Request**:
-```python
-# No parameters
-```
-
-**Response**:
-```python
-# Current joint angles (radians), 10 values for O10
-float64[] angles
-# Whether the hand is ready
-bool is_ready
-# Error message if any
-string error_message
-```
-
-**Usage Example**:
-```python
-from omnihand_2025_node_msgs.srv import GetJointAngles
-import rclpy
-from rclpy.node import Node
-
-# Create service client
-client = node.create_client(GetJointAngles, '/omnihand/omnihand_2025/left/get_joint_angles')
-
-# Wait for service to be available
-client.wait_for_service()
-
-# Create request (empty request)
-request = GetJointAngles.Request()
-
-# Call service
-future = client.call_async(request)
-rclpy.spin_until_future_complete(node, future)
-response = future.result()
-
-if response.is_ready:
-    print(f"Current joint angles: {response.angles}")
-    print(f"Angles (degrees): {[a * 180 / 3.14159 for a in response.angles]}")
-else:
-    print(f"Hand not ready: {response.error_message}")
-```
-
-**Note**:
-- Angles are in radians
-- `is_ready` is `true` when the hand is initialized and can receive commands
-- If the hand is not ready, `error_message` contains the reason
+- [OmniHand 2025 (O10) C++ API](API_CPP_O10.md)
+- [OmniHand 2025 (O10) Python API](API_PYTHON_O10.md)

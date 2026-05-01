@@ -1,27 +1,41 @@
 # OmniHand Pro 2025 (O12) Configuration
-# connection_type: "zlgcan" | "hcan" | "socketcan"
-# 取消注释 right_hand 以启用双手模式
-#
-# SocketCAN 示例（Linux only；需要先 `sudo ip link set can0 up type can ...`）:
-#   left_hand:
-#     hand_device_id: 1
-#     connection_type: "socketcan"
-#     can_interface: "can0"
-#   right_hand:
-#     hand_device_id: 1
-#     connection_type: "socketcan"
-#     can_interface: "can1"
+# connection_type: "zlgcan" | "hcan" | "socketcan" | "rs485" | "usb"
+# request_interval_ms: min gap between requests, SDK default 0 = no throttling, range 0..100
+# frame_recv_timeout_ms: single-frame reply wait, SDK default 50, range 10..1000
 
-omnihand_pro_2025_param_reader:
+/**:
   ros__parameters:
+    # zlgcan example
+    # left_hand:
+    #   hand_device_id: 1
+    #   connection_type: "zlgcan"
+    #   canfd_device_id: 0
+    #   canfd_channel_id: 0
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: false
+    #
+    # right_hand:
+    #   hand_device_id: 1
+    #   connection_type: "zlgcan"
+    #   canfd_device_id: 0
+    #   canfd_channel_id: 1
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: false
+    # socketcan example
     left_hand:
       hand_device_id: 1
-      connection_type: "zlgcan"
-      canfd_device_id: 0
-      canfd_channel_id: 0
+      connection_type: "socketcan"
+      can_interface: "can0"
+      request_interval_ms: 0
+      frame_recv_timeout_ms: 50
+      show_data_details: true
 
     right_hand:
       hand_device_id: 1
-      connection_type: "zlgcan"
-      canfd_device_id: 0
-      canfd_channel_id: 1
+      connection_type: "socketcan"
+      can_interface: "can1"
+      request_interval_ms: 0
+      frame_recv_timeout_ms: 50
+      show_data_details: true

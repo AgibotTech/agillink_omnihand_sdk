@@ -19,6 +19,7 @@ def generate_launch_description():
         package='omnihand_node',
         executable='omnihand_pro_2025_node',
         name='omnihand_pro_2025_param_reader',
+        namespace='o12',
         output='screen',
         parameters=[LaunchConfiguration('config_file')]
     )
