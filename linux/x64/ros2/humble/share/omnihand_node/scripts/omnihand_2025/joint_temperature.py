@@ -19,6 +19,10 @@ from rclpy.node import Node
 from std_msgs.msg import Empty
 from omnihand_msgs.msg import JointStateInt16
 
+# topic:
+# /o10/left/joint_temperature_cmd; /o10/right/joint_temperature_cmd;
+# /o10/left/joint_temperature_states; /o10/right/joint_temperature_states
+
 
 class JointTemperatureNode(Node):
     def __init__(self, hand_side: str, product: str, hz: float):

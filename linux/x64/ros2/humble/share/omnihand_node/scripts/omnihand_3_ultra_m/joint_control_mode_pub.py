@@ -22,6 +22,10 @@ from omnihand_msgs.msg import JointStateInt8
 
 NUM_JOINTS = 20
 
+# topic:
+# /h3u_m/left/joint_control_mode_cmd; /h3u_m/right/joint_control_mode_cmd;
+# /h3u_m/left/joint_control_mode_states; /h3u_m/right/joint_control_mode_states
+
 
 class ControlModePubSub(Node):
     def __init__(self, hand_side: str, product: str, mode: int):

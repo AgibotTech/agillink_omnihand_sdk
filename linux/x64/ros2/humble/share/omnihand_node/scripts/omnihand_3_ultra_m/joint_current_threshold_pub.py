@@ -20,6 +20,10 @@ from omnihand_msgs.msg import JointStateInt16
 
 NUM_JOINTS = 20
 
+# topic:
+# /h3u_m/left/joint_current_threshold_cmd; /h3u_m/right/joint_current_threshold_cmd;
+# /h3u_m/left/joint_current_threshold_states; /h3u_m/right/joint_current_threshold_states
+
 
 class CurrentThresholdPubSub(Node):
     def __init__(self, hand_side: str, product: str, threshold: int):

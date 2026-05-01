@@ -26,6 +26,10 @@ from rclpy.node import Node
 from std_msgs.msg import Empty
 from omnihand_msgs.msg import JointStateInt16
 
+# topic:
+# /o12/left/joint_error_cmd; /o12/right/joint_error_cmd;
+# /o12/left/joint_error_states; /o12/right/joint_error_states
+
 O12_ERROR_BIT_NAMES = [
     'stalled',
     'overheat',

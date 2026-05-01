@@ -22,6 +22,9 @@ from sensor_msgs.msg import JointState
 
 NUM_JOINTS = 12
 
+# topic:
+# /o12/left/joint_mix_control_cmd; /o12/right/joint_mix_control_cmd;
+
 
 class MixControlPublisher(Node):
     def __init__(self, hand_side: str, product: str):

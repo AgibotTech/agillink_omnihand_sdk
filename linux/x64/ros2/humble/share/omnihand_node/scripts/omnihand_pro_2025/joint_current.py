@@ -19,6 +19,10 @@ from rclpy.node import Node
 from std_msgs.msg import Empty
 from omnihand_msgs.msg import JointStateInt16
 
+# topic:
+# /o12/left/joint_current_cmd; /o12/right/joint_current_cmd;
+# /o12/left/joint_current_states; /o12/right/joint_current_states
+
 
 class JointCurrentNode(Node):
     def __init__(self, hand_side: str, product: str, hz: float):

@@ -38,6 +38,10 @@ from std_msgs.msg import Empty
 from omnihand_msgs.msg import JointStateInt16
 from omnihand import h3um_error_report_to_string
 
+# topic:
+# /h3u_m/left/joint_error_cmd; /h3u_m/right/joint_error_cmd;
+# /h3u_m/left/joint_error_states; /h3u_m/right/joint_error_states
+
 
 class JointErrorNode(Node):
     def __init__(self, hand_side: str, product: str, hz: float):

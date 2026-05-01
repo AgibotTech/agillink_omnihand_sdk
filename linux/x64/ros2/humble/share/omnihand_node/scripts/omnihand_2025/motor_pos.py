@@ -22,6 +22,10 @@ from omnihand_msgs.msg import JointStateInt16
 
 NUM_JOINTS = 10
 
+# topic:
+# /o10/left/motor_pos_cmd; /o10/right/motor_pos_cmd;
+# /o10/left/motor_pos_states; /o10/right/motor_pos_states
+
 
 class MotorPosNode(Node):
     def __init__(self, hand_side: str, product: str):

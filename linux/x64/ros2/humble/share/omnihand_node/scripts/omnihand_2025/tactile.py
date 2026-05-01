@@ -25,6 +25,10 @@ from omnihand_2025_node_msgs.msg import TactileSensor
 
 REGION_NAMES = ['THUMB', 'INDEX', 'MIDDLE', 'RING', 'LITTLE', 'PALM', 'DORSUM']
 
+# topic:
+# /o10/left/tactile_cmd; /o10/right/tactile_cmd;
+# /o10/left/tactile_states; /o10/right/tactile_states
+
 
 class TactileNode(Node):
     def __init__(self, hand_side: str, product: str, hz: float):

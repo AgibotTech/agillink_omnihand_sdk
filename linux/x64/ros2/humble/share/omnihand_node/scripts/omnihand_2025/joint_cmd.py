@@ -19,8 +19,11 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
-
 NUM_JOINTS = 10
+
+# topic:
+# /o10/left/joint_cmd; /o10/right/joint_cmd;
+# /o10/left/joint_states; /o10/right/joint_states
 
 
 class JointCmdNode(Node):

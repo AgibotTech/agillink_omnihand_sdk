@@ -21,6 +21,10 @@ from sensor_msgs.msg import JointState
 
 NUM_JOINTS = 20
 
+# topic:
+# /h3u_m/left/joint_cmd; /h3u_m/right/joint_cmd;
+# /h3u_m/left/joint_states; /h3u_m/right/joint_states
+
 
 class JointCmdNode(Node):
     def __init__(self, hand_side: str, product: str):
