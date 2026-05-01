@@ -23,6 +23,7 @@
     #   request_interval_ms: 0
     #   frame_recv_timeout_ms: 50
     #   show_data_details: false
+
     # socketcan example
     left_hand:
       hand_device_id: 1
@@ -39,3 +40,20 @@
       request_interval_ms: 0
       frame_recv_timeout_ms: 50
       show_data_details: true
+
+    # rs485 example
+    # left_hand:
+    #   hand_device_id: 1
+    #   connection_type: "rs485"
+    #   uart_port: "/dev/ttyUSB0"
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: false
+    #
+    # right_hand:
+    #   hand_device_id: 1
+    #   connection_type: "rs485"
+    #   uart_port: "/dev/ttyUSB1"
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: false
