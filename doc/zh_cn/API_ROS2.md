@@ -1,135 +1,174 @@
 # OmniHand SDK ROS2 接口
 
-> ⚠️ **仅限 Linux**：ROS2 接口仅在 Linux 上可用，不支持 Windows。
+> ⚠️ **仅支持 Linux**：ROS2 接口仅在 Linux 上可用，不支持 Windows。
 
 ## 概述
 
-OmniHand SDK 为两种产品型号提供 ROS2 接口：
+OmniHand SDK 为三款产品提供统一风格的 ROS2 接口：
 
-- **OmniHand 2025 (O10)**：10 自由度灵巧手，配备 1D 触觉传感器
-- **OmniHand Pro 2025 (O12)**：12 自由度灵巧手，配备 3D 触觉传感器
+- **OmniHand 2025 (O10)**: 10 自由度灵巧手
+- **OmniHand Pro 2025 (O12)**: 12 自由度灵巧手
+- **OmniHand 3 Ultra M (H3U_M / O20)**: 20 自由度灵巧手
 
-每个产品都有自己的 ROS2 节点和消息类型，提供产品特定的接口。
+三款产品共享统一的 Topic 命名规范和消息类型，区别仅在于自由度数量和连接方式。
 
-## 产品特定 ROS2 文档
+## 产品 ROS2 文档
 
-- **[OmniHand 2025 (O10) ROS2 接口](API_ROS2_O10.md)** - 10 自由度，关节角话题与 set/get 关节角服务
-- **[OmniHand Pro 2025 (O12) ROS2 接口](API_ROS2_O12.md)** - 12 自由度，关节角话题与 set/get 关节角服务
+- **[OmniHand 2025 (O10) ROS2 接口](API_ROS2_O10.md)** - 10 DOF
+- **[OmniHand Pro 2025 (O12) ROS2 接口](API_ROS2_O12.md)** - 12 DOF
+
+## 统一 Topic 规范
+
+所有产品遵循相同的 Topic 命名和交互模式：
+
+### Topic 命名
+
+```
+/<product>/<side>/<topic_name>
+```
+
+- `<product>`: `o10` / `o12` / `h3u_m`
+- `<side>`: `left` / `right`
+- `<topic_name>`: 见下表
+
+### Topic 列表
+
+| Topic | 消息类型 | 方向 | 触发方式 | 说明 |
+|-------|---------|------|---------|------|
+| `joint_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | — | 位置指令 `position[]` = rad |
+| `joint_states` | `sensor_msgs/JointState` | 发布 (你订阅) | 收到 `joint_cmd` 时 | 位置回读 `position[]` = rad |
+| `joint_mix_control_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | — | 位置+力矩混合控制（仅 O10/O12，见下文） |
+| `joint_error_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发错误码查询 |
+| `joint_error_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `joint_error_cmd` 时 | `data[]` = 错误码 bitmask |
+| `joint_temperature_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发温度查询 |
+| `joint_temperature_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `joint_temperature_cmd` 时 | `data[]` = 温度值 |
+| `joint_current_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发电流查询 |
+| `joint_current_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `joint_current_cmd` 时 | `data[]` = 电流值 |
+| `joint_control_mode_cmd` | `omnihand_msgs/JointStateInt8` | 订阅 (你发布) | — | 写入控制模式 `data[]`（仅 H3U_M） |
+| `joint_control_mode_states` | `omnihand_msgs/JointStateInt8` | 发布 (你订阅) | 收到 `joint_control_mode_cmd` 时 | 回读控制模式 `data[]`（仅 H3U_M） |
+| `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | — | 写入电流阈值 `data[]` |
+| `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `joint_current_threshold_cmd` 时 | 回读电流阈值 `data[]` |
+| `motor_pos_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | — | 写入电机原始位置 `data[]` (int16 tick)（仅 O10/O12） |
+| `motor_pos_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `motor_pos_cmd` 时 | 回读电机原始位置 `data[]` (int16 tick)（仅 O10/O12） |
+| `tactile_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发触觉传感器查询（仅 O10/O12） |
+| `tactile_states` | 产品专属消息（见下文） | 发布 (你订阅) | 收到 `tactile_cmd` 时 | 触觉传感器数据 |
+
+**设计原则**：节点不自驱发布。所有状态回读都由外部触发（发送 cmd），不会干扰控制回路的工作节奏。
+
+### 混合控制（O10/O12）
+
+`joint_mix_control_cmd` 是独立于 `joint_cmd` 的混合控制 topic，使用 `sensor_msgs/JointState`：
+
+- `position[]` = 电机原始位置 (int16)
+- `effort[]` = 电机原始力矩 (int16)
+
+节点内部以 POSITION_TORQUE 模式调用 `MixCtrlJointMotor`，**无回读**。
+
+**注意**：`joint_cmd` 的 `position[]` 单位是弧度 (rad)，会自动转换。`joint_mix_control_cmd` 的 `position[]` 和 `effort[]` 都使用电机原始 int16 值，不做单位转换。
+
+### 触觉传感器（O10/O12）
+
+O10 和 O12 的触觉传感器数据结构不同，各自使用产品专属的消息类型：
+
+| 产品 | 消息类型 | 数据结构 |
+|------|---------|---------|
+| O10 | `omnihand_2025_node_msgs/TactileSensor` | 7 个区域（THUMB/INDEX/MIDDLE/RING/LITTLE/PALM/DORSUM），每个区域 `uint8[]` 压力值（1g, 最大 255g） |
+| O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | 5 个手指，每个包含 `online_state`, `channel_value[6]`, `normal_force`, `tangent_force`, `tangent_force_angle`, `capa_approach[4]` |
+
+### 自定义消息类型
+
+`omnihand_msgs` 包定义了通用的整型关节状态消息，所有产品共享：
+
+| 消息类型 | 字段 |
+|---------|------|
+| `omnihand_msgs/JointStateInt8` | `std_msgs/Header header` + `string[] name` + `int8[] data` |
+| `omnihand_msgs/JointStateInt16` | `std_msgs/Header header` + `string[] name` + `int16[] data` |
 
 ## 配置
 
-ROS2 节点支持 YAML 配置文件，便于灵活管理参数。参数命名与 Python API 保持一致。
+ROS2 节点通过 YAML 配置文件管理参数，参数名与 Python API 一致。
 
 ### 配置参数
 
-参数按 `left_hand` 和 `right_hand` 命名空间组织。如果某只手的 `connection_type` 为空（或在 YAML 中注释掉整个命名空间），则跳过该手。
+参数按 `left_hand` 和 `right_hand` 命名空间组织。如果某只手的 `connection_type` 为空（或在 YAML 中注释掉），则跳过该手。
 
-#### 每只手参数（`left_hand` / `right_hand`）
+#### 每只手的参数（`left_hand` / `right_hand`）
 
-| 参数 | 类型 | 默认值 | 描述 |
+| 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `hand_device_id` | int | 1 | 手设备 ID (1-255) |
-| `connection_type` | string | "" | 连接类型："zlgcan"、"hcan"、"rs485" 或 "usb"（rs485/usb 仅 O10）；为空则跳过 |
-| `canfd_serial_number` | string | "" | CANFD 适配器序列号（重启/插拔后稳定；内部会先扫描再打开） |
-| `canfd_device_id` | int | 0 | CANFD 适配器设备索引（不扫直接打开；重启/插拔后索引可能变） |
+| `connection_type` | string | "" | 连接方式: "zlgcan", "hcan", "socketcan", "rs485", "usb"；为空则跳过 |
+| `canfd_serial_number` | string | "" | CANFD 适配器序列号（推荐，重启后稳定） |
+| `canfd_device_id` | int | 0 | CANFD 适配器设备索引（不推荐，重启后可能变化） |
 | `canfd_channel_id` | int | 0 | CAN 通道索引 (0 或 1) |
-| `uart_port` | string | "" | 串口路径（仅 rs485/usb，仅 O10） |
-| `baudrate` | int | 460800 | 波特率（仅 rs485/usb，仅 O10） |
+| `can_interface` | string | "can0" | SocketCAN 接口名 (仅 socketcan) |
+| `uart_port` | string | "" | 串口路径 (仅 rs485/usb, O10 专用) |
+| `baudrate` | int | 460800 | 波特率 (仅 rs485/usb, O10 专用) |
 
-**说明（ZLG CANFD 设备标识）**：
-- **按序列号**（`canfd_serial_number`）：重启/插拔后不变；内部会先扫描（open/close 读信息）再打开使用。
-- **按设备索引**（`canfd_device_id`）：不扫直接打开，设备只 open 一次；重启/插拔后索引可能变化。
-
-### 使用示例
-
-**默认配置** - 默认 YAML 配置启用单只左手。如需双手模式，请在 YAML 文件中取消注释 `right_hand` 部分。
+### 使用方式
 
 **1. 使用 ros2 launch（推荐）：**
 
 ```bash
-# 使用默认配置文件（单手，左手）
+# O10
 ros2 launch omnihand_node omnihand_2025_node.launch.py
 
-# 使用指定配置文件（绝对路径）
-ros2 launch omnihand_node omnihand_2025_node.launch.py \
-  config_file:=/path/to/your/omnihand_2025_node.yaml
+# O12
+ros2 launch omnihand_node omnihand_pro_2025_node.launch.py
+
+# H3U_M
+ros2 launch omnihand_node omnihand_3_ultra_m_node.launch.py
 ```
 
-**2. 使用 ros2 run：**
+**2. YAML 配置示例：**
 
-```bash
-# 直接运行（使用代码中的默认参数，不推荐）
-ros2 run omnihand_node omnihand_2025_node
-
-# 使用配置文件（推荐）
-ros2 run omnihand_node omnihand_2025_node --ros-args \
-  --params-file $(ros2 pkg prefix omnihand_node)/share/omnihand_node/config/omnihand_2025_node.yaml
-```
-
-**3. YAML 配置文件示例：**
-
-单手（CANFD）：
 ```yaml
-omnihand_2025_param_reader:
+/**:
   ros__parameters:
     left_hand:
       hand_device_id: 1
-      connection_type: "zlgcan"
-      canfd_device_id: 0
-      canfd_channel_id: 0
-```
-
-双手（CANFD）：
-```yaml
-omnihand_2025_param_reader:
-  ros__parameters:
-    left_hand:
-      hand_device_id: 1
-      connection_type: "zlgcan"
+      connection_type: "hcan"
       canfd_serial_number: "12345678"
       canfd_channel_id: 0
-
-    right_hand:
-      hand_device_id: 1
-      connection_type: "zlgcan"
-      canfd_serial_number: "87654321"
-      canfd_channel_id: 1
 ```
 
-USB 连接（仅 O10）：
-```yaml
-omnihand_2025_param_reader:
-  ros__parameters:
-    left_hand:
-      hand_device_id: 1
-      connection_type: "usb"
-      uart_port: "/dev/ttyACM0"
-      baudrate: 460800
+**3. Python 脚本示例：**
+
+```bash
+# 发送位置指令 + 订阅位置回读
+python3 joint_cmd.py left o10
+
+# 触发并查看错误码
+python3 joint_error.py left o10
+
+# 触发并查看温度
+python3 joint_temperature.py left o10
+
+# 触发并查看电流
+python3 joint_current.py left o10
+
+# 混合控制 (位置+力矩, 仅 O10/O12)
+python3 mix_control_pub.py left o10
+
+# 发送电机原始位置 (int16 tick) + 订阅回读 (仅 O10/O12)
+python3 motor_pos.py left o10
+
+# 触发并查看触觉传感器 (仅 O10/O12)
+python3 tactile.py left o10
+
+# 设置电流阈值
+python3 joint_current_threshold_pub.py 500 left o10
+
+# 设置控制模式 (仅 H3U_M, 0=CSP, 7=PP)
+python3 joint_control_mode_pub.py 0 left h3u_m
 ```
 
-RS485 连接（仅 O10）：
-```yaml
-omnihand_2025_param_reader:
-  ros__parameters:
-    left_hand:
-      hand_device_id: 1
-      connection_type: "rs485"
-      uart_port: "/dev/ttyUSB0"
-      baudrate: 460800
-```
+**4. 连接方式：**
 
-**4. 连接类型说明：**
-
-- **zlgcan** - ZLG USB CANFD（默认）
-- **hcan** - HCAN USB CANFD
-- **rs485** - RS485 串口通信（仅 O10）
-- **usb** - USB 串口通信（仅 O10）
-
-每个手可以独立选择连接类型。
-
-**5. 设备识别方式：**
-
-使用 ZLG USBCANFD 时：**200U** 有两个 CAN 通道（can0、can1），可分别接左右手；**100U / MINI** 仅单通道，`canfd_channel_id` 恒为 0，仅支持单手。
-
-- **按序列号**（`canfd_serial_number`）：重启/插拔后不变；内部会先扫描再打开使用。
-- **按设备索引**（`canfd_device_id`）：不扫直接打开，只 open 一次；重启/插拔后索引可能变化。
+| 连接方式 | O10 | O12 | H3U_M |
+|---------|-----|-----|-------|
+| zlgcan | ✅ | ✅ | ✅ |
+| hcan | ✅ | ✅ | ✅ |
+| socketcan | ✅ | ✅ | ✅ |
+| rs485 | ✅ | ❌ | ❌ |
+| usb | ✅ | ❌ | ❌ |

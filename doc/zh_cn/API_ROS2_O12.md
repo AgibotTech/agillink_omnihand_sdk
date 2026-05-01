@@ -1,175 +1,155 @@
 # OmniHand Pro 2025 (O12) ROS2 接口
 
-> ⚠️ **仅限 Linux**：ROS2 接口仅在 Linux 上可用，不支持 Windows。
+> ⚠️ **仅支持 Linux**：ROS2 接口仅在 Linux 上可用，不支持 Windows。
 
-## ROS2 话题
+## 概述
 
-| 话题名                                              | 话题描述 | 节点操作 | 消息类型                                                                                              | 备注 |  
-|:----------------------------------------------|  :----:  |:--------:|---------------------------------------------------------------------------------------------------|  ---  |
-| `/omnihand/omnihand_pro_2025/left/motor_angle`  | 关节电机角度 |    发布（您订阅）    | [omnihand_pro_2025_node_msgs.msg.MotorAngle](#omnihand_pro_2025_nodemsgsmsgmotorangle) | 
-| `/omnihand/omnihand_pro_2025/left/motor_angle_cmd`  | 关节电机角度 |    订阅（您发布）    | [omnihand_pro_2025_node_msgs.msg.MotorAngle](#omnihand_pro_2025_nodemsgsmsgmotorangle) | 
-| `/omnihand/omnihand_pro_2025/right/motor_angle`  | 关节电机角度 |    发布（您订阅）    | [omnihand_pro_2025_node_msgs.msg.MotorAngle](#omnihand_pro_2025_nodemsgsmsgmotorangle) | 
-| `/omnihand/omnihand_pro_2025/right/motor_angle_cmd`  | 关节电机角度 |    订阅（您发布）    | [omnihand_pro_2025_node_msgs.msg.MotorAngle](#omnihand_pro_2025_nodemsgsmsgmotorangle) |
+O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2 接口统一规范](API_ROS2.md)。
 
-**注意**：O12 有 12 个自由度。所有消息中的数组包含 12 个值。
+## ROS2 Topics
 
-## ROS2 服务
+所有 Topic 前缀为 `/o12/<side>/`，其中 `<side>` 为 `left` 或 `right`。
 
-| 服务名                                              | 服务描述 | 服务类型                                                                                              | 备注 |  
-|:----------------------------------------------|  :----:  |:--------:|-------------------------------------------------|
-| `/omnihand/omnihand_pro_2025/left/set_joint_angles`  | 设置关节角度 | [omnihand_pro_2025_node_msgs.srv.SetJointAngles](#omnihand_pro_2025_node_msgssrvsetjointangles) | 
-| `/omnihand/omnihand_pro_2025/left/get_joint_angles`  | 获取关节角度 | [omnihand_pro_2025_node_msgs.srv.GetJointAngles](#omnihand_pro_2025_node_msgssrvgetjointangles) | 
-| `/omnihand/omnihand_pro_2025/right/set_joint_angles`  | 设置关节角度 | [omnihand_pro_2025_node_msgs.srv.SetJointAngles](#omnihand_pro_2025_node_msgssrvsetjointangles) | 
-| `/omnihand/omnihand_pro_2025/right/get_joint_angles`  | 获取关节角度 | [omnihand_pro_2025_node_msgs.srv.GetJointAngles](#omnihand_pro_2025_node_msgssrvgetjointangles) | 
+| Topic | 消息类型 | 方向 | 说明 |
+|-------|---------|------|------|
+| `joint_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | `position[0..11]` = rad，触发控制+回读 |
+| `joint_states` | `sensor_msgs/JointState` | 发布 (你订阅) | `position[0..11]` = rad |
+| `joint_mix_control_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | 位置+力矩混合控制（见下文） |
+| `joint_error_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllErrorReport()` |
+| `joint_error_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | `data[]` = 错误码 bitmask (5 bit) |
+| `joint_temperature_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllTemperatureReport()` |
+| `joint_temperature_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | `data[]` = 温度值 |
+| `joint_current_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllCurrentReport()` |
+| `joint_current_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | `data[]` = 电流值 |
+| `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | 写入电流阈值 `data[0..11]` |
+| `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 回读电流阈值 `data[0..11]` |
+| `motor_pos_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | 写入电机原始位置 `data[0..11]` (int16 tick) |
+| `motor_pos_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 回读电机原始位置 `data[0..11]` (int16 tick) |
+| `tactile_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 3D 触觉传感器查询 |
+| `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 3D 触觉传感器数据 |
 
-**注意**：
-- Service 接口使用关节角度（弧度），而不是电机位置
-- `SetJointAngles` 会等待手部移动到目标角度，或超时返回
-- `GetJointAngles` 返回当前关节角度和手部就绪状态
-- O12 有 12 个自由度，角度数组包含 12 个值
+**注意**: O12 有 12 个自由度。所有数组包含 12 个元素。
+
+## 混合控制
+
+`joint_mix_control_cmd` 使用 `sensor_msgs/JointState` 进行位置+力矩混合控制：
+
+- `position[]` = 电机原始位置 (int16)
+- `effort[]` = 电机原始力矩 (int16)
+
+节点内部以 POSITION_TORQUE 模式调用 `MixCtrlJointMotor`，**无回读**。
+
+`joint_cmd` 的 `position[]` 单位是弧度，自动转换。`joint_mix_control_cmd` 的值都是电机原始 int16 值。
+
+## 触觉传感器 (3D)
+
+O12 配备 3D 触觉传感器，5 个手指（THUMB, INDEX, MIDDLE, RING, LITTLE）。
+
+消息类型 `omnihand_pro_2025_node_msgs/TactileSensor`：
+- `header` (std_msgs/Header)
+- `tactile_datas[]` (TactileSensorData[])
+  - `online_state` (uint8): 1=在线, 0=离线
+  - `channel_value[]` (uint32[]): 6 个通道 24 位值
+  - `normal_force` (uint16): 法向力 (0.1N, 最大 3000)
+  - `tangent_force` (uint16): 切向力 (0.1N)
+  - `tangent_force_angle` (uint16): 切向力角度 (0-359°)
+  - `capa_approach[]` (uint8[]): 4 个自电容接近值
+
+`tactile_datas` 数组按 THUMB, INDEX, MIDDLE, RING, LITTLE 顺序排列。
+
+## O12 错误码 bitmask
+
+O12 的错误码与 O10 相同，为 5 位 bitmask：
+
+| Bit | 含义 |
+|-----|------|
+| bit0 | stalled（堵转） |
+| bit1 | overheat（过热） |
+| bit2 | over_current（过流） |
+| bit3 | motor_except（电机异常） |
+| bit4 | commu_except（通讯异常） |
 
 ## 使用方式
 
-### 编译
-参考根目录下的 README.md
+### 启动
 
-### 运行
 ```bash
-export LD_LIBRARY_PATH=$(pwd)/build/install/lib/:$LD_LIBRARY_PATH
-cd build/install/bin/
-./omnihand_pro_2025_node
+ros2 launch omnihand_node omnihand_pro_2025_node.launch.py
 ```
 
-启动节点后，您可以使用 Service 接口控制手部。
+### Python 脚本示例
 
-## 消息定义
+```bash
+# 发送位置指令 + 订阅位置回读（12 DOF, rad）
+python3 scripts/omnihand_pro_2025/joint_cmd.py left
 
-### `omnihand_pro_2025_node_msgs.msg.MotorAngle`
+# 触发并查看错误码 (1Hz)
+python3 scripts/omnihand_pro_2025/joint_error.py left 1
 
-```python
-std_msgs/Header header
-float64[] angles  # O12 为 12 个值（单位：弧度）
+# 触发并查看温度
+python3 scripts/omnihand_pro_2025/joint_temperature.py left
+
+# 触发并查看电流
+python3 scripts/omnihand_pro_2025/joint_current.py left
+
+# 设置电流阈值
+python3 scripts/omnihand_pro_2025/joint_current_threshold_pub.py 500 left
+
+# 发送电机原始位置 (int16 tick) + 订阅回读
+python3 scripts/omnihand_pro_2025/motor_pos.py left
+
+# 混合控制 (位置+力矩)
+python3 scripts/omnihand_pro_2025/mix_control_pub.py left
+
+# 触发并查看触觉传感器
+python3 scripts/omnihand_pro_2025/tactile.py left
 ```
 
-## 服务定义
+### 命令行示例
 
-### `omnihand_pro_2025_node_msgs.srv.SetJointAngles`
+```bash
+# 发送位置指令
+ros2 topic pub --once /o12/left/joint_cmd sensor_msgs/msg/JointState \
+  "{position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
 
-设置所有关节的目标角度，并等待手部移动到目标位置。
+# 查看回读
+ros2 topic echo /o12/left/joint_states
 
-**请求 (Request)**：
-```python
-# 目标关节角度（弧度），O12 为 12 个值
-float64[] target_angles
-# 超时时间（秒），0 表示使用默认值 5.0
-float64 timeout
+# 触发错误码查询
+ros2 topic pub --once /o12/left/joint_error_cmd std_msgs/msg/Empty '{}'
+
+# 查看错误码
+ros2 topic echo /o12/left/joint_error_states
+
+# 混合控制: 位置+力矩 (raw int16)
+ros2 topic pub --once /o12/left/joint_mix_control_cmd sensor_msgs/msg/JointState \
+  "{position: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000], effort: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]}"
 ```
 
-**响应 (Response)**：
-```python
-# 是否成功
-bool success
-# 最终到达的关节角度（弧度），O12 为 12 个值
-float64[] final_angles
-# 错误信息（如果失败）
-string error_message
+## 配置
+
+O12 支持的连接方式：zlgcan, hcan, socketcan（不支持 rs485/usb）。
+
+配置示例：
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "hcan"
+      canfd_serial_number: "12345678"
+      canfd_channel_id: 0
 ```
 
-**使用示例**：
-```python
-from omnihand_pro_2025_node_msgs.srv import SetJointAngles
-import rclpy
-from rclpy.node import Node
-
-# 创建服务客户端
-client = node.create_client(SetJointAngles, '/omnihand/omnihand_pro_2025/left/set_joint_angles')
-
-# 等待服务可用
-client.wait_for_service()
-
-# 创建请求
-request = SetJointAngles.Request()
-request.target_angles = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # 12 个值
-request.timeout = 5.0
-
-# 调用服务
-future = client.call_async(request)
-rclpy.spin_until_future_complete(node, future)
-response = future.result()
-
-if response.success:
-    print(f"成功移动到目标角度: {response.final_angles}")
-else:
-    print(f"失败: {response.error_message}")
-```
-
-**注意**：
-- 角度单位为弧度
-- 如果目标角度超出关节范围，服务会返回失败
-- 超时时间从调用服务开始计算，如果手部在超时时间内未到达目标角度，会返回失败
-
-### `omnihand_pro_2025_node_msgs.srv.GetJointAngles`
-
-获取当前所有关节的角度和手部就绪状态。
-
-**请求 (Request)**：
-```python
-# 无参数
-```
-
-**响应 (Response)**：
-```python
-# 当前关节角度（弧度），O12 为 12 个值
-float64[] angles
-# 手部是否就绪
-bool is_ready
-# 错误信息（如果有）
-string error_message
-```
-
-**使用示例**：
-```python
-from omnihand_pro_2025_node_msgs.srv import GetJointAngles
-import rclpy
-from rclpy.node import Node
-
-# 创建服务客户端
-client = node.create_client(GetJointAngles, '/omnihand/omnihand_pro_2025/left/get_joint_angles')
-
-# 等待服务可用
-client.wait_for_service()
-
-# 创建请求（空请求）
-request = GetJointAngles.Request()
-
-# 调用服务
-future = client.call_async(request)
-rclpy.spin_until_future_complete(node, future)
-response = future.result()
-
-if response.is_ready:
-    print(f"当前关节角度: {response.angles}")
-    print(f"角度（度）: {[a * 180 / 3.14159 for a in response.angles]}")
-else:
-    print(f"手部未就绪: {response.error_message}")
-```
-
-**注意**：
-- 角度单位为弧度
-- `is_ready` 为 `true` 表示手部已初始化并可以接收命令
-- 如果手部未就绪，`error_message` 会包含原因
+详见 [ROS2 接口统一规范](API_ROS2.md) 中的配置说明。
 
 ## 与 O10 的区别
 
-1. **自由度**：O12 有 12 个自由度（O10 为 10 个）
-2. **电机位置范围**：0-2000（O10 为 0-4096）
-3. **触觉传感器**：3D 传感器（仅手指）vs 1D 传感器（手指、手心、手背）
-4. **混合控制**：O12 **不支持** `mix_control_cmd` 话题
-5. **控制模式**：所有控制模式均支持
-6. **消息命名空间**：`omnihand_pro_2025_node_msgs`（O10 为 `omnihand_2025_node_msgs`）
-7. **话题前缀**：`/omnihand/omnihand_pro_2025/`（O10 为 `/omnihand/omnihand_2025/`）
+1. **自由度**: O12 有 12 个自由度 (O10 有 10 个)
+2. **连接方式**: O12 不支持 rs485/usb
+3. **Topic 前缀**: `/o12/<side>/` (O10 为 `/o10/<side>/`)
 
 ## 相关文档
 
-- [OmniHand Pro 2025 (O12) C++ API](API_CPP_O12.md) - C++ API 文档
-- [OmniHand Pro 2025 (O12) Python API](API_PYTHON_O12.md) - Python API 文档
+- [OmniHand Pro 2025 (O12) C++ API](API_CPP_O12.md)
+- [OmniHand Pro 2025 (O12) Python API](API_PYTHON_O12.md)
