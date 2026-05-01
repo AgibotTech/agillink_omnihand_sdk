@@ -41,7 +41,25 @@ if ls "$SCRIPT_DIR/python/"*.whl 1> /dev/null 2>&1; then
         MATCHING_WHL=$(ls "$SCRIPT_DIR/python/"*${PY_VERSION}*.whl 2>/dev/null | head -1)
         if [[ -n "$MATCHING_WHL" ]] && [[ -f "$MATCHING_WHL" ]]; then
             echo "  Found matching wheel for Python ${PY_VERSION}: $(basename "$MATCHING_WHL")"
-            python3 -m pip install --force-reinstall "$MATCHING_WHL"
+            IS_SYSTEM=$(python3 -c "
+import sys, os
+exe = sys.executable
+in_conda = 'CONDA_PREFIX' in os.environ and os.environ['CONDA_PREFIX'] != '' or 'conda' in exe
+in_venv = 'VIRTUAL_ENV' in os.environ and os.environ['VIRTUAL_ENV'] != '' or sys.prefix != sys.base_prefix
+is_system = exe.startswith('/usr/bin/') and not in_conda and not in_venv
+print('true' if is_system else 'false')
+")
+            if [[ "$IS_SYSTEM" == "true" ]]; then
+                echo " $(which python3) Installing system-wide..."
+                if [[ "$PY_VERSION" =~ ^cp31[1-4]$ ]]; then
+                    python3 -m pip install --force-reinstall "$MATCHING_WHL" --break-system-packages
+                else
+                    python3 -m pip install --force-reinstall "$MATCHING_WHL"
+                fi
+            else
+                echo " $(which python3) Installing in user site-packages..."
+                python3 -m pip install --force-reinstall "$MATCHING_WHL"
+            fi
         else
             echo "  Warning: No matching wheel found for Python ${PY_VERSION}"
             echo "  Available wheels:"

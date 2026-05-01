@@ -1,73 +1,72 @@
 #!/usr/bin/env python3
 """
 @Author: huangshiheng@agibot.com
-@Date: 2025-11-06
-@Description: Python node (mix_control_pub) (Omnihand2025)
-"""
-        初始化混合控制发布节点
-        
-        Args:
-            hand_side: 'left' 或 'right'，表示左手或右手
-        """
-        super().__init__(f'{hand_side}_mix_control_publisher')
-        
-        self.hand_side = hand_side
-        
-        # 创建混合控制命令发布器
-        self.mix_control_publisher = self.create_publisher(
-            MixControl,
-            f'/omnihand/omnihand_2025/{hand_side}/mix_control_cmd',
-            10
-        )
+@Description: Publish position+torque mixed-control commands to
+              OmniHand2025 (O10) via sensor_msgs/JointState.
 
-        self.timer = self.create_timer(1, self.timer_callback)
-        self.get_logger().info(f'{hand_side.capitalize()} Mix Control Publisher Node started')
-        self.get_logger().info(f'Publishing to: /omnihand/omnihand_2025/{hand_side}/mix_control_cmd')
+Mixed control uses a separate topic joint_mix_control_cmd.
+position[] = raw int16 motor position, effort[] = raw int16 torque.
+
+Topic:  /<product>/<side>/joint_mix_control_cmd  (JointState)
+
+Usage:  python3 mix_control_pub.py [left|right] [product]
+        default: side=left, product=o10
+"""
+
+import sys
+
+import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import JointState
+
+
+NUM_JOINTS = 10
+
+# topic:
+# /o10/left/joint_mix_control_cmd; /o10/right/joint_mix_control_cmd;
+
+
+class MixControlPublisher(Node):
+    def __init__(self, hand_side: str, product: str):
+        super().__init__(f'{product}_{hand_side}_mix_control_publisher')
+        self.hand_side = hand_side
+        self.product = product
+        self.publisher = self.create_publisher(
+            JointState,
+            f'/{product}/{hand_side}/joint_mix_control_cmd',
+            10,
+        )
+        self.timer = self.create_timer(1.0, self.publish_mix_control)
+        self.get_logger().info(
+            f'{product}/{hand_side} mix_control publisher started '
+            f'(O10, {NUM_JOINTS} DOF, POSITION_TORQUE)'
+        )
 
     def publish_mix_control(self):
-        """
-        发布混合控制命令
-        """
-        msg = MixControl()
-        mix_controls_str = ', '.join([f'{t}' for t in msg.mix_controls])
-        self.get_logger().info(
-            f'Publish {self.hand_side} hand: [{mix_controls_str}]'
-        )
+        msg = JointState()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.position = [2000.0] * NUM_JOINTS
+        msg.effort = [100.0] * NUM_JOINTS
+        self.publisher.publish(msg)
+        self.get_logger().info('Published mix_control (position+torque)')
 
-    def timer_callback(self):
-        """定时器回调"""
-        self.publish_mix_control()
 
 def main(args=None):
     rclpy.init(args=args)
-    
-    # 可以通过命令行参数指定左手或右手，默认为左手
-    hand_side = 'left'
-    if len(sys.argv) > 1:
-        hand_side = sys.argv[1]
-    
-    mix_control_publisher = MixControlPublisher(hand_side)
-
+    hand_side = sys.argv[1].lower() if len(sys.argv) > 1 else 'left'
+    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'o10'
+    node = MixControlPublisher(hand_side, product)
     try:
-        rclpy.spin(mix_control_publisher)
+        rclpy.spin(node)
     except KeyboardInterrupt:
-        # Don't use logger here, context may be shutting down
         pass
-    except Exception as e:
-        try:
-            mix_control_publisher.get_logger().error(f'Error: {str(e)}')
-        except Exception:
-            print(f'Error: {str(e)}')
     finally:
-        # Safely destroy node and shutdown
-        try:
-            mix_control_publisher.destroy_node()
-        except Exception:
-            pass
+        node.destroy_node()
         try:
             rclpy.shutdown()
         except Exception:
-            pass  # Context may already be shut down
+            pass
+
 
 if __name__ == '__main__':
     main()

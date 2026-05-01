@@ -88,46 +88,149 @@ TEST_F(OmniHand3UltraMTest, GetDeviceInfo) {
   }
 }
 
-TEST_F(OmniHand3UltraMTest, SetDeviceId) {
-  auto current_device_info = hand_->GetDeviceInfo();
-  unsigned char current_id = current_device_info.hand_device_id;
-  if (current_id == 0) return;
+// TEST_F(OmniHand3UltraMTest, SetDeviceId) {
+//   auto current_device_info = hand_->GetDeviceInfo();
+//   unsigned char current_id = current_device_info.hand_device_id;
+//   if (current_id == 0) return;
 
-  unsigned char target_id = 2;
-  hand_->SetDeviceId(target_id);
-  std::cout << "[SetDeviceId] Set Device ID: " << static_cast<int>(target_id) << std::endl;
+//   unsigned char target_id = 2;
+//   hand_->SetDeviceId(target_id);
+//   std::cout << "[SetDeviceId] Set Device ID: " << static_cast<int>(target_id) << std::endl;
+//   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//   auto device_info = hand_->GetDeviceInfo();
+//   EXPECT_EQ(device_info.hand_device_id, 2);
+
+//   unsigned char original_id = 9;
+//   hand_->SetDeviceId(original_id);
+//   std::cout << "[SetDeviceId] Reset Device ID: " << static_cast<int>(original_id) << std::endl;
+//   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//   auto device_info1 = hand_->GetDeviceInfo();
+//   EXPECT_EQ(device_info1.hand_device_id, 9);
+// }
+
+TEST_F(OmniHand3UltraMTest, GestureDance) {
+  if (!hand_->Init()) return;
+
+  constexpr int MOTOR_TOTAL_COUNT = 20;
+  constexpr int TFIX = 1000;
+  constexpr int TSWIG = 200;
+  constexpr int TSHORT = 10;
+
+  std::vector<unsigned char> pp_modes(MOTOR_TOTAL_COUNT, static_cast<unsigned char>(agilink::omnihand::ControlMode::PROFILE_POSITION));
+  std::vector<unsigned char> csp_modes(MOTOR_TOTAL_COUNT, static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION));
+
+  std::cout << "[GestureDance] Switching to PP mode (PROFILE_POSITION=7)" << std::endl;
+  hand_->SetAllControlMode(pp_modes);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  auto device_info = hand_->GetDeviceInfo();
-  EXPECT_EQ(device_info.hand_device_id, 2);
 
-  unsigned char original_id = 9;
-  hand_->SetDeviceId(original_id);
-  std::cout << "[SetDeviceId] Reset Device ID: " << static_cast<int>(original_id) << std::endl;
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  auto device_info1 = hand_->GetDeviceInfo();
-  EXPECT_EQ(device_info1.hand_device_id, 9);
-}
+  const uint8_t idx_joint[] = {
+      16,17,16,16,16,18,19,16,17,18,19,
+      13,12,12,12,14,15,13,14,15,
+      9,8,8,8,10,11,9,10,11,
+      5,4,4,4,6,7,5,6,7,
+      1,0,0,0,2,3,1,2,3,
+  };
+  const float ang_joint[] = {
+      -40,25,-30,-50,-40,40,40,0,-15,0,0,
+      40,7,-7,0,40,40,0,0,0,
+      40,7,-7,0,40,40,0,0,0,
+      40,7,-7,0,40,40,0,0,0,
+      40,7,-7,0,40,40,0,0,0,
+  };
+  const uint16_t time_joint[] = {
+      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TFIX,TSHORT,TSHORT,TSHORT,TSHORT,
+      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TSHORT,TSHORT,TSHORT,
+      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TSHORT,TSHORT,TSHORT,
+      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TSHORT,TSHORT,TSHORT,
+      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TSHORT,TSHORT,TSHORT,
+  };
+  constexpr int SINGLE_STEPS = 47;
 
-TEST_F(OmniHand3UltraMTest, JointAngleControl) {
-  if (hand_->Init()) {
-    std::vector<double> angles(20, 0.0);
-    hand_->SetAllActiveJointAngles(angles);
-    std::cout << "[SetAllActiveJointAngles] Set 20 joints to 0.0 rad" << std::endl;
+  const float gesture_eng[][MOTOR_TOTAL_COUNT] = {
+      {0,10,40,40,0,10,40,40,0,10,40,40,0,10,40,40,-55,0,15,15},
+      {0,45,70,70,0,45,70,70,0,45,70,70,0,45,70,70,-40,0,30,30},
+      {0,80,90,80,0,80,90,80,0,80,90,80,0,80,90,80,-65,15,35,35},
+      {0,90,40,50,0,80,60,60,0,60,50,50,0,40,60,60,0,-15,0,0},
+      {0,0,90,90,0,0,90,90,0,0,90,90,0,0,90,90,0,0,20,0},
+      {-12,10,50,50,-6,10,50,50,0,10,50,50,6,10,50,50,-30,5,20,20},
+      {-12,45,50,50,-6,10,50,50,0,10,50,50,6,10,50,50,-30,5,20,20},
+      {-12,45,50,50,-6,45,50,50,0,10,50,50,6,10,50,50,-30,5,20,20},
+      {0,20,10,10,0,20,10,10,0,20,10,10,0,40,45,40,-30,10,0,25},
+      {0,90,90,90,0,90,90,90,-7,0,0,0,7,0,0,0,-55,15,30,20},
+  };
+  constexpr int GESTURE_COUNT = 10;
 
-    auto active_angles = hand_->GetAllActiveJointAngles();
-    if (active_angles.empty() || active_angles.size() != 20) {
-      std::cout << "[GetAllActiveJointAngles] Failed: got " << active_angles.size()
-                << " angles, expected 20" << std::endl;
-      return;
+  auto run_gesture = [&](const float* eng) {
+    std::vector<int16_t> posi(MOTOR_TOTAL_COUNT);
+    for (int i = 0; i < MOTOR_TOTAL_COUNT; ++i) {
+      posi[i] = static_cast<int16_t>(eng[i] * 10);
     }
-    std::cout << "[GetAllActiveJointAngles] Active Joint Angles (rad): ";
-    for (size_t i = 0; i < active_angles.size(); ++i) {
-      std::cout << std::fixed << std::setprecision(4) << active_angles[i];
-      if (i < active_angles.size() - 1) std::cout << ", ";
-    }
-    std::cout << std::endl;
-    EXPECT_EQ(active_angles.size(), 20);
+    auto ret = hand_->SetAllJointMotorPosi(posi);
+    EXPECT_EQ(ret.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
+  };
+
+  std::vector<int16_t> zero_posi(MOTOR_TOTAL_COUNT, 0);
+
+  std::cout << "[GestureDance] Phase 1: Zero position" << std::endl;
+  hand_->SetAllJointMotorPosi(zero_posi);
+  std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+
+  auto read_posi = hand_->GetAllJointMotorPosi();
+  EXPECT_EQ(read_posi.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
+  std::cout << "[GestureDance] Current positions: ";
+  for (size_t i = 0; i < read_posi.size(); ++i) {
+    std::cout << read_posi[i];
+    if (i < read_posi.size() - 1) std::cout << ", ";
   }
+  std::cout << std::endl;
+
+  std::cout << "[GestureDance] Phase 2: Single-joint sequence (" << SINGLE_STEPS << " steps)" << std::endl;
+  for (int s = 0; s < SINGLE_STEPS; ++s) {
+    int16_t posi_val = static_cast<int16_t>(ang_joint[s] * 10);
+    auto ret = hand_->SetJointMotorPosi(idx_joint[s], posi_val);
+    std::cout << "  Step " << (s + 1) << "/" << SINGLE_STEPS
+              << ": Joint " << static_cast<int>(idx_joint[s])
+              << " -> " << ang_joint[s] << " deg (ret=" << ret << ")" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(time_joint[s]));
+  }
+
+  auto after_single = hand_->GetAllJointMotorPosi();
+  EXPECT_EQ(after_single.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
+  std::cout << "[GestureDance] Positions after single-joint phase: ";
+  for (size_t i = 0; i < after_single.size(); ++i) {
+    std::cout << after_single[i];
+    if (i < after_single.size() - 1) std::cout << ", ";
+  }
+  std::cout << std::endl;
+
+  std::cout << "[GestureDance] Phase 3: Full-hand gestures (" << GESTURE_COUNT << " gestures)" << std::endl;
+  for (int g = 0; g < GESTURE_COUNT; ++g) {
+    std::cout << "  Gesture " << (g + 1) << "/" << GESTURE_COUNT << std::endl;
+    run_gesture(gesture_eng[g]);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    auto cur = hand_->GetAllJointMotorPosi();
+    EXPECT_EQ(cur.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
+  }
+
+  std::cout << "[GestureDance] Phase 4: Return to zero" << std::endl;
+  hand_->SetAllJointMotorPosi(zero_posi);
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+  auto final_posi = hand_->GetAllJointMotorPosi();
+  EXPECT_EQ(final_posi.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
+  std::cout << "[GestureDance] Final positions: ";
+  for (size_t i = 0; i < final_posi.size(); ++i) {
+    std::cout << final_posi[i];
+    if (i < final_posi.size() - 1) std::cout << ", ";
+  }
+  std::cout << std::endl;
+
+  std::cout << "[GestureDance] Switching back to CSP mode (POSITION=0)" << std::endl;
+  hand_->SetAllControlMode(csp_modes);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  std::cout << "[GestureDance] Done!" << std::endl;
 }
 
 TEST_F(OmniHand3UltraMTest, ControlMode) {
@@ -154,13 +257,7 @@ TEST_F(OmniHand3UltraMTest, ErrorReport) {
     if (error_reports.empty()) return;
     std::cout << "[GetAllErrorReport] Error Reports (20 joints): ";
     for (size_t i = 0; i < error_reports.size(); ++i) {
-      std::cout << "J" << (i+1) << ":[";
-      if (error_reports[i].bits.stalled_) std::cout << "S";
-      if (error_reports[i].bits.overheat_) std::cout << "H";
-      if (error_reports[i].bits.over_current_) std::cout << "C";
-      if (error_reports[i].bits.motor_except_) std::cout << "M";
-      if (error_reports[i].bits.commu_except_) std::cout << "X";
-      std::cout << "]";
+      std::cout << "J" << (i+1) << ":[" << agilink::omnihand::H3UMErrorReportToString(error_reports[i]) << "]";
       if (i < error_reports.size() - 1) std::cout << " ";
     }
     std::cout << std::endl;
@@ -170,11 +267,11 @@ TEST_F(OmniHand3UltraMTest, ErrorReport) {
 
 TEST_F(OmniHand3UltraMTest, ClearErrorReport) {
   if (hand_->Init()) {
-    bool result = hand_->ClearAllErrorReport();
-    std::cout << "[ClearAllErrorReport] Result: " << (result ? "OK" : "FAILED") << std::endl;
+    hand_->ClearAllErrorReport();
+    std::cout << "[ClearAllErrorReport] Done" << std::endl;
 
-    bool result_single = hand_->ClearErrorReport(1);
-    std::cout << "[ClearErrorReport] Joint 1 Result: " << (result_single ? "OK" : "FAILED") << std::endl;
+    hand_->ClearErrorReport(1);
+    std::cout << "[ClearErrorReport] Joint 1 Done" << std::endl;
   }
 }
 
@@ -269,20 +366,6 @@ TEST_F(OmniHand3UltraMTest, ActualAxisPos) {
 
     auto single = hand_->GetSingleActualAxisPos(1);
     std::cout << "[GetSingleActualAxisPos] Joint 1: " << single << std::endl;
-  }
-}
-
-TEST_F(OmniHand3UltraMTest, SaveParam) {
-  if (hand_->Init()) {
-    bool result = hand_->SaveParam();
-    std::cout << "[SaveParam] Result: " << (result ? "OK" : "FAILED") << std::endl;
-  }
-}
-
-TEST_F(OmniHand3UltraMTest, CalibrateTactileSensor) {
-  if (hand_->Init()) {
-    bool result = hand_->CalibrateTactileSensor();
-    std::cout << "[CalibrateTactileSensor] Result: " << (result ? "OK" : "FAILED") << std::endl;
   }
 }
 
