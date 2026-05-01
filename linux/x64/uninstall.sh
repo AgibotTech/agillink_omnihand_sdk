@@ -24,7 +24,7 @@ echo "Removing Python package..."
 if command -v python3 >/dev/null 2>&1; then
     python3 -m pip uninstall -y omnihand 2>/dev/null || true
 fi
-for py_cmd in python3.10 python3.11 python3.12 python3.13; do
+for py_cmd in python3.10 python3.11 python3.12 python3.13 python3.14; do
     if command -v "$py_cmd" >/dev/null 2>&1; then
         "$py_cmd" -m pip uninstall -y omnihand 2>/dev/null || true
     fi
