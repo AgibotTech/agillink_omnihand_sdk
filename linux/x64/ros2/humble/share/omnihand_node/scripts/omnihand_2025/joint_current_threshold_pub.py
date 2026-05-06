@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-@Author: huangshiheng@agibot.com
 @Description: Publish current threshold values to OmniHand2025 (O10) and
               receive the read-back on joint_current_threshold_states.
 

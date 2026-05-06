@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-@Author: huangshiheng@agibot.com
 @Description: Publish position+torque mixed-control commands to
               OmniHand2025 (O10) via sensor_msgs/JointState.
 

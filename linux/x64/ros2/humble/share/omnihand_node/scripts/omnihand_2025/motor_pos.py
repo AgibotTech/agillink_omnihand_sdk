@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-@Author: huangshiheng@agibot.com
 @Description: Publish motor-position commands (raw int16 ticks) and display
               readback for OmniHand2025 (O10).
 
