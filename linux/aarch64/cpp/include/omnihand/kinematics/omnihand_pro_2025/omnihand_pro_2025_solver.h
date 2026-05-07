@@ -67,8 +67,8 @@ enum ActiveJointID {
 };
 
 enum O12handProActuator {
-  ActuatorIndex1,  // 靠近大拇指
-  ActuatorIndex2,  // 远离大拇指
+  ActuatorIndex1,  // Near thumb
+  ActuatorIndex2,  // Away from thumb
   ActuatorMiddle1,
   ActuatorMiddle2,
   ActuatorThumbABAD,
@@ -129,7 +129,7 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
       6.57e-16,      // (3,0,0)
       -0.000158924,  // (0,3,0)
       0.0013434      // (0,0,3)
-  };                 // 0-2000 min-0 //单位m
+  };               // 0-2000 min-0 // unit: m
 
   const std::vector<double> index_PIP_coeffs_Motor2Joint_ = {
       -239.38462,    // (0,0,1)
@@ -175,7 +175,7 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
       -4.11e-16,     // (3,0,0)
       -0.000147334,  // (0,3,0)
       0.000961855    // (0,0,3)
-  };                 // 0-2000 min-0 //单位m
+  };                 // 0-2000 min-0 // unit: m
 
   const std::vector<double> middle_PIP_coeffs_Motor2Joint_ = {
       -206.3849098,  // (0,0,1)
@@ -211,7 +211,7 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
       0.005173,    // p21
       -0.0004128,  // p12
       0.001921     // p03
-  };               // 0-2000 min-0 //单位m
+  };               // 0-2000 min-0 // unit: m
 
   std::vector<double> coeffs_abad_Motor2Joint_ = {
       0,           // p00
@@ -237,7 +237,7 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
       0.005173,   // p21
       0.0004146,  // p12
       0.001921    // p03
-  };              // 0-2000 min-0 //单位m
+  };              // 0-2000 min-0 // unit: m
 
   std::vector<double> coeffs_mcp_Motor2Joint_ = {
       0,           // p00
@@ -253,23 +253,23 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
   };
 
   std::vector<double> coeffs_thumb_roll_ = {0, -4.414, -2.493, 0.4605,
-                                            0.1868};  // 0-2000 min-0 //单位mm
+                                            0.1868};  // 0-2000 min-0 // unit: mm
   std::vector<double> coeffs_thumb_abad_ = {0, 2.265, 5.312, -1.507,
-                                            -0.01794};  // 0-2000 max-0 //单位mm
+                                            -0.01794};  // 0-2000 max-0 // unit: mm
   std::vector<double> coeffs_thumb_mcp_ = {0, 13.68, -5.975, 4.724,
-                                           -0.4232};  // 0-2000 max-0 //单位mm
+                                           -0.4232};  // 0-2000 max-0 // unit: mm
   std::vector<double> coeffs_thumb_pip_ = {0, 6.451, 2.701, -1.323,
-                                           -0.00933};  // 0-2000 max-0 //单位mm
+                                           -0.00933};  // 0-2000 max-0 // unit: mm
 
   std::vector<double> coeffs_thumb_roll_Motor2Joint_ = {0, -0.2217, -0.02095, -0.002611, -0.0001367};
   std::vector<double> coeffs_thumb_abad_Motor2Joint_ = {0, 0.291, -0.04408, 0.005031, -0.0002107};
   std::vector<double> coeffs_thumb_mcp_Motor2Joint_ = {0, 0.07162, 0.003203, -0.0001568, -3.044e-06};
   std::vector<double> coeffs_thumb_pip_Motor2Joint_ = {0, 0.1504, -0.006036, 0.0004235, -2.954e-06};
 
-  std::vector<double> coeffs_ring_pinky_ = {0, -6.13, -4.317, 0.5921, 0.306};  // 0-2000 min-0 //单位mm
+  std::vector<double> coeffs_ring_pinky_ = {0, -6.13, -4.317, 0.5921, 0.306};  // 0-2000 min-0 // unit: mm
   std::vector<double> coeffs_ring_pinky_Motor2Joint_ = {0, -0.1488, -0.008172, -0.0004489, -8.805e-06};
 
-  // 被动关节
+  // Passive joints
   std::vector<double> thumb_dip_coeff_ = {0, 0.6359, -0.3539, -0.3066, -0.124};
   std::vector<double> index_dip_coeff_ = {0, 1.063, 0.08942, 0.1845, -0.2169};
   std::vector<double> middle_dip_coeff_ = {0, 1.149, -0.2581, 0.6033, -0.3371};

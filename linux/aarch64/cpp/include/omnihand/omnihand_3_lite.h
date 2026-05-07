@@ -139,7 +139,7 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
 
 #ifdef OMNIHAND_TJ_MARVIN_SDK
   /**
-   * @brief 天机 MARVIN 控制器 TJ SDK 末端 CAN/CANFD 透传（O4，与 O10 语义一致）
+   * @brief Factory method - TJ MARVIN controller TJ SDK end-effector CAN/CANFD passthrough (O4, same semantics as O10)
    */
   static std::unique_ptr<OmniHand3Lite> createHandByTJ(
       HandType hand_type,

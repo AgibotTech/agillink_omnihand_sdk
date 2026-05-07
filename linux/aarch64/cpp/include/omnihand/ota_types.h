@@ -52,22 +52,22 @@ enum class AGIBOT_EXPORT OtaErrorCode : int {
   // Positive values (>0) are device-returned error codes
 };
 
-/** OTA 每包字节数，与实现中 2KB 分包一致 */
+/** OTA packet size in bytes, consistent with the 2KB chunking in the implementation */
 constexpr int kOtaPacketSizeBytes = 2048;
 
-/** 单包类型：固定 2KB，不足部分以 0xFF 填充 */
+/** Single packet type: fixed 2KB, padded with 0xFF if less than 2KB */
 using OtaPacket = std::array<std::uint8_t, kOtaPacketSizeBytes>;
 
 /**
- * @brief 仅加载固件文件的结果（不进行设备通信）
- * @note 成功与否看 error_code == OtaErrorCode::AGILINK_SUCCESS
- * @note packets 已按 2KB 分包，最后一包不足部分已填 0xFF，可供 UpdateFirmware 复用
+ * @brief Result of loading a firmware file only (no device communication)
+ * @note Check error_code == OtaErrorCode::AGILINK_SUCCESS to determine success
+ * @note packets are chunked into 2KB blocks, with the last packet padded with 0xFF; can be reused by UpdateFirmware
  */
 struct AGIBOT_EXPORT FirmwareLoadResult {
-  int total_packets{0};          ///< 总包数（按 kOtaPacketSizeBytes 计算）
-  size_t file_size_bytes{0};     ///< 文件大小（字节）
-  OtaErrorCode error_code{OtaErrorCode::AGILINK_SUCCESS};  ///< 成功为 AGILINK_SUCCESS，失败为具体错误码
-  std::vector<OtaPacket> packets;  ///< 已加载并分包的数据，最后一包不足 2KB 已用 0xFF 填充
+  int total_packets{0};          ///< Total number of packets (calculated by kOtaPacketSizeBytes)
+  size_t file_size_bytes{0};     ///< File size in bytes
+  OtaErrorCode error_code{OtaErrorCode::AGILINK_SUCCESS};  ///< AGILINK_SUCCESS on success, specific error code on failure
+  std::vector<OtaPacket> packets;  ///< Loaded and chunked data, last packet padded with 0xFF if less than 2KB
 };
 
 /**
@@ -140,10 +140,10 @@ using OtaProgressCallback = std::function<void(int current_packet, int total_pac
                                                OtaProgressStatus status)>;
 
 /**
- * @brief 仅加载固件文件并计算包数，不与设备通信
- * @param file_name 固件文件路径
- * @return FirmwareLoadResult 含 total_packets、file_size_bytes、packets、error_code（成功时为 AGILINK_SUCCESS）
- * @note 与 UpdateFirmware 内部分包规则一致；packets 已按 2KB 分包，最后一包不足处填 0xFF，可供更新接口复用
+ * @brief Load firmware file only and calculate packet count, without device communication
+ * @param file_name Firmware file path
+ * @return FirmwareLoadResult containing total_packets, file_size_bytes, packets, and error_code (AGILINK_SUCCESS on success)
+ * @note Consistent with the internal chunking rules of UpdateFirmware; packets are chunked into 2KB blocks with the last packet padded with 0xFF, and can be reused by the update interface
  */
 AGIBOT_EXPORT FirmwareLoadResult LoadFirmwareOnly(const std::string& file_name);
 

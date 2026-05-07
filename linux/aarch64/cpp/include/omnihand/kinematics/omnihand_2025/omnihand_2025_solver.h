@@ -1,6 +1,6 @@
 /**
  * @file omnihand_2025_solver.h
- * @brief O10灵巧手运动学求解器 (10自由度)
+ * @brief O10 dexterous hand kinematics solver (10 DOF)
  * @author AgiBot-lishuang
  * @date 2025-03
  */
@@ -19,7 +19,7 @@ namespace omnihand {
 namespace o10 {
 
 /**
- * @brief O10灵巧手主动关节枚举
+ * @brief O10 dexterous hand active joint enumeration
  */
 enum OmnihandActiveJoint {
   ActiveJointhumbRoll = 0,
@@ -33,11 +33,11 @@ enum OmnihandActiveJoint {
   ActiveJointPinkyAbAd,
   ActiveJointPinkyPIP,
 
-  ActiveJointCount  ///< 主动关节总数
+  ActiveJointCount  ///< Total number of active joints
 };
 
 /**
- * @brief O10灵巧手所有关节枚举 (主动+被动)
+ * @brief O10 dexterous hand full joint enumeration (active + passive)
  */
 enum OmnihandJoint {
   JointThumbRoll = 0,
@@ -57,11 +57,11 @@ enum OmnihandJoint {
   JointPinkyPIP,
   JointPinkyDIP,
 
-  JointCount  ///< 所有关节总数
+  JointCount  ///< Total number of all joints
 };
 
 /**
- * @brief O10灵巧手手势枚举
+ * @brief O10 dexterous hand gesture enumeration
  */
 enum OmnihandGesture {
   GesturePAPER = 0,
@@ -89,12 +89,12 @@ enum OmnihandGesture {
  */
 class AGIBOT_EXPORT OmniHand2025Solver {
  private:
-  bool hand_type_;  ///< true=左手, false=右手
+  bool hand_type_;  ///< true=left hand, false=right hand
   std::vector<int> actuator_max_;
   std::vector<int> actuator_min_;
   int max_iput_ = 4096;
   int min_iput_ = 0;
-  // 右手系数
+  // Right-hand coefficients
   std::vector<double> active_joint_max_ = {1.12, 0.05, 0.8416, 0, 1.48,
                                            1.48, 0.17, 1.48, 0.19, 1.48};
   std::vector<double> motor_max_ = {1.12, 0.05, 1.33, 0, 1.43,
@@ -137,8 +137,8 @@ class AGIBOT_EXPORT OmniHand2025Solver {
 
  public:
   /**
-   * @brief 构造函数
-   * @param hand_type true=左手, false=右手
+   * @brief Constructor
+   * @param hand_type true=left hand, false=right hand
    */
   OmniHand2025Solver(const bool &hand_type);
 
@@ -150,34 +150,34 @@ class AGIBOT_EXPORT OmniHand2025Solver {
   }
 
   /**
-   * @brief 设置预定义手势
-   * @param gesture_num 手势索引
-   * @return 执行器命令向量
+   * @brief Set a predefined hand gesture
+   * @param gesture_num Gesture index
+   * @return Actuator command vector
    */
   std::vector<int> SetHandGesture(const int &gesture_num);
 
   /**
-   * @brief 主动关节位置转执行器输入
-   * @param active_joint_pos 主动关节位置向量
-   * @return 执行器命令向量 (范围: 0-4096)
+   * @brief Convert active joint positions to actuator inputs
+   * @param active_joint_pos Active joint position vector
+   * @return Actuator command vector (range: 0-4096)
    * @note O10 motor input range is 0-4096, different from O12 which is 0-2000
    */
   std::vector<int>
   ActiveJointPos2ActuatorInput(const std::vector<double> &active_joint_pos);
 
   /**
-   * @brief 执行器输入转主动关节位置
-   * @param actuator_input 执行器命令向量 (范围: 0-4096)
-   * @return 主动关节位置向量
+   * @brief Convert actuator inputs to active joint positions
+   * @param actuator_input Actuator command vector (range: 0-4096)
+   * @return Active joint position vector
    * @note O10 motor input range is 0-4096, different from O12 which is 0-2000
    */
   std::vector<double>
   ActuatorInput2ActiveJointPos(const std::vector<int> &actuator_input);
 
   /**
-   * @brief 获取所有关节位置 (主动+被动)
-   * @param active_joint_pos 当前主动关节位置
-   * @return 所有关节位置向量
+   * @brief Get all joint positions (active + passive)
+   * @param active_joint_pos Current active joint positions
+   * @return All joint position vector
    */
   std::vector<double>
   GetAllJointPos(const std::vector<double> &active_joint_pos);

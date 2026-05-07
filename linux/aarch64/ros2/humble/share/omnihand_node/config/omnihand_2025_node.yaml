@@ -32,7 +32,7 @@
       request_interval_ms: 0
       frame_recv_timeout_ms: 50
       show_data_details: true
-
+    
     right_hand:
       hand_device_id: 1
       connection_type: "socketcan"

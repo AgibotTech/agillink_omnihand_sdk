@@ -3,7 +3,7 @@
 
 /**
  * @file export_symbols.h
- * @brief 导出符号宏定义
+ * @brief Export symbol macro definitions
  * @author hanjun
  * @date 25-8-1
  **/
