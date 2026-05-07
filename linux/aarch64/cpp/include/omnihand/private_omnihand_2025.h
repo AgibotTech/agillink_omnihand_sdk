@@ -16,7 +16,7 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/private_omnihand.h"
 #include "omnihand/omnihand_2025.h"
-#include "omnihand/io10_tactile_sensor_1d.h"
+#include "omnihand/i_o10_tactile_sensor_1d.h"
 #include "omnihand/proto.h"
 #include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"
 

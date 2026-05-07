@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 #include "omnihand/omnihand_base.h"
-#include "omnihand/io10_tactile_sensor_1d.h"
+#include "omnihand/i_o10_tactile_sensor_1d.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"
@@ -166,11 +166,11 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
 
 #ifdef OMNIHAND_TJ_MARVIN_SDK
   /**
-   * @brief Factory method - 天机 MARVIN 控制器 TJ SDK 末端 CAN/CANFD 透传（O10 与 USB-CAN/SocketCAN 并列的另一路）
-   * @param hand_type 灵巧手左右：LEFT→TJ 左臂末端通道（OnSetChDataA），RIGHT→右臂（OnSetChDataB）。与常见「左/右手装在同侧机械臂」一致
+   * @brief Factory method - TJ MARVIN controller TJ SDK end-effector CAN/CANFD passthrough (O10, parallel to USB-CAN/SocketCAN)
+   * @param hand_type Hand type: LEFT -> TJ left arm end-effector channel (OnSetChDataA), RIGHT -> right arm (OnSetChDataB). Consistent with the convention that left/right hand is mounted on the same-side robotic arm
    * @param hand_device_id Hand device ID on the OmniHand bus
-   * @param marvin_controller_ip 机械臂控制器 IP（UDP，与 TJ SDK OnLinkTo 一致）
-   * @note TJ 末端固定走 CAN/CANFD 透传（set_ch=1）；COM 透传不走本接口
+   * @param marvin_controller_ip Robotic arm controller IP (UDP, consistent with TJ SDK OnLinkTo)
+   * @note TJ end-effector uses CAN/CANFD passthrough (set_ch=1); COM passthrough does not use this interface
    */
   static std::unique_ptr<OmniHand2025> createHandByTJ(
       HandType hand_type,

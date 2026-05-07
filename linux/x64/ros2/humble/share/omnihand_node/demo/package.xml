@@ -4,7 +4,7 @@
   <name>omnihand_ros2_demo</name>
   <version>1.0.0</version>
   <description>ROS2 C++ demo for OmniHand - control via standard ROS2 topics</description>
-  <maintainer email="huangshiheng@agibot.com">huangshiheng</maintainer>
+  <maintainer email="xuqigui@agibot.com">agibot</maintainer>
   <license>Mulan PSL v2</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

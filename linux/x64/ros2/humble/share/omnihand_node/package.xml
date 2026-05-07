@@ -4,7 +4,7 @@
   <name>omnihand_node</name>
   <version>1.0.0</version>
   <description>OmniHand Pro ROS2 Node Package</description>
-  <maintainer email="huangshiheng@agibot.com">huangshiheng</maintainer>
+  <maintainer email="xuqigui@agibot.com">agibot</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

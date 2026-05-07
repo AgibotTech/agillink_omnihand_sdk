@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-@Author: huangshiheng@agibot.com
 @Description: Publish joint-position commands and display position readback
               for OmniHandPro2025 (O12).
 

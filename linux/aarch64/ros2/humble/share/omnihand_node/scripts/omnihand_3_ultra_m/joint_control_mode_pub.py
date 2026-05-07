@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-@Author: huangshiheng@agibot.com
 @Description: Publish control mode values to OmniHand3UltraM (O20) and
               receive the read-back on joint_control_mode_states.
 

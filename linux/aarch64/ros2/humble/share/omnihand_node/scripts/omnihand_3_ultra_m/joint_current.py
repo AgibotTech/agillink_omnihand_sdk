@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-@Author: huangshiheng@agibot.com
 @Description: Periodically trigger current query and display results
               for OmniHand3UltraM (O20).
 

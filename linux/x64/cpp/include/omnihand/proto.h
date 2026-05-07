@@ -152,7 +152,7 @@ inline std::string ToString(ControlMode mode) {
 }
 
 /**
- * @brief 关节电机错误上报
+ * @brief Joint motor error report
  */
 struct AGIBOT_EXPORT JointMotorErrorReport {
   union {
@@ -313,7 +313,7 @@ struct AGIBOT_EXPORT CommuParams {
 };
 
 /**
- * @brief 设备信息
+ * @brief Device information
  */
 struct AGIBOT_EXPORT DeviceInfo {
   uint8_t hand_device_id;
@@ -328,8 +328,8 @@ struct AGIBOT_EXPORT DeviceInfo {
 };
 
 /**
- * @brief 混合控制参数
- * @note 默认构造函数确保位域自动初始化为0，使用更安全
+ * @brief Mixed control parameters
+ * @note Default constructor ensures bit-fields are automatically initialized to 0 for safer usage
  */
 struct AGIBOT_EXPORT MixCtrl {
   unsigned char joint_index_ : 5;
@@ -338,7 +338,7 @@ struct AGIBOT_EXPORT MixCtrl {
   std::optional<short> tgt_velo_;
   std::optional<short> tgt_torque_;
 
-  // 默认构造函数：确保位域初始化为0（C++17兼容）
+  // Default constructor: ensures bit-fields are initialized to 0 (C++17 compatible)
   MixCtrl() : joint_index_(0), ctrl_mode_(0) {}
 };
 

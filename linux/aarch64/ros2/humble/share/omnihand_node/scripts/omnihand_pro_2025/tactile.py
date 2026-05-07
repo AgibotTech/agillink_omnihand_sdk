@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-@Author: huangshiheng@agibot.com
 @Description: Periodically trigger 3D tactile sensor readback and display
               results for OmniHandPro2025 (O12).
 

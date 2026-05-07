@@ -5,7 +5,7 @@
   <version>1.0.0</version>
   <description>Contains message definitions for Omnihand2025 hand ROS2 node.</description>
 
-  <maintainer email="huangshiheng@agibot.com">huangshiheng</maintainer>
+  <maintainer email="xuqigui@agibot.com">agibot</maintainer>
 
   <license>Apache License 2.0</license>
 

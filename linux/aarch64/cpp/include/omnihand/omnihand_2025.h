@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 #include "omnihand/omnihand_base.h"
-#include "omnihand/io10_tactile_sensor_1d.h"
+#include "omnihand/i_o10_tactile_sensor_1d.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"

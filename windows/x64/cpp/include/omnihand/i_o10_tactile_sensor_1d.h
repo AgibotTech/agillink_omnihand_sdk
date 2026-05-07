@@ -1,8 +1,8 @@
 // Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
-#ifndef AGILINK_OMNIHAND_IO10_TACTILE_SENSOR_1D_H
-#define AGILINK_OMNIHAND_IO10_TACTILE_SENSOR_1D_H
+#ifndef AGILINK_OMNIHAND_I_O10_TACTILE_SENSOR_1D_H
+#define AGILINK_OMNIHAND_I_O10_TACTILE_SENSOR_1D_H
 
 #include <cstddef>
 #include <map>
@@ -72,4 +72,4 @@ class AGIBOT_EXPORT IO10TactileSensor1D {
 }  // namespace omnihand
 }  // namespace agilink
 
-#endif  // AGILINK_OMNIHAND_IO10_TACTILE_SENSOR_1D_H
+#endif  // AGILINK_OMNIHAND_I_O10_TACTILE_SENSOR_1D_H
