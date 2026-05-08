@@ -663,9 +663,9 @@ int main(int argc, char** argv) {
       std::cout << "  --tcp-port PORT        ZLG TCP port (zlgcantcp), default 8000\n";
       std::cout << "  -f INTERVAL            Request interval ms, default 5, max 100\n";
       std::cout << "\nExamples:\n";
-      std::cout << "  " << argv[0] << " -t zlgcan -c 0 -i 0\n";
-      std::cout << "  " << argv[0] << " -t socketcan --can-if can0\n";
-      std::cout << "  " << argv[0] << " -t zlgcantcp --tcp-host 192.168.0.178 --tcp-port 8000\n";
+      std::cout << "  " << argv[0] << " -d zlgcan -c 0 -i 0\n";
+      std::cout << "  " << argv[0] << " -d socketcan --can-if can0\n";
+      std::cout << "  " << argv[0] << " -d zlgcantcp --tcp-host 192.168.0.178 --tcp-port 8000\n";
       return 0;
     } else {
       gtest_args.push_back(argv[i]);

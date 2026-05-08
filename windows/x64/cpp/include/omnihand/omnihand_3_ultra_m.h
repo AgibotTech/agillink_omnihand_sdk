@@ -78,18 +78,20 @@ inline std::string H3UMErrorReportToString(const JointMotorErrorReport& report) 
  * This class provides the public interface for OmniHand 3 Ultra product.
  * It supports 20 active degrees of freedom.
  *
- * 角度 <-> 电机位置约定：
- *   - SetAllJointMotorPosi / GetAllJointMotorPosi 中 int16_t 值域为 [0, 4095]
- *     （12-bit，与标定寄存器 Pn7/Pn8 的 0.1° 编码无关）。
- *   - URDF 主动关节角 (rad) 与 tick 是 **按关节独立的线性映射**，不同关节系数不同、
- *     可能反向；O20 不需要 O10 那种多项式修正。
- *   - 实际换算与标定表见
+ * Angle <-> motor position convention:
+ *   - SetAllJointMotorPosi / GetAllJointMotorPosi int16_t values range [0, 4095]
+ *     (12-bit, unrelated to calibration register Pn7/Pn8 0.1-degree encoding).
+ *   - URDF active joint angle (rad) and tick are **per-joint independent linear mappings**,
+ *     with different coefficients per joint that may be reversed;
+ *     O20 does not need the polynomial correction used in O10.
+ *   - For actual conversion and calibration table, see
  *       kinematics/omnihand_3_ultra_m/omnihand_3_ultra_m_solver.{h,cc}
- *     SetAll/GetAllActiveJointAngles 内部即转发给 OmniHand3UltraMSolver，
- *     上层（含 ROS2 节点 / Python 绑定）只需用 rad 单位即可。
+ *     SetAll/GetAllActiveJointAngles internally forwards to OmniHand3UltraMSolver,
+ *     so upper layers (including ROS2 nodes / Python bindings) only need to use rad units.
  *
- * TODO(O20): 运动学求解器（含被动关节）未接入：SetHandGesture、按单关节名/索引
- *   访问被动关节的接口仍为占位实现。
+ * TODO(O20): Kinematics solver (including passive joints) not yet integrated:
+ *   SetHandGesture, and interfaces for accessing passive joints by single joint
+ *   name/index are still placeholder implementations.
  */
 class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase, public IOmniHandCalibrator {
  public:
@@ -167,7 +169,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase, public IOmniHandCalib
 
 #ifdef OMNIHAND_TJ_MARVIN_SDK
   /**
-   * @brief 天机 MARVIN 控制器 TJ SDK 末端 CAN/CANFD 透传（O20）
+   * @brief Factory method - TJ MARVIN controller TJ SDK end-effector CAN/CANFD passthrough (O20)
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByTJ(
       HandType hand_type,
@@ -218,8 +220,9 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase, public IOmniHandCalib
   /**
    * @brief Sets the hand to a predefined gesture.
    * @param gesture_num Gesture number
-   * TODO(O20): 待手势库接入后实现；当前为 no-op。上层请用 SetAllActiveJointAngles(rad)
-   * 下发整手关节目标，或 SetAllJointMotorPosi(0-4095 ticks) 走原始 actuator 通道。
+   * TODO(O20): To be implemented after gesture library integration; currently a no-op.
+   * Upper layers should use SetAllActiveJointAngles(rad) to send whole-hand joint targets,
+   * or SetAllJointMotorPosi(0-4095 ticks) for the raw actuator channel.
    */
   void SetHandGesture(int gesture_num = 1) override;
 
