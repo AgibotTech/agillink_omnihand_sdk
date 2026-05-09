@@ -1,4 +1,4 @@
-# OmniHand 2025 SDK
+# AGILINK OmniHand SDK
 
 [中文文档](README_zh_cn.md)
 
@@ -9,7 +9,7 @@
 
 ## Overview
 
-The OmniHand 2025 SDK supports three product models:
+The AGILINK OmniHand SDK supports three product models:
 
 **OmniHand 2025 灵动款 (O10)**: A compact, high-DOF interactive dexterous hand featuring `10 active + 6 passive degrees of freedom`. Weighing only 500g, it utilizes CANFD communication interfaces and is equipped with `400+ tactile points and 0.1N array resolution, with maximum fingertip force of 5N`. It's suitable for various humanoid robots and robotic arms. Its compact, lightweight design and rich tactile interaction capabilities make it valuable for interactive services, research, education, and light-duty operations.
 
@@ -19,7 +19,7 @@ The OmniHand 2025 SDK supports three product models:
 
 ![](doc/pic/hand_o12.jpg)
 
-**OmniHand Dex UMI (O10 UMI)**: A read-only dexterous hand using UMI protocol, supporting periodic position and tactile sensor data reporting.
+**OmniHand Dex UMI (O10 UMI)**: A read-only dexterous hand using UMI protocol.
 
 ## Dexterous Hand Motor Index
 

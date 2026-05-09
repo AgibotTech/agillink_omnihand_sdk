@@ -1,6 +1,6 @@
 # Python Unit Tests
 
-This directory contains unit tests for the OmniHand 2025 SDK Python interface, using pytest framework.
+This directory contains unit tests for the AGILINK OmniHand SDK Python interface, using pytest framework.
 
 **API note:** O10/Dex UMI factory parameters such as `hand_device_id`, `canfd_device_id`, and `canfd_channel_id` are passed as Python `int` and forwarded to C++ as `uint8_t` (see `release/doc/en/API_PYTHON_O10.md`).
 

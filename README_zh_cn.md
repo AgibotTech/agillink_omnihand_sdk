@@ -1,4 +1,4 @@
-# OmniHand 2025 SDK
+# AGILINK OmniHand SDK
 
 [English Documentation](README.md)
 
@@ -9,7 +9,7 @@
 
 ## 产品概述
 
-OmniHand 2025 SDK 支持三种产品型号：
+AGILINK OmniHand SDK 支持三种产品型号：
 
 **OmniHand 2025 灵动款 (O10)**：紧凑型高自由度交互灵巧手，具有 `10 个主动 + 6 个被动自由度`。重量仅 500g，采用 CANFD 通信接口，配备 `400+ 触觉点，0.1N 阵列分辨率，最大指尖力 5N`。适用于各种人形机器人和机械臂。其紧凑轻量化的设计和丰富的触觉交互能力，使其在交互服务、研究教育、轻量作业等领域具有重要价值。
 
@@ -19,7 +19,7 @@ OmniHand 2025 SDK 支持三种产品型号：
 
 ![](doc/pic/hand_o12.jpg)
 
-**OmniHand Dex UMI (O10 UMI)**：使用 UMI 协议的只读灵巧手，支持周期性的位置和触觉传感器数据上报。
+**OmniHand Dex UMI (O10 UMI)**：使用 UMI 协议的只读灵巧手。
 
 ## 灵巧手电机索引
 

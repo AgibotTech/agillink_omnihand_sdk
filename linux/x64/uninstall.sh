@@ -1,10 +1,10 @@
 #!/bin/bash
-# OmniHand 2025 SDK Uninstall Script
+# AGILINK OmniHand SDK Uninstall Script
 set -e
 
 PREFIX="${1:-/usr/local}"
 
-echo "Uninstalling OmniHand 2025 SDK"
+echo "Uninstalling AGILINK OmniHand SDK"
 echo "  Install path: $PREFIX"
 echo ""
 

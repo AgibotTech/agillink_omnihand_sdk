@@ -1,5 +1,5 @@
 #!/bin/bash
-# OmniHand 2025 SDK - USB Permission Setup Script
+# AGILINK OmniHand SDK - USB Permission Setup Script
 
 set -e
 
@@ -11,7 +11,7 @@ RULES_DST="/etc/udev/rules.d/$RULES_FILE"
 # Check root for install
 if [[ $EUID -ne 0 ]]; then
     echo "============================================"
-    echo "OmniHand 2025 SDK - USB Permission Setup"
+    echo "AGILINK OmniHand SDK - USB Permission Setup"
     echo "============================================"
     echo ""
     echo "Please run with sudo: sudo $0"
@@ -19,7 +19,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 echo "============================================"
-echo "OmniHand 2025 SDK - USB Permission Setup"
+echo "AGILINK OmniHand SDK - USB Permission Setup"
 echo "============================================"
 echo ""
 
@@ -101,7 +101,7 @@ echo ""
 # Generate rules file
 echo "=== Generating udev rules ==="
 cat > "$RULES_SRC" << EOF
-# OmniHand 2025 SDK - USB Device Permission Rules
+# AGILINK OmniHand SDK - USB Device Permission Rules
 # Generated on $(date)
 
 # Generic rules for USB serial devices

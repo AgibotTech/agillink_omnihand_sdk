@@ -1,11 +1,11 @@
 #!/bin/bash
-# OmniHand 2025 SDK Install Script
+# AGILINK OmniHand SDK Install Script
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PREFIX="${1:-/usr/local}"
 
-echo "Installing OmniHand 2025 SDK"
+echo "Installing AGILINK OmniHand SDK"
 echo "  Install path: $PREFIX"
 echo ""
 

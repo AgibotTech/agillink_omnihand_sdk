@@ -1,4 +1,4 @@
-# OmniHand 2025 SDK C++ Unit Tests
+# AGILINK OmniHand SDK C++ Unit Tests
 
 **API note:** For **OmniHand 2025 (O10)** and **OmniHand Dex UMI**, factory and broadcast APIs in the C++ headers use `std::uint8_t` for `hand_device_id` and `canfd_*` indices; tests use integer literals with implicit conversion. See `release/doc/en/API_CPP_O10.md` and `API_CPP_O10_UMI.md`.
 

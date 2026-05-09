@@ -3,7 +3,7 @@
 
 /**
  * @file proto.h
- * @brief Unified protocol definitions for OmniHand 2025 SDK
+ * @brief Unified protocol definitions for AGILINK OmniHand SDK
  * @author agiuser
  * @date 25-8-7
  **/
