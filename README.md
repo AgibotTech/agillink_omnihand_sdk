@@ -9,31 +9,36 @@
 
 ## Overview
 
-The AGILINK OmniHand SDK supports three product models:
+The AGILINK OmniHand SDK supports the following product models:
 
-**OmniHand 2025 灵动款 (O10)**: A compact, high-DOF interactive dexterous hand featuring `10 active + 6 passive degrees of freedom`. Weighing only 500g, it utilizes CANFD communication interfaces and is equipped with `400+ tactile points and 0.1N array resolution, with maximum fingertip force of 5N`. It's suitable for various humanoid robots and robotic arms. Its compact, lightweight design and rich tactile interaction capabilities make it valuable for interactive services, research, education, and light-duty operations.
+**OmniHand 2025 灵动款 (O10)**
+
+ A compact, high-DOF interactive dexterous hand featuring `10 active + 6 passive degrees of freedom`. Weighing only 500g, it utilizes CANFD communication interfaces and is equipped with `400+ tactile points and 0.1N array resolution, with maximum fingertip force of 5N`. It's suitable for various humanoid robots and robotic arms. Its compact, lightweight design and rich tactile interaction capabilities make it valuable for interactive services, research, education, and light-duty operations.
 
 ![](doc/pic/hand_o10.jpg)
 
-**OmniHand Pro 2025 专业款 (O12)**: A 12-degree-of-freedom professional dexterous hand featuring precise operation and flexible control capabilities. It is equipped with tactile sensors and multiple control modes (position control, torque control, hybrid control), making it suitable for a wide range of applications including research and education, entertainment and commercial performances, exhibition guidance, and industrial scenarios.
-
-![](doc/pic/hand_o12.jpg)
-
-**OmniHand Dex UMI (O10 UMI)**: A read-only dexterous hand using UMI protocol.
-
-## Dexterous Hand Motor Index
-
-**OmniHand 2025 灵动款 (O10)**: Has 10 degrees of freedom, indexed from 1 to 10. The corresponding control motors are shown in the following image:
+The corresponding control motors are shown in the following image:
 
 ![](doc/pic/hand_o10_motors.jpg)
 
-**OmniHand Pro 2025 专业款 (O12)**: Has 12 degrees of freedom, indexed from 1 to 12. The corresponding control motors are shown in the following image:
+**OmniHand Pro 2025 专业款 (O12)**
+
+ A 12-degree-of-freedom professional dexterous hand featuring precise operation and flexible control capabilities. It is equipped with tactile sensors and multiple control modes (position control, torque control, hybrid control), making it suitable for a wide range of applications including research and education, entertainment and commercial performances, exhibition guidance, and industrial scenarios.
+
+![](doc/pic/hand_o12.jpg)
+
+The corresponding control motors are shown in the following image:
 
 ![](doc/pic/hand_o12_motors.jpg)
 
+**OmniHand Dex UMI (O10 UMI)**
+
+A read-only dexterous hand using UMI protocol.
+
 ## Platform-Specific Documentation
 
-- **[Linux (x64)](linux/x64/README.md)** - Installation, USB setup, ROS2
+- **[Linux (x64/amd64)](linux/x64/README.md)** - Installation, USB setup, ROS2
+- **[Linux (arm64/aarch64)](linux/aarch64/README.md)** - Installation, USB setup, ROS2
 - **[Windows (x64)](windows/README.md)** - Installation, driver setup
 
 ## API Documentation
