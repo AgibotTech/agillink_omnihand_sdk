@@ -29,7 +29,7 @@ This guide helps you get started with the OmniHand SDK in 5 minutes.
 
 ## Step 1: Hardware Connection
 
-### Recommended: ZLG USBCANFD Adapter
+### Recommended: ZLG USBCANFD Adapter (All Products)
 
 1. Connect ZLG USBCANFD adapter to your computer via USB
 2. Connect the CANFD cable from the adapter to your OmniHand
@@ -41,9 +41,27 @@ This guide helps you get started with the OmniHand SDK in 5 minutes.
                                     [24V Power]
 ```
 
-### Alternative: USB Direct (OmniHand 2025 O10 only)
+### Alternative 1: USB Direct (O10 only)
 
 Connect the OmniHand directly to your computer via USB cable.
+
+> **Note**: O10 still requires 24V power through the CANFD connector. USB is for data communication only.
+
+### Alternative 2: RS485 Serial (O10 only)
+
+Connect the OmniHand to your computer via RS485 serial cable.
+
+> **Note**: Even when using RS485 for communication, O10 still requires 24V power through the CANFD connector. RS485 is for data communication only and does not provide power.
+
+### Product Connection Support
+
+| Connection | O10 | O12 |
+|-----------|-----|-----|
+| ZLG USBCANFD (recommended) | ✅ | ✅ |
+| USB Direct | ✅ | ❌ |
+| RS485 Serial | ✅ | ❌ |
+
+> **O12 only supports CANFD connections** (ZLG USBCANFD / SocketCAN / HCAN).
 
 ## Step 2: Install SDK
 
@@ -53,7 +71,7 @@ Connect the OmniHand directly to your computer via USB cable.
 cd release/linux/x64
 ./install.sh
 
-# Configure USB permissions (first time only)
+# Configure USB permissions (first time only, required for both CANFD adapters and RS485 serial ports)
 sudo ./setup_udev.sh
 # Then log out and log back in
 ```

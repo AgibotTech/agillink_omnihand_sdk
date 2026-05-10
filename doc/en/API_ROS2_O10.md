@@ -130,9 +130,71 @@ ros2 topic pub --once /o10/left/joint_mix_control_cmd sensor_msgs/msg/JointState
 
 ## Configuration
 
-O10 supports: zlgcan, hcan, socketcan, rs485, usb.
+The default config file is [config/omnihand_2025_node.yaml](../../../node/config/omnihand_2025_node.yaml). Edit it directly or override via the `config_file` launch argument.
 
-Example:
+O10 supports: `zlgcan`, `hcan`, `socketcan`, `rs485`, `usb`.
+
+### Parameters
+
+Parameters are organized under `left_hand` / `right_hand` namespaces. If `connection_type` is empty or not set, that hand is skipped.
+
+| Parameter | Type | Default | Applicable | Description |
+|-----------|------|---------|------------|-------------|
+| `hand_device_id` | int | 1 | All | Hand device ID (1-255) |
+| `connection_type` | string | "" | — | `"zlgcan"` / `"hcan"` / `"socketcan"` / `"rs485"` / `"usb"`; empty = skip |
+| `canfd_serial_number` | string | "" | zlgcan / hcan | Adapter serial number (**recommended**, stable across reboots) |
+| `canfd_device_id` | int | 0 | zlgcan / hcan | Adapter device index (used when `canfd_serial_number` is empty; may change across reboots) |
+| `canfd_channel_id` | int | 0 | zlgcan / hcan | CAN channel index (0 or 1; dual-channel adapters like 200U use 0/1) |
+| `can_interface` | string | "can0" | socketcan | SocketCAN interface name (e.g. `can0`, `can1`) |
+| `uart_port` | string | "" | rs485 / usb | Serial device path (e.g. `/dev/ttyUSB0`) |
+| `request_interval_ms` | int | -1 | All | Minimum request interval (ms), 0=no limit, range 0-100, -1=SDK default |
+| `frame_recv_timeout_ms` | int | -1 | All | Per-frame receive timeout (ms), range 10-1000, -1=SDK default (50ms) |
+| `show_data_details` | bool | false | All | Print TX/RX data to terminal (for debugging) |
+
+> **Adapter selection priority**: `canfd_serial_number` takes priority over `canfd_device_id`. If `canfd_serial_number` is non-empty, the adapter is found by serial number; otherwise by device index. Serial number is recommended as device indices may change across reboots.
+
+### YAML Examples
+
+> ⚠️ YAML is strict about indentation — use **spaces only** (no tabs), and keep indentation consistent for parameters at the same level.
+
+> All examples below show dual-hand configuration. For single-hand use, simply remove the `right_hand` (or `left_hand`) namespace.
+
+**ZLG CANFD adapter (by serial number, recommended):**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_serial_number: "12345678"    # Adapter serial (recommended, stable)
+      canfd_channel_id: 0                # Channel 0
+    right_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_serial_number: "12345678"    # Same adapter
+      canfd_channel_id: 1                # Channel 1 (dual-channel adapters like 200U)
+```
+
+**ZLG CANFD adapter (by device index):**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_device_id: 0                 # First adapter (index may change across reboots)
+      canfd_channel_id: 0
+    right_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_device_id: 0                 # Same adapter
+      canfd_channel_id: 1
+```
+
+**HCAN adapter (by serial number):**
+
 ```yaml
 /**:
   ros__parameters:
@@ -141,9 +203,87 @@ Example:
       connection_type: "hcan"
       canfd_serial_number: "12345678"
       canfd_channel_id: 0
+    right_hand:
+      hand_device_id: 1
+      connection_type: "hcan"
+      canfd_serial_number: "12345678"
+      canfd_channel_id: 1
 ```
 
-See [Unified ROS2 Interface Specification](API_ROS2.md) for full configuration details.
+**SocketCAN:**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can0"
+    right_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can1"
+```
+
+**RS485 Serial (O10 only):**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "rs485"
+      uart_port: "/dev/ttyUSB0"
+    right_hand:
+      hand_device_id: 1
+      connection_type: "rs485"
+      uart_port: "/dev/ttyUSB1"
+```
+
+**USB Direct (O10 only):**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "usb"
+      uart_port: "/dev/ttyACM0"
+    right_hand:
+      hand_device_id: 1
+      connection_type: "usb"
+      uart_port: "/dev/ttyACM1"
+```
+
+**Tuning CAN bus timing:**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can0"
+      request_interval_ms: 5             # 5ms between requests (reduce bus load)
+      frame_recv_timeout_ms: 100         # 100ms per-frame timeout (increase if bus is busy)
+      show_data_details: true            # Debug: print TX/RX data
+    right_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can1"
+      request_interval_ms: 5
+      frame_recv_timeout_ms: 100
+```
+
+### Launch
+
+```bash
+# Default config file
+ros2 launch omnihand_node omnihand_2025_node.launch.py
+
+# Custom config file
+ros2 launch omnihand_node omnihand_2025_node.launch.py config_file:=/path/to/your_config.yaml
+```
 
 ## Demo
 

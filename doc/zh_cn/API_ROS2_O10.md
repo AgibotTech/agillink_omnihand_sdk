@@ -130,9 +130,71 @@ ros2 topic pub --once /o10/left/joint_mix_control_cmd sensor_msgs/msg/JointState
 
 ## 配置
 
-O10 支持的连接方式：zlgcan, hcan, socketcan, rs485, usb。
+配置文件默认位于 [config/omnihand_2025_node.yaml](../../../node/config/omnihand_2025_node.yaml)，可直接修改或通过启动参数 `config_file` 指定。
 
-配置示例：
+O10 支持的连接方式：`zlgcan`、`hcan`、`socketcan`、`rs485`、`usb`。
+
+### 参数说明
+
+参数按 `left_hand` / `right_hand` 命名空间组织。如果 `connection_type` 为空或未设置，则跳过该手。
+
+| 参数 | 类型 | 默认值 | 适用连接方式 | 说明 |
+|------|------|--------|-------------|------|
+| `hand_device_id` | int | 1 | 全部 | 手设备 ID（1-255） |
+| `connection_type` | string | "" | — | `"zlgcan"` / `"hcan"` / `"socketcan"` / `"rs485"` / `"usb"`；为空则跳过 |
+| `canfd_serial_number` | string | "" | zlgcan / hcan | 适配器序列号（**推荐**，重启后稳定） |
+| `canfd_device_id` | int | 0 | zlgcan / hcan | 适配器设备索引（`canfd_serial_number` 为空时使用，重启后可能变化） |
+| `canfd_channel_id` | int | 0 | zlgcan / hcan | CAN 通道索引（0 或 1，双通道适配器如 200U 选 0/1，单通道始终为 0） |
+| `can_interface` | string | "can0" | socketcan | SocketCAN 接口名（如 `can0`、`can1`） |
+| `uart_port` | string | "" | rs485 / usb | 串口设备路径（如 `/dev/ttyUSB0`） |
+| `request_interval_ms` | int | -1 | 全部 | 请求最小间隔（ms），0=不限速，范围 0-100，-1=使用 SDK 默认值 |
+| `frame_recv_timeout_ms` | int | -1 | 全部 | 单帧接收超时（ms），范围 10-1000，-1=使用 SDK 默认值（50ms） |
+| `show_data_details` | bool | false | 全部 | 是否在终端打印收发数据详情（调试用） |
+
+> **适配器选择优先级**：`canfd_serial_number` 优先于 `canfd_device_id`。如果 `canfd_serial_number` 非空，则按序列号查找适配器；否则按 `canfd_device_id` 索引。推荐使用序列号，因为设备索引在重启后可能变化。
+
+### YAML 配置示例
+
+> ⚠️ YAML 对缩进要求严格，必须使用**空格**（不能用 Tab），且同级参数缩进必须一致。
+
+> 以下示例均为双手配置。如只需单手，删除 `right_hand`（或 `left_hand`）整个命名空间即可。
+
+**ZLG CANFD 适配器（按序列号，推荐）：**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_serial_number: "12345678"    # 适配器序列号（推荐，重启后稳定）
+      canfd_channel_id: 0                # 通道 0
+    right_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_serial_number: "12345678"    # 同一个适配器
+      canfd_channel_id: 1                # 通道 1（双通道适配器如 200U）
+```
+
+**ZLG CANFD 适配器（按设备索引）：**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_device_id: 0                 # 第一个适配器（重启后索引可能变化）
+      canfd_channel_id: 0
+    right_hand:
+      hand_device_id: 1
+      connection_type: "zlgcan"
+      canfd_device_id: 0                 # 同一个适配器
+      canfd_channel_id: 1
+```
+
+**HCAN 适配器（按序列号）：**
+
 ```yaml
 /**:
   ros__parameters:
@@ -141,9 +203,87 @@ O10 支持的连接方式：zlgcan, hcan, socketcan, rs485, usb。
       connection_type: "hcan"
       canfd_serial_number: "12345678"
       canfd_channel_id: 0
+    right_hand:
+      hand_device_id: 1
+      connection_type: "hcan"
+      canfd_serial_number: "12345678"
+      canfd_channel_id: 1
 ```
 
-详见 [ROS2 接口统一规范](API_ROS2.md) 中的配置说明。
+**SocketCAN：**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can0"
+    right_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can1"
+```
+
+**RS485 串口（仅 O10）：**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "rs485"
+      uart_port: "/dev/ttyUSB0"
+    right_hand:
+      hand_device_id: 1
+      connection_type: "rs485"
+      uart_port: "/dev/ttyUSB1"
+```
+
+**USB 直连（仅 O10）：**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "usb"
+      uart_port: "/dev/ttyACM0"
+    right_hand:
+      hand_device_id: 1
+      connection_type: "usb"
+      uart_port: "/dev/ttyACM1"
+```
+
+**调整 CAN 总线时序参数：**
+
+```yaml
+/**:
+  ros__parameters:
+    left_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can0"
+      request_interval_ms: 5             # 请求间隔 5ms（降低总线负载）
+      frame_recv_timeout_ms: 100         # 单帧超时 100ms（总线繁忙时适当增大）
+      show_data_details: true            # 调试：打印收发数据
+    right_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can1"
+      request_interval_ms: 5
+      frame_recv_timeout_ms: 100
+```
+
+### 启动
+
+```bash
+# 使用默认配置文件
+ros2 launch omnihand_node omnihand_2025_node.launch.py
+
+# 指定自定义配置文件
+ros2 launch omnihand_node omnihand_2025_node.launch.py config_file:=/path/to/your_config.yaml
+```
 
 ## Demo
 
