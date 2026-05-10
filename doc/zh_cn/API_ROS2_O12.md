@@ -23,12 +23,12 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 | `joint_current_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | `data[]` = 电流值 |
 | `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | 写入电流阈值 `data[0..11]` |
 | `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 回读电流阈值 `data[0..11]` |
-| `motor_pos_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | 写入电机原始位置 `data[0..11]` (int16 tick) |
-| `motor_pos_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 回读电机原始位置 `data[0..11]` (int16 tick) |
 | `tactile_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 3D 触觉传感器查询 |
 | `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 3D 触觉传感器数据 |
 
 **注意**: O12 有 12 个自由度。所有数组包含 12 个元素。
+
+**触发式回读**：节点不会自动周期发布状态。温度、电流、错误码等需要你先发送对应的 `*_cmd`（如 `joint_temperature_cmd`），节点才会查询硬件并在 `*_states` 上发布一次回读。`joint_cmd` 例外——发送位置指令后自动回读 `joint_states`。这样设计是为了避免占用 CAN 总线带宽，保证控制指令的实时性。
 
 ## 混合控制
 

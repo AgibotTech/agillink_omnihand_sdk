@@ -48,12 +48,15 @@ All products follow the same topic naming and interaction pattern:
 | `joint_control_mode_states` | `omnihand_msgs/JointStateInt8` | Publish (you sub) | On `joint_control_mode_cmd` received | Readback control mode `data[]` (H3U_M only) |
 | `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | Subscribe (you pub) | — | Write current threshold `data[]` |
 | `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | On `joint_current_threshold_cmd` received | Readback current threshold `data[]` |
-| `motor_pos_cmd` | `omnihand_msgs/JointStateInt16` | Subscribe (you pub) | — | Write raw motor position `data[]` (int16 tick) (O10/O12 only) |
-| `motor_pos_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | On `motor_pos_cmd` received | Readback raw motor position `data[]` (int16 tick) (O10/O12 only) |
 | `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger tactile sensor query (O10/O12 only) |
 | `tactile_states` | Product-specific msg (see below) | Publish (you sub) | On `tactile_cmd` received | Tactile sensor data |
 
-**Design principle**: The node never publishes autonomously. All state readbacks are triggered externally (by sending a cmd), so they never interfere with the control loop's rhythm.
+**Design Principle — Trigger-based Readback**: The OmniHand ROS2 node **never publishes state autonomously on a periodic timer**. All state readbacks (joint position, temperature, current, error codes, etc.) are triggered externally — you must first publish a `*_cmd` message, then the node will perform one hardware query and publish the result on the corresponding `*_states` topic.
+
+The rationale behind this design:
+- **No interference with the control loop**: Periodic autonomous queries would consume CAN bus bandwidth and may affect the real-time performance of position control commands.
+- **User-controlled resource usage**: The state query frequency is entirely determined by the user — trigger on demand, avoid unnecessary bus load.
+- **Usage pattern**: For example, to read temperature, publish a `std_msgs/Empty` to `joint_temperature_cmd`; the node will query the hardware and publish one reading on `joint_temperature_states`. The `joint_cmd` topic is special — after sending a position command, the node automatically publishes position readback on `joint_states` without an extra trigger.
 
 ### Control Mode
 

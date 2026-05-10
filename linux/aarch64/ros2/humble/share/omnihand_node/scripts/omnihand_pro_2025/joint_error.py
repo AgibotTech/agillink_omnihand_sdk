@@ -3,6 +3,10 @@
 @Description: Periodically trigger error-report query and display results
               for OmniHandPro2025 (O12).
 
+Note: OmniHand node uses trigger-based readback — it does not publish states
+      on a periodic timer. You must send a *_cmd to get one *_states response.
+      This avoids consuming CAN bus bandwidth and ensures control loop real-time.
+
 Topic:
   pub: /<product>/<side>/joint_error_cmd    (std_msgs/Empty)
   sub: /<product>/<side>/joint_error_states (omnihand_msgs/JointStateInt16)

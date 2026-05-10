@@ -3,6 +3,10 @@
 @Description: Periodically trigger 1D tactile sensor readback and display
               results for OmniHand2025 (O10).
 
+Note: OmniHand node uses trigger-based readback — it does not publish states
+      on a periodic timer. You must send a *_cmd to get one *_states response.
+      This avoids consuming CAN bus bandwidth and ensures control loop real-time.
+
 Topic:
   pub: /<product>/<side>/tactile_cmd     (std_msgs/Empty)
   sub: /<product>/<side>/tactile_states  (omnihand_2025_node_msgs/TactileSensor)

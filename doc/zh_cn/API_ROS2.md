@@ -48,12 +48,15 @@ OmniHand SDK 为三款产品提供统一风格的 ROS2 接口：
 | `joint_control_mode_states` | `omnihand_msgs/JointStateInt8` | 发布 (你订阅) | 收到 `joint_control_mode_cmd` 时 | 回读控制模式 `data[]`（仅 H3U_M） |
 | `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | — | 写入电流阈值 `data[]` |
 | `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `joint_current_threshold_cmd` 时 | 回读电流阈值 `data[]` |
-| `motor_pos_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | — | 写入电机原始位置 `data[]` (int16 tick)（仅 O10/O12） |
-| `motor_pos_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `motor_pos_cmd` 时 | 回读电机原始位置 `data[]` (int16 tick)（仅 O10/O12） |
 | `tactile_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发触觉传感器查询（仅 O10/O12） |
 | `tactile_states` | 产品专属消息（见下文） | 发布 (你订阅) | 收到 `tactile_cmd` 时 | 触觉传感器数据 |
 
-**设计原则**：节点不自驱发布。所有状态回读都由外部触发（发送 cmd），不会干扰控制回路的工作节奏。
+**设计原则 — 触发式回读**：OmniHand ROS2 节点**不会自动周期发布任何状态**。所有状态回读（关节位置、温度、电流、错误码等）都由外部显式触发——你必须先发送对应的 `*_cmd` 消息，节点才会执行一次硬件查询并在 `*_states` topic 上发布回读结果。
+
+这种设计的目的是：
+- **不干扰控制回路节奏**：周期性自动查询会占用 CAN 总线带宽，可能影响位置控制指令的实时性。
+- **资源可控**：状态查询频率完全由用户决定，按需触发，避免不必要的总线负载。
+- **使用方式**：例如需要读取温度时，向 `joint_temperature_cmd` 发送一条 `std_msgs/Empty`，节点会查询硬件并在 `joint_temperature_states` 上发布一次数据。`joint_cmd` 是特殊的——发送位置指令后，节点自动在 `joint_states` 上回传位置回读，无需额外触发。
 
 ### 控制模式
 

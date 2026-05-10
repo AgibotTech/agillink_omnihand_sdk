@@ -54,6 +54,13 @@
  *   sub: /<product>/<side>/joint_temperature_states (omnihand_msgs/JointStateInt8)
  *   sub: /<product>/<side>/joint_current_states     (omnihand_msgs/JointStateInt16)
  *
+ * 触发式回读 (Trigger-based Readback):
+ *   OmniHand ROS2 节点不会自动周期发布状态。温度、电流等 *_states
+ *   只在你发送对应的 *_cmd 后才会查询硬件并发布一次。
+ *   例如：发一条 Empty 到 joint_temperature_cmd → 收到一条 joint_temperature_states。
+ *   joint_cmd 例外：发送位置指令后，节点自动回读位置到 joint_states。
+ *   设计目的：避免占用 CAN 总线带宽，保证控制指令实时性。
+ *
  * ======================================================================
  * 自己从零写 ROS2 C++ 包
  * ======================================================================

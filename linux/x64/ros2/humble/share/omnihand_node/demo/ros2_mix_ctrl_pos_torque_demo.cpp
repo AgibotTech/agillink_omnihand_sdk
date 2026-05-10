@@ -71,6 +71,14 @@
  *   sub: /<product>/<side>/joint_temperature_states (omnihand_msgs/JointStateInt8)
  *   sub: /<product>/<side>/joint_current_states     (omnihand_msgs/JointStateInt16)
  *
+ * Trigger-based Readback:
+ *   The OmniHand ROS2 node never publishes state on a periodic timer.
+ *   Temperature, current, and other *_states are only published once after
+ *   you send the corresponding *_cmd message.
+ *   Example: publish Empty to joint_temperature_cmd → receive one joint_temperature_states.
+ *   Exception: joint_cmd / joint_mix_control_cmd automatically trigger joint_states readback.
+ *   Rationale: avoid consuming CAN bus bandwidth, ensure real-time control responsiveness.
+ *
  * ======================================================================
  * Writing your own ROS2 C++ package from scratch
  * ======================================================================

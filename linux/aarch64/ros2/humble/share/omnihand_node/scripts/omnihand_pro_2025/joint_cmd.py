@@ -3,6 +3,11 @@
 @Description: Publish joint-position commands and display position readback
               for OmniHandPro2025 (O12).
 
+Note: joint_cmd is the only topic that automatically triggers joint_states
+      readback. Other state queries (temperature, current, etc.) require you
+      to explicitly send a *_cmd first. This trigger-based design avoids
+      consuming CAN bus bandwidth and ensures control loop real-time.
+
 Topic:
   pub: /<product>/<side>/joint_cmd     (sensor_msgs/JointState, position[] = rad)
   sub: /<product>/<side>/joint_states  (sensor_msgs/JointState, position[] = rad)

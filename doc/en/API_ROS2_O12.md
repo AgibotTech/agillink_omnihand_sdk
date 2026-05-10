@@ -23,12 +23,12 @@ All topics are prefixed with `/o12/<side>/`, where `<side>` is `left` or `right`
 | `joint_current_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = current |
 | `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | Subscribe (you pub) | Write current threshold `data[0..11]` |
 | `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | Readback current threshold `data[0..11]` |
-| `motor_pos_cmd` | `omnihand_msgs/JointStateInt16` | Subscribe (you pub) | Write raw motor position `data[0..11]` (int16 tick) |
-| `motor_pos_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | Readback raw motor position `data[0..11]` (int16 tick) |
 | `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Trigger 3D tactile sensor query |
 | `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | Publish (you sub) | 3D tactile sensor data |
 
 **Note**: O12 has 12 degrees of freedom. All arrays contain 12 elements.
+
+**Trigger-based Readback**: The node never publishes state on a periodic timer. To read temperature, current, error codes, etc., you must first publish the corresponding `*_cmd` message (e.g. `joint_temperature_cmd`); the node will then query the hardware and publish one reading on `*_states`. The exception is `joint_cmd` — after sending a position command, the node automatically publishes position readback on `joint_states`. This avoids consuming CAN bus bandwidth and ensures real-time responsiveness of control commands.
 
 ## Mixed Control
 
