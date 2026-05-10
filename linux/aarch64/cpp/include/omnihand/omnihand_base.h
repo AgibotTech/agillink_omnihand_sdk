@@ -95,13 +95,13 @@ class AGIBOT_EXPORT OmniHandBase : public virtual OmniHand {
   
   /**
    * @brief Calculates all joint angles (including active and passive joints) from active joint angles.
-   * @param active_joint_pos Active joint angle vector (unit: radians). Length depends on product type:
+   * @param active_joint_angles Active joint angle vector (unit: radians). Length depends on product type:
    *                         - OmniHand 2025 (O10): 10 values
    *                         - OmniHand Pro 2025 (O12): 12 values
    * @return All joint angle vector (unit: radians), including active and passive joints
    * @note This function does not perform hardware communication, only kinematics calculation.
    */
-  virtual std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos) const { (void)active_joint_pos; return {}; }
+  virtual std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles) const { (void)active_joint_angles; return {}; }
 
   // ============ Velocity Control ============
   /**
