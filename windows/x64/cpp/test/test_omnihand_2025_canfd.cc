@@ -596,9 +596,9 @@ TEST_F(OmniHand2025CanfdTest, KinematicsSolver) {
   RequireDevice();
   
   std::vector<double> active_angles(10, 0.0);
-  auto all_angles = hand_->GetAllJointPos(active_angles);
+  auto all_angles = hand_->GetAllJointAngles(active_angles);
   
-  std::cout << "[GetAllJointPos] Forward kinematics: " << all_angles.size() << " angles" << std::endl;
+  std::cout << "[GetAllJointAngles] Forward kinematics: " << all_angles.size() << " angles" << std::endl;
   
   EXPECT_EQ(all_angles.size(), 16);
 }

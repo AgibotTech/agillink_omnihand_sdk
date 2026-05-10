@@ -38,7 +38,7 @@
 - `omnihand_pro_2025/demo_socketcan.py` - SocketCAN 示例（仅 Linux）
 
 ## OmniHand Dex UMI（10 自由度，UMI 协议）示例
-- **运动学（Python）：** `OmniHandDexUMI.get_all_active_joint_angles()`、`get_all_joint_angles()`、`get_all_joint_pos(...)` 与 O10 共用求解器，只读（无 set 角度类接口）。
+- **运动学（Python）：** `OmniHandDexUMI.get_all_active_joint_angles()`、`get_all_joint_angles()`、`get_all_joint_angles(...)` 与 O10 共用求解器，只读（无 set 角度类接口）。
 - `omnihand_dex_umi/demo_get_hardware_info.py` - 获取硬件信息
 - `omnihand_dex_umi/demo_tactile_sensor_raw.py` - 读取触觉原始数据（Pn6 协议）
 - `omnihand_dex_umi/demo_periodic_report.py` - 接收周期上报（位置与触觉）

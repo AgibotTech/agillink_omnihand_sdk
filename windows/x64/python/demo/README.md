@@ -38,7 +38,7 @@
 - `omnihand_pro_2025/demo_socketcan.py` - SocketCAN example (Linux only)
 
 ## OmniHand Dex UMI (10 DOF, UMI Protocol) Examples
-- **Kinematics (Python):** `OmniHandDexUMI.get_all_active_joint_angles()`, `get_all_joint_angles()`, `get_all_joint_pos(...)` — same O10 solver as OmniHand 2025; read-only (no set-angle APIs).
+- **Kinematics (Python):** `OmniHandDexUMI.get_all_active_joint_angles()`, `get_all_joint_angles()`, `get_all_joint_angles(...)` — same O10 solver as OmniHand 2025; read-only (no set-angle APIs).
 - `omnihand_dex_umi/demo_get_hardware_info.py` - Get hardware information
 - `omnihand_dex_umi/demo_tactile_sensor_raw.py` - Read tactile sensor raw data (uses Pn6 protocol)
 - `omnihand_dex_umi/demo_periodic_report.py` - Receive periodic reports (position and tactile sensor)

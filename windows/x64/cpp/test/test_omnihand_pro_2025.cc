@@ -333,16 +333,16 @@ TEST_F(OmniHandPro2025Test, KinematicsSolver) {
     
     // Test forward kinematics with valid input
     std::vector<double> active_angles(12, 0.0);
-    auto all_angles = hand_->GetAllJointPos(active_angles);
+    auto all_angles = hand_->GetAllJointAngles(active_angles);
     
     // Check if calculation succeeded (non-empty result and correct size)
     if (all_angles.empty() || all_angles.size() != 19) {
-      std::cout << "[GetAllJointPos] Failed: got " << all_angles.size() 
+      std::cout << "[GetAllJointAngles] Failed: got " << all_angles.size() 
                 << " angles, expected 19" << std::endl;
       return;
     }
     
-    std::cout << "[GetAllJointPos] Forward Kinematics (input: 12 active angles, output: " 
+    std::cout << "[GetAllJointAngles] Forward Kinematics (input: 12 active angles, output: " 
               << all_angles.size() << " joint angles): ";
     for (size_t i = 0; i < all_angles.size(); ++i) {
       std::cout << std::fixed << std::setprecision(4) << all_angles[i];
