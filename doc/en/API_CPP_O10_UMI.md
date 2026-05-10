@@ -263,6 +263,18 @@ int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
 std::vector<int16_t> GetAllJointMotorPosi() const;
 ```
 
+## Joint Angles
+
+```cpp
+/**
+ * @brief Get 10 active joint angles
+ * 
+ * Converts motor positions (0-4096) to angles via calibration parameters.
+ * @return 10 active joint angles in rad
+ */
+std::vector<double> GetAllActiveJointAngles() const;
+```
+
 ## Position Calibration
 
 **Note**: UMI protocol supports position calibration via Pn7/Pn8 register. This is a write-only operation.
@@ -425,6 +437,18 @@ int main() {
 - **Pn8**: Minimum position calibration (write-only)
   - **Pn8.00**: Set all joints min position at once
   - **Pn8.01~Pn8.0A**: Set individual joint min position (joint 1-10)
+
+## Demo Files
+
+The SDK release package includes ready-to-compile C++ demo source code:
+
+| Demo | Path |
+|------|------|
+| CAN FD (connect by ID) | [UMI_demo_canfd_id.cc](../../../cpp/demo/omnihand_dex_umi/UMI_demo_canfd_id.cc) |
+| CAN FD (connect by serial) | [UMI_demo_canfd_serial.cc](../../../cpp/demo/omnihand_dex_umi/UMI_demo_canfd_serial.cc) |
+| SocketCAN | [UMI_demo_socketcan.cc](../../../cpp/demo/omnihand_dex_umi/UMI_demo_socketcan.cc) |
+
+See [CMakeLists.txt](../../../cpp/demo/omnihand_dex_umi/CMakeLists.txt) for build instructions.
 
 ## Related Documentation
 

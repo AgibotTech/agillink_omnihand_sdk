@@ -358,11 +358,11 @@ std::vector<double> GetAllJointAngles() const;
 
 /**
  * @brief Computes all joint angles (including passive) from active joint angles.
- * @param active_joint_pos A vector of active joint angles (in radians). Must have 12 values.
+ * @param active_joint_angles A vector of active joint angles (in radians). Must have 12 values.
  * @return A vector of all joint angles (in radians), including both active and passive joints.
  * @note This function does not communicate with hardware; it only performs kinematics calculations.
  */
-std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos) const;
+std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles) const;
 ```
 
 ## Velocity Control
@@ -655,6 +655,18 @@ int main() {
     return 0;
 }
 ```
+
+## Demo Files
+
+The SDK release package includes ready-to-compile C++ demo source code:
+
+| Demo | Path |
+|------|------|
+| CAN FD (connect by ID) | [O12_demo_canfd_id.cc](../../../cpp/demo/omnihand_pro_2025/O12_demo_canfd_id.cc) |
+| CAN FD (connect by serial) | [O12_demo_canfd_serial.cc](../../../cpp/demo/omnihand_pro_2025/O12_demo_canfd_serial.cc) |
+| SocketCAN | [O12_demo_socketcan.cc](../../../cpp/demo/omnihand_pro_2025/O12_demo_socketcan.cc) |
+
+See [CMakeLists.txt](../../../cpp/demo/omnihand_pro_2025/CMakeLists.txt) for build instructions.
 
 ## Related Documentation
 

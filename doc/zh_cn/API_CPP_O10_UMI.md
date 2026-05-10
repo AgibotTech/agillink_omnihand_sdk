@@ -179,6 +179,18 @@ int16_t GetJointMotorPosi(unsigned char joint_motor_index) const;
 std::vector<int16_t> GetAllJointMotorPosi() const;
 ```
 
+### 关节角度
+
+```cpp
+/**
+ * @brief 获取 10 个主动关节角度
+ * 
+ * 从电机位置（0-4096）通过标定参数转换为角度。
+ * @return 10 个主动关节角度（单位 rad）
+ */
+std::vector<double> GetAllActiveJointAngles() const;
+```
+
 ### 位置校准
 
 ```cpp
@@ -318,6 +330,18 @@ int main() {
 - **Pn8**: 最小位置校准（只写）
   - **Pn8.00**: 一次性设置所有关节的最小位置
   - **Pn8.01~Pn8.0A**: 设置单个关节的最小位置（关节 1-10）
+
+## Demo 文件
+
+SDK 发布包中提供了可直接编译运行的 C++ demo 源码：
+
+| Demo | 路径 |
+|------|------|
+| CAN FD（按 ID 连接） | [UMI_demo_canfd_id.cc](../../../cpp/demo/omnihand_dex_umi/UMI_demo_canfd_id.cc) |
+| CAN FD（按串号连接） | [UMI_demo_canfd_serial.cc](../../../cpp/demo/omnihand_dex_umi/UMI_demo_canfd_serial.cc) |
+| SocketCAN | [UMI_demo_socketcan.cc](../../../cpp/demo/omnihand_dex_umi/UMI_demo_socketcan.cc) |
+
+编译方式参见 [CMakeLists.txt](../../../cpp/demo/omnihand_dex_umi/CMakeLists.txt)。
 
 ## 相关文档
 

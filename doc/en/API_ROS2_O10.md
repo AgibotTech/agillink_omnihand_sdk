@@ -35,9 +35,9 @@ All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`
 `joint_mix_control_cmd` uses `sensor_msgs/JointState` for position+torque mixed control:
 
 - `position[]` = raw motor position (int16, range 0–4095)
-- `effort[]` = motor current (int16, unit: **mA**, not the standard N·m)
+- `effort[]` = motor current (int16, unit: **mA**, range **0–1000**, not the standard N·m)
 
-> **Note**: The `effort` field carries current values in mA, not ROS2 standard torque (N·m). The position + velocity + torque mode (POSITION_VELOCITY_TORQUE) is not yet available.
+> **Note**: The `effort` field carries current values in mA (0–1000), not ROS2 standard torque (N·m). The position + velocity + torque mode (POSITION_VELOCITY_TORQUE) is not yet available.
 
 The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No readback**.
 

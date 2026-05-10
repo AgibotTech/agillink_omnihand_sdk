@@ -133,6 +133,15 @@ def get_all_joint_positions(self) -> List[int]:
     Returns:
         List[int]: 10 个关节位置（0-4096）。
     """
+
+def get_all_active_joint_angles(self) -> List[float]:
+    """获取 10 个主动关节角度。
+    
+    从电机位置通过标定参数转换为角度。
+    
+    Returns:
+        List[float]: 10 个主动关节角度（单位 rad）。
+    """
 ```
 
 
@@ -193,10 +202,29 @@ if not hand.init():
 positions = hand.get_all_joint_positions()
 print(f"所有关节位置 ({len(positions)} 个值): {positions}")
 
+# 获取 10 个主动关节角度
+angles = hand.get_all_active_joint_angles()
+print(f"主动关节角度 ({len(angles)} 个, rad): {[f'{a:.4f}' for a in angles]}")
+
 # 获取触觉传感器数据
 tactile_data = hand.get_all_tactile_sensor_data_raw()
 print(f"触觉传感器: {len(tactile_data)} 个传感器")
 ```
+
+## Demo 文件
+
+SDK 发布包中提供了可直接运行的 Python demo 脚本（位于 `python/demo/omnihand_dex_umi/`）：
+
+| Demo | 文件 |
+|------|------|
+| CAN FD（按 ID 连接） | [demo_canfd_id.py](../../../python/demo/omnihand_dex_umi/demo_canfd_id.py) |
+| CAN FD（按串号连接） | [demo_canfd_serial.py](../../../python/demo/omnihand_dex_umi/demo_canfd_serial.py) |
+| SocketCAN | [demo_socketcan.py](../../../python/demo/omnihand_dex_umi/demo_socketcan.py) |
+| 触觉传感器（原始数据） | [demo_tactile_sensor_raw.py](../../../python/demo/omnihand_dex_umi/demo_tactile_sensor_raw.py) |
+| 最大最小位置标定 | [demo_set_max_min_calibration.py](../../../python/demo/omnihand_dex_umi/demo_set_max_min_calibration.py) |
+| UMI 遥操 O10 | [demo_umi_to_o10.py](../../../python/demo/omnihand_dex_umi/demo_umi_to_o10.py) |
+| 主动关节角度读取 | [demo_get_all_active_joint_angles.py](../../../python/demo/omnihand_dex_umi/demo_get_all_active_joint_angles.py) |
+| 硬件信息 | [demo_get_hardware_info.py](../../../python/demo/omnihand_dex_umi/demo_get_hardware_info.py) |
 
 ## 相关文档
 

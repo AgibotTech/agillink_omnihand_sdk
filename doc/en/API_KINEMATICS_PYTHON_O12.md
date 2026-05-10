@@ -23,7 +23,7 @@ OmniHandPro2025Solver(hand_type: bool)
 ### 1. check_joint_pos
 
 ```python
-def check_joint_pos(active_joint_pos: List[float]) -> bool
+def check_joint_pos(active_joint_angles: List[float]) -> bool
 ```
 
 - Checks if the number of active joints is reasonable. If not, returns `False`.
@@ -48,7 +48,7 @@ def set_hand_gesture(gesture: int) -> List[int]
 ### 3. convert_joint_to_actuator
 
 ```python
-def convert_joint_to_actuator(active_joint_pos: List[float]) -> List[int]
+def convert_joint_to_actuator(active_joint_angles: List[float]) -> List[int]
 ```
 
 - Converts active joint positions into actuator input values.
@@ -66,7 +66,7 @@ def convert_actuator_to_joint(actuator_input: List[int]) -> List[float]
 ### 5. active_joint_to_motor_length
 
 ```python
-def active_joint_to_motor_length(active_joint_pos: List[float]) -> List[float]
+def active_joint_to_motor_length(active_joint_angles: List[float]) -> List[float]
 ```
 
 - Converts active joint positions into motor length.
@@ -95,10 +95,10 @@ def motor_input_to_motor_length(motor_input: List[int]) -> List[float]
 
 - Converts the motor input value to motor length.
 
-### 9. get_all_joint_pos
+### 9. get_all_joint_angles
 
 ```python
-def get_all_joint_pos(active_joint_pos: List[float]) -> List[float]
+def get_all_joint_angles(active_joint_angles: List[float]) -> List[float]
 ```
 
 - Retrieves the angles of all joints, including passive joints, based on the given active joint positions.
@@ -112,17 +112,17 @@ from omnihand.omnihand_pro_2025 import OmniHandPro2025Solver
 solver = OmniHandPro2025Solver(hand_type=False)
 
 # Check and validate joint positions
-active_joint_pos = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3]
-valid = solver.check_joint_pos(active_joint_pos)
+active_joint_angles = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3]
+valid = solver.check_joint_pos(active_joint_angles)
 
 # Set a gesture
 actuator_input = solver.set_hand_gesture(1)  # PAPER gesture
 
 # Convert joint positions to actuator input
-input_values = solver.convert_joint_to_actuator(active_joint_pos)
+input_values = solver.convert_joint_to_actuator(active_joint_angles)
 
 # Get all joint positions (including passive joints)
-all_joints = solver.get_all_joint_pos(active_joint_pos)
+all_joints = solver.get_all_joint_angles(active_joint_angles)
 ```
 
 ## Related Documentation

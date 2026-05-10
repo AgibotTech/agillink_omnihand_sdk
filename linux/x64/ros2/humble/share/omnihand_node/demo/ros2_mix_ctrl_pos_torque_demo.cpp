@@ -30,7 +30,7 @@
  * ======================================================================
  *   - sensor_msgs/JointState        : mix control (position[] + effort[])
  *       position[] = raw motor position (0–4095)
- *       effort[]   = motor current in mA (non-standard, not N·m)
+ *       effort[]   = motor current in mA (range 0–1000, non-standard, not N·m)
  *   - omnihand_msgs/JointStateInt16 : current readback (data[] = int16)
  *   - omnihand_msgs/JointStateInt8  : temperature/error readback (data[] = int8)
  *

@@ -356,7 +356,7 @@ O10 不支持通过 `set_control_mode` 指令切换控制模式，默认工作�
 | `ControlMode.POSITION_TORQUE` | 4 | 位置 + 力矩混合控制 |
 | `ControlMode.POSITION_VELOCITY_TORQUE` | 6 | 位置 + 速度 + 力矩混合控制（**暂未开放**） |
 
-> **非标单位说明**：`POSITION_TORQUE` 模式中的"力矩"实际对应电机电流值，单位为 **mA**，而非 ROS2 标准的 N·m。
+> **非标单位说明**：`POSITION_TORQUE` 模式中的"力矩"实际对应电机电流值，单位为 **mA**，范围 **0–1000**，而非 ROS2 标准的 N·m。
 
 ## 电流阈值控制
 
@@ -408,7 +408,7 @@ def get_all_current_thresholds(self) -> List[int]:
 
 ## 混合控制
 
-> **注意**：O10/H3L 的混合控制中，`tgt_torque` 字段实际对应电机电流，单位为 **mA**（非标准 N·m）。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
+> **注意**：O10/H3L 的混合控制中，`tgt_torque` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
 
 ```python
 def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
@@ -418,7 +418,7 @@ def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
         mix_ctrls: 混合控制参数列表。
             - ctrl_mode: 控制模式（仅 POSITION_TORQUE 可用）
             - tgt_posi: 目标位置（0–4095 编码器原始值）
-            - tgt_torque: 目标电流（单位 mA，非 N·m）
+            - tgt_torque: 目标电流（单位 mA，范围 0–1000，非 N·m）
     
     Note:
         纯力控模式 (TORQUE) 不支持。
@@ -549,6 +549,30 @@ print(f"已设置关节角度: {angles} (rad)")
 thumb_data = hand.get_tactile_sensor_data(Finger.THUMB)
 print(f"拇指传感器数据: {len(thumb_data)} 个点")
 ```
+
+## Demo 文件
+
+SDK 发布包中提供了可直接运行的 Python demo 脚本（位于 `python/demo/omnihand_2025/`）：
+
+| Demo | 文件 |
+|------|------|
+| CAN FD（按 ID 连接） | [demo_canfd_id.py](../../../python/demo/omnihand_2025/demo_canfd_id.py) |
+| CAN FD（按串号连接） | [demo_canfd_serial.py](../../../python/demo/omnihand_2025/demo_canfd_serial.py) |
+| SocketCAN | [demo_socketcan.py](../../../python/demo/omnihand_2025/demo_socketcan.py) |
+| ZLG CAN TCP | [demo_zlgcan_tcp.py](../../../python/demo/omnihand_2025/demo_zlgcan_tcp.py) |
+| 位置+力矩混合控制 | [demo_mix_ctrl_pos_torque.py](../../../python/demo/omnihand_2025/demo_mix_ctrl_pos_torque.py) |
+| 位置+速度+力矩混合控制 | [demo_mix_ctrl_pos_vel_torque.py](../../../python/demo/omnihand_2025/demo_mix_ctrl_pos_vel_torque.py) |
+| 电流监控 | [demo_monitor_current.py](../../../python/demo/omnihand_2025/demo_monitor_current.py) |
+| 温度监控 | [demo_monitor_temperature.py](../../../python/demo/omnihand_2025/demo_monitor_temperature.py) |
+| 错误监控 | [demo_monitor_error.py](../../../python/demo/omnihand_2025/demo_monitor_error.py) |
+| 角度控制 | [demo_set_angle.py](../../../python/demo/omnihand_2025/demo_set_angle.py) |
+| 电机位置控制 | [demo_set_motor.py](../../../python/demo/omnihand_2025/demo_set_motor.py) |
+| 运动序列 | [demo_set_motion.py](../../../python/demo/omnihand_2025/demo_set_motion.py) |
+| 触觉传感器 | [demo_tactile_sensor.py](../../../python/demo/omnihand_2025/demo_tactile_sensor.py) |
+| 硬件信息 | [demo_get_hardware_info.py](../../../python/demo/omnihand_2025/demo_get_hardware_info.py) |
+| 双手控制（多 CAN） | [demo_set_motor_via_multicans.py](../../../python/demo/omnihand_2025/demo_set_motor_via_multicans.py) |
+| 双手控制（多通道） | [demo_set_motor_via_multichannels.py](../../../python/demo/omnihand_2025/demo_set_motor_via_multichannels.py) |
+| 双手控制（多 SocketCAN） | [demo_set_motor_via_multisocketcans.py](../../../python/demo/omnihand_2025/demo_set_motor_via_multisocketcans.py) |
 
 ## 相关文档
 

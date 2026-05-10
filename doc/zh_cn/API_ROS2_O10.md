@@ -35,9 +35,9 @@ O10 ROS2 节点提供 10 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 `joint_mix_control_cmd` 使用 `sensor_msgs/JointState` 进行位置+力矩混合控制：
 
 - `position[]` = 电机原始位置 (int16, 范围 0–4095)
-- `effort[]` = 电机电流 (int16, 单位 **mA**，非标准 N·m)
+- `effort[]` = 电机电流 (int16, 单位 **mA**，范围 **0–1000**，非标准 N·m)
 
-> **注意**：`effort` 字段传递的是电流值（mA），而非 ROS2 标准的力矩（N·m）。位置+速度+力矩模式（POSITION_VELOCITY_TORQUE）暂未开放。
+> **注意**：`effort` 字段传递的是电流值（mA，0–1000），而非 ROS2 标准的力矩（N·m）。位置+速度+力矩模式（POSITION_VELOCITY_TORQUE）暂未开放。
 
 节点内部以 POSITION_TORQUE 模式调用 `MixCtrlJointMotor`，**无回读**。
 

@@ -52,7 +52,7 @@ std::vector<int> SetHandGesture(const int& gesture);
 ### 2. ActiveJointPos2ActuatorInput
 
 ```cpp
-std::vector<int> ActiveJointPos2ActuatorInput(const std::vector<double>& active_joint_pos);
+std::vector<int> ActiveJointPos2ActuatorInput(const std::vector<double>& active_joint_angles);
 ```
 
 - Converts active joint positions into actuator input values.
@@ -67,10 +67,10 @@ std::vector<double> ActuatorInput2ActiveJointPos(const std::vector<int>& actuato
 - Converts actuator input values back into active joint positions.
 - **Note**: O10 motor input range is 0-4096, different from O12 which is 0-2000.
 
-### 4. GetAllJointPos
+### 4. GetAllJointAngles
 
 ```cpp
-std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos);
+std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles);
 ```
 
 - Retrieves the angles of all joints, including passive joints, based on the given active joint positions.
@@ -98,11 +98,11 @@ solver.show_log(true);
 std::vector<int> actuator_input = solver.SetHandGesture(1); // FIST gesture
 
 // Convert joint positions to actuator input
-std::vector<double> active_joint_pos = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0};
-std::vector<int> input = solver.ActiveJointPos2ActuatorInput(active_joint_pos);
+std::vector<double> active_joint_angles = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0};
+std::vector<int> input = solver.ActiveJointPos2ActuatorInput(active_joint_angles);
 
 // Get all joint positions (including passive joints)
-std::vector<double> all_joints = solver.GetAllJointPos(active_joint_pos);
+std::vector<double> all_joints = solver.GetAllJointAngles(active_joint_angles);
 ```
 
 ## Related Documentation

@@ -62,7 +62,7 @@ OmniHand SDK 为三款产品提供统一风格的 ROS2 接口：
 
 不同产品型号对控制模式的支持有所不同：
 
-**O10 / H3L**：不支持通过 `joint_control_mode_cmd` topic 切换控制模式，默认位置控制。可通过 `joint_mix_control_cmd` 实现位置+力矩混合控制；位置+速度+力矩模式暂未开放。注意：混合控制中 `effort` 字段实际对应电机电流，单位为 **mA**（非标准 N·m）。
+**O10 / H3L**：不支持通过 `joint_control_mode_cmd` topic 切换控制模式，默认位置控制。可通过 `joint_mix_control_cmd` 实现位置+力矩混合控制；位置+速度+力矩模式暂未开放。注意：混合控制中 `effort` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。
 
 **O12**：支持通过 `SetControlMode` 接口设置位置模式、伺服模式、速度模式、力矩模式，也可通过 `joint_mix_control_cmd` 实现位置+力混合控制（支持 5 种模式）。混合控制中 `effort` 字段单位为 **0.01N**（与触觉传感器法向力关联）。注意 O12 的 ROS2 node 当前未暴露 `joint_control_mode_cmd` topic，控制模式切换需通过 C++/Python SDK 直接调用。
 
@@ -73,7 +73,7 @@ OmniHand SDK 为三款产品提供统一风格的 ROS2 接口：
 `joint_mix_control_cmd` 是独立于 `joint_cmd` 的混合控制 topic，使用 `sensor_msgs/JointState`：
 
 - `position[]` = 电机原始位置 (int16)
-- `effort[]` = 电机原始力矩 (int16)
+- `effort[]` = 电机原始力矩 (int16, O10/H3L: 电流 mA 范围 0–1000, O12: 0.01N)
 
 节点内部以 POSITION_TORQUE 模式调用 `MixCtrlJointMotor`，**无回读**。
 

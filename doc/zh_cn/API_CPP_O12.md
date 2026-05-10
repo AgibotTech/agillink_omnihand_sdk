@@ -369,6 +369,18 @@ int main() {
 }
 ```
 
+## Demo 文件
+
+SDK 发布包中提供了可直接编译运行的 C++ demo 源码：
+
+| Demo | 路径 |
+|------|------|
+| CAN FD（按 ID 连接） | [O12_demo_canfd_id.cc](../../../cpp/demo/omnihand_pro_2025/O12_demo_canfd_id.cc) |
+| CAN FD（按串号连接） | [O12_demo_canfd_serial.cc](../../../cpp/demo/omnihand_pro_2025/O12_demo_canfd_serial.cc) |
+| SocketCAN | [O12_demo_socketcan.cc](../../../cpp/demo/omnihand_pro_2025/O12_demo_socketcan.cc) |
+
+编译方式参见 [CMakeLists.txt](../../../cpp/demo/omnihand_pro_2025/CMakeLists.txt)。
+
 ## 相关文档
 
 - [OmniHand Pro 2025 (O12) 运动学求解器 C++ API](API_KINEMATICS_CPP_O12.md) - 运动学计算

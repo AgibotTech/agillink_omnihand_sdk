@@ -755,6 +755,26 @@ thumb_data = hand.get_tactile_sensor_3d_data(Finger.THUMB)
 print(f"Thumb normal force: {thumb_data.normal_force} (0.1N)")
 ```
 
+## Demo Files
+
+The SDK release package includes ready-to-run Python demo scripts (under `python/demo/omnihand_pro_2025/`):
+
+| Demo | File |
+|------|------|
+| CAN FD (connect by ID) | [demo_canfd_id.py](../../../python/demo/omnihand_pro_2025/demo_canfd_id.py) |
+| CAN FD (connect by serial) | [demo_canfd_serial.py](../../../python/demo/omnihand_pro_2025/demo_canfd_serial.py) |
+| SocketCAN | [demo_socketcan.py](../../../python/demo/omnihand_pro_2025/demo_socketcan.py) |
+| ZLG CAN TCP | [demo_zlgcan_tcp.py](../../../python/demo/omnihand_pro_2025/demo_zlgcan_tcp.py) |
+| Position + Torque mixed control | [demo_mix_ctrl_pos_torque.py](../../../python/demo/omnihand_pro_2025/demo_mix_ctrl_pos_torque.py) |
+| Position control | [demo_set_position.py](../../../python/demo/omnihand_pro_2025/demo_set_position.py) |
+| Velocity control | [demo_set_velocity.py](../../../python/demo/omnihand_pro_2025/demo_set_velocity.py) |
+| Angle control | [demo_set_angle.py](../../../python/demo/omnihand_pro_2025/demo_set_angle.py) |
+| Current monitoring | [demo_monitor_current.py](../../../python/demo/omnihand_pro_2025/demo_monitor_current.py) |
+| Temperature monitoring | [demo_monitor_temperature.py](../../../python/demo/omnihand_pro_2025/demo_monitor_temperature.py) |
+| Error monitoring | [demo_monitor_error.py](../../../python/demo/omnihand_pro_2025/demo_monitor_error.py) |
+| Tactile sensor | [demo_sensor_touch.py](../../../python/demo/omnihand_pro_2025/demo_sensor_touch.py) |
+| Hardware info | [demo_get_hardware_info.py](../../../python/demo/omnihand_pro_2025/demo_get_hardware_info.py) |
+
 ## Related Documentation
 
 - [OmniHand Pro 2025 (O12) Kinematics Solver Python API](API_KINEMATICS_PYTHON_O12.md) - For kinematics calculations

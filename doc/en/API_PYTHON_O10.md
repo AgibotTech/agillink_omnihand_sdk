@@ -546,7 +546,7 @@ O10 does not support switching control modes via `set_control_mode`. It operates
 | `ControlMode.POSITION_TORQUE` | 4 | Position + torque mixed control |
 | `ControlMode.POSITION_VELOCITY_TORQUE` | 6 | Position + velocity + torque mixed control (**not yet available**) |
 
-> **Non-standard unit note**: In `POSITION_TORQUE` mode, "torque" actually corresponds to motor current in **mA**, not the ROS2 standard N·m.
+> **Non-standard unit note**: In `POSITION_TORQUE` mode, "torque" actually corresponds to motor current in **mA**, range **0–1000**, not the ROS2 standard N·m.
 
 ## Current Threshold Control
 
@@ -598,7 +598,7 @@ def get_all_current_thresholds(self) -> List[int]:
 
 ## Mixed Control
 
-> **Note**: For O10/H3L, `tgt_torque` actually corresponds to motor current in **mA** (not the standard N·m). `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
+> **Note**: For O10/H3L, `tgt_torque` actually corresponds to motor current in **mA**, range **0–1000** (not the standard N·m). `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
 
 ```python
 def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
@@ -608,7 +608,7 @@ def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
         mix_ctrls: List of mixed control parameters.
             - ctrl_mode: Control mode (only POSITION_TORQUE is available for O10)
             - tgt_posi: Target position (0–4095 raw encoder value)
-            - tgt_torque: Target current in mA (non-standard, not N·m)
+            - tgt_torque: Target current in mA, range 0–1000 (non-standard, not N·m)
     
     Note:
         Pure torque control (TORQUE) is not supported.
@@ -739,6 +739,30 @@ print(f"Set joint angles: {angles} (rad)")
 thumb_data = hand.get_tactile_sensor_data(Finger.THUMB)
 print(f"Thumb sensor data: {len(thumb_data)} points")
 ```
+
+## Demo Files
+
+The SDK release package includes ready-to-run Python demo scripts (under `python/demo/omnihand_2025/`):
+
+| Demo | File |
+|------|------|
+| CAN FD (connect by ID) | [demo_canfd_id.py](../../../python/demo/omnihand_2025/demo_canfd_id.py) |
+| CAN FD (connect by serial) | [demo_canfd_serial.py](../../../python/demo/omnihand_2025/demo_canfd_serial.py) |
+| SocketCAN | [demo_socketcan.py](../../../python/demo/omnihand_2025/demo_socketcan.py) |
+| ZLG CAN TCP | [demo_zlgcan_tcp.py](../../../python/demo/omnihand_2025/demo_zlgcan_tcp.py) |
+| Position + Torque mixed control | [demo_mix_ctrl_pos_torque.py](../../../python/demo/omnihand_2025/demo_mix_ctrl_pos_torque.py) |
+| Position + Velocity + Torque mixed control | [demo_mix_ctrl_pos_vel_torque.py](../../../python/demo/omnihand_2025/demo_mix_ctrl_pos_vel_torque.py) |
+| Current monitoring | [demo_monitor_current.py](../../../python/demo/omnihand_2025/demo_monitor_current.py) |
+| Temperature monitoring | [demo_monitor_temperature.py](../../../python/demo/omnihand_2025/demo_monitor_temperature.py) |
+| Error monitoring | [demo_monitor_error.py](../../../python/demo/omnihand_2025/demo_monitor_error.py) |
+| Angle control | [demo_set_angle.py](../../../python/demo/omnihand_2025/demo_set_angle.py) |
+| Motor position control | [demo_set_motor.py](../../../python/demo/omnihand_2025/demo_set_motor.py) |
+| Motion sequence | [demo_set_motion.py](../../../python/demo/omnihand_2025/demo_set_motion.py) |
+| Tactile sensor | [demo_tactile_sensor.py](../../../python/demo/omnihand_2025/demo_tactile_sensor.py) |
+| Hardware info | [demo_get_hardware_info.py](../../../python/demo/omnihand_2025/demo_get_hardware_info.py) |
+| Dual-hand control (multi CAN) | [demo_set_motor_via_multicans.py](../../../python/demo/omnihand_2025/demo_set_motor_via_multicans.py) |
+| Dual-hand control (multi channel) | [demo_set_motor_via_multichannels.py](../../../python/demo/omnihand_2025/demo_set_motor_via_multichannels.py) |
+| Dual-hand control (multi SocketCAN) | [demo_set_motor_via_multisocketcans.py](../../../python/demo/omnihand_2025/demo_set_motor_via_multisocketcans.py) |
 
 ## Related Documentation
 

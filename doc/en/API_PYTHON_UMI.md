@@ -1,4 +1,4 @@
-﻿# OmniHand Dex UMI (O10 UMI) Python API
+# OmniHand Dex UMI (O10 UMI) Python API
 
 ## Overview
 
@@ -352,6 +352,15 @@ def get_all_joint_positions(self) -> List[int]:
     Returns:
         List[int]: List of 10 joint positions (0-4096).
     """
+
+def get_all_active_joint_angles(self) -> List[float]:
+    """Get 10 active joint angles.
+    
+    Converts motor positions to angles via calibration parameters.
+    
+    Returns:
+        List[float]: 10 active joint angles in rad.
+    """
 ```
 
 ## Tactile Sensor Data
@@ -466,6 +475,10 @@ print(device_info)
 positions = hand.get_all_joint_positions()
 print(f"All joint positions ({len(positions)} values): {positions}")
 
+# Get 10 active joint angles
+angles = hand.get_all_active_joint_angles()
+print(f"Active joint angles ({len(angles)}, rad): {[f'{a:.4f}' for a in angles]}")
+
 # Get tactile sensor data
 tactile_data = hand.get_all_tactile_sensor_data_raw()
 print(f"Tactile sensors: {len(tactile_data)} sensors")
@@ -487,6 +500,21 @@ print(f"Tactile sensors: {len(tactile_data)} sensors")
 - **Pn8**: Minimum position calibration (write-only)
   - **Pn8.00**: Set all joints min position at once
   - **Pn8.01~Pn8.0A**: Set individual joint min position (joint 1-10)
+
+## Demo Files
+
+The SDK release package includes ready-to-run Python demo scripts (under `python/demo/omnihand_dex_umi/`):
+
+| Demo | File |
+|------|------|
+| CAN FD (connect by ID) | [demo_canfd_id.py](../../../python/demo/omnihand_dex_umi/demo_canfd_id.py) |
+| CAN FD (connect by serial) | [demo_canfd_serial.py](../../../python/demo/omnihand_dex_umi/demo_canfd_serial.py) |
+| SocketCAN | [demo_socketcan.py](../../../python/demo/omnihand_dex_umi/demo_socketcan.py) |
+| Tactile sensor (raw data) | [demo_tactile_sensor_raw.py](../../../python/demo/omnihand_dex_umi/demo_tactile_sensor_raw.py) |
+| Max/Min position calibration | [demo_set_max_min_calibration.py](../../../python/demo/omnihand_dex_umi/demo_set_max_min_calibration.py) |
+| UMI teleoperate O10 | [demo_umi_to_o10.py](../../../python/demo/omnihand_dex_umi/demo_umi_to_o10.py) |
+| Active joint angles readout | [demo_get_all_active_joint_angles.py](../../../python/demo/omnihand_dex_umi/demo_get_all_active_joint_angles.py) |
+| Hardware info | [demo_get_hardware_info.py](../../../python/demo/omnihand_dex_umi/demo_get_hardware_info.py) |
 
 ## Related Documentation
 

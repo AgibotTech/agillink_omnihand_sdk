@@ -23,7 +23,7 @@ agilink::omnihand::omnihand::o12::OmniHandPro2025Solver(const bool& hand_type);
 ### 1. CheckJointPos
 
 ```cpp
-bool CheckJointPos(std::vector<double> &active_joint_pos);
+bool CheckJointPos(std::vector<double> &active_joint_angles);
 ```
 
 - Checks if the number of active joints is reasonable. If not, returns `false`.
@@ -48,7 +48,7 @@ std::vector<int> SetHandGesture(const int& gesture);
 ### 3. ConvertJoint2Actuator
 
 ```cpp
-std::vector<int> ConvertJoint2Actuator(const std::vector<double>& active_joint_pos);
+std::vector<int> ConvertJoint2Actuator(const std::vector<double>& active_joint_angles);
 ```
 
 - Converts active joint positions into actuator input values.
@@ -66,7 +66,7 @@ std::vector<double> ConvertActuator2Joint(const std::vector<int>& actuator_input
 ### 5. ActiveJoint2MotorLength
 
 ```cpp
-std::vector<double> ActiveJoint2MotorLength(const std::vector<double> &active_joint_pos);
+std::vector<double> ActiveJoint2MotorLength(const std::vector<double> &active_joint_angles);
 ```
 
 - Converts active joint positions into motor length.
@@ -95,10 +95,10 @@ std::vector<double> MotorInput2MotorLength(const std::vector<int> &motor_input);
 
 - Converts the motor input value to motor length.
 
-### 9. GetAllJointPos
+### 9. GetAllJointAngles
 
 ```cpp
-std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos);
+std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles);
 ```
 
 - Retrieves the angles of all joints, including passive joints, based on the given active joint positions.
@@ -112,17 +112,17 @@ std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos);
 agilink::omnihand::omnihand::o12::OmniHandPro2025Solver solver(false);
 
 // Check and validate joint positions
-std::vector<double> active_joint_pos = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3};
-bool valid = solver.CheckJointPos(active_joint_pos);
+std::vector<double> active_joint_angles = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3};
+bool valid = solver.CheckJointPos(active_joint_angles);
 
 // Set a gesture
 std::vector<int> actuator_input = solver.SetHandGesture(1); // PAPER gesture
 
 // Convert joint positions to actuator input
-std::vector<int> input = solver.ConvertJoint2Actuator(active_joint_pos);
+std::vector<int> input = solver.ConvertJoint2Actuator(active_joint_angles);
 
 // Get all joint positions (including passive joints)
-std::vector<double> all_joints = solver.GetAllJointPos(active_joint_pos);
+std::vector<double> all_joints = solver.GetAllJointAngles(active_joint_angles);
 ```
 
 ## Related Documentation

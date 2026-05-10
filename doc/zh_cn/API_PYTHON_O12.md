@@ -539,6 +539,26 @@ def show_data_details(self, show: bool) -> None:
     """
 ```
 
+## Demo 文件
+
+SDK 发布包中提供了可直接运行的 Python demo 脚本（位于 `python/demo/omnihand_pro_2025/`）：
+
+| Demo | 文件 |
+|------|------|
+| CAN FD（按 ID 连接） | [demo_canfd_id.py](../../../python/demo/omnihand_pro_2025/demo_canfd_id.py) |
+| CAN FD（按串号连接） | [demo_canfd_serial.py](../../../python/demo/omnihand_pro_2025/demo_canfd_serial.py) |
+| SocketCAN | [demo_socketcan.py](../../../python/demo/omnihand_pro_2025/demo_socketcan.py) |
+| ZLG CAN TCP | [demo_zlgcan_tcp.py](../../../python/demo/omnihand_pro_2025/demo_zlgcan_tcp.py) |
+| 位置+力矩混合控制 | [demo_mix_ctrl_pos_torque.py](../../../python/demo/omnihand_pro_2025/demo_mix_ctrl_pos_torque.py) |
+| 位置控制 | [demo_set_position.py](../../../python/demo/omnihand_pro_2025/demo_set_position.py) |
+| 速度控制 | [demo_set_velocity.py](../../../python/demo/omnihand_pro_2025/demo_set_velocity.py) |
+| 角度控制 | [demo_set_angle.py](../../../python/demo/omnihand_pro_2025/demo_set_angle.py) |
+| 电流监控 | [demo_monitor_current.py](../../../python/demo/omnihand_pro_2025/demo_monitor_current.py) |
+| 温度监控 | [demo_monitor_temperature.py](../../../python/demo/omnihand_pro_2025/demo_monitor_temperature.py) |
+| 错误监控 | [demo_monitor_error.py](../../../python/demo/omnihand_pro_2025/demo_monitor_error.py) |
+| 触觉传感器 | [demo_sensor_touch.py](../../../python/demo/omnihand_pro_2025/demo_sensor_touch.py) |
+| 硬件信息 | [demo_get_hardware_info.py](../../../python/demo/omnihand_pro_2025/demo_get_hardware_info.py) |
+
 ## 相关文档
 
 - [OmniHand Pro 2025 (O12) 运动学求解器 Python API](API_KINEMATICS_PYTHON_O12.md) - 运动学计算

@@ -62,7 +62,7 @@ enum class ControlMode : unsigned char {
     SERVO                     = 1,    // 伺服模式（O10 不支持 SetControlMode 切换）
     VELOCITY                  = 2,    // 速度模式（O10 不支持 SetControlMode 切换）
     TORQUE                    = 3,    // 力控模式（O10 不支持）
-    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 电流 mA）
+    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 电流 mA，范围 0–1000）
     VELOCITY_TORQUE           = 5,    // 速度-力控模式（O10 暂未开放）
     POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（O10 暂未开放）
     UNKNOWN                   = 10    // 未知模式
@@ -73,7 +73,7 @@ enum class ControlMode : unsigned char {
 
 **O10 可用模式**：
 - `POSITION` (0)：默认位置控制
-- `POSITION_TORQUE` (4)：位置+电流混合控制（力矩字段实为电流 mA）
+- `POSITION_TORQUE` (4)：位置+电流混合控制（力矩字段实为电流 mA，范围 0–1000）
 - 其余模式不可用或暂未开放
 
 ## 数据结构
@@ -377,11 +377,11 @@ std::vector<double> GetAllJointAngles() const;
 
 /**
  * @brief 从主动关节角度计算所有关节角度（包括主动和被动关节）。
- * @param active_joint_pos 主动关节角度向量（单位：弧度）。必须包含 10 个值）
+ * @param active_joint_angles 主动关节角度向量（单位：弧度）。必须包含 10 个值。
  * @return 所有关节角度向量（单位：弧度），包括主动和被动关节）
  * @note 此函数不进行硬件通信，仅执行运动学计算。
  */
-std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos) const;
+std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles) const;
 ```
 
 ## 电机位置控制
@@ -525,7 +525,7 @@ O10 不支持通过 `SetControlMode` 指令切换控制模式，默认工作在*
 | `POSITION_TORQUE` | 4 | 位置 + 力矩混合控制 |
 | `POSITION_VELOCITY_TORQUE` | 6 | 位置 + 速度 + 力矩混合控制（**暂未开放**） |
 
-> **非标单位说明**：`POSITION_TORQUE` 模式中的"力矩"实际对应电机电流值，单位为 **mA**，而非 ROS2 标准的 N·m。
+> **非标单位说明**：`POSITION_TORQUE` 模式中的"力矩"实际对应电机电流值，单位为 **mA**，范围 **0–1000**，而非 ROS2 标准的 N·m。
 
 ## 电流阈值控制
 
@@ -538,7 +538,7 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 
 ## 混合控制
 
-> **注意**：O10/H3L 的混合控制中，`tgt_torque_` 字段实际对应电机电流，单位为 **mA**（非标准 N·m）。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
+> **注意**：O10/H3L 的混合控制中，`tgt_torque_` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
 
 ```cpp
 /**
@@ -546,7 +546,7 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
  * @param mix_ctrls 混合控制参数向量
  *   - ctrl_mode_: 控制模式（仅 POSITION_TORQUE 可用）
  *   - tgt_posi_: 目标位置（0–4095 编码器原始值）
- *   - tgt_torque_: 目标电流（单位 mA，非 N·m）
+ *   - tgt_torque_: 目标电流（单位 mA，范围 0–1000，非 N·m）
  * @note 纯力控模式(TORQUE) 不支持。
  * @note 串口通信（RS485）不支持此接口。
  */
@@ -625,6 +625,21 @@ int main() {
     return 0;
 }
 ```
+
+## Demo 文件
+
+SDK 发布包中提供了可直接编译运行的 C++ demo 源码：
+
+| Demo | 路径 |
+|------|------|
+| CAN FD（按 ID 连接） | [O10_demo_canfd_id.cc](../../../cpp/demo/omnihand_2025/O10_demo_canfd_id.cc) |
+| CAN FD（按串号连接） | [O10_demo_canfd_serial.cc](../../../cpp/demo/omnihand_2025/O10_demo_canfd_serial.cc) |
+| SocketCAN | [O10_demo_socketcan.cc](../../../cpp/demo/omnihand_2025/O10_demo_socketcan.cc) |
+| RS485 串口 | [O10_demo_rs485.cc](../../../cpp/demo/omnihand_2025/O10_demo_rs485.cc) |
+| ZLG CAN TCP | [O10_demo_zlgcan_tcp.cc](../../../cpp/demo/omnihand_2025/O10_demo_zlgcan_tcp.cc) |
+| OTA 升级 | [O10_demo_ota.cc](../../../cpp/demo/omnihand_2025/O10_demo_ota.cc) |
+
+编译方式参见 [CMakeLists.txt](../../../cpp/demo/omnihand_2025/CMakeLists.txt)。
 
 ## 相关文档
 

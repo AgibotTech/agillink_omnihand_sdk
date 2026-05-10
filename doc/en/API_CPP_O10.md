@@ -56,7 +56,7 @@ enum class ControlMode : unsigned char {
     SERVO = 1,    // Servo mode
     VELOCITY = 2,    // Velocity mode (O10 does not support SetControlMode)
     TORQUE = 3,    // Torque mode (O10 not supported)
-    POSITION_TORQUE = 4,    // Position-Torque mode (Mixed control: position + current mA)
+    POSITION_TORQUE = 4,    // Position-Torque mode (Mixed control: position + current mA, range 0–1000)
     VELOCITY_TORQUE = 5,    // Velocity-Torque mode (O10 not yet available)
     POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mode (O10 not yet available)
     UNKNOWN = 10    // Unknown mode
@@ -65,7 +65,7 @@ enum class ControlMode : unsigned char {
 
 **O10 available modes**:
 - `POSITION` (0): Default position control
-- `POSITION_TORQUE` (4): Position + current mixed control (torque field is actually current in mA)
+- `POSITION_TORQUE` (4): Position + current mixed control (torque field is actually current in mA, range 0–1000)
 - Other modes are not available or not yet open
 
 ## Data Structures
@@ -369,11 +369,11 @@ std::vector<double> GetAllJointAngles() const;
 
 /**
  * @brief Computes all joint angles (including passive) from active joint angles.
- * @param active_joint_pos A vector of active joint angles (in radians). Must have 10 values.
+ * @param active_joint_angles A vector of active joint angles (in radians). Must have 10 values.
  * @return A vector of all joint angles (in radians), including both active and passive joints.
  * @note This function does not communicate with hardware; it only performs kinematics calculations.
  */
-std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos) const;
+std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles) const;
 ```
 
 ## Motor Position Control
@@ -521,7 +521,7 @@ O10 does not support switching control modes via `SetControlMode`. It operates i
 | `POSITION_TORQUE` | 4 | Position + torque mixed control |
 | `POSITION_VELOCITY_TORQUE` | 6 | Position + velocity + torque mixed control (**not yet available**) |
 
-> **Non-standard unit note**: In `POSITION_TORQUE` mode, "torque" actually corresponds to motor current in **mA**, not the ROS2 standard N·m.
+> **Non-standard unit note**: In `POSITION_TORQUE` mode, "torque" actually corresponds to motor current in **mA**, range **0–1000**, not the ROS2 standard N·m.
 
 ## Current Threshold Control
 
@@ -559,7 +559,7 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 
 ## Mixed Control
 
-> **Note**: For O10/H3L, `tgt_torque_` actually corresponds to motor current in **mA** (not the standard N·m). `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
+> **Note**: For O10/H3L, `tgt_torque_` actually corresponds to motor current in **mA**, range **0–1000** (not the standard N·m). `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
 
 Only the following mode is currently available:
 - **POSITION_TORQUE**: Position + current (mA) control
@@ -571,7 +571,7 @@ Only the following mode is currently available:
  *                   - joint_index_: Joint index (1-10)
  *                   - ctrl_mode_: Control mode (only POSITION_TORQUE is available for O10)
  *                   - tgt_posi_: Target position (0–4095 raw encoder value)
- *                   - tgt_torque_: Target current in mA (non-standard, not N·m)
+ *                   - tgt_torque_: Target current in mA, range 0–1000 (non-standard, not N·m)
  * @note Pure torque control (TORQUE) is not supported.
  * @note This interface is not supported for serial port communication (RS485).
  */
@@ -685,6 +685,21 @@ int main() {
     return 0;
 }
 ```
+
+## Demo Files
+
+The SDK release package includes ready-to-compile C++ demo source code:
+
+| Demo | Path |
+|------|------|
+| CAN FD (connect by ID) | [O10_demo_canfd_id.cc](../../../cpp/demo/omnihand_2025/O10_demo_canfd_id.cc) |
+| CAN FD (connect by serial) | [O10_demo_canfd_serial.cc](../../../cpp/demo/omnihand_2025/O10_demo_canfd_serial.cc) |
+| SocketCAN | [O10_demo_socketcan.cc](../../../cpp/demo/omnihand_2025/O10_demo_socketcan.cc) |
+| RS485 Serial | [O10_demo_rs485.cc](../../../cpp/demo/omnihand_2025/O10_demo_rs485.cc) |
+| ZLG CAN TCP | [O10_demo_zlgcan_tcp.cc](../../../cpp/demo/omnihand_2025/O10_demo_zlgcan_tcp.cc) |
+| OTA Upgrade | [O10_demo_ota.cc](../../../cpp/demo/omnihand_2025/O10_demo_ota.cc) |
+
+See [CMakeLists.txt](../../../cpp/demo/omnihand_2025/CMakeLists.txt) for build instructions.
 
 ## Related Documentation
 

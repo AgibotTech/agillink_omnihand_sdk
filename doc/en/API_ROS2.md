@@ -62,7 +62,7 @@ The rationale behind this design:
 
 Different product models have different control mode support:
 
-**O10 / H3L**: Do not support switching control modes via `joint_control_mode_cmd` topic. They operate in position control mode by default. Position + torque mixed control can be achieved through `joint_mix_control_cmd`; position + velocity + torque mode is not yet available. Note: in mixed control, the `effort` field actually corresponds to motor current in **mA** (not the standard N·m).
+**O10 / H3L**: Do not support switching control modes via `joint_control_mode_cmd` topic. They operate in position control mode by default. Position + torque mixed control can be achieved through `joint_mix_control_cmd`; position + velocity + torque mode is not yet available. Note: in mixed control, the `effort` field actually corresponds to motor current in **mA**, range **0–1000** (not the standard N·m).
 
 **O12**: Supports setting position mode, servo mode, velocity mode, and torque mode via `SetControlMode` interface. Also supports position + force mixed control via `joint_mix_control_cmd` (5 modes supported). In mixed control, the `effort` field is in **0.01 N** (correlated with tactile sensor normal force). Note that the O12 ROS2 node does not currently expose a `joint_control_mode_cmd` topic; control mode switching should be done through the C++/Python SDK directly.
 
@@ -73,7 +73,7 @@ Different product models have different control mode support:
 `joint_mix_control_cmd` is a separate topic from `joint_cmd` for mixed control, using `sensor_msgs/JointState`:
 
 - `position[]` = raw int16 motor position
-- `effort[]` = raw int16 motor torque
+- `effort[]` = raw int16 motor torque (O10/H3L: current in mA, range 0–1000; O12: 0.01 N)
 
 The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No readback**.
 

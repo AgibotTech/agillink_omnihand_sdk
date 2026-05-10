@@ -23,7 +23,7 @@ OmniHandPro2025Solver(hand_type: bool)
 ### 1. check_joint_pos
 
 ```python
-def check_joint_pos(active_joint_pos: List[float]) -> bool
+def check_joint_pos(active_joint_angles: List[float]) -> bool
 ```
 
 - 检查主动关节数量是否合理。如果不合理，返回 `False`。
@@ -48,7 +48,7 @@ def set_hand_gesture(gesture: int) -> List[int]
 ### 3. convert_joint_to_actuator
 
 ```python
-def convert_joint_to_actuator(active_joint_pos: List[float]) -> List[int]
+def convert_joint_to_actuator(active_joint_angles: List[float]) -> List[int]
 ```
 
 - 将主动关节位置转换为执行器输入值。
@@ -66,7 +66,7 @@ def convert_actuator_to_joint(actuator_input: List[int]) -> List[float]
 ### 5. active_joint_to_motor_length
 
 ```python
-def active_joint_to_motor_length(active_joint_pos: List[float]) -> List[float]
+def active_joint_to_motor_length(active_joint_angles: List[float]) -> List[float]
 ```
 
 - 将主动关节位置转换为电机长度。
@@ -95,10 +95,10 @@ def motor_input_to_motor_length(motor_input: List[int]) -> List[float]
 
 - 将电机输入值转换为电机长度。
 
-### 9. get_all_joint_pos
+### 9. get_all_joint_angles
 
 ```python
-def get_all_joint_pos(active_joint_pos: List[float]) -> List[float]
+def get_all_joint_angles(active_joint_angles: List[float]) -> List[float]
 ```
 
 - 根据给定的主动关节位置，获取所有关节（包括被动关节）的角度。
@@ -112,17 +112,17 @@ from omnihand.omnihand_pro_2025 import OmniHandPro2025Solver
 solver = OmniHandPro2025Solver(hand_type=False)
 
 # 检查并验证关节位置
-active_joint_pos = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3]
-valid = solver.check_joint_pos(active_joint_pos)
+active_joint_angles = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3]
+valid = solver.check_joint_pos(active_joint_angles)
 
 # 设置手势
 actuator_input = solver.set_hand_gesture(1)  # PAPER 手势
 
 # 将关节位置转换为执行器输入
-input_values = solver.convert_joint_to_actuator(active_joint_pos)
+input_values = solver.convert_joint_to_actuator(active_joint_angles)
 
 # 获取所有关节位置（包括被动关节）
-all_joints = solver.get_all_joint_pos(active_joint_pos)
+all_joints = solver.get_all_joint_angles(active_joint_angles)
 ```
 
 ## 相关文档

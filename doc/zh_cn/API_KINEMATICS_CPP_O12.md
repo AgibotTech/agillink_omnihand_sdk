@@ -23,7 +23,7 @@ agilink::o12::OmniHandPro2025Solver(const bool& hand_type);
 ### 1. CheckJointPos
 
 ```cpp
-bool CheckJointPos(std::vector<double> &active_joint_pos);
+bool CheckJointPos(std::vector<double> &active_joint_angles);
 ```
 
 - 检查主动关节数量是否合理。如果不合理，返回 `false`。
@@ -48,7 +48,7 @@ std::vector<int> SetHandGesture(const int& gesture);
 ### 3. ConvertJoint2Actuator
 
 ```cpp
-std::vector<int> ConvertJoint2Actuator(const std::vector<double>& active_joint_pos);
+std::vector<int> ConvertJoint2Actuator(const std::vector<double>& active_joint_angles);
 ```
 
 - 将主动关节位置转换为执行器输入值。
@@ -66,7 +66,7 @@ std::vector<double> ConvertActuator2Joint(const std::vector<int>& actuator_input
 ### 5. ActiveJoint2MotorLength
 
 ```cpp
-std::vector<double> ActiveJoint2MotorLength(const std::vector<double> &active_joint_pos);
+std::vector<double> ActiveJoint2MotorLength(const std::vector<double> &active_joint_angles);
 ```
 
 - 将主动关节位置转换为电机长度。
@@ -95,10 +95,10 @@ std::vector<double> MotorInput2MotorLength(const std::vector<int> &motor_input);
 
 - 将电机输入值转换为电机长度。
 
-### 9. GetAllJointPos
+### 9. GetAllJointAngles
 
 ```cpp
-std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos);
+std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles);
 ```
 
 - 根据给定的主动关节位置，获取所有关节（包括被动关节）的角度。
@@ -112,17 +112,17 @@ std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos);
 agilink::omnihand::o12::OmniHandPro2025Solver solver(false);
 
 // 检查并验证关节位置
-std::vector<double> active_joint_pos = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3};
-bool valid = solver.CheckJointPos(active_joint_pos);
+std::vector<double> active_joint_angles = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.3};
+bool valid = solver.CheckJointPos(active_joint_angles);
 
 // 设置手势
 std::vector<int> actuator_input = solver.SetHandGesture(1); // PAPER 手势
 
 // 将关节位置转换为执行器输入
-std::vector<int> input = solver.ConvertJoint2Actuator(active_joint_pos);
+std::vector<int> input = solver.ConvertJoint2Actuator(active_joint_angles);
 
 // 获取所有关节位置（包括被动关节）
-std::vector<double> all_joints = solver.GetAllJointPos(active_joint_pos);
+std::vector<double> all_joints = solver.GetAllJointAngles(active_joint_angles);
 ```
 
 ## 相关文档

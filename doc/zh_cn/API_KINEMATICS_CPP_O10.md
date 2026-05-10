@@ -52,7 +52,7 @@ std::vector<int> SetHandGesture(const int& gesture);
 ### 2. ActiveJointPos2ActuatorInput
 
 ```cpp
-std::vector<int> ActiveJointPos2ActuatorInput(const std::vector<double>& active_joint_pos);
+std::vector<int> ActiveJointPos2ActuatorInput(const std::vector<double>& active_joint_angles);
 ```
 
 - 将主动关节位置转换为执行器输入值。
@@ -67,10 +67,10 @@ std::vector<double> ActuatorInput2ActiveJointPos(const std::vector<int>& actuato
 - 将执行器输入值转换回主动关节位置。
 - **注意**：O10 电机输入范围为 0-4096，与 O12 的 0-2000 不同。
 
-### 4. GetAllJointPos
+### 4. GetAllJointAngles
 
 ```cpp
-std::vector<double> GetAllJointPos(const std::vector<double>& active_joint_pos);
+std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles);
 ```
 
 - 根据给定的主动关节位置，获取所有关节（包括被动关节）的角度。
@@ -98,11 +98,11 @@ solver.show_log(true);
 std::vector<int> actuator_input = solver.SetHandGesture(1); // 拳头手势
 
 // 将关节位置转换为执行器输入
-std::vector<double> active_joint_pos = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0};
-std::vector<int> input = solver.ActiveJointPos2ActuatorInput(active_joint_pos);
+std::vector<double> active_joint_angles = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0};
+std::vector<int> input = solver.ActiveJointPos2ActuatorInput(active_joint_angles);
 
 // 获取所有关节位置（包括被动关节）
-std::vector<double> all_joints = solver.GetAllJointPos(active_joint_pos);
+std::vector<double> all_joints = solver.GetAllJointAngles(active_joint_angles);
 ```
 
 ## 相关文档

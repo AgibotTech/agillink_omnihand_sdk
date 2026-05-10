@@ -49,28 +49,28 @@ def set_hand_gesture(gesture: int) -> List[int]
 | 15     | 双手比心3 | <img src="../pic/hand_heart_3.jpg" width="100" /> |
 | 16     | 合掌     | <img src="../pic/clasping.jpg" width="100" /> |
 
-### 2. active_joint_pos_to_actuator_input
+### 2. active_joint_angles_to_actuator_input
 
 ```python
-def active_joint_pos_to_actuator_input(active_joint_pos: List[float]) -> List[int]
+def active_joint_angles_to_actuator_input(active_joint_angles: List[float]) -> List[int]
 ```
 
 - 将主动关节位置转换为执行器输入值。
 - **注意**：O10 电机输入范围为 0-4096，与 O12 的 0-2000 不同。
 
-### 3. actuator_input_to_active_joint_pos
+### 3. actuator_input_to_active_joint_angles
 
 ```python
-def actuator_input_to_active_joint_pos(actuator_input: List[int]) -> List[float]
+def actuator_input_to_active_joint_angles(actuator_input: List[int]) -> List[float]
 ```
 
 - 将执行器输入值转换回主动关节位置。
 - **注意**：O10 电机输入范围为 0-4096，与 O12 的 0-2000 不同。
 
-### 4. get_all_joint_pos
+### 4. get_all_joint_angles
 
 ```python
-def get_all_joint_pos(active_joint_pos: List[float]) -> List[float]
+def get_all_joint_angles(active_joint_angles: List[float]) -> List[float]
 ```
 
 - 根据给定的主动关节位置，获取所有关节（包括被动关节）的角度。
@@ -98,11 +98,11 @@ solver.show_log(True)
 actuator_input = solver.set_hand_gesture(1)  # 拳头手势
 
 # 将关节位置转换为执行器输入
-active_joint_pos = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0]
-input_values = solver.active_joint_pos_to_actuator_input(active_joint_pos)
+active_joint_angles = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0]
+input_values = solver.active_joint_angles_to_actuator_input(active_joint_angles)
 
 # 获取所有关节位置（包括被动关节）
-all_joints = solver.get_all_joint_pos(active_joint_pos)
+all_joints = solver.get_all_joint_angles(active_joint_angles)
 ```
 
 ## 相关文档

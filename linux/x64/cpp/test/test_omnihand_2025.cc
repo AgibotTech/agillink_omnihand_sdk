@@ -402,8 +402,8 @@ TEST_F(OmniHand2025Test, KinematicsSolver) {
   if (hand_->Init()) {
     // Test forward kinematics
     std::vector<double> active_angles(10, 0.0);
-    auto all_angles = hand_->GetAllJointPos(active_angles);
-    std::cout << "[GetAllJointPos] Forward Kinematics (input: 10 active angles, output: " 
+    auto all_angles = hand_->GetAllJointAngles(active_angles);
+    std::cout << "[GetAllJointAngles] Forward Kinematics (input: 10 active angles, output: " 
               << all_angles.size() << " joint angles): ";
     for (size_t i = 0; i < std::min(all_angles.size(), size_t(10)); ++i) {
       std::cout << std::fixed << std::setprecision(4) << all_angles[i];
