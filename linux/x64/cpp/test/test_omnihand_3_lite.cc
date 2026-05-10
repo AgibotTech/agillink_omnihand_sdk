@@ -215,30 +215,6 @@ TEST_F(OmniHand3LiteTest, SetHandGesture) {
   std::cout << "[SetHandGesture] Called (should output warning)" << std::endl;
 }
 
-// Test control mode (requires hardware)
-TEST_F(OmniHand3LiteTest, ControlMode) {
-  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
-  
-  // Test reading control mode (read-only operation)
-  auto current_modes = hand_->GetAllControlMode();
-  // Check if request succeeded (non-empty result)
-  if (current_modes.empty()) {
-    // Request failed (timeout), skip assertion to avoid false failure
-    return;
-  }
-  std::cout << "[GetAllControlMode] Control Modes: ";
-  for (size_t i = 0; i < current_modes.size(); ++i) {
-    std::cout << static_cast<int>(current_modes[i]);
-    if (i < current_modes.size() - 1) std::cout << ", ";
-  }
-  std::cout << std::endl;
-  EXPECT_EQ(current_modes.size(), OmniHand3Lite::kDegreesOfActiveFreedom);
-  
-  // Test single joint control mode
-  auto mode = hand_->GetControlMode(1);
-  std::cout << "[GetControlMode] Joint 1 Control Mode: " << static_cast<int>(mode) << std::endl;
-}
-
 // Test velocity control (requires hardware)
 TEST_F(OmniHand3LiteTest, VelocityControl) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";

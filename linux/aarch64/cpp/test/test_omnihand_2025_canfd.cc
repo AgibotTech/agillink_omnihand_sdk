@@ -407,28 +407,6 @@ TEST_F(OmniHand2025CanfdTest, GetAllTactileSensorDataRaw) {
 }
 
 // ============================================================================
-// Control Mode Tests
-// ============================================================================
-
-TEST_F(OmniHand2025CanfdTest, GetAllControlMode) {
-  RequireDevice();
-  
-  auto modes = hand_->GetAllControlMode();
-  std::cout << "[GetAllControlMode] ";
-  for (size_t i = 0; i < modes.size(); ++i) {
-    std::cout << static_cast<int>(modes[i]);
-    if (i < modes.size() - 1) std::cout << ", ";
-  }
-  std::cout << std::endl;
-  
-  if (modes.empty()) {
-    GTEST_SKIP() << "GetAllControlMode timeout";
-  }
-  
-  EXPECT_EQ(modes.size(), 10);
-}
-
-// ============================================================================
 // Motor Velocity Control Tests
 // ============================================================================
 

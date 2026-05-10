@@ -55,6 +55,16 @@ OmniHand SDK 为三款产品提供统一风格的 ROS2 接口：
 
 **设计原则**：节点不自驱发布。所有状态回读都由外部触发（发送 cmd），不会干扰控制回路的工作节奏。
 
+### 控制模式
+
+不同产品型号对控制模式的支持有所不同：
+
+**O10 / H3L**：不支持通过 `joint_control_mode_cmd` topic 切换控制模式，默认位置控制。可通过 `joint_mix_control_cmd` 实现位置+力矩、位置+速度+力矩混合控制（支持 3 种模式）。
+
+**O12**：支持通过 `SetControlMode` 接口设置位置模式、伺服模式、速度模式、力矩模式，也可通过 `joint_mix_control_cmd` 实现位置+力矩混合控制（支持 5 种模式）。注意 O12 的 ROS2 node 当前未暴露 `joint_control_mode_cmd` topic，控制模式切换需通过 C++/Python SDK 直接调用。
+
+**H3U_M**：支持通过 `joint_control_mode_cmd` topic 切换控制模式（0=CSP 位置模式，7=PP 规划位置模式）。
+
 ### 混合控制（O10/O12）
 
 `joint_mix_control_cmd` 是独立于 `joint_cmd` 的混合控制 topic，使用 `sensor_msgs/JointState`：

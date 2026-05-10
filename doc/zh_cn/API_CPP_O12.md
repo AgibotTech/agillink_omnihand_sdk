@@ -267,7 +267,17 @@ std::vector<int16_t> GetAllJointMotorVelo() const;                       // 批�
 
 ### 控制模式
 
-**注意**：纯力控模式 (TORQUE) 不支持，请使用混合控制模式（POSITION_TORQUE、VELOCITY_TORQUE、POSITION_VELOCITY_TORQUE）。
+O12 支持通过 `SetControlMode` 指令切换控制模式，支持以下 5 种控制模式：
+
+| 模式枚举 | 值 | 说明 |
+|---|---|---|
+| `POSITION` | 0 | 位置控制（默认） |
+| `SERVO` | 1 | 伺服控制模式 |
+| `VELOCITY` | 2 | 速度控制模式 |
+| `TORQUE` | 3 | 力矩控制模式 |
+| `POSITION_TORQUE` | 4 | 位置 + 力矩混合控制（通过 `MixCtrlJointMotor`） |
+
+**注意**：纯力矩控制（TORQUE）可通过 `SetControlMode` 设置，但混合控制模式（POSITION_TORQUE、VELOCITY_TORQUE、POSITION_VELOCITY_TORQUE）需通过 `MixCtrlJointMotor` 指令使用。
 
 ```cpp
 void SetControlMode(unsigned char joint_motor_index, ControlMode mode);  // 设置单个关节控制模式，索引 1-12

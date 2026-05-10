@@ -419,9 +419,17 @@ TactileSensor3DData GetTactileSensor3DData(Finger eFinger) const;
 
 ## Control Mode
 
-**Note**: 
-- **SERVO mode (1)**: Servo control mode
-- **Pure torque control (TORQUE) is not supported**: Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead
+O12 supports switching control modes via `SetControlMode`. The following 5 control modes are supported:
+
+| Mode Enum | Value | Description |
+|---|---|---|
+| `POSITION` | 0 | Position control (default) |
+| `SERVO` | 1 | Servo control mode |
+| `VELOCITY` | 2 | Velocity control mode |
+| `TORQUE` | 3 | Torque control mode |
+| `POSITION_TORQUE` | 4 | Position + torque mixed control (via `MixCtrlJointMotor`) |
+
+**Note**: Pure torque control (TORQUE) can be set via `SetControlMode`, but mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) should be used through `MixCtrlJointMotor`.
 
 ```cpp
 /**

@@ -12,7 +12,14 @@ find_package(omnihand_msgs REQUIRED)
 
 add_executable(ros2_joint_cmd_demo ros2_joint_cmd_demo.cpp)
 ament_target_dependencies(ros2_joint_cmd_demo rclcpp sensor_msgs omnihand_msgs)
-
 install(TARGETS ros2_joint_cmd_demo DESTINATION lib/${PROJECT_NAME})
+
+add_executable(ros2_mix_ctrl_pos_torque_demo ros2_mix_ctrl_pos_torque_demo.cpp)
+ament_target_dependencies(ros2_mix_ctrl_pos_torque_demo rclcpp sensor_msgs omnihand_msgs)
+install(TARGETS ros2_mix_ctrl_pos_torque_demo DESTINATION lib/${PROJECT_NAME})
+
+add_executable(ros2_mix_ctrl_pos_vel_torque_demo ros2_mix_ctrl_pos_vel_torque_demo.cpp)
+ament_target_dependencies(ros2_mix_ctrl_pos_vel_torque_demo rclcpp sensor_msgs omnihand_msgs)
+install(TARGETS ros2_mix_ctrl_pos_vel_torque_demo DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

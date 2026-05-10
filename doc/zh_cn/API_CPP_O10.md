@@ -516,37 +516,13 @@ static const std::vector<Finger>& GetSensorOrder();
 
 ## 控制模式
 
-```cpp
-/**
- * @brief 设置单个关节电机的控制模式）
- * @param joint_motor_index 关节电机索引（1-10）。
- * @param mode 控制模式枚举值）
- * @note 纯力控模式(TORQUE) 不支持。请使用混合控制模式（POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE）。
- */
-void SetControlMode(unsigned char joint_motor_index, ControlMode mode);
+O10 不支持通过 `SetControlMode` 指令切换控制模式，默认工作在**位置控制模式**。可通过混合控制指令 `MixCtrlJointMotor` 实现多种控制方式，支持以下 3 种控制模式：
 
-/**
- * @brief 获取单个关节电机的控制模式）
- * @param joint_motor_index 关节电机索引（1-10）。
- * @return 当前控制模式）
- * @note 串口通信（RS485）不支持此接口）
- */
-ControlMode GetControlMode(unsigned char joint_motor_index) const;
-
-/**
- * @brief 批量设置所有关节电机的控制模式）
- * @param ctrl_modes 控制模式向量。必须包含 10 个值）
- * @note 串口通信（RS485）不支持此接口）
- */
-void SetAllControlMode(const std::vector<unsigned char>& ctrl_modes);
-
-/**
- * @brief 批量获取所有关节电机的控制模式）
- * @return 控制模式向量。返回 10 个值）
- * @note 串口通信（RS485）不支持此接口）
- */
-std::vector<unsigned char> GetAllControlMode() const;
-```
+| 模式枚举 | 值 | 说明 |
+|---|---|---|
+| `POSITION` | 0 | 位置控制（默认） |
+| `POSITION_TORQUE` | 4 | 位置 + 力矩混合控制 |
+| `POSITION_VELOCITY_TORQUE` | 6 | 位置 + 速度 + 力矩混合控制 |
 
 ## 电流阈值控制
 

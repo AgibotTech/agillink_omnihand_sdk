@@ -512,41 +512,13 @@ The 16 sensors on the finger are arranged as shown below:
 
 ## Control Mode
 
-**Note**: 
-- **SERVO mode (1)**: Servo control mode
-- **Pure torque control (TORQUE) is not supported**: Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead
+O10 does not support switching control modes via `SetControlMode`. It operates in **position control mode** by default. Multiple control modes can be achieved through the mixed control command `MixCtrlJointMotor`. The following 3 control modes are supported:
 
-```cpp
-/**
- * @brief Sets the control mode of a single joint motor.
- * @param joint_motor_index The index of the joint motor (1-10).
- * @param mode The control mode enum value.
- * @note Pure torque control (TORQUE) is not supported. Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead.
- */
-void SetControlMode(unsigned char joint_motor_index, ControlMode mode);
-
-/**
- * @brief Gets the control mode of a single joint motor.
- * @param joint_motor_index The index of the joint motor (1-10).
- * @return The current control mode.
- * @note This interface is not supported for serial port communication (RS485).
- */
-ControlMode GetControlMode(unsigned char joint_motor_index) const;
-
-/**
- * @brief Sets the control modes of all joint motors in batch.
- * @param ctrl_modes A vector of control modes. Must have 10 values.
- * @note This interface is not supported for serial port communication (RS485).
- */
-void SetAllControlMode(const std::vector<unsigned char>& ctrl_modes);
-
-/**
- * @brief Gets the control modes of all joint motors in batch.
- * @return A vector of control modes. Returns 10 values.
- * @note This interface is not supported for serial port communication (RS485).
- */
-std::vector<unsigned char> GetAllControlMode() const;
-```
+| Mode Enum | Value | Description |
+|---|---|---|
+| `POSITION` | 0 | Position control (default) |
+| `POSITION_TORQUE` | 4 | Position + torque mixed control |
+| `POSITION_VELOCITY_TORQUE` | 6 | Position + velocity + torque mixed control |
 
 ## Current Threshold Control
 

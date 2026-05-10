@@ -538,52 +538,13 @@ def get_sensor_order() -> List[int]:
 
 ## Control Mode
 
-```python
-def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
-    """Sets the control mode of a single joint motor.
-    
-    Args:
-        joint_motor_index: Joint motor index (1-10).
-        mode: Control mode (see ControlMode).
-    
-    Note:
-        - SERVO mode is O10-only
-        - Pure TORQUE mode is not supported
-    """
+O10 does not support switching control modes via `set_control_mode`. It operates in **position control mode** by default. Multiple control modes can be achieved through the mixed control command `mix_ctrl_joint_motor`. The following 3 control modes are supported:
 
-def get_control_mode(self, joint_motor_index: int) -> int:
-    """Gets the control mode of a single joint motor.
-    
-    Args:
-        joint_motor_index: Joint motor index (1-10).
-    
-    Returns:
-        int: Current control mode (see ControlMode).
-    
-    Note:
-        This interface is not supported for serial port communication (RS485).
-    """
-
-def set_all_control_modes(self, ctrl_modes: List[int]) -> None:
-    """Sets the control modes of all joint motors in batch.
-    
-    Args:
-        ctrl_modes: List of control modes. Must have 10 values.
-    
-    Note:
-        This interface is not supported for serial port communication (RS485).
-    """
-
-def get_all_control_modes(self) -> List[int]:
-    """Gets the control modes of all joint motors in batch.
-    
-    Returns:
-        List[int]: List of control modes. Returns 10 values.
-    
-    Note:
-        This interface is not supported for serial port communication (RS485).
-    """
-```
+| Mode Enum | Value | Description |
+|---|---|---|
+| `ControlMode.POSITION` | 0 | Position control (default) |
+| `ControlMode.POSITION_TORQUE` | 4 | Position + torque mixed control |
+| `ControlMode.POSITION_VELOCITY_TORQUE` | 6 | Position + velocity + torque mixed control |
 
 ## Current Threshold Control
 

@@ -228,22 +228,6 @@ def test_joint_angle_control(hand):
     assert len(all_angles) == 16  # 10 active + 6 passive
 
 
-def test_control_mode(hand):
-    """Test control mode (read-only, requires hardware)"""
-    if not hand.init():
-        pytest.skip("Device not initialized")
-    
-    # Only test reading control mode (read-only operation)
-    # Note: set_all_control_modes is not tested as it may cause CANFD communication to crash
-    current_modes = hand.get_all_control_modes()
-    # Check if request succeeded (non-empty result)
-    if not current_modes:
-        pytest.skip("Failed to get control modes")
-    
-    print(f"\n[get_all_control_modes] Control Modes: {current_modes}")
-    assert len(current_modes) == 10
-
-
 def test_tactile_sensor(hand):
     """Test tactile sensor (requires hardware)"""
     if not hand.init():

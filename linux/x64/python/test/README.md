@@ -91,7 +91,6 @@ Each test file covers:
 - Tests require hardware to be connected
 - Tests will skip if device initialization fails
 - Tests handle timeouts gracefully (skip instead of fail)
-- Similar to C++ tests, `set_all_control_modes` is not tested as it may cause CANFD communication issues
 
 ## More Information
 

@@ -348,52 +348,13 @@ def get_all_joint_velocities(self) -> List[int]:
 
 ## 控制模式
 
-```python
-def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
-    """设置单个关节电机的控制模式。
-    
-    Args:
-        joint_motor_index: 关节电机索引（1-10）。
-        mode: 控制模式（参见 ControlMode）。
-    
-    Note:
-        - SERVO 模式仅 O10 支持
-        - 纯 TORQUE 模式不支持
-    """
+O10 不支持通过 `set_control_mode` 指令切换控制模式，默认工作在**位置控制模式**。可通过混合控制指令 `mix_ctrl_joint_motor` 实现多种控制方式，支持以下 3 种控制模式：
 
-def get_control_mode(self, joint_motor_index: int) -> int:
-    """获取单个关节电机的控制模式。
-    
-    Args:
-        joint_motor_index: 关节电机索引（1-10）。
-    
-    Returns:
-        int: 当前控制模式（参见 ControlMode）。
-    
-    Note:
-        串口通信（RS485）不支持此接口。
-    """
-
-def set_all_control_modes(self, ctrl_modes: List[int]) -> None:
-    """批量设置所有关节电机的控制模式。
-    
-    Args:
-        ctrl_modes: 控制模式列表。必须包含 10 个值。
-    
-    Note:
-        串口通信（RS485）不支持此接口。
-    """
-
-def get_all_control_modes(self) -> List[int]:
-    """批量获取所有关节电机的控制模式。
-    
-    Returns:
-        List[int]: 控制模式列表。返回 10 个值。
-    
-    Note:
-        串口通信（RS485）不支持此接口。
-    """
-```
+| 模式枚举 | 值 | 说明 |
+|---|---|---|
+| `ControlMode.POSITION` | 0 | 位置控制（默认） |
+| `ControlMode.POSITION_TORQUE` | 4 | 位置 + 力矩混合控制 |
+| `ControlMode.POSITION_VELOCITY_TORQUE` | 6 | 位置 + 速度 + 力矩混合控制 |
 
 ## 电流阈值控制
 

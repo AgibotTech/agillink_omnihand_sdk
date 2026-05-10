@@ -505,6 +505,18 @@ def get_tactile_sensor_3d_data(self, eFinger: Finger) -> TactileSensor3DData:
 
 ## Control Mode
 
+O12 supports switching control modes via `set_control_mode`. The following 5 control modes are supported:
+
+| Mode Enum | Value | Description |
+|---|---|---|
+| `ControlMode.POSITION` | 0 | Position control (default) |
+| `ControlMode.SERVO` | 1 | Servo control mode |
+| `ControlMode.VELOCITY` | 2 | Velocity control mode |
+| `ControlMode.TORQUE` | 3 | Torque control mode |
+| `ControlMode.POSITION_TORQUE` | 4 | Position + torque mixed control (via `mix_ctrl_joint_motor`) |
+
+**Note**: Pure torque control (TORQUE) can be set via `set_control_mode`, but mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) should be used through `mix_ctrl_joint_motor`.
+
 ```python
 def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
     """Sets the control mode of a single joint motor.

@@ -55,6 +55,16 @@ All products follow the same topic naming and interaction pattern:
 
 **Design principle**: The node never publishes autonomously. All state readbacks are triggered externally (by sending a cmd), so they never interfere with the control loop's rhythm.
 
+### Control Mode
+
+Different product models have different control mode support:
+
+**O10 / H3L**: Do not support switching control modes via `joint_control_mode_cmd` topic. They operate in position control mode by default. Mixed control (position + torque, position + velocity + torque) can be achieved through `joint_mix_control_cmd` (3 modes supported).
+
+**O12**: Supports setting position mode, servo mode, velocity mode, and torque mode via `SetControlMode` interface. Also supports position + torque mixed control via `joint_mix_control_cmd` (5 modes supported). Note that the O12 ROS2 node does not currently expose a `joint_control_mode_cmd` topic; control mode switching should be done through the C++/Python SDK directly.
+
+**H3U_M**: Supports switching control modes via `joint_control_mode_cmd` topic (0=CSP position mode, 7=PP profile position mode).
+
 ### Mixed Control (O10/O12)
 
 `joint_mix_control_cmd` is a separate topic from `joint_cmd` for mixed control, using `sensor_msgs/JointState`:

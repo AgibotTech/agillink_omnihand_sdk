@@ -16,7 +16,6 @@
  * - GET_ALL_AXIS_TEMP (0x0C) - GetAllTemperatureReport
  * - GET_ERROR_CODE (0x0D) - GetErrorReport
  * - GET_FINGERTIP_SENSOR_DATA (0x11) - GetTactileSensorData
- * - SET_RUN_MODE (0x15) - SetControlMode
  * - SET_PROTECTIVE_CURRENT (0x25) - SetAllCurrentThreshold
  * - GET_ALL_AXIS_CVP (0x29) - (CVP data)
  * - SET_POS_SPEED_CUR_DATA (0x32) - MixCtrlJointMotor
@@ -311,29 +310,6 @@ TEST_F(OmniHand2025UsbTest, GetTactileSensorData) {
     std::cout << std::endl;
     EXPECT_EQ(data.size(), 25);
   }
-}
-
-// ============================================================================
-// Control Mode Test (SET_RUN_MODE 0x15)
-// ============================================================================
-
-TEST_F(OmniHand2025UsbTest, SetControlMode) {
-  RequireDevice();
-  
-  // Set control mode for joint 1
-  hand_->SetControlMode(1, agilink::omnihand::ControlMode::SERVO);
-  std::cout << "[SetControlMode] Joint 1 -> SERVO" << std::endl;
-  
-  // Note: GetAllControlMode returns cached values for USB
-  auto modes = hand_->GetAllControlMode();
-  std::cout << "[GetAllControlMode] (cached) ";
-  for (size_t i = 0; i < modes.size(); ++i) {
-    std::cout << static_cast<int>(modes[i]);
-    if (i < modes.size() - 1) std::cout << ", ";
-  }
-  std::cout << std::endl;
-  
-  EXPECT_EQ(modes.size(), 10);
 }
 
 // ============================================================================
