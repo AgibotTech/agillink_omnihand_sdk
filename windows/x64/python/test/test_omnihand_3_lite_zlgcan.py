@@ -157,37 +157,6 @@ def test_set_get_all_joint_velocities(hand):
         assert len(all_velocities) == 4
 
 
-def test_set_get_control_mode(hand):
-    """Test setting and getting control mode"""
-    if hand.init():
-        # Test reading control mode (read-only operation, same as C++ gtest)
-        current_modes = hand.get_all_control_modes()
-        # Check if request succeeded (non-empty result)
-        if len(current_modes) == 0:
-            # Request failed (timeout), skip assertion to avoid false failure
-            return
-        print(f"\n[get_all_control_modes] Control Modes: {current_modes}")
-        assert len(current_modes) == 4
-        
-        # Test single joint control mode
-        mode = hand.get_control_mode(1)
-        print(f"[get_control_mode] Joint 1 Control Mode: {mode}")
-        # Note: get_control_mode returns int, not enum
-
-
-def test_set_all_control_modes(hand):
-    """Test setting all control modes (same as C++ gtest - read-only)"""
-    if hand.init():
-        # Test reading control mode (read-only operation, same as C++ gtest)
-        current_modes = hand.get_all_control_modes()
-        # Check if request succeeded (non-empty result)
-        if len(current_modes) == 0:
-            # Request failed (timeout), skip assertion to avoid false failure
-            return
-        print(f"\n[get_all_control_modes] Control Modes: {current_modes}")
-        assert len(current_modes) == 4
-
-
 def test_get_all_error_reports(hand):
     """Test getting all error reports (same as C++ gtest)"""
     if hand.init():

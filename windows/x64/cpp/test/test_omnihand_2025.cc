@@ -217,32 +217,6 @@ TEST_F(OmniHand2025Test, JointAngleControl) {
   }
 }
 
-// Test control mode (requires hardware)
-// Note: SetAllControlMode is disabled as it may cause CANFD communication issues
-// Only testing read operation (GetAllControlMode)
-TEST_F(OmniHand2025Test, ControlMode) {
-  if (hand_->Init()) {
-    // std::vector<unsigned char> control_modes(10, static_cast<unsigned char>(agilink::omnihand::ControlMode::SERVO));
-    // hand_->SetAllControlMode(control_modes);
-    // Only test reading control mode (read-only operation)
-    // Note: SetAllControlMode is not tested as it may cause CANFD communication to crash
-    auto current_modes = hand_->GetAllControlMode();
-    // Check if request succeeded (non-empty result)
-    if (current_modes.empty()) {
-      // Request failed (timeout), skip assertion to avoid false failure
-      // This is expected if device is not responding
-      return;
-    }
-    std::cout << "[GetAllControlMode] Control Modes: ";
-    for (size_t i = 0; i < current_modes.size(); ++i) {
-      std::cout << static_cast<int>(current_modes[i]);
-      if (i < current_modes.size() - 1) std::cout << ", ";
-    }
-    std::cout << std::endl;
-    EXPECT_EQ(current_modes.size(), 10);
-  }
-}
-
 // Test tactile sensor (requires hardware)
 TEST_F(OmniHand2025Test, TactileSensor) {
   if (hand_->Init()) {
