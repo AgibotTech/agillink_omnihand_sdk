@@ -62,9 +62,9 @@ OmniHand SDK 为三款产品提供统一风格的 ROS2 接口：
 
 不同产品型号对控制模式的支持有所不同：
 
-**O10 / H3L**：不支持通过 `joint_control_mode_cmd` topic 切换控制模式，默认位置控制。可通过 `joint_mix_control_cmd` 实现位置+力矩、位置+速度+力矩混合控制（支持 3 种模式）。
+**O10 / H3L**：不支持通过 `joint_control_mode_cmd` topic 切换控制模式，默认位置控制。可通过 `joint_mix_control_cmd` 实现位置+力矩混合控制；位置+速度+力矩模式暂未开放。注意：混合控制中 `effort` 字段实际对应电机电流，单位为 **mA**（非标准 N·m）。
 
-**O12**：支持通过 `SetControlMode` 接口设置位置模式、伺服模式、速度模式、力矩模式，也可通过 `joint_mix_control_cmd` 实现位置+力矩混合控制（支持 5 种模式）。注意 O12 的 ROS2 node 当前未暴露 `joint_control_mode_cmd` topic，控制模式切换需通过 C++/Python SDK 直接调用。
+**O12**：支持通过 `SetControlMode` 接口设置位置模式、伺服模式、速度模式、力矩模式，也可通过 `joint_mix_control_cmd` 实现位置+力混合控制（支持 5 种模式）。混合控制中 `effort` 字段单位为 **0.01N**（与触觉传感器法向力关联）。注意 O12 的 ROS2 node 当前未暴露 `joint_control_mode_cmd` topic，控制模式切换需通过 C++/Python SDK 直接调用。
 
 **H3U_M**：支持通过 `joint_control_mode_cmd` topic 切换控制模式（0=CSP 位置模式，7=PP 规划位置模式）。
 
@@ -162,9 +162,6 @@ python3 joint_current.py left o10
 
 # 混合控制 (位置+力矩, 仅 O10/O12)
 python3 mix_control_pub.py left o10
-
-# 发送电机原始位置 (int16 tick) + 订阅回读 (仅 O10/O12)
-python3 motor_pos.py left o10
 
 # 触发并查看触觉传感器 (仅 O10/O12)
 python3 tactile.py left o10

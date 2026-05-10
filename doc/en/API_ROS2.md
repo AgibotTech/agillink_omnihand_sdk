@@ -62,9 +62,9 @@ The rationale behind this design:
 
 Different product models have different control mode support:
 
-**O10 / H3L**: Do not support switching control modes via `joint_control_mode_cmd` topic. They operate in position control mode by default. Mixed control (position + torque, position + velocity + torque) can be achieved through `joint_mix_control_cmd` (3 modes supported).
+**O10 / H3L**: Do not support switching control modes via `joint_control_mode_cmd` topic. They operate in position control mode by default. Position + torque mixed control can be achieved through `joint_mix_control_cmd`; position + velocity + torque mode is not yet available. Note: in mixed control, the `effort` field actually corresponds to motor current in **mA** (not the standard N·m).
 
-**O12**: Supports setting position mode, servo mode, velocity mode, and torque mode via `SetControlMode` interface. Also supports position + torque mixed control via `joint_mix_control_cmd` (5 modes supported). Note that the O12 ROS2 node does not currently expose a `joint_control_mode_cmd` topic; control mode switching should be done through the C++/Python SDK directly.
+**O12**: Supports setting position mode, servo mode, velocity mode, and torque mode via `SetControlMode` interface. Also supports position + force mixed control via `joint_mix_control_cmd` (5 modes supported). In mixed control, the `effort` field is in **0.01 N** (correlated with tactile sensor normal force). Note that the O12 ROS2 node does not currently expose a `joint_control_mode_cmd` topic; control mode switching should be done through the C++/Python SDK directly.
 
 **H3U_M**: Supports switching control modes via `joint_control_mode_cmd` topic (0=CSP position mode, 7=PP profile position mode).
 
@@ -162,9 +162,6 @@ python3 joint_current.py left o10
 
 # Mixed control (position + torque, O10/O12 only)
 python3 mix_control_pub.py left o10
-
-# Send raw motor position (int16 tick) + subscribe to readback (O10/O12 only)
-python3 motor_pos.py left o10
 
 # Trigger and view tactile sensor (O10/O12 only)
 python3 tactile.py left o10

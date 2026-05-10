@@ -34,12 +34,12 @@ All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`
 
 `joint_mix_control_cmd` uses `sensor_msgs/JointState` for position+torque mixed control:
 
-- `position[]` = raw int16 motor position
-- `effort[]` = raw int16 motor torque
+- `position[]` = raw motor position (int16, range 0–4095)
+- `effort[]` = motor current (int16, unit: **mA**, not the standard N·m)
+
+> **Note**: The `effort` field carries current values in mA, not ROS2 standard torque (N·m). The position + velocity + torque mode (POSITION_VELOCITY_TORQUE) is not yet available.
 
 The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No readback**.
-
-`joint_cmd` uses `position[]` in radians with automatic conversion. `joint_mix_control_cmd` uses raw int16 motor values.
 
 ## Tactile Sensor (1D)
 
@@ -100,10 +100,7 @@ python3 scripts/omnihand_2025/joint_current.py left
 # Set current threshold
 python3 scripts/omnihand_2025/joint_current_threshold_pub.py 500 left
 
-# Send raw motor position (int16 tick) + subscribe to readback
-python3 scripts/omnihand_2025/motor_pos.py left
-
-# Mixed control (position + torque)
+# Mixed control (position + force)
 python3 scripts/omnihand_2025/mix_control_pub.py left
 
 # Trigger and view tactile sensor
@@ -126,7 +123,7 @@ ros2 topic pub --once /o10/left/joint_error_cmd std_msgs/msg/Empty '{}'
 # View error reports
 ros2 topic echo /o10/left/joint_error_states
 
-# Mixed control: position + torque (raw int16)
+# Mixed control: position + force (raw int16, effort=current mA)
 ros2 topic pub --once /o10/left/joint_mix_control_cmd sensor_msgs/msg/JointState \
   "{position: [2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000], effort: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]}"
 ```
@@ -147,6 +144,19 @@ Example:
 ```
 
 See [Unified ROS2 Interface Specification](API_ROS2.md) for full configuration details.
+
+## Demo
+
+| Function | Python | C++ |
+|---|---|---|
+| Position control + state readback | [joint_cmd.py](../../../node/scripts/omnihand_2025/joint_cmd.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| Mixed control (position + force) | [mix_control_pub.py](../../../node/scripts/omnihand_2025/mix_control_pub.py) | [ros2_mix_ctrl_pos_torque_demo.cpp](../../../node/demo/ros2_mix_ctrl_pos_torque_demo.cpp) |
+| Temperature query | [joint_temperature.py](../../../node/scripts/omnihand_2025/joint_temperature.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| Current query | [joint_current.py](../../../node/scripts/omnihand_2025/joint_current.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| Error report query | [joint_error.py](../../../node/scripts/omnihand_2025/joint_error.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| Tactile sensor query | [tactile.py](../../../node/scripts/omnihand_2025/tactile.py) | [ros2_mix_ctrl_pos_torque_demo.cpp](../../../node/demo/ros2_mix_ctrl_pos_torque_demo.cpp) |
+
+> `ros2_joint_cmd_demo.cpp` is a comprehensive demo that includes position control, temperature, current, error report queries, and tactile sensor readback.
 
 ## Related Documentation
 

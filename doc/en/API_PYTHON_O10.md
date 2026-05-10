@@ -538,13 +538,15 @@ def get_sensor_order() -> List[int]:
 
 ## Control Mode
 
-O10 does not support switching control modes via `set_control_mode`. It operates in **position control mode** by default. Multiple control modes can be achieved through the mixed control command `mix_ctrl_joint_motor`. The following 3 control modes are supported:
+O10 does not support switching control modes via `set_control_mode`. It operates in **position control mode** by default. Multiple control modes can be achieved through the mixed control command `mix_ctrl_joint_motor`. The following control modes are supported:
 
 | Mode Enum | Value | Description |
 |---|---|---|
 | `ControlMode.POSITION` | 0 | Position control (default) |
 | `ControlMode.POSITION_TORQUE` | 4 | Position + torque mixed control |
-| `ControlMode.POSITION_VELOCITY_TORQUE` | 6 | Position + velocity + torque mixed control |
+| `ControlMode.POSITION_VELOCITY_TORQUE` | 6 | Position + velocity + torque mixed control (**not yet available**) |
+
+> **Non-standard unit note**: In `POSITION_TORQUE` mode, "torque" actually corresponds to motor current in **mA**, not the ROS2 standard N·m.
 
 ## Current Threshold Control
 
@@ -596,15 +598,20 @@ def get_all_current_thresholds(self) -> List[int]:
 
 ## Mixed Control
 
+> **Note**: For O10/H3L, `tgt_torque` actually corresponds to motor current in **mA** (not the standard N·m). `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
+
 ```python
 def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
     """Controls joint motors in mixed mode.
     
     Args:
         mix_ctrls: List of mixed control parameters.
+            - ctrl_mode: Control mode (only POSITION_TORQUE is available for O10)
+            - tgt_posi: Target position (0–4095 raw encoder value)
+            - tgt_torque: Target current in mA (non-standard, not N·m)
     
     Note:
-        Pure torque control (TORQUE) is not supported. Use mixed control modes instead.
+        Pure torque control (TORQUE) is not supported.
         This interface is not supported for serial port communication (RS485).
     """
 ```

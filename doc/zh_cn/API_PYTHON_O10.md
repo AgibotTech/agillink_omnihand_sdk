@@ -348,13 +348,15 @@ def get_all_joint_velocities(self) -> List[int]:
 
 ## 控制模式
 
-O10 不支持通过 `set_control_mode` 指令切换控制模式，默认工作在**位置控制模式**。可通过混合控制指令 `mix_ctrl_joint_motor` 实现多种控制方式，支持以下 3 种控制模式：
+O10 不支持通过 `set_control_mode` 指令切换控制模式，默认工作在**位置控制模式**。可通过混合控制指令 `mix_ctrl_joint_motor` 实现多种控制方式，支持以下控制模式：
 
 | 模式枚举 | 值 | 说明 |
 |---|---|---|
 | `ControlMode.POSITION` | 0 | 位置控制（默认） |
 | `ControlMode.POSITION_TORQUE` | 4 | 位置 + 力矩混合控制 |
-| `ControlMode.POSITION_VELOCITY_TORQUE` | 6 | 位置 + 速度 + 力矩混合控制 |
+| `ControlMode.POSITION_VELOCITY_TORQUE` | 6 | 位置 + 速度 + 力矩混合控制（**暂未开放**） |
+
+> **非标单位说明**：`POSITION_TORQUE` 模式中的"力矩"实际对应电机电流值，单位为 **mA**，而非 ROS2 标准的 N·m。
 
 ## 电流阈值控制
 
@@ -406,15 +408,20 @@ def get_all_current_thresholds(self) -> List[int]:
 
 ## 混合控制
 
+> **注意**：O10/H3L 的混合控制中，`tgt_torque` 字段实际对应电机电流，单位为 **mA**（非标准 N·m）。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
+
 ```python
 def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
     """以混合模式控制关节电机。
     
     Args:
         mix_ctrls: 混合控制参数列表。
+            - ctrl_mode: 控制模式（仅 POSITION_TORQUE 可用）
+            - tgt_posi: 目标位置（0–4095 编码器原始值）
+            - tgt_torque: 目标电流（单位 mA，非 N·m）
     
     Note:
-        纯力控模式 (TORQUE) 不支持。请使用混合控制模式。
+        纯力控模式 (TORQUE) 不支持。
         串口通信（RS485）不支持此接口。
     """
 ```

@@ -62,9 +62,9 @@ enum class ControlMode : unsigned char {
     SERVO                     = 1,    // 伺服模式
     VELOCITY                  = 2,    // 速度模式
     TORQUE                    = 3,    // 力控模式（不支持：纯力控不可用）
-    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 力矩）
-    VELOCITY_TORQUE           = 5,    // 速度-力控模式（混合控制：速度 + 力矩）
-    POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
+    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 力，力单位 0.01N）
+    VELOCITY_TORQUE           = 5,    // 速度-力控模式（混合控制：速度 + 力，力单位 0.01N）
+    POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力，力单位 0.01N）
     UNKNOWN                   = 10    // 未知模式
 };
 }  // namespace omnihand
@@ -275,9 +275,9 @@ O12 支持通过 `SetControlMode` 指令切换控制模式，支持以下 5 种�
 | `SERVO` | 1 | 伺服控制模式 |
 | `VELOCITY` | 2 | 速度控制模式 |
 | `TORQUE` | 3 | 力矩控制模式 |
-| `POSITION_TORQUE` | 4 | 位置 + 力矩混合控制（通过 `MixCtrlJointMotor`） |
+| `POSITION_TORQUE` | 4 | 位置 + 力混合控制（通过 `MixCtrlJointMotor`，力单位 0.01N） |
 
-**注意**：纯力矩控制（TORQUE）可通过 `SetControlMode` 设置，但混合控制模式（POSITION_TORQUE、VELOCITY_TORQUE、POSITION_VELOCITY_TORQUE）需通过 `MixCtrlJointMotor` 指令使用。
+**注意**：混合控制中 `tgt_torque_` 字段单位为 **0.01N**，与触觉传感器法向力关联。纯力矩控制（TORQUE）可通过 `SetControlMode` 设置，但混合控制模式（POSITION_TORQUE、VELOCITY_TORQUE、POSITION_VELOCITY_TORQUE）需通过 `MixCtrlJointMotor` 指令使用。
 
 ```cpp
 void SetControlMode(unsigned char joint_motor_index, ControlMode mode);  // 设置单个关节控制模式，索引 1-12
@@ -297,10 +297,10 @@ std::vector<int16_t> GetAllCurrentThreshold() const;                            
 
 ### 混合控制
 
-**注意**：仅支持混合控制模式（位置+力矩、速度+力矩、位置+速度+力矩），不支持纯力矩模式。
+**注意**：仅支持混合控制模式（位置+力、速度+力、位置+速度+力），不支持纯力矩模式。`tgt_torque_` 单位为 **0.01N**（与触觉法向力关联）。
 
 ```cpp
-void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);  // 混合控制，每项含 joint_index_(1-12)、ctrl_mode_、tgt_posi_/tgt_velo_/tgt_torque_
+void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);  // 混合控制，每项含 joint_index_(1-12)、ctrl_mode_、tgt_posi_/tgt_velo_/tgt_torque_(0.01N)
 ```
 
 ### 错误上报

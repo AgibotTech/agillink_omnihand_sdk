@@ -34,12 +34,12 @@ O10 ROS2 节点提供 10 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 
 `joint_mix_control_cmd` 使用 `sensor_msgs/JointState` 进行位置+力矩混合控制：
 
-- `position[]` = 电机原始位置 (int16)
-- `effort[]` = 电机原始力矩 (int16)
+- `position[]` = 电机原始位置 (int16, 范围 0–4095)
+- `effort[]` = 电机电流 (int16, 单位 **mA**，非标准 N·m)
+
+> **注意**：`effort` 字段传递的是电流值（mA），而非 ROS2 标准的力矩（N·m）。位置+速度+力矩模式（POSITION_VELOCITY_TORQUE）暂未开放。
 
 节点内部以 POSITION_TORQUE 模式调用 `MixCtrlJointMotor`，**无回读**。
-
-`joint_cmd` 的 `position[]` 单位是弧度，自动转换。`joint_mix_control_cmd` 的值都是电机原始 int16 值。
 
 ## 触觉传感器 (1D)
 
@@ -100,10 +100,7 @@ python3 scripts/omnihand_2025/joint_current.py left
 # 设置电流阈值
 python3 scripts/omnihand_2025/joint_current_threshold_pub.py 500 left
 
-# 发送电机原始位置 (int16 tick) + 订阅回读
-python3 scripts/omnihand_2025/motor_pos.py left
-
-# 混合控制 (位置+力矩)
+# 混合控制 (位置+力)
 python3 scripts/omnihand_2025/mix_control_pub.py left
 
 # 触发并查看触觉传感器
@@ -126,7 +123,7 @@ ros2 topic pub --once /o10/left/joint_error_cmd std_msgs/msg/Empty '{}'
 # 查看错误码
 ros2 topic echo /o10/left/joint_error_states
 
-# 混合控制: 位置+力矩 (raw int16)
+# 混合控制: 位置+力 (raw int16, effort=电流mA)
 ros2 topic pub --once /o10/left/joint_mix_control_cmd sensor_msgs/msg/JointState \
   "{position: [2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000], effort: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]}"
 ```
@@ -147,6 +144,19 @@ O10 支持的连接方式：zlgcan, hcan, socketcan, rs485, usb。
 ```
 
 详见 [ROS2 接口统一规范](API_ROS2.md) 中的配置说明。
+
+## Demo
+
+| 功能 | Python | C++ |
+|---|---|---|
+| 位置控制 + 状态回读 | [joint_cmd.py](../../../node/scripts/omnihand_2025/joint_cmd.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| 混合控制（位置+力） | [mix_control_pub.py](../../../node/scripts/omnihand_2025/mix_control_pub.py) | [ros2_mix_ctrl_pos_torque_demo.cpp](../../../node/demo/ros2_mix_ctrl_pos_torque_demo.cpp) |
+| 温度查询 | [joint_temperature.py](../../../node/scripts/omnihand_2025/joint_temperature.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| 电流查询 | [joint_current.py](../../../node/scripts/omnihand_2025/joint_current.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| 错误码查询 | [joint_error.py](../../../node/scripts/omnihand_2025/joint_error.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| 触觉传感器查询 | [tactile.py](../../../node/scripts/omnihand_2025/tactile.py) | [ros2_mix_ctrl_pos_torque_demo.cpp](../../../node/demo/ros2_mix_ctrl_pos_torque_demo.cpp) |
+
+> `ros2_joint_cmd_demo.cpp` 是综合示例，包含位置控制、温度、电流、错误码查询和触觉传感器读取功能。
 
 ## 相关文档
 

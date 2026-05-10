@@ -58,22 +58,23 @@ enum class Finger : unsigned char {
 namespace agilink {
 namespace omnihand {
 enum class ControlMode : unsigned char {
-    POSITION                  = 0,    // 位置模式
-    SERVO                     = 1,    // 伺服模式
-    VELOCITY                  = 2,    // 速度模式
-    TORQUE                    = 3,    // 力控模式（不支持：纯力控不可用）
-    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 力矩）
-    VELOCITY_TORQUE           = 5,    // 速度-力控模式（混合控制：速度 + 力矩）
-    POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（混合控制：位置 + 速度 + 力矩）
+    POSITION                  = 0,    // 位置模式（默认）
+    SERVO                     = 1,    // 伺服模式（O10 不支持 SetControlMode 切换）
+    VELOCITY                  = 2,    // 速度模式（O10 不支持 SetControlMode 切换）
+    TORQUE                    = 3,    // 力控模式（O10 不支持）
+    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 电流 mA）
+    VELOCITY_TORQUE           = 5,    // 速度-力控模式（O10 暂未开放）
+    POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（O10 暂未开放）
     UNKNOWN                   = 10    // 未知模式
 };
 }  // namespace omnihand
 }  // namespace agilink
 ```
 
-**注意**：
-- **SERVO 模式 (1)**：伺服控制模式
-- **纯力控模式(TORQUE) 不支持*：请使用混合控制模式（POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE）
+**O10 可用模式**：
+- `POSITION` (0)：默认位置控制
+- `POSITION_TORQUE` (4)：位置+电流混合控制（力矩字段实为电流 mA）
+- 其余模式不可用或暂未开放
 
 ## 数据结构
 
@@ -516,13 +517,15 @@ static const std::vector<Finger>& GetSensorOrder();
 
 ## 控制模式
 
-O10 不支持通过 `SetControlMode` 指令切换控制模式，默认工作在**位置控制模式**。可通过混合控制指令 `MixCtrlJointMotor` 实现多种控制方式，支持以下 3 种控制模式：
+O10 不支持通过 `SetControlMode` 指令切换控制模式，默认工作在**位置控制模式**。可通过混合控制指令 `MixCtrlJointMotor` 实现多种控制方式，支持以下控制模式：
 
 | 模式枚举 | 值 | 说明 |
 |---|---|---|
 | `POSITION` | 0 | 位置控制（默认） |
 | `POSITION_TORQUE` | 4 | 位置 + 力矩混合控制 |
-| `POSITION_VELOCITY_TORQUE` | 6 | 位置 + 速度 + 力矩混合控制 |
+| `POSITION_VELOCITY_TORQUE` | 6 | 位置 + 速度 + 力矩混合控制（**暂未开放**） |
+
+> **非标单位说明**：`POSITION_TORQUE` 模式中的"力矩"实际对应电机电流值，单位为 **mA**，而非 ROS2 标准的 N·m。
 
 ## 电流阈值控制
 
@@ -535,12 +538,17 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 
 ## 混合控制
 
+> **注意**：O10/H3L 的混合控制中，`tgt_torque_` 字段实际对应电机电流，单位为 **mA**（非标准 N·m）。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
+
 ```cpp
 /**
  * @brief 以混合模式控制关节电机。
- * @param mix_ctrls 混合控制参数向量）
- * @note 纯力控模式(TORQUE) 不支持。请使用混合控制模式）
- * @note 串口通信（RS485）不支持此接口）
+ * @param mix_ctrls 混合控制参数向量
+ *   - ctrl_mode_: 控制模式（仅 POSITION_TORQUE 可用）
+ *   - tgt_posi_: 目标位置（0–4095 编码器原始值）
+ *   - tgt_torque_: 目标电流（单位 mA，非 N·m）
+ * @note 纯力控模式(TORQUE) 不支持。
+ * @note 串口通信（RS485）不支持此接口。
  */
 void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);
 ```

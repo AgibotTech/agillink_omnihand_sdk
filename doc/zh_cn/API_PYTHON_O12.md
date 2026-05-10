@@ -328,9 +328,9 @@ O12 支持通过 `set_control_mode` 指令切换控制模式，支持以下 5 �
 | `ControlMode.SERVO` | 1 | 伺服控制模式 |
 | `ControlMode.VELOCITY` | 2 | 速度控制模式 |
 | `ControlMode.TORQUE` | 3 | 力矩控制模式 |
-| `ControlMode.POSITION_TORQUE` | 4 | 位置 + 力矩混合控制（通过 `mix_ctrl_joint_motor`） |
+| `ControlMode.POSITION_TORQUE` | 4 | 位置 + 力混合控制（通过 `mix_ctrl_joint_motor`，力单位 0.01N） |
 
-**注意**：纯力矩控制（TORQUE）可通过 `set_control_mode` 设置，但混合控制模式（POSITION_TORQUE、VELOCITY_TORQUE、POSITION_VELOCITY_TORQUE）需通过 `mix_ctrl_joint_motor` 指令使用。
+**注意**：混合控制中 `tgt_torque` 字段单位为 **0.01N**，与触觉传感器法向力关联。纯力矩控制（TORQUE）可通过 `set_control_mode` 设置，但混合控制模式（POSITION_TORQUE、VELOCITY_TORQUE、POSITION_VELOCITY_TORQUE）需通过 `mix_ctrl_joint_motor` 指令使用。
 
 ```python
 def set_control_mode(self, joint_motor_index: int, mode: int) -> None:

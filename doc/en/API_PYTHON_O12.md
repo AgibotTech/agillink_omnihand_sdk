@@ -513,9 +513,9 @@ O12 supports switching control modes via `set_control_mode`. The following 5 con
 | `ControlMode.SERVO` | 1 | Servo control mode |
 | `ControlMode.VELOCITY` | 2 | Velocity control mode |
 | `ControlMode.TORQUE` | 3 | Torque control mode |
-| `ControlMode.POSITION_TORQUE` | 4 | Position + torque mixed control (via `mix_ctrl_joint_motor`) |
+| `ControlMode.POSITION_TORQUE` | 4 | Position + force mixed control (via `mix_ctrl_joint_motor`, force unit: 0.01 N) |
 
-**Note**: Pure torque control (TORQUE) can be set via `set_control_mode`, but mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) should be used through `mix_ctrl_joint_motor`.
+**Note**: In mixed control, `tgt_torque` is in **0.01 N**, correlated with tactile sensor normal force. Pure torque control (TORQUE) can be set via `set_control_mode`, but mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) should be used through `mix_ctrl_joint_motor`.
 
 ```python
 def set_control_mode(self, joint_motor_index: int, mode: int) -> None:

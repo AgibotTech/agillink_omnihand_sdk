@@ -54,18 +54,19 @@ enum class Finger : unsigned char {
 enum class ControlMode : unsigned char {
     POSITION = 0,    // Position mode
     SERVO = 1,    // Servo mode
-    VELOCITY = 2,    // Velocity mode
-    TORQUE = 3,    // Torque mode (Not supported: pure torque control not available)
-    POSITION_TORQUE = 4,    // Position-Torque mode (Mixed control: position + torque)
-    VELOCITY_TORQUE = 5,    // Velocity-Torque mode (Mixed control: velocity + torque)
-    POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mode (Mixed control: position + velocity + torque)
+    VELOCITY = 2,    // Velocity mode (O10 does not support SetControlMode)
+    TORQUE = 3,    // Torque mode (O10 not supported)
+    POSITION_TORQUE = 4,    // Position-Torque mode (Mixed control: position + current mA)
+    VELOCITY_TORQUE = 5,    // Velocity-Torque mode (O10 not yet available)
+    POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mode (O10 not yet available)
     UNKNOWN = 10    // Unknown mode
 };
 ```
 
-**Note**: 
-- **SERVO mode (1)**: Servo control mode
-- **Pure torque control (TORQUE) is not supported**: Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead
+**O10 available modes**:
+- `POSITION` (0): Default position control
+- `POSITION_TORQUE` (4): Position + current mixed control (torque field is actually current in mA)
+- Other modes are not available or not yet open
 
 ## Data Structures
 
@@ -512,13 +513,15 @@ The 16 sensors on the finger are arranged as shown below:
 
 ## Control Mode
 
-O10 does not support switching control modes via `SetControlMode`. It operates in **position control mode** by default. Multiple control modes can be achieved through the mixed control command `MixCtrlJointMotor`. The following 3 control modes are supported:
+O10 does not support switching control modes via `SetControlMode`. It operates in **position control mode** by default. Multiple control modes can be achieved through the mixed control command `MixCtrlJointMotor`. The following control modes are supported:
 
 | Mode Enum | Value | Description |
 |---|---|---|
 | `POSITION` | 0 | Position control (default) |
 | `POSITION_TORQUE` | 4 | Position + torque mixed control |
-| `POSITION_VELOCITY_TORQUE` | 6 | Position + velocity + torque mixed control |
+| `POSITION_VELOCITY_TORQUE` | 6 | Position + velocity + torque mixed control (**not yet available**) |
+
+> **Non-standard unit note**: In `POSITION_TORQUE` mode, "torque" actually corresponds to motor current in **mA**, not the ROS2 standard N·m.
 
 ## Current Threshold Control
 
@@ -556,21 +559,20 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 
 ## Mixed Control
 
-**Note**: Pure torque control (TORQUE) is not supported. Only mixed control modes are supported:
-- **POSITION_TORQUE**: Position + Torque control
-- **VELOCITY_TORQUE**: Velocity + Torque control
-- **POSITION_VELOCITY_TORQUE**: Position + Velocity + Torque control
+> **Note**: For O10/H3L, `tgt_torque_` actually corresponds to motor current in **mA** (not the standard N·m). `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
+
+Only the following mode is currently available:
+- **POSITION_TORQUE**: Position + current (mA) control
 
 ```cpp
 /**
  * @brief Controls joint motors in mixed mode.
  * @param mix_ctrls A vector of mixed control parameters. Each element contains:
  *                   - joint_index_: Joint index (1-10)
- *                   - ctrl_mode_: Control mode (only mixed control modes: POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE)
- *                   - tgt_posi_: Target position (optional, required for POSITION_TORQUE and POSITION_VELOCITY_TORQUE modes)
- *                   - tgt_velo_: Target velocity (optional, required for VELOCITY_TORQUE and POSITION_VELOCITY_TORQUE modes)
- *                   - tgt_torque_: Target torque (required for all mixed control modes)
- * @note Pure torque control (TORQUE) is not supported. Use mixed control modes instead.
+ *                   - ctrl_mode_: Control mode (only POSITION_TORQUE is available for O10)
+ *                   - tgt_posi_: Target position (0–4095 raw encoder value)
+ *                   - tgt_torque_: Target current in mA (non-standard, not N·m)
+ * @note Pure torque control (TORQUE) is not supported.
  * @note This interface is not supported for serial port communication (RS485).
  */
 void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);
