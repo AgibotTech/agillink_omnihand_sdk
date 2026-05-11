@@ -3,18 +3,18 @@
 
 /**
  * @file O10_demo_canfd_serial.cc
- * @brief OmniHand 2025 控制示例 - CANFD 通信（通过 serial_number）
+ * @brief OmniHand 2025 control demo - CANFD communication (via serial_number)
  * 
- * 此示例演示如何使用设备序列号创建和控制 OmniHand 2025 灵巧手
- * 支持单手（left/right）和双手（both）控制
+ * This demo shows how to create and control using device serial number OmniHand 2025 dexterous hand
+ * Supports single-hand (left/right) and dual-hand (both) control
  * 
- * 编译: cmake .. && make
- * 运行: 
- *   ./example_canfd_serial left    # 控制左手
- *   ./example_canfd_serial right   # 控制右手
- *   ./example_canfd_serial both    # 同时控制左右手
+ * Build: cmake .. && make
+ * Run: 
+ *   ./example_canfd_serial left    # Control left hand
+ *   ./example_canfd_serial right   # Control right hand
+ *   ./example_canfd_serial both    # Control both left and right hands simultaneously
  * 
- * 注意：代码中的序列号需要根据实际情况修改
+ * Note: serial numbers in code should be updated for your setup
  */
 
 #include <iostream>
@@ -38,17 +38,17 @@ void printUsage(const char* program_name) {
 void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
 
-  // ============ 获取设备信息 ============
+  // ============ Get Device Info ============
   auto vendor_info = hand->GetVendorInfo();
   std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
 
   auto device_info = hand->GetDeviceInfo();
   std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
 
-  // ============ 读取传感器数据 ============
+  // ============ Read Sensor Data ============
   std::cout << "\n=== Reading Sensor Data ===" << std::endl;
   
-  // 读取触觉传感器数据
+  // Read tactile sensor data
   std::cout << "\nTactile Sensor Data (1D):" << std::endl;
   try {
     auto thumb_tactile = hand->GetTactileSensorData(agilink::omnihand::Finger::THUMB);
@@ -70,7 +70,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
     std::cout << "  Warning: " << e.what() << std::endl;
   }
 
-  // 读取温度报告
+  // Read temperature report
   std::cout << "\nTemperature Reports:" << std::endl;
   auto temperatures = hand->GetAllTemperatureReport();
   std::cout << "  All Joint Temperatures (°C): [";
@@ -80,7 +80,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
   }
   std::cout << "]" << std::endl;
 
-  // 读取电流报告
+  // Read current report
   std::cout << "\nCurrent Reports:" << std::endl;
   auto currents = hand->GetAllCurrentReport();
   std::cout << "  All Joint Currents: [";
@@ -90,7 +90,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
   }
   std::cout << "]" << std::endl;
 
-  // 读取错误报告
+  // Read error report
   std::cout << "\nError Reports:" << std::endl;
   auto errors = hand->GetAllErrorReport();
   for (size_t i = 0; i < errors.size(); ++i) {
@@ -112,7 +112,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
     std::cout << "  No errors detected" << std::endl;
   }
 
-  // 读取速度（读取，不算控制）
+  // Read velocity (read-only, not control)
   std::cout << "\nJoint Velocities:" << std::endl;
   auto velocities = hand->GetAllJointMotorVelo();
   std::cout << "  All Joint Velocities: [";
@@ -122,15 +122,15 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
   }
   std::cout << "]" << std::endl;
 
-  // ============ 关节角度控制示例 ============
-  // 使用关节角度控制（推荐方式，底层会自动转换）
+  // ============ Joint Angle Control Demo ============
+  // Use joint-angle control (recommended; underlying layer auto-converts)
   std::cout << "\nSetting joint angles..." << std::endl;
   std::vector<double> angles(10, 0.0);
   hand->SetAllActiveJointAngles(angles);
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-  // 读取关节角度
+  // Read joint angle
   auto active_angles = hand->GetAllActiveJointAngles();
   std::cout << "Active Joint Angles (rad): [";
   for (size_t i = 0; i < active_angles.size(); ++i) {
@@ -162,9 +162,9 @@ int main(int argc, char** argv) {
   std::cout << "============================================" << std::endl;
 
   unsigned char device_id = 1;
-  // 注意：序列号需要根据实际情况修改
-  std::string left_serial = "201BFF2A";   // 左手适配器序列号（部分匹配）
-  std::string right_serial = "201BFF2B";  // 右手适配器序列号（部分匹配，请根据实际情况修改）
+  // Note: serial numbers should be updated for your setup
+  std::string left_serial = "201BFF2A";   // left-hand adapter serial number (partial match)
+  std::string right_serial = "201BFF2B";  // right-hand adapter serial number (partial match, update for your setup)
 
   if (mode == "left" || mode == "both") {
     auto left_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
@@ -213,7 +213,7 @@ int main(int argc, char** argv) {
     if (mode == "right") {
       controlSingleHand(right_hand, "Right");
     } else {
-      // both 模式：同时控制
+      // both mode: control simultaneously
       std::cout << "\n=== Dual Hand Control ===" << std::endl;
       
       auto left_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(

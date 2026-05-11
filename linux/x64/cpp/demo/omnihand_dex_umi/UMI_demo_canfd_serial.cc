@@ -3,19 +3,19 @@
 
 /**
  * @file UMI_demo_canfd_serial.cc
- * @brief OmniHand Dex UMI 控制示例 - CANFD 通信（通过 serial_number）
+ * @brief OmniHand Dex UMI control demo - CANFD communication (via serial_number)
  * 
- * 此示例演示如何使用设备序列号创建和读取 OmniHand Dex UMI 灵巧手数据
- * 支持单手（left/right）和双手（both）控制
+ * This demo shows how to create and read using device serial number OmniHand Dex UMI dexterous-hand data
+ * Supports single-hand (left/right) and dual-hand (both) control
  * 
- * 注意：UMI 协议是只读的，不支持位置/速度/力矩控制
- * 注意：代码中的序列号需要根据实际情况修改
+ * Note: UMI protocol is read-only and does not support position/velocity/torque control
+ * Note: serial numbers in code should be updated for your setup
  * 
- * 编译: cmake .. && make
- * 运行: 
- *   ./demo_omnihand_dex_umi_canfd_serial left    # 读取左手数据
- *   ./demo_omnihand_dex_umi_canfd_serial right   # 读取右手数据
- *   ./demo_omnihand_dex_umi_canfd_serial both    # 同时读取左右手数据
+ * Build: cmake .. && make
+ * Run: 
+ *   ./demo_omnihand_dex_umi_canfd_serial left    # Read left-hand data
+ *   ./demo_omnihand_dex_umi_canfd_serial right   # Read right-hand data
+ *   ./demo_omnihand_dex_umi_canfd_serial both    # Read both left and right hand data simultaneously
  */
 
 #include <iostream>
@@ -40,22 +40,22 @@ void printUsage(const char* program_name) {
 void readSingleHand(std::unique_ptr<agilink::omnihand::OmniHandDexUMI>& hand, const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Data Reading ===" << std::endl;
 
-  // ============ 获取设备信息 ============
+  // ============ Get Device Info ============
   auto vendor_info = hand->GetVendorInfo();
   std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
 
   auto device_info = hand->GetDeviceInfo();
   std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
 
-  // ============ 读取传感器数据 ============
+  // ============ Read Sensor Data ============
   std::cout << "\n=== Reading Sensor Data ===" << std::endl;
   
-  // 注意：UMI 协议支持主动查询关节位置
-  // 使用 GetJointMotorPosi() 或 GetAllJointMotorPosi() 来获取位置数据
+  // Note: UMI protocol supports active joint position query
+  // Use GetJointMotorPosi() or GetAllJointMotorPosi() to obtain position data
   std::cout << "\nNote: UMI protocol supports active position query." << std::endl;
   std::cout << "      Use GetJointMotorPosi() or GetAllJointMotorPosi() to get position data." << std::endl;
 
-  // 读取触觉传感器数据（1D，使用 Raw API）
+  // Read tactile sensor data (1D, using Raw API)
   std::cout << "\n1D Tactile Sensor Data (Raw):" << std::endl;
   try {
     auto thumb_sensor = hand->GetTactileSensorDataRaw(agilink::omnihand::Finger::THUMB);
@@ -82,7 +82,7 @@ void readSingleHand(std::unique_ptr<agilink::omnihand::OmniHandDexUMI>& hand, co
     }
     std::cout << "] (unit: 1g, max: 255g)" << std::endl;
     
-    // 读取所有传感器数据
+    // Read all sensor data
     std::cout << "\nAll Tactile Sensor Data:" << std::endl;
     auto all_sensors = hand->GetAllTactileSensorDataRaw();
     for (const auto& sensor : all_sensors) {
@@ -126,9 +126,9 @@ int main(int argc, char** argv) {
   std::cout << "============================================" << std::endl;
 
   unsigned char device_id = 1;
-  // 注意：序列号需要根据实际情况修改
-  std::string left_serial = "201BFF2A";   // 左手适配器序列号（部分匹配）
-  std::string right_serial = "201BFF2B";  // 右手适配器序列号（部分匹配，请根据实际情况修改）
+  // Note: serial numbers should be updated for your setup
+  std::string left_serial = "201BFF2A";   // left-hand adapter serial number (partial match)
+  std::string right_serial = "201BFF2B";  // right-hand adapter serial number (partial match, update for your setup)
 
   if (mode == "left" || mode == "both") {
     auto left_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
@@ -177,7 +177,7 @@ int main(int argc, char** argv) {
     if (mode == "right") {
       readSingleHand(right_hand, "Right");
     } else {
-      // both 模式：同时读取
+      // both mode: read simultaneously
       std::cout << "\n=== Dual Hand Data Reading ===" << std::endl;
       
       auto left_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
         return 1;
       }
 
-      // UMI 协议支持主动查询位置
+      // UMI protocol supports active position query
       std::cout << "\nNote: UMI protocol supports active position query." << std::endl;
       std::cout << "      Use GetJointMotorPosi() or GetAllJointMotorPosi() to get position data." << std::endl;
     }

@@ -3,20 +3,20 @@
 # AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
-OmniHand Dex UMI 综合控制示例 - CANFD 通信（通过 serial_number）
+OmniHand Dex UMI comprehensive control demo - CANFD communication (via serial_number)
 
-此示例演示如何使用设备序列号创建和读取 OmniHand Dex UMI 灵巧手数据
-支持单手（left/right）和双手（both）控制
+This demo creates and reads OmniHand Dex UMI data via device serial number
+Supports single-hand (left/right) and dual-hand (both)
 
-注意：UMI 协议是只读的，不支持位置/速度/力矩控制
-位置数据只能通过周期性位置报告获取
+Note: UMI is read-only; no position/velocity/torque control
+Position can also come from periodic position reports
 
-运行方式：
-    python3 demo_canfd_serial.py left    # 读取左手数据
-    python3 demo_canfd_serial.py right   # 读取右手数据
-    python3 demo_canfd_serial.py both    # 同时读取左右手数据
+Run:
+    python3 demo_canfd_serial.py left    # read left
+    python3 demo_canfd_serial.py right   # read right
+    python3 demo_canfd_serial.py both    # read both
 
-注意：代码中的序列号需要根据实际情况修改
+Note: update serial numbers in code for your setup
 """
 
 import sys
@@ -26,7 +26,7 @@ from omnihand import OmniHandDexUMI, HandType, Finger
 
 
 def print_usage(program_name):
-    """打印使用说明"""
+    """Print usage help."""
     print(f"Usage: {program_name} [left|right|both]")
     print("  left   - Read left hand data only")
     print("  right  - Read right hand data only")
@@ -36,43 +36,43 @@ def print_usage(program_name):
     print("Note: UMI protocol is read-only, position/velocity/torque control is not supported")
 
 
-# 用于统计和显示的数据
+# Stats for display
 position_report_count = {}
 tactile_report_count = {}
 lock = threading.Lock()
 
 
 def position_report_callback(positions, hand_name="Unknown"):
-    """位置周期上报回调函数"""
+    """Periodic position report callback."""
     global position_report_count
     with lock:
         if hand_name not in position_report_count:
             position_report_count[hand_name] = 0
         position_report_count[hand_name] += 1
         count = position_report_count[hand_name]
-        if count % 100 == 0:  # 每100次打印一次
+        if count % 100 == 0:  # print every 100 callbacks
             print(f"\n[{hand_name} Position Report #{count}]")
             print(f"  Position data (0-4096): {positions[:5]}..." if len(positions) > 5 else f"  Position data: {positions}")
 
 
 def tactile_report_callback(sensor_data, hand_name="Unknown"):
-    """触觉传感器周期上报回调函数"""
+    """Periodic tactile report callback."""
     global tactile_report_count
     with lock:
         if hand_name not in tactile_report_count:
             tactile_report_count[hand_name] = 0
         tactile_report_count[hand_name] += 1
         count = tactile_report_count[hand_name]
-        if count % 100 == 0:  # 每100次打印一次
+        if count % 100 == 0:  # print every 100 callbacks
             print(f"\n[{hand_name} Tactile Report #{count}]")
             print(f"  Sensor ID: {sensor_data.sensor_id}, Data length: {len(sensor_data.data) if sensor_data.data else 0}")
 
 
 def read_single_hand(hand, hand_name):
-    """读取单手的完整流程"""
+    """Read flow for one hand."""
     print(f"\n=== {hand_name} Hand Data Reading ===")
 
-    # ============ 获取设备信息 ============
+    # ============ Get device info ============
     print("\n--- Vendor Info ---")
     vendor_info = hand.get_vendor_info()
     print(f"  Model: {vendor_info.product_model}")
@@ -95,14 +95,14 @@ def read_single_hand(hand, hand_name):
     print(f"    D-Bitrate: {device_info.commu_params.dbitrate}")
     print(f"    D-Sample Point: {device_info.commu_params.dsample_point}")
 
-    # ============ 读取传感器数据 ============
+    # ============ Read sensor data ============
     print("\n=== Reading Sensor Data ===")
 
-    # 注意：UMI 协议支持主动查询关节位置
+    # Note: UMI supports active joint position query
     print("\nNote: UMI protocol supports active position query.")
     print("      Use get_joint_position() or get_all_joint_positions() to get position data.")
 
-    # 读取触觉传感器数据（1D，使用 Raw API）
+    # Read tactile data (1D, Raw API)
     print("\n--- 1D Tactile Sensor Data (Raw) ---")
     try:
         fingers = [
@@ -122,7 +122,7 @@ def read_single_hand(hand, hand_name):
             except Exception as e:
                 print(f"  {finger_name}: Error - {e}")
 
-        # 读取所有传感器数据
+        # Read all sensor data
         print("\n--- All Tactile Sensor Data ---")
         all_sensors = hand.get_all_tactile_sensor_data_raw()
         print(f"  Total sensors: {len(all_sensors)}")
@@ -137,19 +137,19 @@ def read_single_hand(hand, hand_name):
     except Exception as e:
         print(f"  Warning: {e}")
 
-    # ============ 主动查询位置数据 ============
+    # ============ Active position query ============
     print("\n=== Active Position Query ===")
     
-    # 主动查询所有关节位置
+    # Query all joint positions
     try:
         positions = hand.get_all_joint_positions()
         print(f"  All joint positions: {positions}")
     except Exception as e:
         print(f"  Warning: Failed to get all joint positions - {e}")
     
-    # 主动查询单个关节位置
+    # Query single joint positions
     try:
-        for i in range(1, 4):  # 查询前3个关节
+        for i in range(1, 4):  # first 3 joints
             pos = hand.get_joint_position(i)
             print(f"  Joint {i} position: {pos}")
     except Exception as e:
@@ -157,7 +157,7 @@ def read_single_hand(hand, hand_name):
 
 
 def main():
-    """主函数"""
+    """Main entry point."""
     import argparse
     parser = argparse.ArgumentParser(description='OmniHand Dex UMI - CANFD Control (by serial_number)')
     parser.add_argument('mode', nargs='?', choices=['left', 'right', 'both'], default='left',
@@ -175,10 +175,10 @@ def main():
     print("=" * 60)
 
     hand_device_id= OmniHandDexUMI.kDefaultHandDeviceId
-    # 注意：序列号需要根据实际情况修改
-    # 序列号支持部分匹配（例如 "201BFF2A" 可以匹配 "201BFF2AF01202D44690USBCANFD-200U"）
-    left_serial = "201BFF2A"   # 左手适配器序列号（部分匹配）
-    right_serial = "201BFF2B"  # 右手适配器序列号（部分匹配，请根据实际情况修改）
+    # Note: update serial numbers for your setup
+    # Serial numbers support partial match (e.g. "201BFF2A" matches longer strings)
+    left_serial = "201BFF2A"   # left adapter serial (partial match)
+    right_serial = "201BFF2B"  # right adapter serial (partial match; update for your setup)
 
     # Helper function to create hand instance by serial number
     def create_hand_by_serial(hand_type, serial_number, channel_id=0):
@@ -234,17 +234,17 @@ def main():
             print("\nWaiting for periodic reports (5 seconds)...")
             time.sleep(5)
         else:
-            # both 模式：同时读取
+            # both mode: read both
             print("\n=== Dual Hand Data Reading ===")
 
             if left_hand is None:
-                # 如果之前没有创建左手，现在创建
+                # Create left hand if not created yet
                 left_hand = create_hand_by_serial(HandType.LEFT, left_serial, 0)
                 if left_hand is None or not left_hand.init():
                     print("[Error]: Failed to initialize left hand for dual mode")
                     return 1
 
-            # 获取设备信息
+            # Get device info
             left_vendor = left_hand.get_vendor_info()
             right_vendor = right_hand.get_vendor_info()
 
@@ -256,7 +256,7 @@ def main():
             print(f"  Model: {right_vendor.product_model}")
             print(f"  Serial: {right_vendor.product_seq_num}")
 
-            # 主动查询两个手的位置数据
+            # Active query positions for both hands
             print("\n--- Active Position Query ---")
             try:
                 left_positions = left_hand.get_all_joint_positions()

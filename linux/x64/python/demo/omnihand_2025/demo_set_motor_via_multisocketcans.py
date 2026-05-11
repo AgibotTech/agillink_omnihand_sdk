@@ -8,7 +8,7 @@ def main():
     left_hand = OmniHand2025.create_hand_socketcan(hand_type=HandType.LEFT, can_interface="can0")
     right_hand = OmniHand2025.create_hand_socketcan(hand_type=HandType.RIGHT, can_interface="can1")
 
-    # 启用详细日志查看 CAN 通信
+    # Verbose CAN log
     left_hand.show_data_details(True)
     right_hand.show_data_details(True)
 

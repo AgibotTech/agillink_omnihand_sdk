@@ -27,27 +27,27 @@ class Gesture(Enum):
     EXIT = 99
 
 def print_menu():
-    print("\n=== OmniHand 手势控制菜单(预置指令仅适合右手) ===")
-    print("0. 重置位置")
-    print("1. 手掌展开")
-    print("2. 握拳方式1")
-    print("3. 握拳方式2")
-    print("4. OK手势")
-    print("5. 单手比心")
-    print("6. 点赞")
-    print("7. ILY手势")
-    print("8. 数字1")
-    print("9. 数字2")
-    print("10. 数字3")
-    print("11. 数字4")
-    print("12. 数字6")
-    print("13. 数字8")
-    print("14. 双手比心1")
-    print("15. 双手比心2")
-    print("16. 双手比心3")
-    print("17. 合十")
-    print("99. 退出程序")
-    print("请输入对应的数字选择手势: ")
+    print("\n=== OmniHand gesture menu (presets tuned for right hand) ===")
+    print("0. Reset pose")
+    print("1. Open palm")
+    print("2. Fist style 1")
+    print("3. Fist style 2")
+    print("4. OK gesture")
+    print("5. One-hand heart")
+    print("6. Thumbs up")
+    print("7. ILY gesture")
+    print("8. Digit 1")
+    print("9. Digit 2")
+    print("10. Digit 3")
+    print("11. Digit 4")
+    print("12. Digit 6")
+    print("13. Digit 8")
+    print("14. Two-hand heart 1")
+    print("15. Two-hand heart 2")
+    print("16. Two-hand heart 3")
+    print("17. Prayer hands")
+    print("99. Exit")
+    print("Enter number to select gesture: ")
 
 def get_gesture_positions(gesture):
     gesture_positions = {
@@ -98,22 +98,22 @@ def main():
             gesture = Gesture(choice)
             
             if gesture == Gesture.EXIT:
-                print("程序退出")
+                print("Exiting")
                 break
                 
-            print(f"\n执行手势: {gesture.name}")
+            print(f"\nRunning gesture: {gesture.name}")
             positions = get_gesture_positions(gesture)
             hand.set_all_active_joint_angles(positions)
             time.sleep(1)
             
-            # 获取并打印实际位置
+            # read and print actual positions
             real_positions = hand.get_all_active_joint_angles()
-            print("当前关节角度: ", real_positions)
+            print("Current joint angles: ", real_positions)
             
         except ValueError:
-            print("输入无效，请输入正确的数字")
+            print("Invalid input; enter a valid number")
         except Exception as e:
-            print(f"发生错误: {e}")
+            print(f"Error: {e}")
 
 if __name__ == "__main__":
     main()

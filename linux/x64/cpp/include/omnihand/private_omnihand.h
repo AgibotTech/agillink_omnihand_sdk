@@ -77,18 +77,18 @@ struct AGIBOT_EXPORT ProductSerialNumber {
 /**
  * @brief Firmware version information structure (0xCD response)
  * @note 10 bytes total:
- *       - device_type: Device type (2=O10灵巧手, 1=O12, etc.)
+ *       - device_type: Device type (2=O10 dexterous hand, 1=O12, etc.)
  *       - product_status[2]: Product status (ASCII, e.g., "T1", "T2", "P1")
  *       - software_version: Software version (major, minor, patch)
  *       - hardware_version: Hardware version (major, minor, patch)
  *       - dof: Degrees of freedom
  */
 struct AGIBOT_EXPORT FirmwareVersionInfo {
-  uint8_t device_type;              // 设备类型 (2=O10灵巧手, 1=O12)
-  char product_status[3];           // 产品状态（ASCII码，如"T1"、"T2"、"P1"等），包含结束符
-  Version software_version;         // 软件版本 (major, minor, patch)
-  Version hardware_version;         // 硬件版本 (major, minor, patch)
-  uint8_t dof;                      // 自由度
+  uint8_t device_type;              // device type (2=O10 dexterous hand, 1=O12)
+  char product_status[3];           // product status (ASCII, e.g. "T1", "T2", "P1"), including terminator
+  Version software_version;         // software version (major, minor, patch)
+  Version hardware_version;         // hardware version (major, minor, patch)
+  uint8_t dof;                      // degrees of freedom
   
   FirmwareVersionInfo() : device_type(0), dof(0) {
     product_status[0] = '\0';

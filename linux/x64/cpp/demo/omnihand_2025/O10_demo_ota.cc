@@ -3,22 +3,22 @@
 
 /**
  * @file O10_demo_ota.cc
- * @brief OmniHand 2025 OTA 固件升级示例
+ * @brief OmniHand 2025 OTA firmware upgrade demo
  * 
- * 此示例演示如何使用 OTA 功能升级 OmniHand 2025 固件
- * 支持的通信方式：
- *   - CANFD 通信（ZLG CANFD、HCAN、SocketCAN）- 所有平台
- *   - USB 通信（仅 Windows，Ubuntu不支持USB CDC OTA）
+ * This demo shows how to use OTA functionality to upgrade OmniHand 2025 firmware
+ * Supported communication types:
+ *   - CANFD communication (ZLG CANFD, HCAN, SocketCAN) - all platforms
+ *   - USB communication (Windows only; USB CDC OTA is not supported on Ubuntu)
  * 
- * 编译: cmake .. && make
- * 运行: 
+ * Build: cmake .. && make
+ * Run: 
  *   ./demo_omnihand_2025_ota <firmware_file_path> [canfd_device_id] [canfd_channel_id] [hand_type] [hand_device_id]
  * 
- * 示例（CANFD）:
+ * Example (CANFD):
  *   ./demo_omnihand_2025_ota ../../release/firmware/O10/ag001_hc00_app_v1.2.2_20260123.bin 0 0 right 1
  *   ./demo_omnihand_2025_ota ../../release/firmware/O10/ag001_hc00_app_v99.02.06_20260202.bin
  * 
- * 示例（USB，仅Windows）:
+ * Example (USB, Windows only):
  *   ./demo_omnihand_2025_ota ../../release/firmware/O10/ag001_hc00_app_v1.2.2_20260123.bin COM3
  */
 
