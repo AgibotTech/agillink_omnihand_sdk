@@ -68,7 +68,7 @@
 ### Linux
 
 ```bash
-cd release/linux/x64
+cd linux/x64
 ./install.sh
 
 # 配置 USB 权限（仅首次需要, canfd适配器、RS485 串口均需要）
@@ -80,7 +80,7 @@ sudo ./setup_udev.sh
 
 以管理员身份运行：
 ```cmd
-cd release\windows\x64
+cd windows\x64
 install.bat
 ```
 
@@ -197,7 +197,6 @@ int main() {
 
 ```bash
 # Source ROS2 和 OmniHand
-source /opt/ros/humble/setup.bash
 source ros2/setup.bash
 
 # 使用 launch 文件启动（推荐，默认单手左手）
