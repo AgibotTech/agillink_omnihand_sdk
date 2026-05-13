@@ -3,26 +3,26 @@
 # AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
-UMI 到 O10 控制示例
+UMI to O10 control demo
 
-此示例演示如何从 UMI 设备获取位置数据，并将其直接设置到 O10 灵巧手。
+This demo reads positions from UMI and applies them directly to O10.
 
-工作流程：
-1. 从 UMI 获取电机位置值（范围：0-4096）
-2. 直接将电机位置值设置到 O10 灵巧手（无需转换）
+Flow:
+1. Read motor positions from UMI (0-4096)
+2. Apply same values to O10 (no conversion)
 
-运行方式：
+Run:
     python3 demo_umi_to_o10.py [left|right]
     
-参数说明：
-    left  - 控制左手（默认）
-    right - 控制右手
+Arguments:
+    left  - left hand (default)
+    right - right hand
 
-注意：
-    - UMI 设备是只读的，只能获取位置数据
-    - O10 设备需要支持位置控制
-    - 需要确保 UMI 和 O10 的手型（左右手）匹配
-    - UMI 和 O10 都使用相同的电机位置值范围（0-4096），可直接使用
+Notes:
+    - UMI is read-only; only positions
+    - O10 must support position control
+    - Match left/right between UMI and O10
+    - Same motor position range 0-4096 on both
 """
 
 import sys
@@ -32,7 +32,7 @@ from omnihand import OmniHandDexUMI, OmniHand2025, HandType
 
 
 def print_usage(program_name):
-    """打印使用说明"""
+    """Print usage help."""
     print(f"Usage: {program_name} [left|right]")
     print("  left  - Control left hand (default)")
     print("  right - Control right hand")
@@ -42,7 +42,7 @@ def print_usage(program_name):
 
 
 def main():
-    """主函数"""
+    """Main entry point."""
     parser = argparse.ArgumentParser(
         description='UMI to O10 control demo',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -106,7 +106,7 @@ def main():
     
     args = parser.parse_args()
     
-    # 确定手型
+    # Resolve hand side
     is_left = (args.hand == 'left')
     hand_type = HandType.LEFT if is_left else HandType.RIGHT
     hand_name = "Left" if is_left else "Right"
@@ -116,7 +116,7 @@ def main():
     print(f"Hand Type: {hand_name}")
     print("=" * 60)
     
-    # ============ 初始化 UMI 设备 ============
+    # ============ Init UMI ============
     print("\n[1/3] Initializing UMI device...")
     try:
         if args.device == 'hcan':
@@ -145,7 +145,7 @@ def main():
         
         print(f"[OK]: UMI {hand_name} hand initialized successfully")
         
-        # 获取设备信息
+        # Get device info
         vendor_info = umi_hand.get_vendor_info()
         print(f"  Model: {vendor_info.product_model}")
         print(f"  Serial: {vendor_info.product_seq_num}")
@@ -155,7 +155,7 @@ def main():
         print(f"[ERROR]: Failed to initialize UMI device: {e}")
         return 1
     
-    # ============ 初始化 O10 设备 ============
+    # ============ Init O10 ============
     print("\n[2/3] Initializing O10 device...")
     try:
         if args.device == 'hcan':
@@ -184,13 +184,13 @@ def main():
         
         print(f"[OK]: O10 {hand_name} hand initialized successfully")
         
-        # 获取设备信息
+        # Get device info
         vendor_info = o10_hand.get_vendor_info()
         print(f"  Model: {vendor_info.product_model}")
         print(f"  Serial: {vendor_info.product_seq_num}")
         print(f"  DOF: {vendor_info.dof}")
         
-        # 设置控制模式为位置控制
+        # Set control mode to position
         # o10_hand.set_control_mode(0)  # 0 = POSI mode
         print("  Control mode: POSI (position control)")
         
@@ -208,9 +208,9 @@ def main():
     umi_error_count = 0
     o10_error_count = 0
     consecutive_errors = 0
-    max_consecutive_errors = 10  # 连续错误超过此数量时打印警告
+    max_consecutive_errors = 10  # warn after this many consecutive errors
 
-    # ============ 主循环：从 UMI 读取位置并设置到 O10 ============
+    # ============ Main loop: UMI read -> O10 write ============
     print("\n[3/3] Starting control loop...")
     print("-" * 60)
     print("**Press Ctrl+C to stop**")
@@ -221,14 +221,14 @@ def main():
     print(f"  - UMI/O10 timeout: {recv_timeout}ms, request interval: {request_interval}ms")
     print("-" * 60)
     
-    # 设置较短的超时以提高响应速度（降低单次超时等待时间）
-    # 注意：如果设置太短可能导致频繁超时
+    # Shorter timeout for faster response (less wait per call)
+    # Note: too short a timeout may cause frequent timeouts
     # umi_hand.set_request_interval(request_interval)
     umi_hand.set_frame_recv_timeout(recv_timeout)
     # o10_hand.set_request_interval(request_interval)
     o10_hand.set_frame_recv_timeout(recv_timeout)
 
-    # 开启调试模式，查看 CAN 收发数据（出问题时取消注释）
+    # Uncomment to enable CAN traffic debug
     # umi_hand.show_data_details(True)
     # o10_hand.show_data_details(True)
     
@@ -236,7 +236,7 @@ def main():
         while True:
             loop_start_time = time.time()
             
-            # 从 UMI 获取位置数据
+            # Read positions from UMI
             try:
                 umi_positions = umi_hand.get_all_joint_positions()
                 
@@ -246,8 +246,8 @@ def main():
                     time.sleep(update_period)
                     continue
                 
-                # 直接设置电机位置值到 O10（无需转换）
-                # set_all_joint_positions 返回实际位置，空列表表示失败
+                # Write motor positions to O10 directly
+                # set_all_joint_positions returns actual; empty means fail
                 actual_positions = o10_hand.set_all_joint_positions(umi_positions)
                 if len(actual_positions) > 0:
                     consecutive_errors = 0
@@ -259,15 +259,15 @@ def main():
                 umi_error_count += 1
                 consecutive_errors += 1
             
-            # 打印统计（同一行刷新）
+            # Print stats (same line)
             loop_count += 1
             print(f"\r#{loop_count} | UMI err: {umi_error_count} | O10 err: {o10_error_count}", end="", flush=True)
             
-            # 连续错误警告
+            # Consecutive error warning
             if consecutive_errors == max_consecutive_errors:
                 print(f"[WARNING] {consecutive_errors} consecutive errors! Check device connections.")
             
-            # 控制循环频率
+            # Loop rate
             elapsed = time.time() - loop_start_time
             sleep_time = max(0, update_period - elapsed)
             if sleep_time > 0:

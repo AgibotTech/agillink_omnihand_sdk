@@ -3,12 +3,12 @@
 # AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
-OmniHand Dex UMI 主动关节角度读取示例
+OmniHand Dex UMI active joint angle read demo
 
-此示例演示如何使用 get_all_active_joint_angles() 获取 UMI 10 个主动关节角度。
-返回值从电机位置通过标定参数转换得到，单位为 rad。
+This demo shows get_all_active_joint_angles() for UMI 10 active joints.
+Values are converted from motor positions via calibration; unit is rad.
 
-运行方式：
+Run:
     python3 demo_get_all_active_joint_angles.py left
     python3 demo_get_all_active_joint_angles.py right
 """

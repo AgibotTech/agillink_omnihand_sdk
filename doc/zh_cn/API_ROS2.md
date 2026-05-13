@@ -194,8 +194,7 @@ Demo 位于 `ros2/humble/share/omnihand_node/demo/`，包含：
 ### 快速开始
 
 ```bash
-# 1. source ROS2 和 OmniHand release 环境
-source /opt/ros/humble/setup.bash
+# 1. source OmniHand release 环境
 source /path/to/omnihand_sdk_release/ros2/setup.bash
 
 # 2. 创建 workspace 并拷入 demo

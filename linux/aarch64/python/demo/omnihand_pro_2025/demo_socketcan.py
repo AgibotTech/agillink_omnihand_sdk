@@ -3,24 +3,24 @@
 # AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
-OmniHand Pro 2025 综合控制示例 - SocketCAN 通信（仅 Linux）
+OmniHand Pro 2025 comprehensive control demo - SocketCAN communication (Linux only)
 
-此示例演示如何使用 SocketCAN 创建和控制 OmniHand Pro 2025 灵巧手
-支持单手（left/right）和双手（both）控制
+This demo shows how to create and control OmniHand Pro 2025 via SocketCAN
+Supports single-hand (left/right) and dual-hand (both)
 
-⚠️ 注意：此示例适用于已有 SocketCAN 环境的场景（如板载 CAN、其他 SocketCAN 设备）
-⚠️ 对于 USB CANFD 设备，推荐使用 ZLG 库方式，无需配置驱动
+Warning: for environments with SocketCAN already set up (onboard CAN, etc.)
+Warning: for USB CANFD, prefer ZLG library without extra driver setup
 
-使用前需配置 CAN 接口:
+Configure CAN interface before use:
     sudo ip link set can0 type can bitrate 1000000 sample-point 0.8 dbitrate 5000000 dsample-point 0.8 fd on
     sudo ip link set can0 up
     sudo ip link set can1 type can bitrate 1000000 sample-point 0.8 dbitrate 5000000 dsample-point 0.8 fd on
     sudo ip link set can1 up
 
-运行方式：
-    python3 demo_socketcan_comprehensive.py left    # 控制左手（使用 can0）
-    python3 demo_socketcan_comprehensive.py right   # 控制右手（使用 can0）
-    python3 demo_socketcan_comprehensive.py both    # 同时控制左右手（使用 can0 和 can1）
+Run:
+    python3 demo_socketcan_comprehensive.py left    # control left (using can0)
+    python3 demo_socketcan_comprehensive.py right   # control right (using can0)
+    python3 demo_socketcan_comprehensive.py both    # both hands (can0 and can1)
 """
 
 import sys
@@ -29,7 +29,7 @@ from omnihand import OmniHandPro2025, HandType, Finger
 
 
 def print_usage(program_name):
-    """打印使用说明"""
+    """Print usage help."""
     print(f"Usage: {program_name} [left|right|both]")
     print("  left   - Control left hand only (uses can0)")
     print("  right  - Control right hand only (uses can0)")
@@ -43,10 +43,10 @@ def print_usage(program_name):
 
 
 def control_single_hand(hand, hand_name):
-    """控制单手的完整流程"""
+    """Full demo flow for one hand."""
     print(f"\n=== {hand_name} Hand Control ===")
 
-    # ============ 获取设备信息 ============
+    # ============ Get device info ============
     print("\n--- Vendor Info ---")
     vendor_info = hand.get_vendor_info()
     print(f"  Model: {vendor_info.product_model}")
@@ -69,10 +69,10 @@ def control_single_hand(hand, hand_name):
     print(f"    D-Bitrate: {device_info.commu_params.dbitrate}")
     print(f"    D-Sample Point: {device_info.commu_params.dsample_point}")
 
-    # ============ 读取传感器数据 ============
+    # ============ Read sensor data ============
     print("\n=== Reading Sensor Data ===")
 
-    # 读取 3D 触觉传感器数据（O12 特有）
+    # Read 3D tactile sensor data (O12-specific)
     print("\n--- 3D Tactile Sensor Data (O12 only) ---")
     try:
         thumb_sensor = hand.get_tactile_sensor_3d_data(Finger.THUMB)
@@ -91,7 +91,7 @@ def control_single_hand(hand, hand_name):
     except Exception as e:
         print(f"  Warning: {e}")
 
-    # 读取温度报告
+    # Read temperature report
     print("\n--- Temperature Reports ---")
     try:
         periods = [500] * 12
@@ -103,7 +103,7 @@ def control_single_hand(hand, hand_name):
     except Exception as e:
         print(f"  Warning: {e}")
 
-    # 读取电流报告
+    # Read current report
     print("\n--- Current Reports ---")
     try:
         periods = [500] * 12
@@ -115,7 +115,7 @@ def control_single_hand(hand, hand_name):
     except Exception as e:
         print(f"  Warning: {e}")
 
-    # 读取错误报告
+    # Read error report
     print("\n--- Error Reports ---")
     try:
         errors = hand.get_all_error_reports()
@@ -142,7 +142,7 @@ def control_single_hand(hand, hand_name):
     except Exception as e:
         print(f"  Warning: {e}")
 
-    # 读取速度
+    # Read velocity
     print("\n--- Joint Velocities ---")
     try:
         velocities = hand.get_all_joint_motor_velo()
@@ -150,21 +150,21 @@ def control_single_hand(hand, hand_name):
     except Exception as e:
         print(f"  Warning: {e}")
 
-    # ============ 关节角度控制示例 ============
+    # ============ Joint angle control demo ============
     print("\n=== Joint Angle Control ===")
     print("Setting joint angles...")
-    angles = [0.0] * 12  # O12 有 12 个主动关节
+    angles = [0.0] * 12  # O12 has 12 active joints
     hand.set_all_active_joint_angles(angles)
 
     time.sleep(1.0)
 
-    # 读取关节角度
+    # Read joint angles
     active_angles = hand.get_all_active_joint_angles()
     print(f"Active Joint Angles (rad): {[f'{a:.4f}' for a in active_angles]}")
 
 
 def main():
-    """主函数"""
+    """Main entry point."""
     mode = "left"
     if len(sys.argv) > 1:
         arg = sys.argv[1]
@@ -230,11 +230,11 @@ def main():
         if mode == "right":
             control_single_hand(right_hand, "Right")
         else:
-            # both 模式：同时控制
+            # both mode: control both
             print("\n=== Dual Hand Control ===")
 
             if left_hand is None:
-                # 如果之前没有创建左手，现在创建
+                # Create left hand if not created yet
                 left_hand = OmniHandPro2025.create_hand_socketcan(
                     hand_type=HandType.LEFT,
                     hand_device_id=hand_device_id,
@@ -244,7 +244,7 @@ def main():
                     print("[Error]: Failed to initialize left hand for dual mode")
                     return 1
 
-            # 使用关节角度控制
+            # Joint-angle control
             print("\nSetting joint angles for both hands...")
             left_angles = [0.0] * 12
             right_angles = [0.5] * 12

@@ -4,7 +4,7 @@
 """
 OmniHand 2025 demo - ZLG CAN over TCP (e.g. WiFi/Ethernet adapter as server).
 
-Connect to ZLG WiFi转CANFD device as TCP client. Default: 192.168.0.178:8000.
+Connect to ZLG WiFi-to-CANFD device as TCP client. Default: 192.168.0.178:8000.
 
 Usage:
     python demo_zlgcan_tcp.py
@@ -92,26 +92,26 @@ def main():
     device_info = hand.get_device_info()
     print(f"Device Info: hand_device_id={device_info.hand_device_id}\n")
 
-        # Step 1: 左右手先握拳
+        # Step 1: fist both hands
     print("Step 1: Making hand into fist position...")
-    # 使用新的 SetHandGesture 接口（solver会自动处理左右手差异）
+    # Use SetHandGesture (solver handles left/right differences)
     hand.set_hand_gesture(2)  # FIST2
-    time.sleep(2)  # 等待握拳动作完成
+    time.sleep(2)  # wait for fist motion
     print("Fist position set for hand")
 
-        # Step 2: 摊开手掌
+        # Step 2: open palm
     print("\nStep 2: Opening hand (reset position)...")
-    reset_angles = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # 重置位置（摊开）
+    reset_angles = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # reset to open palm
     hand.set_all_active_joint_angles(reset_angles)
-    time.sleep(2)  # 等待摊开动作完成
+    time.sleep(2)  # wait for open palm
     print("Hands opened (reset position)")
 
-    # Step 3: 做目前的小拇指动作
+    # Step 3: little-finger motion demo
     print("\nStep 3: Setting pinky positions...")
     hand.set_joint_position(10, 200) 
     time.sleep(1)
 
-    # 读取所有关节位置
+    # Read all joint positions
     real_positions = hand.get_all_joint_positions()
     print("All joint positions of hand: ", real_positions)
 

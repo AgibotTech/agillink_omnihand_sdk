@@ -2,9 +2,9 @@
 # AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
-OmniHand Dex UMI 硬件信息获取示例
+OmniHand Dex UMI hardware info demo
 
-此示例演示如何获取 OmniHand Dex UMI 产品的厂家信息和设备信息。
+This demo reads vendor and device info for OmniHand Dex UMI.
 """
 
 import argparse
@@ -21,7 +21,7 @@ def main():
     print("OmniHand Dex UMI Hardware Info Demo")
     print("=" * 50)
     
-    # 创建 OmniHand Dex UMI 灵巧手实例 based on device type
+    # Create OmniHand Dex UMI instance by device type
     if args.device == 'hcan':
         hand = OmniHandDexUMI.create_hand_by_hcan(
             hand_type=HandType.LEFT,
@@ -37,14 +37,14 @@ def main():
             canfd_channel_id=0
         )
     
-    # 检查初始化状态
+    # Check init status
     if not hand.init():
         print("[Error]: Failed to initialize OmniHand Dex UMI hand!")
         return
     
     print("[OK]: OmniHand Dex UMI hand initialized successfully!\n")
     
-    # 获取厂家信息
+    # Vendor info
     print("=" * 50)
     print("Vendor Info (Pn1)")
     print("=" * 50)
@@ -56,7 +56,7 @@ def main():
     print(f"Voltage: {vendor_info.voltage} mV")
     print(f"DOF: {vendor_info.dof}")
     
-    # 获取设备信息
+    # Get device info
     print("\n" + "=" * 50)
     print("Device Info (Pn2)")
     print("=" * 50)
@@ -68,7 +68,7 @@ def main():
     print(f"  CAN FD Data Bitrate: {device_info.commu_params.dbitrate}")
     print(f"  CAN FD Data Sample Point: {device_info.commu_params.dsample_point}")
     
-    # 使用 toString() 方法显示完整信息
+    # Use toString() for full dump
     print("\n" + "=" * 50)
     print("Full Device Info (toString):")
     print("=" * 50)

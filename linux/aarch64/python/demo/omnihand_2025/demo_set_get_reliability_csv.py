@@ -39,12 +39,12 @@ def main():
     interval_ms = max(0, args.interval_ms)
     total_iterations = max(1, args.iterations)
     frame_recv_timeout_ms = max(10, min(1000, args.timeout_ms))
-    # TJ 链路（UDP + 控制器调度 + 末端总线）一般比直连 CAN 慢，默认拉高超时避免误报超时
+    # TJ path (UDP + controller + bus) is slower than direct CAN; raise default timeout to reduce false timeouts
     if args.device == 'tj' and frame_recv_timeout_ms < 200:
         frame_recv_timeout_ms = 200
 
     raw_positions = [int(x.strip()) for x in args.positions.split(',') if x.strip() != ""]
-    # O10 固定 10 关节：不足补默认值，超出截断
+    # O10 fixed 10 joints: pad short lists, truncate long
     base_positions = (raw_positions + [2048] * 10)[:10]
 
     try:
@@ -95,7 +95,7 @@ def main():
     time.sleep(1)
 
     csv_header = ["action", "elapsed_ms"] + [f"pos_{i}" for i in range(10)]
-    # 使用高精度单调时钟计时，避免受系统时间调整影响；elapsed_ms 可能偶尔相同，但真实反映测量时间
+    # Monotonic clock avoids wall-clock skew; elapsed_ms may repeat but reflects real timing
     start_time = time.perf_counter()
 
     try:
@@ -105,7 +105,7 @@ def main():
             for iteration in range(total_iterations):
                 # --- Set position ---
                 try:
-                    # 每轮都强制修正长度，避免偶发空列表/短列表导致索引越界
+                    # Normalize length each round to avoid index errors on short/empty lists
                     target_positions = (list(target_positions) + [2048] * 10)[:10]
                     target_positions[9] = iteration % 4096
 

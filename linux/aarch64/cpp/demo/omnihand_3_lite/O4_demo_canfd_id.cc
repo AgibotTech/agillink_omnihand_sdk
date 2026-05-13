@@ -3,16 +3,16 @@
 
 /**
  * @file O4_demo_canfd_id.cc
- * @brief OmniHand 3 Lite (O4) 控制示例 - CANFD 通信（通过 canfd_id）
+ * @brief OmniHand 3 Lite (O4) control demo - CANFD communication (via canfd_id)
  *
- * 此示例演示如何使用 canfd_id 创建和控制 OmniHand 3 Lite 灵巧手（4 DOF）
- * 支持单手（left/right）和双手（both）控制
+ * This demo shows how to use canfd_id create and control OmniHand 3 Lite dexterous hand (4 DOF)
+ * Supports single-hand (left/right) and dual-hand (both) control
  *
- * 编译: cmake .. && make
- * 运行:
- *   ./demo_omnihand_3_lite_canfd_id left    # 控制左手
- *   ./demo_omnihand_3_lite_canfd_id right   # 控制右手
- *   ./demo_omnihand_3_lite_canfd_id both    # 同时控制左右手
+ * Build: cmake .. && make
+ * Run:
+ *   ./demo_omnihand_3_lite_canfd_id left    # Control left hand
+ *   ./demo_omnihand_3_lite_canfd_id right   # Control right hand
+ *   ./demo_omnihand_3_lite_canfd_id both    # Control both left and right hands simultaneously
  */
 
 #include <iostream>
@@ -39,14 +39,14 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
                        const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
 
-  // ============ 获取设备信息 ============
+  // ============ Get Device Info ============
   auto vendor_info = hand->GetVendorInfo();
   std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
 
   auto device_info = hand->GetDeviceInfo();
   std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
 
-  // ============ 读取传感器数据（O4 无触觉，仅温度/电流/错误）============
+  // ============ Read Sensor Data (O4 has no tactile sensors, only temperature/current/error) ============
   std::cout << "\n=== Reading Sensor Data ===" << std::endl;
 
   std::cout << "\nTemperature Reports:" << std::endl;
@@ -88,7 +88,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
     std::cout << "  No errors detected" << std::endl;
   }
 
-  // ============ 电机位置控制示例（O4 使用电机位置 0~4096，无角度控制）============
+  // ============ Motor Position Control Demo (O4 uses motor positions 0~4096, no angle control)============
   std::cout << "\nSetting joint motor positions (0~4096)..." << std::endl;
   std::vector<int16_t> positions(
       static_cast<size_t>(agilink::omnihand::OmniHand3Lite::kDegreesOfActiveFreedom), 2048);

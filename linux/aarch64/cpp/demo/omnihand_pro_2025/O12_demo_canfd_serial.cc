@@ -50,7 +50,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::cout << "  Warning: " << e.what() << std::endl;
   }
 
-  // 读取温度报告
+  // Read temperature report
   std::cout << "\nTemperature Reports:" << std::endl;
   auto temperatures = hand->GetAllTemperatureReport();
   std::cout << "  All Joint Temperatures (°C): [";
@@ -60,7 +60,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
   }
   std::cout << "]" << std::endl;
 
-  // 读取电流报告
+  // Read current report
   std::cout << "\nCurrent Reports:" << std::endl;
   auto currents = hand->GetAllCurrentReport();
   std::cout << "  All Joint Currents: [";
@@ -70,7 +70,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
   }
   std::cout << "]" << std::endl;
 
-  // 读取错误报告
+  // Read error report
   std::cout << "\nError Reports:" << std::endl;
   auto errors = hand->GetAllErrorReport();
   for (size_t i = 0; i < errors.size(); ++i) {
@@ -92,7 +92,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::cout << "  No errors detected" << std::endl;
   }
 
-  // 读取速度（读取，不算控制）
+  // Read velocity (read-only, not control)
   std::cout << "\nJoint Velocities:" << std::endl;
   auto velocities = hand->GetAllJointMotorVelo();
   std::cout << "  All Joint Velocities: [";
@@ -102,15 +102,15 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
   }
   std::cout << "]" << std::endl;
 
-  // ============ 关节角度控制示例 ============
-  // 使用关节角度控制（推荐方式，底层会自动转换）
+  // ============ Joint Angle Control Demo ============
+  // Use joint-angle control (recommended; underlying layer auto-converts)
   std::cout << "\nSetting joint angles..." << std::endl;
-  std::vector<double> angles(12, 0.0);  // O12 有 12 个主动关节
+  std::vector<double> angles(12, 0.0);  // O12 has 12 active joints
   hand->SetAllActiveJointAngles(angles);
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-  // 读取关节角度
+  // Read joint angle
   auto active_angles = hand->GetAllActiveJointAngles();
   std::cout << "Active Joint Angles (rad): [";
   for (size_t i = 0; i < active_angles.size(); ++i) {
@@ -142,9 +142,9 @@ int main(int argc, char** argv) {
   std::cout << "============================================" << std::endl;
 
   unsigned char device_id = 1;
-  // 注意：序列号需要根据实际情况修改
-  std::string left_serial = "201BFF2A";   // 左手适配器序列号（部分匹配）
-  std::string right_serial = "201BFF2B";  // 右手适配器序列号（部分匹配，请根据实际情况修改）
+  // Note: serial numbers should be updated for your setup
+  std::string left_serial = "201BFF2A";   // left-hand adapter serial number (partial match)
+  std::string right_serial = "201BFF2B";  // right-hand adapter serial number (partial match, update for your setup)
 
   if (mode == "left" || mode == "both") {
     auto left_hand = agilink::omnihand::OmniHandPro2025::createHandByZlgcan(
@@ -193,7 +193,7 @@ int main(int argc, char** argv) {
     if (mode == "right") {
       controlSingleHand(right_hand, "Right");
     } else {
-      // both 模式：同时控制
+      // both mode: control simultaneously
       std::cout << "\n=== Dual Hand Control ===" << std::endl;
       
       auto left_hand = agilink::omnihand::OmniHandPro2025::createHandByZlgcan(
@@ -207,7 +207,7 @@ int main(int argc, char** argv) {
         return 1;
       }
 
-      // 使用关节角度控制（推荐方式，底层会自动转换）
+      // Use joint-angle control (recommended; underlying layer auto-converts)
       std::cout << "\nSetting joint angles for both hands..." << std::endl;
       std::vector<double> left_angles(12, 0.0);
       std::vector<double> right_angles(12, 0.5);
