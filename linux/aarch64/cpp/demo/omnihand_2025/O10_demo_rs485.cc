@@ -3,18 +3,18 @@
 
 /**
  * @file O10_demo_rs485.cc
- * @brief OmniHand 2025 控制示例 - RS485 通信
+ * @brief OmniHand 2025 control demo - RS485 communication
  * 
- * 此示例演示如何使用 RS485 串口通信创建和控制 OmniHand 2025 灵巧手
- * 支持单手（left/right）和双手（both）控制
+ * This demo shows how to use RS485 serial communication to create and control OmniHand 2025 dexterous hand
+ * Supports single-hand (left/right) and dual-hand (both) control
  * 
- * 编译: cmake .. && make
- * 运行: 
- *   ./example_rs485 left    # 控制左手
- *   ./example_rs485 right   # 控制右手
- *   ./example_rs485 both    # 同时控制左右手
+ * Build: cmake .. && make
+ * Run: 
+ *   ./example_rs485 left    # Control left hand
+ *   ./example_rs485 right   # Control right hand
+ *   ./example_rs485 both    # Control both left and right hands simultaneously
  * 
- * 注意：需要修改代码中的串口路径（例如 /dev/ttyUSB0 或 COM3）
+ * Note: you need to update serial port path in code (e.g. /dev/ttyUSB0 or COM3)
  */
 
 #include <iostream>
@@ -38,18 +38,18 @@ void printUsage(const char* program_name) {
 void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
 
-  // ============ 获取设备信息 ============
+  // ============ Get Device Info ============
   auto vendor_info = hand->GetVendorInfo();
   std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
 
   auto device_info = hand->GetDeviceInfo();
   std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
 
-  // ============ 读取传感器数据 ============
+  // ============ Read Sensor Data ============
   std::cout << "\n=== Reading Sensor Data ===" << std::endl;
   
-  // 注意：RS485 不支持触觉传感器原始数据读取（GetTactileSensorDataRaw）
-  // 但支持 GetTactileSensorData（降采样数据）
+  // Note: RS485 does not support raw tactile sensor data reading (GetTactileSensorDataRaw)
+  // But it supports GetTactileSensorData (downsampled data)
   std::cout << "\nTactile Sensor Data (1D):" << std::endl;
   try {
     auto thumb_tactile = hand->GetTactileSensorData(agilink::omnihand::Finger::THUMB);
@@ -71,18 +71,18 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
     std::cout << "  Warning: " << e.what() << std::endl;
   }
 
-  // 注意：RS485 不支持温度、电流、错误报告和速度读取
+  // Note: RS485 does not support temperature/current/error report/velocity reads
   std::cout << "\nNote: RS485 communication does not support temperature/current/error/velocity reports" << std::endl;
 
-  // ============ 关节角度控制示例 ============
-  // 使用关节角度控制（推荐方式，底层会自动转换）
+  // ============ Joint Angle Control Demo ============
+  // Use joint-angle control (recommended; underlying layer auto-converts)
   std::cout << "\nSetting joint angles..." << std::endl;
   std::vector<double> angles(10, 0.0);
   hand->SetAllActiveJointAngles(angles);
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-  // 读取关节角度
+  // Read joint angle
   auto active_angles = hand->GetAllActiveJointAngles();
   std::cout << "Active Joint Angles (rad): [";
   for (size_t i = 0; i < active_angles.size(); ++i) {
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
   std::cout << "============================================" << std::endl;
 
   unsigned char device_id = 1;
-  // 注意：串口路径需要根据实际情况修改
+  // Note: serial port path should be updated for your setup
   std::string left_port = "/dev/ttyUSB0";   // Linux: /dev/ttyUSB0, Windows: COM3
   std::string right_port = "/dev/ttyUSB1";  // Linux: /dev/ttyUSB1, Windows: COM4
   int32_t baudrate = 115200;
@@ -168,7 +168,7 @@ int main(int argc, char** argv) {
     if (mode == "right") {
       controlSingleHand(right_hand, "Right");
     } else {
-      // both 模式：同时控制
+      // both mode: control simultaneously
       std::cout << "\n=== Dual Hand Control ===" << std::endl;
       
       auto left_hand = agilink::omnihand::OmniHand2025::createHandByRs485(
@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
         return 1;
       }
 
-      // 使用关节角度控制（推荐方式，底层会自动转换）
+      // Use joint-angle control (recommended; underlying layer auto-converts)
       std::cout << "\nSetting joint angles for both hands..." << std::endl;
       std::vector<double> left_angles(10, 0.0);
       std::vector<double> right_angles(10, 0.5);

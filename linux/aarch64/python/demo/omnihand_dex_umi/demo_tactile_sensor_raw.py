@@ -2,12 +2,12 @@
 # AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
-OmniHand Dex UMI 触觉传感器示例
+OmniHand Dex UMI tactile sensor demo
 
-此示例演示如何读取 OmniHand Dex UMI 产品的触觉传感器数据。
-OmniHand Dex UMI 使用一维触觉传感器（1D sensors）。
-注意：UMI 协议只支持 Pn6 (0x06)，不支持 Pn5 (0x05)。
-因此必须使用 get_tactile_sensor_data_raw() 方法，而不是 get_tactile_sensor_data()。
+This demo reads tactile sensor data from OmniHand Dex UMI.
+OmniHand Dex UMI uses 1D tactile sensors.
+Note: UMI supports Pn6 (0x06) only, not Pn5 (0x05).
+Use get_tactile_sensor_data_raw(), not get_tactile_sensor_data().
 """
 
 from omnihand import OmniHandDexUMI, Finger, HandType
@@ -27,7 +27,7 @@ def main():
                         help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
     args = parser.parse_args()
     
-    # 创建 OmniHand Dex UMI 灵巧手实例 based on device type
+    # Create OmniHand Dex UMI instance by device type
     if args.device == 'hcan':
         hand = OmniHandDexUMI.create_hand_by_hcan(
             hand_type=HandType.LEFT,
@@ -43,14 +43,14 @@ def main():
             canfd_channel_id=0
         )
     
-    # 检查初始化状态
+    # Check init status
     if not hand.init():
         print("[Error]: Failed to initialize OmniHand Dex UMI hand!")
         return
     
     print("[OK]: OmniHand Dex UMI hand initialized successfully!\n")
     
-    # 读取各个手指的触觉传感器数据
+    # Read per-finger tactile data
     print("Reading tactile sensor data for each finger...\n")
     
     # UMI has 6 sensors (no Dorsum/back of hand)
@@ -79,7 +79,7 @@ def main():
             print(f"{finger_name}: Error - {e}")
         print()
     
-    # 读取所有触觉传感器原始数据
+    # Read all tactile raw
     print("=" * 50)
     print("Reading all tactile sensor raw data...")
     print("=" * 50)
@@ -99,7 +99,7 @@ def main():
     except Exception as e:
         print(f"Error reading all sensor data: {e}")
     
-    # 连续读取示例
+    # Continuous read example
     print("\n" + "=" * 50)
     print("Continuous reading (5 samples)...")
     print("=" * 50)

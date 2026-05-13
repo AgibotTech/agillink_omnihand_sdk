@@ -3,18 +3,18 @@
 
 /**
  * @file O4_demo_canfd_serial.cc
- * @brief OmniHand 3 Lite (O4) 控制示例 - CANFD 通信（通过 serial_number）
+ * @brief OmniHand 3 Lite (O4) control demo - CANFD communication (via serial_number)
  *
- * 此示例演示如何使用设备序列号创建和控制 OmniHand 3 Lite 灵巧手（4 DOF）
- * 支持单手（left/right）和双手（both）控制
+ * This demo shows how to create and control using device serial number OmniHand 3 Lite dexterous hand (4 DOF)
+ * Supports single-hand (left/right) and dual-hand (both) control
  *
- * 编译: cmake .. && make
- * 运行:
+ * Build: cmake .. && make
+ * Run:
  *   ./demo_omnihand_3_lite_canfd_serial left
  *   ./demo_omnihand_3_lite_canfd_serial right
  *   ./demo_omnihand_3_lite_canfd_serial both
  *
- * 注意：代码中的序列号需要根据实际情况修改
+ * Note: serial numbers in code should be updated for your setup
  */
 
 #include <iostream>
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
   std::cout << "============================================" << std::endl;
 
   unsigned char device_id = 1;
-  // 注意：序列号需要根据实际情况修改
+  // Note: serial numbers should be updated for your setup
   std::string left_serial = "201BFF2A";
   std::string right_serial = "201BFF2B";
 

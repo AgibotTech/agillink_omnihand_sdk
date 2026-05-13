@@ -69,7 +69,7 @@ class AGIBOT_EXPORT PrivateOmniHand3Lite : public OmniHand3Lite, public PrivateO
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
-   * @brief Factory method - ZLG CANFD over TCP (WiFi/网口转 CANFD)
+   * @brief Factory method - ZLG CANFD over TCP (WiFi/Ethernet-to-CANFD)
    * @note Only available on Windows and Linux x64 (not supported on Linux aarch64/arm64)
    */
   static std::unique_ptr<PrivateOmniHand3Lite> createHandByZlgCanTcp(
