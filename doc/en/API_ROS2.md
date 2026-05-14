@@ -39,15 +39,15 @@ All products follow the same topic naming and interaction pattern:
 | `joint_states` | `sensor_msgs/JointState` | Publish (you sub) | On `joint_cmd` received | Position readback `position[]` = rad |
 | `joint_mix_control_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | — | Position+torque mixed control (O10/O12 only, see below) |
 | `joint_error_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger error report query |
-| `joint_error_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | On `joint_error_cmd` received | `data[]` = error bitmask |
+| `joint_error_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_error_cmd` received | `data[]` = error bitmask |
 | `joint_temperature_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger temperature query |
-| `joint_temperature_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | On `joint_temperature_cmd` received | `data[]` = temperature |
+| `joint_temperature_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_temperature_cmd` received | `data[]` = temperature |
 | `joint_current_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger current query |
-| `joint_current_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | On `joint_current_cmd` received | `data[]` = current |
-| `joint_control_mode_cmd` | `omnihand_msgs/JointStateInt8` | Subscribe (you pub) | — | Write control mode `data[]` (H3U_M only) |
-| `joint_control_mode_states` | `omnihand_msgs/JointStateInt8` | Publish (you sub) | On `joint_control_mode_cmd` received | Readback control mode `data[]` (H3U_M only) |
-| `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | Subscribe (you pub) | — | Write current threshold `data[]` |
-| `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | On `joint_current_threshold_cmd` received | Readback current threshold `data[]` |
+| `joint_current_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_current_cmd` received | `data[]` = current |
+| `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | Subscribe (you pub) | — | Write control mode `data[]` (H3U_M only) |
+| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | Publish (you sub) | On `joint_control_mode_cmd` received | Readback control mode `data[]` (H3U_M only) |
+| `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | — | Write current threshold `data[]` |
+| `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_current_threshold_cmd` received | Readback current threshold `data[]` |
 | `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger tactile sensor query (O10/O12 only) |
 | `tactile_states` | Product-specific msg (see below) | Publish (you sub) | On `tactile_cmd` received | Tactile sensor data |
 
@@ -88,14 +88,9 @@ O10 and O12 have different tactile sensor data structures, each using product-sp
 | O10 | `omnihand_2025_node_msgs/TactileSensor` | 7 regions (THUMB/INDEX/MIDDLE/RING/LITTLE/PALM/DORSUM), each with `uint8[]` pressure values (1g, max 255g) |
 | O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | 5 fingers, each with `online_state`, `channel_value[6]`, `normal_force`, `tangent_force`, `tangent_force_angle`, `capa_approach[4]` |
 
-### Custom Message Types
+### `std_msgs` array payloads
 
-The `omnihand_msgs` package defines generic integer joint state messages shared by all products:
-
-| Message Type | Fields |
-|-------------|--------|
-| `omnihand_msgs/JointStateInt8` | `std_msgs/Header header` + `string[] name` + `int8[] data` |
-| `omnihand_msgs/JointStateInt16` | `std_msgs/Header header` + `string[] name` + `int16[] data` |
+Error, temperature, current, and current-threshold topics carry per-joint `int16` values in `std_msgs/Int16MultiArray` (`data[]`, with a 1-D `layout.dim` entry). H3U_M control modes use `std_msgs/Int8MultiArray` the same way. Tactile data remains in product-specific `omnihand_*_node_msgs` types.
 
 ## Configuration
 
@@ -188,7 +183,7 @@ python3 joint_control_mode_pub.py 0 left h3u_m
 The release package includes a ROS2 C++ demo showing how to control OmniHand via standard ROS2 topics (without depending on the OmniHand C++ SDK).
 
 The demo is located at `ros2/humble/share/omnihand_node/demo/` and contains:
-- `ros2_joint_cmd_demo.cpp` — Uses `sensor_msgs/JointState` for position control + `omnihand_msgs` for temperature and current readback
+- `ros2_joint_cmd_demo.cpp` — Uses `sensor_msgs/JointState` for position control + `std_msgs/Int16MultiArray` for temperature and current readback
 - `CMakeLists.txt` / `package.xml` — Standard ament_cmake package configuration
 
 ### Quick Start
@@ -217,7 +212,7 @@ To write your own ROS2 C++ package for OmniHand control, add the dependencies in
 ```xml
 <depend>rclcpp</depend>
 <depend>sensor_msgs</depend>
-<depend>omnihand_msgs</depend>
+<depend>std_msgs</depend>
 ```
 
 And in `CMakeLists.txt`:
@@ -225,10 +220,10 @@ And in `CMakeLists.txt`:
 ```cmake
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(omnihand_msgs REQUIRED)
-ament_target_dependencies(your_node rclcpp sensor_msgs omnihand_msgs)
+find_package(std_msgs REQUIRED)
+ament_target_dependencies(your_node rclcpp sensor_msgs std_msgs)
 ```
 
-> 💡 `source ros2/setup.bash` adds the `omnihand_msgs` CMake config, headers, and libraries to the search paths, so your package can be built in any workspace location.
+> 💡 `source ros2/setup.bash` adds the OmniHand message packages and libraries to the search paths, so your package can be built in any workspace location.
 >
-> If you only need joint position control (no temperature/current/error readback), you can skip `omnihand_msgs` and use only `sensor_msgs`.
+> If you only need joint position control (no temperature/current/error readback), you can use only `sensor_msgs` and `std_msgs` for triggers.

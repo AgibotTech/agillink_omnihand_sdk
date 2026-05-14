@@ -4,18 +4,24 @@
               receive the read-back on joint_current_threshold_states.
 
 Topic:
-  pub: /<product>/<side>/joint_current_threshold_cmd  (omnihand_msgs/JointStateInt16)
-  sub: /<product>/<side>/joint_current_threshold_states  (omnihand_msgs/JointStateInt16)
+  pub: /<product>/<side>/joint_current_threshold_cmd  (std_msgs/Int16MultiArray)
+  sub: /<product>/<side>/joint_current_threshold_states  (std_msgs/Int16MultiArray)
 
 Usage:  python3 joint_current_threshold_pub.py <threshold> [left|right] [product]
         default: threshold=500, side=left, product=h3u_m
 """
 
+import os
 import sys
+
+_scripts = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _scripts not in sys.path:
+    sys.path.insert(0, _scripts)
 
 import rclpy
 from rclpy.node import Node
-from omnihand_msgs.msg import JointStateInt16
+from std_msgs.msg import Int16MultiArray
+from ros_multi_array_utils import make_int16_multi_array
 
 NUM_JOINTS = 20
 
@@ -30,18 +36,15 @@ class CurrentThresholdPubSub(Node):
         self.product = product
         self.hand_side = hand_side
         self.publisher = self.create_publisher(
-            JointStateInt16, f'/{product}/{hand_side}/joint_current_threshold_cmd', 10)
+            Int16MultiArray, f'/{product}/{hand_side}/joint_current_threshold_cmd', 10)
         self.subscription = self.create_subscription(
-            JointStateInt16, f'/{product}/{hand_side}/joint_current_threshold_states', self.callback, 10)
+            Int16MultiArray, f'/{product}/{hand_side}/joint_current_threshold_states', self.callback, 10)
 
-        msg = JointStateInt16()
-        msg.data = [threshold] * NUM_JOINTS
-        self.publisher.publish(msg)
+        self.publisher.publish(make_int16_multi_array([threshold] * NUM_JOINTS))
         self.get_logger().info(f'{product}/{hand_side} set current_threshold={threshold} for all {NUM_JOINTS} joints')
 
-    def callback(self, msg: JointStateInt16):
-        names = msg.name if msg.name else [f'joint_{i}' for i in range(len(msg.data))]
-        pairs = [f'{names[i]}={msg.data[i]}' for i in range(len(msg.data))]
+    def callback(self, msg: Int16MultiArray):
+        pairs = [f'joint_{i}={msg.data[i]}' for i in range(len(msg.data))]
         self.get_logger().info(f'{self.product}/{self.hand_side} current_threshold read-back: [{", ".join(pairs)}]')
         raise SystemExit(0)
 

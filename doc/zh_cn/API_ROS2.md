@@ -39,15 +39,15 @@ OmniHand SDK 为三款产品提供统一风格的 ROS2 接口：
 | `joint_states` | `sensor_msgs/JointState` | 发布 (你订阅) | 收到 `joint_cmd` 时 | 位置回读 `position[]` = rad |
 | `joint_mix_control_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | — | 位置+力矩混合控制（仅 O10/O12，见下文） |
 | `joint_error_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发错误码查询 |
-| `joint_error_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `joint_error_cmd` 时 | `data[]` = 错误码 bitmask |
+| `joint_error_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_error_cmd` 时 | `data[]` = 错误码 bitmask |
 | `joint_temperature_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发温度查询 |
-| `joint_temperature_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `joint_temperature_cmd` 时 | `data[]` = 温度值 |
+| `joint_temperature_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_temperature_cmd` 时 | `data[]` = 温度值 |
 | `joint_current_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发电流查询 |
-| `joint_current_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `joint_current_cmd` 时 | `data[]` = 电流值 |
-| `joint_control_mode_cmd` | `omnihand_msgs/JointStateInt8` | 订阅 (你发布) | — | 写入控制模式 `data[]`（仅 H3U_M） |
-| `joint_control_mode_states` | `omnihand_msgs/JointStateInt8` | 发布 (你订阅) | 收到 `joint_control_mode_cmd` 时 | 回读控制模式 `data[]`（仅 H3U_M） |
-| `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | — | 写入电流阈值 `data[]` |
-| `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 收到 `joint_current_threshold_cmd` 时 | 回读电流阈值 `data[]` |
+| `joint_current_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_current_cmd` 时 | `data[]` = 电流值 |
+| `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | 订阅 (你发布) | — | 写入控制模式 `data[]`（仅 H3U_M） |
+| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | 发布 (你订阅) | 收到 `joint_control_mode_cmd` 时 | 回读控制模式 `data[]`（仅 H3U_M） |
+| `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | — | 写入电流阈值 `data[]` |
+| `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_current_threshold_cmd` 时 | 回读电流阈值 `data[]` |
 | `tactile_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发触觉传感器查询（仅 O10/O12） |
 | `tactile_states` | 产品专属消息（见下文） | 发布 (你订阅) | 收到 `tactile_cmd` 时 | 触觉传感器数据 |
 
@@ -88,14 +88,9 @@ O10 和 O12 的触觉传感器数据结构不同，各自使用产品专属的�
 | O10 | `omnihand_2025_node_msgs/TactileSensor` | 7 个区域（THUMB/INDEX/MIDDLE/RING/LITTLE/PALM/DORSUM），每个区域 `uint8[]` 压力值（1g, 最大 255g） |
 | O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | 5 个手指，每个包含 `online_state`, `channel_value[6]`, `normal_force`, `tangent_force`, `tangent_force_angle`, `capa_approach[4]` |
 
-### 自定义消息类型
+### `std_msgs` 数组载荷
 
-`omnihand_msgs` 包定义了通用的整型关节状态消息，所有产品共享：
-
-| 消息类型 | 字段 |
-|---------|------|
-| `omnihand_msgs/JointStateInt8` | `std_msgs/Header header` + `string[] name` + `int8[] data` |
-| `omnihand_msgs/JointStateInt16` | `std_msgs/Header header` + `string[] name` + `int16[] data` |
+错误、温度、电流与电流阈值 topic 使用 `std_msgs/Int16MultiArray` 承载每个关节的 `int16`（`data[]`，`layout.dim` 为一维）。H3U_M 的控制模式使用 `std_msgs/Int8MultiArray`，用法相同。触觉数据仍使用各产品 `omnihand_*_node_msgs` 中的类型。
 
 ## 配置
 
@@ -188,7 +183,7 @@ python3 joint_control_mode_pub.py 0 left h3u_m
 Release 包中提供了一个 ROS2 C++ demo，展示如何通过标准 ROS2 topic 控制 OmniHand（不依赖 OmniHand C++ SDK）。
 
 Demo 位于 `ros2/humble/share/omnihand_node/demo/`，包含：
-- `ros2_joint_cmd_demo.cpp` — 使用 `sensor_msgs/JointState` 发送关节位置指令 + 使用 `omnihand_msgs` 读取温度和电流
+- `ros2_joint_cmd_demo.cpp` — 使用 `sensor_msgs/JointState` 发送关节位置指令 + 使用 `std_msgs/Int16MultiArray` 读取温度和电流
 - `CMakeLists.txt` / `package.xml` — 标准 ament_cmake 包配置
 
 ### 快速开始
@@ -216,7 +211,7 @@ ros2 run omnihand_ros2_demo ros2_joint_cmd_demo left o10
 ```xml
 <depend>rclcpp</depend>
 <depend>sensor_msgs</depend>
-<depend>omnihand_msgs</depend>
+<depend>std_msgs</depend>
 ```
 
 在 `CMakeLists.txt` 中：
@@ -224,10 +219,10 @@ ros2 run omnihand_ros2_demo ros2_joint_cmd_demo left o10
 ```cmake
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(omnihand_msgs REQUIRED)
-ament_target_dependencies(your_node rclcpp sensor_msgs omnihand_msgs)
+find_package(std_msgs REQUIRED)
+ament_target_dependencies(your_node rclcpp sensor_msgs std_msgs)
 ```
 
-> 💡 `source ros2/setup.bash` 会将 `omnihand_msgs` 的 CMake 配置、头文件和库文件加入搜索路径，你的包可以在任意 workspace 位置编译。
+> 💡 `source ros2/setup.bash` 会将 OmniHand 消息包与库加入搜索路径，你的包可以在任意 workspace 位置编译。
 >
-> 如果只需关节位置控制（不读取温度/电流/错误码），可以不依赖 `omnihand_msgs`，仅用 `sensor_msgs` 即可。
+> 如果只需关节位置控制（不读取温度/电流/错误码），可仅依赖 `sensor_msgs` 与 `std_msgs`（用于触发 `Empty` 等）。

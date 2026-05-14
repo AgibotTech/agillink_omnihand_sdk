@@ -9,20 +9,19 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(omnihand_msgs REQUIRED)
 find_package(omnihand_2025_node_msgs REQUIRED)
 find_package(omnihand_pro_2025_node_msgs REQUIRED)
 
 add_executable(ros2_joint_cmd_demo ros2_joint_cmd_demo.cpp)
-ament_target_dependencies(ros2_joint_cmd_demo rclcpp sensor_msgs std_msgs omnihand_msgs omnihand_2025_node_msgs omnihand_pro_2025_node_msgs)
+ament_target_dependencies(ros2_joint_cmd_demo rclcpp sensor_msgs std_msgs omnihand_2025_node_msgs omnihand_pro_2025_node_msgs)
 install(TARGETS ros2_joint_cmd_demo DESTINATION lib/${PROJECT_NAME})
 
 add_executable(ros2_mix_ctrl_pos_torque_demo ros2_mix_ctrl_pos_torque_demo.cpp)
-ament_target_dependencies(ros2_mix_ctrl_pos_torque_demo rclcpp sensor_msgs std_msgs omnihand_msgs omnihand_2025_node_msgs omnihand_pro_2025_node_msgs)
+ament_target_dependencies(ros2_mix_ctrl_pos_torque_demo rclcpp sensor_msgs std_msgs omnihand_2025_node_msgs omnihand_pro_2025_node_msgs)
 install(TARGETS ros2_mix_ctrl_pos_torque_demo DESTINATION lib/${PROJECT_NAME})
 
 add_executable(ros2_mix_ctrl_pos_vel_torque_demo ros2_mix_ctrl_pos_vel_torque_demo.cpp)
-ament_target_dependencies(ros2_mix_ctrl_pos_vel_torque_demo rclcpp sensor_msgs std_msgs omnihand_msgs omnihand_2025_node_msgs omnihand_pro_2025_node_msgs)
+ament_target_dependencies(ros2_mix_ctrl_pos_vel_torque_demo rclcpp sensor_msgs std_msgs omnihand_2025_node_msgs omnihand_pro_2025_node_msgs)
 install(TARGETS ros2_mix_ctrl_pos_vel_torque_demo DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

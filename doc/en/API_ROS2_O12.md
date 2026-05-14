@@ -16,13 +16,13 @@ All topics are prefixed with `/o12/<side>/`, where `<side>` is `left` or `right`
 | `joint_states` | `sensor_msgs/JointState` | Publish (you sub) | `position[0..11]` = rad |
 | `joint_mix_control_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Position+force mixed control (see below) |
 | `joint_error_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllErrorReport()` |
-| `joint_error_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = error bitmask (5 bit) |
+| `joint_error_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = error bitmask (5 bit) |
 | `joint_temperature_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllTemperatureReport()` |
-| `joint_temperature_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = temperature |
+| `joint_temperature_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = temperature |
 | `joint_current_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllCurrentReport()` |
-| `joint_current_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = current |
-| `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | Subscribe (you pub) | Write current threshold `data[0..11]` |
-| `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | Readback current threshold `data[0..11]` |
+| `joint_current_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = current |
+| `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..11]` |
+| `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..11]` |
 | `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Trigger 3D tactile sensor query |
 | `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | Publish (you sub) | 3D tactile sensor data |
 

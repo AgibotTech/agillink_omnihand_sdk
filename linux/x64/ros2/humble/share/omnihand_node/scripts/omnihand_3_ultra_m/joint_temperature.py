@@ -5,7 +5,7 @@
 
 Topic:
   pub: /<product>/<side>/joint_temperature_cmd    (std_msgs/Empty)
-  sub: /<product>/<side>/joint_temperature_states  (omnihand_msgs/JointStateInt16)
+  sub: /<product>/<side>/joint_temperature_states  (std_msgs/Int16MultiArray)
 
 Usage:  python3 joint_temperature.py [left|right] [product] [hz]
         default: side=left, product=h3u_m, hz=1
@@ -15,8 +15,7 @@ import sys
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Empty
-from omnihand_msgs.msg import JointStateInt16
+from std_msgs.msg import Empty, Int16MultiArray
 
 # topic:
 # /h3u_m/left/joint_temperature_cmd; /h3u_m/right/joint_temperature_cmd;
@@ -31,17 +30,15 @@ class JointTemperatureNode(Node):
         self.publisher = self.create_publisher(
             Empty, f'/{product}/{hand_side}/joint_temperature_cmd', 10)
         self.subscription = self.create_subscription(
-            JointStateInt16, f'/{product}/{hand_side}/joint_temperature_states',
+            Int16MultiArray, f'/{product}/{hand_side}/joint_temperature_states',
             self.callback, 10)
         self.timer = self.create_timer(1.0 / hz, lambda: self.publisher.publish(Empty()))
         self.get_logger().info(f'{product}/{hand_side} joint_temperature started ({hz} Hz)')
 
-    def callback(self, msg: JointStateInt16):
-        stamp = f'{msg.header.stamp.sec}.{msg.header.stamp.nanosec:09d}'
-        names = msg.name if msg.name else [f'joint_{i}' for i in range(len(msg.data))]
-        pairs = [f'{names[i]}={msg.data[i]}' for i in range(len(msg.data))]
+    def callback(self, msg: Int16MultiArray):
+        pairs = [f'joint_{i}={msg.data[i]}' for i in range(len(msg.data))]
         self.get_logger().info(
-            f'{self.product}/{self.hand_side} temperature (stamp={stamp}): [{", ".join(pairs)}]')
+            f'{self.product}/{self.hand_side} temperature: [{", ".join(pairs)}]')
 
 
 def main(args=None):
