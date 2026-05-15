@@ -2,24 +2,34 @@
 # AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
-OmniHand Pro 2025 (O12) demo - ZLG CAN over TCP (e.g. WiFi/Ethernet adapter as server).
+OmniHand Pro 2025 (O12) - ZLG CAN over TCP Demo (WiFi/Ethernet adapter as server)
 
 Connect to ZLG WiFi-to-CANFD device as TCP client. Default: 192.168.0.178:8000.
 
-Usage:
-    python demo_zlgcan_tcp.py
-    python demo_zlgcan_tcp.py --host 192.168.0.178 --port 8000
-    python demo_zlgcan_tcp.py --hand right
+Run with -h or --help to see all available options and usage examples.
 """
 
 import argparse
 import time
 from omnihand import OmniHandPro2025, HandType
 
+EXAMPLES = """\
+examples:
+  # Default server
+  python demo_zlgcan_tcp.py
+
+  # Custom host and port
+  python demo_zlgcan_tcp.py --host 192.168.0.178 --port 8000
+
+  # Left hand
+  python demo_zlgcan_tcp.py --hand left
+"""
 
 def main():
     parser = argparse.ArgumentParser(
-        description="OmniHand Pro 2025 (O12) via ZLG CAN over TCP (WiFi/Ethernet adapter as server)"
+        description="OmniHand Pro 2025 (O12) via ZLG CAN over TCP (WiFi/Ethernet adapter as server)",
+        epilog=EXAMPLES,
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
         "--host",
