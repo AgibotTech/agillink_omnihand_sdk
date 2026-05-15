@@ -189,7 +189,15 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
 
   // ============ Sensor Utilities ============
   // Note: O4 (OmniHand3Lite) does not support tactile sensors
-
+  /**
+   * @brief Get joint names for O4 (OmniHand 3 Lite)
+   * @return Vector of joint names
+   */
+  std::vector<std::string> GetJointNames() const override {
+    const std::string p = is_left_hand_ ? "L_" : "R_";
+    // because of doesn't have URDF, so we hardcode the joint names
+    return {p + "joint1", p + "joint2", p + "joint3", p + "joint4"};
+  }
   // ============ Gesture Control ============
   /**
    * @brief Sets the hand to a predefined gesture.

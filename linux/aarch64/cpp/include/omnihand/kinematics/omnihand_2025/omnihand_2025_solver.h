@@ -61,26 +61,29 @@ enum OmnihandJoint {
 };
 
 /**
- * @brief O10 dexterous hand gesture enumeration
+ * @brief O10 predefined hand gestures for SetHandGesture.
+ * @note Integer values 0–16 match the historic gesture index (PAPER … CLASPING).
+ *       OMNIHAND_2025_GESTURE_RESET is 17 so existing numeric codes stay stable.
  */
-enum OmnihandGesture {
-  GesturePAPER = 0,
-  GestureFIST1,
-  GestureFIST2,
-  GestureOK,
-  GestureOneHandedFingerHeart,
-  GestureLIKE,
-  GestureILY,
-  GestureNUM1,
-  GestureNUM2,
-  GestureNUM3,
-  GestureNUM4,
-  GestureNUM6,
-  GestureNUM8,
-  GestureHandHeart1,
-  GestureHandHeart2,
-  GestureHandHeart3,
-  GestureClasping,
+enum class OmniHand2025Gesture : int {
+  OMNIHAND_2025_GESTURE_PAPER = 0,
+  OMNIHAND_2025_GESTURE_FIST1,
+  OMNIHAND_2025_GESTURE_FIST2,
+  OMNIHAND_2025_GESTURE_OK,
+  OMNIHAND_2025_GESTURE_ONE_HANDED_FINGER_HEART,
+  OMNIHAND_2025_GESTURE_LIKE,
+  OMNIHAND_2025_GESTURE_ILY,
+  OMNIHAND_2025_GESTURE_NUM1,
+  OMNIHAND_2025_GESTURE_NUM2,
+  OMNIHAND_2025_GESTURE_NUM3,
+  OMNIHAND_2025_GESTURE_NUM4,
+  OMNIHAND_2025_GESTURE_NUM6,
+  OMNIHAND_2025_GESTURE_NUM8,
+  OMNIHAND_2025_GESTURE_HAND_HEART1,
+  OMNIHAND_2025_GESTURE_HAND_HEART2,
+  OMNIHAND_2025_GESTURE_HAND_HEART3,
+  OMNIHAND_2025_GESTURE_CLASPING,
+  OMNIHAND_2025_GESTURE_RESET,
 };
 
 /**
@@ -151,10 +154,10 @@ class AGIBOT_EXPORT OmniHand2025Solver {
 
   /**
    * @brief Set a predefined hand gesture
-   * @param gesture_num Gesture index
+   * @param gesture See OmniHand2025Gesture
    * @return Actuator command vector
    */
-  std::vector<int> SetHandGesture(const int &gesture_num);
+  std::vector<int> SetHandGesture(OmniHand2025Gesture gesture);
 
   /**
    * @brief Convert active joint positions to actuator inputs

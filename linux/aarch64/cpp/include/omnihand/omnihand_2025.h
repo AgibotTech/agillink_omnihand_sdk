@@ -269,8 +269,13 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
 
   // ============ Gesture Control ============
   /**
-   * @brief Sets the hand to a predefined gesture.
-   * @param gesture_num Gesture number: 1 = FIST1, 2 = FIST2 (default: 1)
+   * @brief Sets the hand to a predefined gesture (typed API).
+   */
+  void SetHandGesture(o10::OmniHand2025Gesture gesture);
+
+  /**
+   * @brief Same gestures as o10::OmniHand2025Gesture: 0 = PAPER … 16 = CLASPING;
+   *        17 = RESET (all active joints zero). Default 1 = FIST1.
    */
   void SetHandGesture(int gesture_num = 1) override;
 

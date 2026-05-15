@@ -14,7 +14,7 @@ Usage:
 
 import argparse
 import time
-from omnihand import OmniHand2025, HandType
+from omnihand import OmniHand2025, HandType, OmniHand2025Gesture
 
 
 def main():
@@ -95,14 +95,13 @@ def main():
         # Step 1: fist both hands
     print("Step 1: Making hand into fist position...")
     # Use SetHandGesture (solver handles left/right differences)
-    hand.set_hand_gesture(2)  # FIST2
+    hand.set_hand_gesture(OmniHand2025Gesture.OMNIHAND_2025_GESTURE_FIST2)
     time.sleep(2)  # wait for fist motion
     print("Fist position set for hand")
 
         # Step 2: open palm
     print("\nStep 2: Opening hand (reset position)...")
-    reset_angles = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # reset to open palm
-    hand.set_all_active_joint_angles(reset_angles)
+    hand.set_hand_gesture(OmniHand2025Gesture.OMNIHAND_2025_GESTURE_RESET)
     time.sleep(2)  # wait for open palm
     print("Hands opened (reset position)")
 

@@ -23,31 +23,23 @@ OmniHand2025Solver(hand_type: bool)
 ### 1. set_hand_gesture
 
 ```python
-def set_hand_gesture(gesture: int) -> List[int]
+def set_hand_gesture(gesture: OmniHand2025Gesture) -> List[int]
 ```
 
 - 设置预定义的手势。
 - 返回对应的执行器输入值。
+- 从 `omnihand` 导入 `OmniHand2025Gesture`。
 
-| 手势ID | 手势名称 | 手势图片 |
-|--------|----------|----------|
-| 0      | 张开手   | <img src="../pic/open_hand.jpg" width="100" /> |
-| 1      | 拳头1    | <img src="../pic/fist_1.jpg" width="100" /> |
-| 2      | 拳头2    | <img src="../pic/fist_2.jpg" width="100" /> |
-| 3      | OK       | <img src="../pic/OK.jpg" width="100" /> |
-| 4      | 单手比心  | <img src="../pic/One-handed_finger_heart.jpg" width="100" /> |
-| 5      | 点赞     | <img src="../pic/like.jpg" width="100" /> |
-| 6      | ILY      | <img src="../pic/ILY.jpg" width="100" /> |
-| 7      | 数字1    | <img src="../pic/number_1.jpg" width="100" /> |
-| 8      | 数字2    | <img src="../pic/number_2.jpg" width="100" /> |
-| 9      | 数字3    | <img src="../pic/number_3.jpg" width="100" /> |
-| 10     | 数字4    | <img src="../pic/number_4.jpg" width="100" /> |
-| 11     | 数字6    | <img src="../pic/number_6.jpg" width="100" /> |
-| 12     | 数字8    | <img src="../pic/number_8.jpg" width="100" /> |
-| 13     | 双手比心1 | <img src="../pic/hand_heart_1.jpg" width="100" /> |
-| 14     | 双手比心2 | <img src="../pic/hand_heart_2.jpg" width="100" /> |
-| 15     | 双手比心3 | <img src="../pic/hand_heart_3.jpg" width="100" /> |
-| 16     | 合掌     | <img src="../pic/clasping.jpg" width="100" /> |
+| 手势ID | 成员 | 手势名称 |
+|--------|------|----------|
+| 0 | `OMNIHAND_2025_GESTURE_PAPER` | 张开手 |
+| 1 | `OMNIHAND_2025_GESTURE_FIST1` | 拳头1 |
+| 2 | `OMNIHAND_2025_GESTURE_FIST2` | 拳头2 |
+| … | … | … |
+| 16 | `OMNIHAND_2025_GESTURE_CLASPING` | 合掌 |
+| 17 | `OMNIHAND_2025_GESTURE_RESET` | 复位 |
+
+请传入 `OmniHand2025Gesture` 枚举成员，勿使用裸数字。
 
 ### 2. active_joint_angles_to_actuator_input
 
@@ -95,7 +87,9 @@ solver = OmniHand2025Solver(hand_type=False)
 solver.show_log(True)
 
 # 设置手势
-actuator_input = solver.set_hand_gesture(1)  # 拳头手势
+from omnihand import OmniHand2025Gesture
+
+actuator_input = solver.set_hand_gesture(OmniHand2025Gesture.OMNIHAND_2025_GESTURE_FIST1)
 
 # 将关节位置转换为执行器输入
 active_joint_angles = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0]

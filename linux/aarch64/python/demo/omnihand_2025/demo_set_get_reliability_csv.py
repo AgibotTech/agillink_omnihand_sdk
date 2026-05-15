@@ -12,7 +12,7 @@ Usage:
   python demo_set_get_reliability_csv.py --interval_ms 5 --iterations 500 --output set_get_log.csv -d zlgcan
 """
 
-from omnihand import OmniHand2025, HandType
+from omnihand import OmniHand2025, HandType, OmniHand2025Gesture
 import time
 import csv
 import argparse
@@ -85,7 +85,7 @@ def main():
 
     hand.set_request_interval(interval_ms)
     hand.set_frame_recv_timeout(frame_recv_timeout_ms)
-    hand.set_hand_gesture(0) 
+    hand.set_hand_gesture(OmniHand2025Gesture.OMNIHAND_2025_GESTURE_PAPER)
     time.sleep(1)
     read_back_positions = hand.get_all_joint_positions()
     if read_back_positions is not None and len(read_back_positions) >= 10:

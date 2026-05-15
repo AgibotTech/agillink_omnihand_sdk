@@ -23,31 +23,23 @@ OmniHand2025Solver(hand_type: bool)
 ### 1. set_hand_gesture
 
 ```python
-def set_hand_gesture(gesture: int) -> List[int]
+def set_hand_gesture(gesture: OmniHand2025Gesture) -> List[int]
 ```
 
 - Sets a predefined hand gesture.
 - Returns the corresponding actuator input values.
+- Import `OmniHand2025Gesture` from `omnihand`.
 
-| gestureID | gesture name | gesture image |
-|-----------|--------------|----------------|
-| 0         | open hand    | <img src="../pic/open_hand.jpg" width="100" /> |
-| 1         | fist 1       | <img src="../pic/fist_1.jpg" width="100" /> |
-| 2         | fist 2       | <img src="../pic/fist_2.jpg" width="100" /> |
-| 3         | OK    | <img src="../pic/OK.jpg" width="100" /> |
-| 4         | One-handed finger heart       | <img src="../pic/One-handed_finger_heart.jpg" width="100" /> |
-| 5         | like       | <img src="../pic/like.jpg" width="100" /> |
-| 6         | ILY    | <img src="../pic/ILY.jpg" width="100" /> |
-| 7         | number 1    | <img src="../pic/number_1.jpg" width="100" /> |
-| 8         | number 2       | <img src="../pic/number_2.jpg" width="100" /> |
-| 9         | number 3       | <img src="../pic/number_3.jpg" width="100" /> |
-| 10        | number 4    | <img src="../pic/number_4.jpg" width="100" /> |
-| 11        | number 6       | <img src="../pic/number_6.jpg" width="100" /> |
-| 12        | number 8       | <img src="../pic/number_8.jpg" width="100" /> |
-| 13        | hand heart 1    | <img src="../pic/hand_heart_1.jpg" width="100" /> |
-| 14        | hand heart 2       | <img src="../pic/hand_heart_2.jpg" width="100" /> |
-| 15        | hand heart 3       | <img src="../pic/hand_heart_3.jpg" width="100" /> |
-| 16        | clasping       | <img src="../pic/clasping.jpg" width="100" /> |
+| gestureID | member | gesture name |
+|-----------|--------|--------------|
+| 0 | `OMNIHAND_2025_GESTURE_PAPER` | open hand |
+| 1 | `OMNIHAND_2025_GESTURE_FIST1` | fist 1 |
+| 2 | `OMNIHAND_2025_GESTURE_FIST2` | fist 2 |
+| … | … | … |
+| 16 | `OMNIHAND_2025_GESTURE_CLASPING` | clasping |
+| 17 | `OMNIHAND_2025_GESTURE_RESET` | reset (all active joints zero) |
+
+Pass `OmniHand2025Gesture` members only (no raw menu integers).
 
 ### 2. active_joint_angles_to_actuator_input
 
@@ -95,7 +87,9 @@ solver = OmniHand2025Solver(hand_type=False)
 solver.show_log(True)
 
 # Set a gesture
-actuator_input = solver.set_hand_gesture(1)  # FIST gesture
+from omnihand import OmniHand2025Gesture
+
+actuator_input = solver.set_hand_gesture(OmniHand2025Gesture.OMNIHAND_2025_GESTURE_FIST1)
 
 # Convert joint positions to actuator input
 active_joint_angles = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0]

@@ -90,7 +90,7 @@ def main():
     # time.sleep(1)
 
     csv_header = ["action", "elapsed_ms"] + [f"pos_{i}" for i in range(10)]
-    # 使用高精度单调时钟计时，避免受系统时间调整影响；elapsed_ms 可能偶尔相同，但真实反映测量时间
+    # Monotonic clock avoids wall-clock skew; elapsed_ms may repeat but reflects real timing
     # start_time = time.perf_counter()
 
     try:
