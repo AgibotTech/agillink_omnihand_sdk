@@ -4,8 +4,8 @@
               receive the read-back on joint_control_mode_states.
 
 Topic:
-  pub: /<product>/<side>/joint_control_mode_cmd  (omnihand_msgs/JointStateInt8)
-  sub: /<product>/<side>/joint_control_mode_states  (omnihand_msgs/JointStateInt8)
+  pub: /<product>/<side>/joint_control_mode_cmd  (std_msgs/Int8MultiArray)
+  sub: /<product>/<side>/joint_control_mode_states  (std_msgs/Int8MultiArray)
 
 ControlMode values: 0=POSITION(CSP), 7=PROFILE_POSITION(PP)
 
@@ -13,11 +13,17 @@ Usage:  python3 joint_control_mode_pub.py <mode> [left|right] [product]
         default: mode=0, side=left, product=h3u_m
 """
 
+import os
 import sys
+
+_scripts = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _scripts not in sys.path:
+    sys.path.insert(0, _scripts)
 
 import rclpy
 from rclpy.node import Node
-from omnihand_msgs.msg import JointStateInt8
+from std_msgs.msg import Int8MultiArray
+from ros_multi_array_utils import make_int8_multi_array
 
 NUM_JOINTS = 20
 
@@ -32,18 +38,16 @@ class ControlModePubSub(Node):
         self.product = product
         self.hand_side = hand_side
         self.publisher = self.create_publisher(
-            JointStateInt8, f'/{product}/{hand_side}/joint_control_mode_cmd', 10)
+            Int8MultiArray, f'/{product}/{hand_side}/joint_control_mode_cmd', 10)
         self.subscription = self.create_subscription(
-            JointStateInt8, f'/{product}/{hand_side}/joint_control_mode_states', self.callback, 10)
+            Int8MultiArray, f'/{product}/{hand_side}/joint_control_mode_states', self.callback, 10)
 
-        msg = JointStateInt8()
-        msg.data = [mode] * NUM_JOINTS
-        self.publisher.publish(msg)
+        payload = [mode] * NUM_JOINTS
+        self.publisher.publish(make_int8_multi_array(payload))
         self.get_logger().info(f'{product}/{hand_side} set control_mode={mode} for all {NUM_JOINTS} joints')
 
-    def callback(self, msg: JointStateInt8):
-        names = msg.name if msg.name else [f'joint_{i}' for i in range(len(msg.data))]
-        pairs = [f'{names[i]}={msg.data[i]}' for i in range(len(msg.data))]
+    def callback(self, msg: Int8MultiArray):
+        pairs = [f'joint_{i}={msg.data[i]}' for i in range(len(msg.data))]
         self.get_logger().info(f'{self.product}/{self.hand_side} control_mode read-back: [{", ".join(pairs)}]')
         raise SystemExit(0)
 

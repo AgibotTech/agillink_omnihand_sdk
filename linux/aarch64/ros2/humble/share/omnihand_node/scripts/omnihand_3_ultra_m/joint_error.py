@@ -5,7 +5,7 @@
 
 Topic:
   pub: /<product>/<side>/joint_error_cmd    (std_msgs/Empty)
-  sub: /<product>/<side>/joint_error_states (omnihand_msgs/JointStateInt16)
+  sub: /<product>/<side>/joint_error_states (std_msgs/Int16MultiArray)
 
 H3U_M error bitmask per joint (16 bits):
   bit0  = encoder_comm_timeout
@@ -33,8 +33,7 @@ import sys
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Empty
-from omnihand_msgs.msg import JointStateInt16
+from std_msgs.msg import Empty, Int16MultiArray
 from omnihand import h3um_error_report_to_string
 
 # topic:
@@ -50,19 +49,18 @@ class JointErrorNode(Node):
         self.publisher = self.create_publisher(
             Empty, f'/{product}/{hand_side}/joint_error_cmd', 10)
         self.subscription = self.create_subscription(
-            JointStateInt16, f'/{product}/{hand_side}/joint_error_states',
+            Int16MultiArray, f'/{product}/{hand_side}/joint_error_states',
             self.callback, 10)
         self.timer = self.create_timer(1.0 / hz, lambda: self.publisher.publish(Empty()))
         self.get_logger().info(
             f'{product}/{hand_side} joint_error started ({hz} Hz, O20 20 DOF)')
 
-    def callback(self, msg: JointStateInt16):
-        stamp = f'{msg.header.stamp.sec}.{msg.header.stamp.nanosec:09d}'
-        lines = [f'{self.product}/{self.hand_side} joint_error_states (stamp={stamp}):']
+    def callback(self, msg: Int16MultiArray):
+        lines = [f'{self.product}/{self.hand_side} joint_error_states:']
         has_error = False
         for i, val in enumerate(msg.data):
             unsigned_val = val & 0xFFFF
-            name = msg.name[i] if i < len(msg.name) else f'joint_{i}'
+            name = f'joint_{i}'
             decoded = h3um_error_report_to_string(unsigned_val)
             if unsigned_val != 0:
                 has_error = True

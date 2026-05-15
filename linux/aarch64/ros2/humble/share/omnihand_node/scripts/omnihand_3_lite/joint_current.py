@@ -12,7 +12,7 @@ Topic:
   sub: /<product>/<side>/joint_current_states  (std_msgs/Int16MultiArray)
 
 Usage:  python3 joint_current.py [left|right] [product] [hz]
-        default: side=left, product=o10, hz=1
+        default: side=left, product=h3l, hz=1
 """
 
 import sys
@@ -22,8 +22,8 @@ from rclpy.node import Node
 from std_msgs.msg import Empty, Int16MultiArray
 
 # topic:
-# /o10/left/joint_current_cmd; /o10/right/joint_current_cmd;
-# /o10/left/joint_current_states; /o10/right/joint_current_states
+# /h3l/left/joint_current_cmd; /h3l/right/joint_current_cmd;
+# /h3l/left/joint_current_states; /h3l/right/joint_current_states
 
 
 class JointCurrentNode(Node):
@@ -48,7 +48,7 @@ class JointCurrentNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     hand_side = sys.argv[1].lower() if len(sys.argv) > 1 else 'left'
-    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'o10'
+    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'h3l'
     hz = float(sys.argv[3]) if len(sys.argv) > 3 else 1.0
     node = JointCurrentNode(hand_side, product, hz)
     try:

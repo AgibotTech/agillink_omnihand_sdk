@@ -4,10 +4,11 @@
 
 ## Overview
 
-The OmniHand SDK provides unified ROS2 interfaces for three product models:
+The OmniHand SDK provides unified ROS2 interfaces for four product models:
 
 - **OmniHand 2025 (O10)**: 10 DOF dexterous hand
 - **OmniHand Pro 2025 (O12)**: 12 DOF dexterous hand
+- **OmniHand 3 Lite (H3L)**: 4 DOF lightweight dexterous hand
 - **OmniHand 3 Ultra M (H3U_M / O20)**: 20 DOF dexterous hand
 
 All products share the same topic naming convention and message types, differing only in DOF count and connection options.
@@ -16,6 +17,7 @@ All products share the same topic naming convention and message types, differing
 
 - **[OmniHand 2025 (O10) ROS2 Interface](API_ROS2_O10.md)** - 10 DOF
 - **[OmniHand Pro 2025 (O12) ROS2 Interface](API_ROS2_O12.md)** - 12 DOF
+- **[OmniHand 3 Lite (H3L) ROS2 Interface](API_ROS2_H3L.md)** - 4 DOF
 
 ## Unified Topic Specification
 
@@ -27,7 +29,7 @@ All products follow the same topic naming and interaction pattern:
 /<product>/<side>/<topic_name>
 ```
 
-- `<product>`: `o10` / `o12` / `h3u_m`
+- `<product>`: `o10` / `o12` / `h3l` / `h3u_m`
 - `<side>`: `left` / `right`
 - `<topic_name>`: see table below
 
@@ -124,6 +126,9 @@ ros2 launch omnihand_node omnihand_2025_node.launch.py
 # O12
 ros2 launch omnihand_node omnihand_pro_2025_node.launch.py
 
+# H3L
+ros2 launch omnihand_node omnihand_3_lite_node.launch.py
+
 # H3U_M
 ros2 launch omnihand_node omnihand_3_ultra_m_node.launch.py
 ```
@@ -170,13 +175,13 @@ python3 joint_control_mode_pub.py 0 left h3u_m
 
 **4. Connection types:**
 
-| Connection | O10 | O12 | H3U_M |
-|-----------|-----|-----|-------|
-| zlgcan | ✅ | ✅ | ✅ |
-| hcan | ✅ | ✅ | ✅ |
-| socketcan | ✅ | ✅ | ✅ |
-| rs485 | ✅ | ❌ | ❌ |
-| usb | ✅ | ❌ | ❌ |
+| Connection | O10 | O12 | H3L | H3U_M |
+|-----------|-----|-----|-----|-------|
+| zlgcan | ✅ | ✅ | ✅ | ✅ |
+| hcan | ✅ | ✅ | ✅ | ✅ |
+| socketcan | ✅ | ✅ | ✅ | ✅ |
+| rs485 | ✅ | ❌ | ❌ | ❌ |
+| usb | ✅ | ❌ | ❌ | ❌ |
 
 ## C++ Development Demo
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-@Description: Publish current threshold values to OmniHandPro2025 (O12) and
+@Description: Publish current threshold values to OmniHand2025 (O10) and
               receive the read-back on joint_current_threshold_states.
 
 Topic:
@@ -8,7 +8,7 @@ Topic:
   sub: /<product>/<side>/joint_current_threshold_states  (std_msgs/Int16MultiArray)
 
 Usage:  python3 joint_current_threshold_pub.py <threshold> [left|right] [product]
-        default: threshold=500, side=left, product=o12
+        default: threshold=500, side=left, product=h3l
 """
 
 import os
@@ -23,11 +23,11 @@ from rclpy.node import Node
 from std_msgs.msg import Int16MultiArray
 from ros_multi_array_utils import make_int16_multi_array
 
-NUM_JOINTS = 12
+NUM_JOINTS = 4
 
 # topic:
-# /o12/left/joint_current_threshold_cmd; /o12/right/joint_current_threshold_cmd;
-# /o12/left/joint_current_threshold_states; /o12/right/joint_current_threshold_states
+# /h3l/left/joint_current_threshold_cmd; /h3l/right/joint_current_threshold_cmd;
+# /h3l/left/joint_current_threshold_states; /h3l/right/joint_current_threshold_states
 
 
 class CurrentThresholdPubSub(Node):
@@ -53,7 +53,7 @@ def main(args=None):
     rclpy.init(args=args)
     threshold = int(sys.argv[1]) if len(sys.argv) > 1 else 500
     hand_side = sys.argv[2].lower() if len(sys.argv) > 2 else 'left'
-    product = sys.argv[3].lower() if len(sys.argv) > 3 else 'o12'
+    product = sys.argv[3].lower() if len(sys.argv) > 3 else 'h3l'
     node = CurrentThresholdPubSub(hand_side, product, threshold)
     try:
         rclpy.spin(node)

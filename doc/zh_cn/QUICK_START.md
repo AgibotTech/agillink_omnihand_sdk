@@ -55,13 +55,13 @@
 
 ### 产品连接方式对比
 
-| 连接方式 | O10 | O12 |
-|---------|-----|-----|
-| ZLG USBCANFD（推荐） | ✅ | ✅ |
-| USB 直连 | ✅ | ❌ |
-| RS485 串口 | ✅ | ❌ |
+| 连接方式 | O10 | O12 | H3L |
+|---------|-----|-----|-----|
+| ZLG USBCANFD（推荐） | ✅ | ✅ | ✅ |
+| USB 直连 | ✅ | ❌ | ❌ |
+| RS485 串口 | ✅ | ❌ | ❌ |
 
-> **O12 仅支持 CANFD 连接**（ZLG USBCANFD / SocketCAN / HCAN）。
+> **O12 和 H3L 仅支持 CANFD 连接**（ZLG USBCANFD / SocketCAN / HCAN）。
 
 ## 步骤 2：安装 SDK
 
@@ -239,8 +239,8 @@ ros2 topic echo /omnihand/omnihand_2025/left/motor_angle
 
 | 语言 | 路径 |
 |------|------|
-| Python | `python/demo/omnihand_2025/`, `python/demo/omnihand_pro_2025/` |
-| C++ | `cpp/demo/omnihand_2025/`, `cpp/demo/omnihand_pro_2025/` |
+| Python | `python/demo/omnihand_2025/`, `python/demo/omnihand_pro_2025/`, `python/demo/omnihand_3_lite/` |
+| C++ | `cpp/demo/omnihand_2025/`, `cpp/demo/omnihand_pro_2025/`, `cpp/demo/omnihand_3_lite/` |
 | ROS2 | `ros2/`（仅限 Linux） |
 
 ## 下一步
