@@ -13,11 +13,25 @@ This demo tests the reliability of position control by:
 
 This helps identify communication stability and data integrity issues.
 Note: O4 does not support tactile sensors, so this test only covers position control.
+Supports multiple connection types: ZLG CANFD, HCAN, SocketCAN (Linux only).
+Run with -h or --help to see all available options and usage examples.
 """
 
 from omnihand import OmniHand3Lite, HandType
 import time
 from collections import defaultdict
+
+EXAMPLES = """\
+examples:
+  # ZLG CANFD, device 0 channel 0
+  python demo_set_get_position_reliability.py -d zlgcan --canfd-device-id 0 --canfd-channel-id 0
+
+  # HCAN, device 0 channel 1
+  python demo_set_get_position_reliability.py -d hcan --canfd-device-id 0 --canfd-channel-id 1
+
+  # SocketCAN (Linux only)
+  python demo_set_get_position_reliability.py -d socketcan --can-interface can0
+"""
 
 def main():
     # Configuration parameters
@@ -31,9 +45,19 @@ def main():
     print()
 
     import argparse
-    parser = argparse.ArgumentParser(description='OmniHand 3 Lite S (O4) Set/Get Position Reliability Test')
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
-                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    parser = argparse.ArgumentParser(
+        description='OmniHand 3 Lite S (O4) Set/Get Position Reliability Test',
+        epilog=EXAMPLES,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'socketcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD), hcan (HCAN USB CANFD), socketcan (Linux only), default: zlgcan')
+    parser.add_argument('--canfd-device-id', type=int, default=0,
+                        help='CANFD device index, default: 0')
+    parser.add_argument('--canfd-channel-id', type=int, default=0,
+                        help='CANFD channel index, default: 0')
+    parser.add_argument('--can-interface', type=str, default='can0',
+                        help='SocketCAN interface (Linux only), default: can0')
     args = parser.parse_args()
     
     # Create hand instance: left hand, channel 0 based on device type
@@ -43,15 +67,21 @@ def main():
             hand = OmniHand3Lite.create_hand_by_hcan(
                 hand_type=HandType.LEFT,
                 hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
-                canfd_device_id=0,
-                canfd_channel_id=0
+                canfd_device_id=args.canfd_device_id,
+                canfd_channel_id=args.canfd_channel_id
+            )
+        elif args.device == 'socketcan':
+            hand = OmniHand3Lite.create_hand_socketcan(
+                hand_type=HandType.LEFT,
+                hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
+                can_interface=args.can_interface
             )
         else:  # default: zlgcan
             hand = OmniHand3Lite.create_hand_by_zlgcan(
                 hand_type=HandType.LEFT,
                 hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
-                canfd_device_id=0,
-                canfd_channel_id=0
+                canfd_device_id=args.canfd_device_id,
+                canfd_channel_id=args.canfd_channel_id
             )
     except Exception as e:
         print(f"Failed to create hand: {e}")
