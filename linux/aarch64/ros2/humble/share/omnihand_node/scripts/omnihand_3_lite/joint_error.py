@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 @Description: Periodically trigger error-report query and display results
-              for OmniHandPro2025 (O12).
+              for OmniHand2025 (O10).
 
 Note: OmniHand node uses trigger-based readback — it does not publish states
       on a periodic timer. You must send a *_cmd to get one *_states response.
@@ -11,7 +11,7 @@ Topic:
   pub: /<product>/<side>/joint_error_cmd    (std_msgs/Empty)
   sub: /<product>/<side>/joint_error_states (std_msgs/Int16MultiArray)
 
-O12 error bitmask per joint (5 bits, same as O10):
+O10 error bitmask per joint (5 bits):
   bit0 = stalled
   bit1 = overheat
   bit2 = over_current
@@ -19,7 +19,7 @@ O12 error bitmask per joint (5 bits, same as O10):
   bit4 = commu_except
 
 Usage:  python3 joint_error.py [left|right] [product] [hz]
-        default: side=left, product=o12, hz=1
+        default: side=left, product=h3l, hz=1
 """
 
 import sys
@@ -29,10 +29,10 @@ from rclpy.node import Node
 from std_msgs.msg import Empty, Int16MultiArray
 
 # topic:
-# /o12/left/joint_error_cmd; /o12/right/joint_error_cmd;
-# /o12/left/joint_error_states; /o12/right/joint_error_states
+# /h3l/left/joint_error_cmd; /h3l/right/joint_error_cmd;
+# /h3l/left/joint_error_states; /h3l/right/joint_error_states
 
-O12_ERROR_BIT_NAMES = [
+O10_ERROR_BIT_NAMES = [
     'stalled',
     'overheat',
     'over_current',
@@ -41,12 +41,12 @@ O12_ERROR_BIT_NAMES = [
 ]
 
 
-def decode_o12_error(value: int) -> str:
+def decode_h3l_error(value: int) -> str:
     value &= 0xFFFF
     if value == 0:
         return '0'
     return ','.join(
-        name for i, name in enumerate(O12_ERROR_BIT_NAMES) if value & (1 << i)
+        name for i, name in enumerate(O10_ERROR_BIT_NAMES) if value & (1 << i)
     )
 
 
@@ -62,7 +62,7 @@ class JointErrorNode(Node):
             self.callback, 10)
         self.timer = self.create_timer(1.0 / hz, lambda: self.publisher.publish(Empty()))
         self.get_logger().info(
-            f'{product}/{hand_side} joint_error started ({hz} Hz, O12 12 DOF)')
+            f'{product}/{hand_side} joint_error started ({hz} Hz, O10 10 DOF)')
 
     def callback(self, msg: Int16MultiArray):
         lines = [f'{self.product}/{self.hand_side} joint_error_states:']
@@ -70,7 +70,7 @@ class JointErrorNode(Node):
         for i, val in enumerate(msg.data):
             unsigned_val = val & 0xFFFF
             name = f'joint_{i}'
-            decoded = decode_o12_error(unsigned_val)
+            decoded = decode_h3l_error(unsigned_val)
             if unsigned_val != 0:
                 has_error = True
             lines.append(f'  [{i:2d}] {name:25s} = 0x{unsigned_val:04X} ({decoded})')
@@ -83,7 +83,7 @@ class JointErrorNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     hand_side = sys.argv[1].lower() if len(sys.argv) > 1 else 'left'
-    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'o12'
+    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'h3l'
     hz = float(sys.argv[3]) if len(sys.argv) > 3 else 1.0
     node = JointErrorNode(hand_side, product, hz)
     try:

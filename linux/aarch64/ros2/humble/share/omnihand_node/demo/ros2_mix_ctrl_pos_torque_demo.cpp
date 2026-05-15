@@ -31,8 +31,8 @@
  *   - sensor_msgs/JointState        : mix control (position[] + effort[])
  *       position[] = raw motor position (0–4095)
  *       effort[]   = motor current in mA (range 0–1000, non-standard, not N·m)
- *   - omnihand_msgs/JointStateInt16 : current readback (data[] = int16)
- *   - omnihand_msgs/JointStateInt8  : temperature/error readback (data[] = int8)
+ *   - std_msgs/Int16MultiArray : current / temperature readback (mA / °C)
+ *   - std_msgs/Empty                : temperature / current query triggers
  *
  * ======================================================================
  * Quick Start (after obtaining the OmniHand release package)
@@ -67,12 +67,12 @@
  * Topic list (<product> = o10/o12/h3u_m, <side> = left/right)
  * ======================================================================
  *   pub: /<product>/<side>/joint_mix_control_cmd  (sensor_msgs/JointState, position+effort)
- *   pub: /<product>/<side>/joint_temperature_cmd  (omnihand_msgs/JointStateInt8, trigger)
- *   pub: /<product>/<side>/joint_current_cmd      (omnihand_msgs/JointStateInt16, trigger)
+ *   pub: /<product>/<side>/joint_temperature_cmd  (std_msgs/Empty, trigger)
+ *   pub: /<product>/<side>/joint_current_cmd      (std_msgs/Empty, trigger)
  *   pub: /<product>/<side>/tactile_cmd            (std_msgs/Empty, trigger)
  *   sub: /<product>/<side>/joint_states           (sensor_msgs/JointState)
- *   sub: /<product>/<side>/joint_temperature_states (omnihand_msgs/JointStateInt8)
- *   sub: /<product>/<side>/joint_current_states     (omnihand_msgs/JointStateInt16)
+ *   sub: /<product>/<side>/joint_temperature_states (std_msgs/Int16MultiArray)
+ *   sub: /<product>/<side>/joint_current_states     (std_msgs/Int16MultiArray)
  *   sub: /<product>/<side>/tactile_states           (omnihand_2025_node_msgs/TactileSensor or omnihand_pro_2025_node_msgs/TactileSensor)
  *
  * Trigger-based Readback:
@@ -92,13 +92,18 @@
  * package.xml:
  *   <depend>rclcpp</depend>
  *   <depend>sensor_msgs</depend>
- *   <depend>omnihand_msgs</depend>
+ *   <depend>std_msgs</depend>
+ *   <depend>omnihand_2025_node_msgs</depend>
+ *   <depend>omnihand_pro_2025_node_msgs</depend>
  *
  * CMakeLists.txt:
  *   find_package(rclcpp REQUIRED)
  *   find_package(sensor_msgs REQUIRED)
- *   find_package(omnihand_msgs REQUIRED)
- *   ament_target_dependencies(your_node rclcpp sensor_msgs omnihand_msgs)
+ *   find_package(std_msgs REQUIRED)
+ *   find_package(omnihand_2025_node_msgs REQUIRED)
+ *   find_package(omnihand_pro_2025_node_msgs REQUIRED)
+ *   ament_target_dependencies(your_node rclcpp sensor_msgs std_msgs
+ *       omnihand_2025_node_msgs omnihand_pro_2025_node_msgs)
  */
 
 #include <chrono>
@@ -111,16 +116,14 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/empty.hpp"
-#include "omnihand_msgs/msg/joint_state_int16.hpp"
-#include "omnihand_msgs/msg/joint_state_int8.hpp"
+#include "std_msgs/msg/int16_multi_array.hpp"
 #include "omnihand_2025_node_msgs/msg/tactile_sensor.hpp"
 #include "omnihand_pro_2025_node_msgs/msg/tactile_sensor.hpp"
 
 using namespace std::chrono_literals;
 using sensor_msgs::msg::JointState;
 using std_msgs::msg::Empty;
-using omnihand_msgs::msg::JointStateInt16;
-using omnihand_msgs::msg::JointStateInt8;
+using std_msgs::msg::Int16MultiArray;
 using O10Tactile = omnihand_2025_node_msgs::msg::TactileSensor;
 using O12Tactile = omnihand_pro_2025_node_msgs::msg::TactileSensor;
 
@@ -141,15 +144,15 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
         prefix + "/joint_states", 10,
         std::bind(&MixCtrlPosTorqueDemo::OnJointStates, this, std::placeholders::_1));
 
-    temp_cmd_pub_ = this->create_publisher<JointStateInt8>(
+    temp_cmd_pub_ = this->create_publisher<Empty>(
         prefix + "/joint_temperature_cmd", 10);
-    temp_states_sub_ = this->create_subscription<JointStateInt8>(
+    temp_states_sub_ = this->create_subscription<Int16MultiArray>(
         prefix + "/joint_temperature_states", 10,
         std::bind(&MixCtrlPosTorqueDemo::OnTemperature, this, std::placeholders::_1));
 
-    current_cmd_pub_ = this->create_publisher<JointStateInt16>(
+    current_cmd_pub_ = this->create_publisher<Empty>(
         prefix + "/joint_current_cmd", 10);
-    current_states_sub_ = this->create_subscription<JointStateInt16>(
+    current_states_sub_ = this->create_subscription<Int16MultiArray>(
         prefix + "/joint_current_states", 10,
         std::bind(&MixCtrlPosTorqueDemo::OnCurrent, this, std::placeholders::_1));
 
@@ -173,9 +176,9 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
                 product.c_str(), side.c_str(), num_joints);
     RCLCPP_INFO(this->get_logger(), "  pub -> %s/joint_mix_control_cmd (sensor_msgs/JointState, position+effort)",
                 prefix.c_str());
-    RCLCPP_INFO(this->get_logger(), "  pub -> %s/joint_temperature_cmd (omnihand_msgs/JointStateInt8, trigger)",
+    RCLCPP_INFO(this->get_logger(), "  pub -> %s/joint_temperature_cmd (std_msgs/Empty, trigger)",
                 prefix.c_str());
-    RCLCPP_INFO(this->get_logger(), "  pub -> %s/joint_current_cmd (omnihand_msgs/JointStateInt16, trigger)",
+    RCLCPP_INFO(this->get_logger(), "  pub -> %s/joint_current_cmd (std_msgs/Empty, trigger)",
                 prefix.c_str());
   }
 
@@ -198,13 +201,9 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
                 mix_cmd.effort[0]);
     mix_ctrl_pub_->publish(mix_cmd);
 
-    JointStateInt8 temp_trigger;
-    temp_trigger.header.stamp = this->now();
-    temp_cmd_pub_->publish(temp_trigger);
+    temp_cmd_pub_->publish(Empty());
 
-    JointStateInt16 current_trigger;
-    current_trigger.header.stamp = this->now();
-    current_cmd_pub_->publish(current_trigger);
+    current_cmd_pub_->publish(Empty());
 
     Empty tactile_trigger;
     tactile_cmd_pub_->publish(tactile_trigger);
@@ -223,7 +222,7 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
 
-  void OnTemperature(const JointStateInt8::SharedPtr msg) {
+  void OnTemperature(const Int16MultiArray::SharedPtr msg) {
     std::ostringstream oss;
     oss << "temperature (°C): [";
     for (size_t i = 0; i < msg->data.size(); ++i) {
@@ -234,7 +233,7 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
 
-  void OnCurrent(const JointStateInt16::SharedPtr msg) {
+  void OnCurrent(const Int16MultiArray::SharedPtr msg) {
     std::ostringstream oss;
     oss << "current (mA): [";
     for (size_t i = 0; i < msg->data.size(); ++i) {
@@ -273,10 +272,10 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
 
   rclcpp::Publisher<JointState>::SharedPtr mix_ctrl_pub_;
   rclcpp::Subscription<JointState>::SharedPtr joint_states_sub_;
-  rclcpp::Publisher<JointStateInt8>::SharedPtr temp_cmd_pub_;
-  rclcpp::Subscription<JointStateInt8>::SharedPtr temp_states_sub_;
-  rclcpp::Publisher<JointStateInt16>::SharedPtr current_cmd_pub_;
-  rclcpp::Subscription<JointStateInt16>::SharedPtr current_states_sub_;
+  rclcpp::Publisher<Empty>::SharedPtr temp_cmd_pub_;
+  rclcpp::Subscription<Int16MultiArray>::SharedPtr temp_states_sub_;
+  rclcpp::Publisher<Empty>::SharedPtr current_cmd_pub_;
+  rclcpp::Subscription<Int16MultiArray>::SharedPtr current_states_sub_;
   rclcpp::Publisher<Empty>::SharedPtr tactile_cmd_pub_;
   rclcpp::Subscription<O10Tactile>::SharedPtr o10_tactile_sub_;
   rclcpp::Subscription<O12Tactile>::SharedPtr o12_tactile_sub_;

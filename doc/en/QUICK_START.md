@@ -55,13 +55,13 @@ Connect the OmniHand to your computer via RS485 serial cable.
 
 ### Product Connection Support
 
-| Connection | O10 | O12 |
-|-----------|-----|-----|
-| ZLG USBCANFD (recommended) | ✅ | ✅ |
-| USB Direct | ✅ | ❌ |
-| RS485 Serial | ✅ | ❌ |
+| Connection | O10 | O12 | H3L |
+|-----------|-----|-----|-----|
+| ZLG USBCANFD (recommended) | ✅ | ✅ | ✅ |
+| USB Direct | ✅ | ❌ | ❌ |
+| RS485 Serial | ✅ | ❌ | ❌ |
 
-> **O12 only supports CANFD connections** (ZLG USBCANFD / SocketCAN / HCAN).
+> **O12 and H3L only support CANFD connections** (ZLG USBCANFD / SocketCAN / HCAN).
 
 ## Step 2: Install SDK
 
@@ -240,8 +240,8 @@ ros2 topic echo /omnihand/omnihand_2025/left/motor_angle
 
 | Language | Path |
 |----------|------|
-| Python | `python/demo/omnihand_2025/`, `python/demo/omnihand_pro_2025/` |
-| C++ | `cpp/demo/omnihand_2025/`, `cpp/demo/omnihand_pro_2025/` |
+| Python | `python/demo/omnihand_2025/`, `python/demo/omnihand_pro_2025/`, `python/demo/omnihand_3_lite/` |
+| C++ | `cpp/demo/omnihand_2025/`, `cpp/demo/omnihand_pro_2025/`, `cpp/demo/omnihand_3_lite/` |
 | ROS2 | `ros2/` (Linux only) |
 
 ## Next Steps

@@ -4,18 +4,20 @@
 
 ## 概述
 
-OmniHand SDK 为三款产品提供统一风格的 ROS2 接口：
+OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 
 - **OmniHand 2025 (O10)**: 10 自由度灵巧手
 - **OmniHand Pro 2025 (O12)**: 12 自由度灵巧手
+- **OmniHand 3 Lite (H3L)**: 4 自由度轻量级灵巧手
 - **OmniHand 3 Ultra M (H3U_M / O20)**: 20 自由度灵巧手
 
-三款产品共享统一的 Topic 命名规范和消息类型，区别仅在于自由度数量和连接方式。
+四款产品共享统一的 Topic 命名规范和消息类型，区别仅在于自由度数量和连接方式。
 
 ## 产品 ROS2 文档
 
 - **[OmniHand 2025 (O10) ROS2 接口](API_ROS2_O10.md)** - 10 DOF
 - **[OmniHand Pro 2025 (O12) ROS2 接口](API_ROS2_O12.md)** - 12 DOF
+- **[OmniHand 3 Lite (H3L) ROS2 接口](API_ROS2_H3L.md)** - 4 DOF
 
 ## 统一 Topic 规范
 
@@ -27,7 +29,7 @@ OmniHand SDK 为三款产品提供统一风格的 ROS2 接口：
 /<product>/<side>/<topic_name>
 ```
 
-- `<product>`: `o10` / `o12` / `h3u_m`
+- `<product>`: `o10` / `o12` / `h3l` / `h3u_m`
 - `<side>`: `left` / `right`
 - `<topic_name>`: 见下表
 
@@ -129,6 +131,9 @@ ros2 launch omnihand_node omnihand_2025_node.launch.py
 # O12
 ros2 launch omnihand_node omnihand_pro_2025_node.launch.py
 
+# H3L
+ros2 launch omnihand_node omnihand_3_lite_node.launch.py
+
 # H3U_M
 ros2 launch omnihand_node omnihand_3_ultra_m_node.launch.py
 ```
@@ -175,13 +180,13 @@ python3 joint_control_mode_pub.py 0 left h3u_m
 
 **4. 连接方式：**
 
-| 连接方式 | O10 | O12 | H3U_M |
-|---------|-----|-----|-------|
-| zlgcan | ✅ | ✅ | ✅ |
-| hcan | ✅ | ✅ | ✅ |
-| socketcan | ✅ | ✅ | ✅ |
-| rs485 | ✅ | ❌ | ❌ |
-| usb | ✅ | ❌ | ❌ |
+| 连接方式 | O10 | O12 | H3L | H3U_M |
+|---------|-----|-----|-----|-------|
+| zlgcan | ✅ | ✅ | ✅ | ✅ |
+| hcan | ✅ | ✅ | ✅ | ✅ |
+| socketcan | ✅ | ✅ | ✅ | ✅ |
+| rs485 | ✅ | ❌ | ❌ | ❌ |
+| usb | ✅ | ❌ | ❌ | ❌ |
 
 ## C++ 开发示例
 

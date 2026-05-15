@@ -2,13 +2,14 @@
 
 ## 概述
 
-OmniHand SDK 为三种不同的产品提供了**产品特定的接口**：
+OmniHand SDK 为四种不同的产品提供了**产品特定的接口**：
 
 - **OmniHand 2025 (O10)**: 10 自由度灵巧手，配备 1D 触觉传感器
 - **OmniHand Pro 2025 (O12)**: 12 自由度灵巧手，配备 3D 触觉传感器
+- **OmniHand 3 Lite (H3L)**: 4 自由度轻量级灵巧手
 - **OmniHand Dex UMI (O10 UMI)**: 10 自由度灵巧手，支持 UMI 协议
 
-每个产品都有自己的接口类（`OmniHand2025`、`OmniHandPro2025`、`OmniHandDexUMI`），具有产品特定的工厂方法和 API。与使用 `ProductType` 的统一接口相比，这种设计提供了更好的类型安全性和更清晰的 API 组织。
+每个产品都有自己的接口类（`OmniHand2025`、`OmniHandPro2025`、`OmniHand3Lite`、`OmniHandDexUMI`），具有产品特定的工厂方法和 API。与使用 `ProductType` 的统一接口相比，这种设计提供了更好的类型安全性和更清晰的 API 组织。
 
 **说明：** **OmniHand 2025 (O10)** 与 **OmniHand Dex UMI** 的工厂方法中，`hand_device_id` 与 `canfd_*` 在 Python 侧为 `int`，绑定层以 `uint8_t` 传入 C++，与头文件一致。
 
@@ -16,6 +17,7 @@ OmniHand SDK 为三种不同的产品提供了**产品特定的接口**：
 
 - **[OmniHand 2025 (O10) Python API](API_PYTHON_O10.md)** - 10 自由度，1D 触觉传感器，支持 CAN 和 RS485
 - **[OmniHand Pro 2025 (O12) Python API](API_PYTHON_O12.md)** - 12 自由度，3D 触觉传感器，仅支持 CAN
+- **[OmniHand 3 Lite (H3L) Python API](API_PYTHON_H3L.md)** - 4 自由度，无触觉传感器，仅支持 CAN
 - **[OmniHand Dex UMI (O10 UMI) Python API](API_PYTHON_UMI.md)** - 10 自由度，UMI 协议，主动查询，仅支持 CAN
 
 ## 快速开始示例
