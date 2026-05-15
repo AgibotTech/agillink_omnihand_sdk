@@ -31,6 +31,10 @@ The corresponding control motors are shown in the following image:
 
 ![](doc/pic/hand_o12_motors.jpg)
 
+**OmniHand 3 Lite (H3L)**
+
+A 4-degree-of-freedom lightweight dexterous hand designed for cost-sensitive and space-constrained applications. It uses CAN communication.
+
 **OmniHand Dex UMI (O10 UMI)**
 
 A read-only dexterous hand using UMI protocol.
@@ -47,12 +51,14 @@ A read-only dexterous hand using UMI protocol.
 - [C++ API Index](doc/en/API_CPP.md)
 - [OmniHand 2025 (O10) C++ API](doc/en/API_CPP_O10.md)
 - [OmniHand Pro 2025 (O12) C++ API](doc/en/API_CPP_O12.md)
+- [OmniHand 3 Lite (H3L) C++ API](doc/en/API_CPP_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) C++ API](doc/en/API_CPP_O10_UMI.md)
 
 ### Python API
 - [Python API Index](doc/en/API_PYTHON.md)
 - [OmniHand 2025 (O10) Python API](doc/en/API_PYTHON_O10.md)
 - [OmniHand Pro 2025 (O12) Python API](doc/en/API_PYTHON_O12.md)
+- [OmniHand 3 Lite (H3L) Python API](doc/en/API_PYTHON_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) Python API](doc/en/API_PYTHON_UMI.md)
 
 ### Kinematics API
@@ -65,6 +71,7 @@ A read-only dexterous hand using UMI protocol.
 - [ROS2 API Index](doc/en/API_ROS2.md)
 - [OmniHand 2025 (O10) ROS2 Interface](doc/en/API_ROS2_O10.md)
 - [OmniHand Pro 2025 (O12) ROS2 Interface](doc/en/API_ROS2_O12.md)
+- [OmniHand 3 Lite (H3L) ROS2 Interface](doc/en/API_ROS2_H3L.md)
 
 ## License
 

@@ -31,6 +31,10 @@ AGILINK OmniHand SDK 支持以下产品型号：
 
 ![](doc/pic/hand_o12_motors.jpg)
 
+**OmniHand 3 Lite (H3L)**
+
+4 自由度轻量级灵巧手，面向成本与空间敏感场景。支持 CAN 通信。
+
 **OmniHand Dex UMI (O10 UMI)**
 
 使用 UMI 协议的只读灵巧手。
@@ -47,12 +51,14 @@ AGILINK OmniHand SDK 支持以下产品型号：
 - [C++ API 索引](doc/zh_cn/API_CPP.md)
 - [OmniHand 2025 (O10) C++ API](doc/zh_cn/API_CPP_O10.md)
 - [OmniHand Pro 2025 (O12) C++ API](doc/zh_cn/API_CPP_O12.md)
+- [OmniHand 3 Lite (H3L) C++ API](doc/zh_cn/API_CPP_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) C++ API](doc/zh_cn/API_CPP_O10_UMI.md)
 
 ### Python API
 - [Python API 索引](doc/zh_cn/API_PYTHON.md)
 - [OmniHand 2025 (O10) Python API](doc/zh_cn/API_PYTHON_O10.md)
 - [OmniHand Pro 2025 (O12) Python API](doc/zh_cn/API_PYTHON_O12.md)
+- [OmniHand 3 Lite (H3L) Python API](doc/zh_cn/API_PYTHON_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) Python API](doc/zh_cn/API_PYTHON_UMI.md)
 
 ### 运动学 API
@@ -65,6 +71,7 @@ AGILINK OmniHand SDK 支持以下产品型号：
 - [ROS2 API 索引](doc/zh_cn/API_ROS2.md)
 - [OmniHand 2025 (O10) ROS2 接口](doc/zh_cn/API_ROS2_O10.md)
 - [OmniHand Pro 2025 (O12) ROS2 接口](doc/zh_cn/API_ROS2_O12.md)
+- [OmniHand 3 Lite (H3L) ROS2 接口](doc/zh_cn/API_ROS2_H3L.md)
 
 ## 许可证
 
