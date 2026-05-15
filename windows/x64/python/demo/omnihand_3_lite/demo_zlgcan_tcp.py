@@ -4,22 +4,30 @@
 """
 OmniHand 3 Lite S (O4) demo - ZLG CAN over TCP (e.g. WiFi/Ethernet adapter as server).
 
-Connect to ZLG WiFi转CANFD device as TCP client. Default: 192.168.0.178:8000.
+Connect to ZLG WiFi-to-CANFD device as TCP client. Default: 192.168.0.178:8000.
 
-Usage:
-    python demo_zlgcan_tcp.py
-    python demo_zlgcan_tcp.py --host 192.168.0.178 --port 8000
-    python demo_zlgcan_tcp.py --hand right
+Run with -h or --help to see all available options and usage examples.
 """
 
 import argparse
 import time
 from omnihand import OmniHand3Lite, HandType
 
+EXAMPLES = """\
+examples:
+  # Default server (192.168.0.178:8000), right hand
+  python demo_zlgcan_tcp.py
+
+  # Custom server, left hand
+  python demo_zlgcan_tcp.py --host 192.168.1.100 --port 8000 --hand left
+"""
+
 
 def main():
     parser = argparse.ArgumentParser(
-        description="OmniHand 3 Lite S (O4) via ZLG CAN over TCP (WiFi/Ethernet adapter as server)"
+        description="OmniHand 3 Lite S (O4) via ZLG CAN over TCP (WiFi/Ethernet adapter as server)",
+        epilog=EXAMPLES,
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
         "--host",

@@ -6,7 +6,7 @@ from enum import Enum
 
 def init_hand(hand_type: str = "right", device_type: str = "zlgcan"):
     """
-    初始化手
+    Initialize hand
     """
     if device_type == "hcan":
         create_hand = OmniHand2025.create_hand_by_hcan
@@ -22,14 +22,14 @@ def init_hand(hand_type: str = "right", device_type: str = "zlgcan"):
     else:
         left_hand = create_hand(hand_device_id=OmniHand2025.kDefaultHandDeviceId, canfd_device_id=0, hand_type=HandType.LEFT, canfd_channel_id=0)
         right_hand = create_hand(hand_device_id=OmniHand2025.kDefaultHandDeviceId, canfd_device_id=0, hand_type=HandType.RIGHT, canfd_channel_id=1)
-        # 启用详细日志查看 CAN 通信
+        # Verbose log for CAN traffic
         left_hand.show_data_details(True)
         right_hand.show_data_details(True)
         return left_hand, right_hand
 
 def set_hand_position(hand: OmniHand2025, positions: list):
     """
-    设置手的位置
+    Set hand positions
     """
     hand.set_all_active_joint_angles(positions)
     print("get active joint angles:", hand.get_all_active_joint_angles())

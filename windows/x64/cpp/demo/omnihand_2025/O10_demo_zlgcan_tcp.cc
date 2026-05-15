@@ -5,7 +5,7 @@
  * @file O10_demo_zlgcan_tcp.cc
  * @brief OmniHand 2025 demo - ZLG CANFD over TCP (e.g. WiFi/Ethernet adapter as server)
  *
- * Connect to ZLG WiFi转CANFD device as TCP client. Default server: 192.168.0.178:8000.
+ * Connect to ZLG WiFi-to-CANFD device as TCP client. Default server: 192.168.0.178:8000.
  *
  * Build: cmake .. && make
  * Run:

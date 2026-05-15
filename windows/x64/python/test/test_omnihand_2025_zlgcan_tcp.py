@@ -4,7 +4,7 @@
 """
 Tests for OmniHand 2025 (O10) via ZLG CAN over TCP.
 
-Run when ZLG WiFi转CANFD is available as TCP server (e.g. 192.168.0.178:8000):
+Run when ZLG WiFi-to-CANFD is available as TCP server (e.g. 192.168.0.178:8000):
 
   OMNIHAND_TCP_HOST=192.168.0.178 OMNIHAND_TCP_PORT=8000 python test_omnihand_2025_zlgcan_tcp.py
   pytest test_omnihand_2025_zlgcan_tcp.py -v

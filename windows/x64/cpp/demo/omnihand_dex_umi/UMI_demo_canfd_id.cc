@@ -3,18 +3,18 @@
 
 /**
  * @file UMI_demo_canfd_id.cc
- * @brief OmniHand Dex UMI 控制示例 - CANFD 通信（通过 canfd_id）
+ * @brief OmniHand Dex UMI control demo - CANFD communication (via canfd_id)
  * 
- * 此示例演示如何使用 canfd_id 创建和读取 OmniHand Dex UMI 灵巧手数据
- * 支持单手（left/right）和双手（both）控制
+ * This demo shows how to use canfd_id create and read OmniHand Dex UMI dexterous-hand data
+ * Supports single-hand (left/right) and dual-hand (both) control
  * 
- * 注意：UMI 协议是只读的，不支持位置/速度/力矩控制
+ * Note: UMI protocol is read-only and does not support position/velocity/torque control
  * 
- * 编译: cmake .. && make
- * 运行: 
- *   ./demo_omnihand_dex_umi_canfd_id left    # 读取左手数据
- *   ./demo_omnihand_dex_umi_canfd_id right   # 读取右手数据
- *   ./demo_omnihand_dex_umi_canfd_id both    # 同时读取左右手数据
+ * Build: cmake .. && make
+ * Run: 
+ *   ./demo_omnihand_dex_umi_canfd_id left    # Read left-hand data
+ *   ./demo_omnihand_dex_umi_canfd_id right   # Read right-hand data
+ *   ./demo_omnihand_dex_umi_canfd_id both    # Read both left and right hand data simultaneously
  */
 
 #include <iostream>
@@ -38,22 +38,22 @@ void printUsage(const char* program_name) {
 void readSingleHand(std::unique_ptr<agilink::omnihand::OmniHandDexUMI>& hand, const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Data Reading ===" << std::endl;
 
-  // ============ 获取设备信息 ============
+  // ============ Get Device Info ============
   auto vendor_info = hand->GetVendorInfo();
   std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
 
   auto device_info = hand->GetDeviceInfo();
   std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
 
-  // ============ 读取传感器数据 ============
+  // ============ Read Sensor Data ============
   std::cout << "\n=== Reading Sensor Data ===" << std::endl;
   
-  // 注意：UMI 协议支持主动查询关节位置
-  // 使用 GetJointMotorPosi() 或 GetAllJointMotorPosi() 来获取位置数据
+  // Note: UMI protocol supports active joint position query
+  // Use GetJointMotorPosi() or GetAllJointMotorPosi() to obtain position data
   std::cout << "\nNote: UMI protocol supports active position query." << std::endl;
   std::cout << "      Use GetJointMotorPosi() or GetAllJointMotorPosi() to get position data." << std::endl;
 
-  // 读取触觉传感器数据（1D，使用 Raw API）
+  // Read tactile sensor data (1D, using Raw API)
   std::cout << "\n1D Tactile Sensor Data (Raw):" << std::endl;
   try {
     auto thumb_sensor = hand->GetTactileSensorDataRaw(agilink::omnihand::Finger::THUMB);
@@ -80,7 +80,7 @@ void readSingleHand(std::unique_ptr<agilink::omnihand::OmniHandDexUMI>& hand, co
     }
     std::cout << "] (unit: 1g, max: 255g)" << std::endl;
     
-    // 读取所有传感器数据
+    // Read all sensor data
     std::cout << "\nAll Tactile Sensor Data:" << std::endl;
     auto all_sensors = hand->GetAllTactileSensorDataRaw();
     for (const auto& sensor : all_sensors) {
@@ -103,8 +103,8 @@ void readSingleHand(std::unique_ptr<agilink::omnihand::OmniHandDexUMI>& hand, co
 }
 
 int main(int argc, char** argv) {
-  // 解析命令行参�?
-  std::string mode = "left";  // 默认左手
+  // Parse command-line arguments?
+  std::string mode = "left";  // default left hand
   if (argc > 1) {
     std::string arg = argv[1];
     if (arg == "--help" || arg == "-h") {
@@ -128,12 +128,12 @@ int main(int argc, char** argv) {
   unsigned char canfd_id = 0;
 
   if (mode == "left") {
-    // 创建左手实例
+    // Create left-hand instance
     auto left_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
         agilink::omnihand::HandType::LEFT,
         device_id,
         canfd_id,
-        0  // channel_id (第一个通道)
+        0  // channel_id (first channel)
     );
 
     if (!left_hand) {
@@ -149,12 +149,12 @@ int main(int argc, char** argv) {
     std::cout << "[OK]: Left hand initialized successfully" << std::endl;
     readSingleHand(left_hand, "Left");
   } else if (mode == "right") {
-    // 创建右手实例
+    // Create right-hand instance
     auto right_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
         agilink::omnihand::HandType::RIGHT,
         device_id,
         canfd_id,
-        0  // channel_id (第一个通道)
+        0  // channel_id (first channel)
     );
 
     if (!right_hand) {
@@ -170,19 +170,19 @@ int main(int argc, char** argv) {
     std::cout << "[OK]: Right hand initialized successfully" << std::endl;
     readSingleHand(right_hand, "Right");
   } else if (mode == "both") {
-    // both 模式：同时读取两个手
+    // both mode: read both hands simultaneously
     auto left_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
         agilink::omnihand::HandType::LEFT,
         device_id,
         canfd_id,
-        0  // channel_id (第一个通道)
+        0  // channel_id (first channel)
     );
 
     auto right_hand = agilink::omnihand::OmniHandDexUMI::createHandByZlgcan(
         agilink::omnihand::HandType::RIGHT,
         device_id,
         canfd_id,
-        1  // channel_id (第二个通道)
+        1  // channel_id (second channel)
     );
 
     if (!left_hand || !right_hand) {
@@ -202,10 +202,10 @@ int main(int argc, char** argv) {
 
     std::cout << "[OK]: Both hands initialized successfully" << std::endl;
 
-    // 同时读取两个手的数据
+    // Read data from both hands simultaneously
     std::cout << "\n=== Dual Hand Data Reading ===" << std::endl;
     
-    // 获取设备信息
+    // Get device info
     auto left_vendor = left_hand->GetVendorInfo();
     auto right_vendor = right_hand->GetVendorInfo();
     
@@ -217,9 +217,9 @@ int main(int argc, char** argv) {
     std::cout << "  Model: " << right_vendor.productModel << std::endl;
     std::cout << "  Serial: " << right_vendor.productSeqNum << std::endl;
 
-    // 读取两个手的位置
+    // Read positions of both hands
     std::cout << "\nReading joint positions from both hands..." << std::endl;
-    // UMI 协议支持主动查询位置
+    // UMI protocol supports active position query
     std::cout << "\nNote: UMI protocol supports active position query." << std::endl;
     std::cout << "      Use GetJointMotorPosi() or GetAllJointMotorPosi() to get position data." << std::endl;
   }

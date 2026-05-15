@@ -5,12 +5,12 @@ from typing import List, Dict, Optional
 import math
 
 
-# 手套数据接收模块
-# 负责通过UDP接收传感器数据并解析，供主程序调用。
+# Glove UDP receive module
+# Receives and parses sensor data over UDP for main program.
 
 class Vector3Float:
     """
-    三维浮点向量类，表示手指关节数据
+    3D float vector for finger joint samples
     """
     def __init__(self, x: float, y: float, z: float):
         self.x = x
@@ -19,31 +19,31 @@ class Vector3Float:
 
 class ServerStatus:
     """
-    服务状态枚举类
+    Server status enum
     """
-    NO_INIT = 0     # 未初始化
-    READY = 1       # 已初始化，准备接收
-    IN_LISTENING = 2 # 正在监听
-    END = 3         # 已停止
+    NO_INIT = 0     # not initialized
+    READY = 1       # ready to receive
+    IN_LISTENING = 2 # listening
+    END = 3         # stopped
 
 class GloveReceiver:
     """
-    手套数据接收类，负责UDP监听和数据解析。
+    UDP glove receiver and parser.
     """
     def __init__(self, server_ip="192.168.5.71", port=7777):
-        self.port = port  # 监听端口
-        self.sock = None  # UDP套接字
-        self.server_addr = (server_ip, self.port)  # 监听地址
-        self.name_list: List[str] = []  # 角色名列表
-        self.glove_vec_res = [Vector3Float(0, 0, 0) for _ in range(30)]  # 默认手指数据
-        self.cur_status = ServerStatus.NO_INIT  # 当前状态
-        self.recv_thread: Optional[Thread] = None  # 接收线程
-        self.glove_data_list: List[Dict] = []  # 手套数据列表
-        self.controller_data_list: List[Dict] = []  # 控制器数据列表
+        self.port = port  # listen port
+        self.sock = None  # UDP socket
+        self.server_addr = (server_ip, self.port)  # bind address
+        self.name_list: List[str] = []  # role names
+        self.glove_vec_res = [Vector3Float(0, 0, 0) for _ in range(30)]  # default finger samples
+        self.cur_status = ServerStatus.NO_INIT  # current status
+        self.recv_thread: Optional[Thread] = None  # recv thread
+        self.glove_data_list: List[Dict] = []  # glove frames
+        self.controller_data_list: List[Dict] = []  # controller frames
 
     def initialize(self):
         """
-        初始化UDP监听服务
+        Init UDP listener
         """
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -57,23 +57,23 @@ class GloveReceiver:
 
     def start_listening(self):
         """
-        启动数据监听线程
+        Start recv thread
         """
         if self.cur_status != ServerStatus.READY:
             print("GloveReceiver is not ready to start listening")
             return
         self.cur_status = ServerStatus.IN_LISTENING
         print("GloveReceiver Start Listening..")
-        # daemon=True：主线程退出时不无限等待；仍须调用 end_listening 关闭套接字以唤醒 recvfrom
+        # daemon=True: do not block main exit; still call end_listening to close socket and unblock recvfrom
         self.recv_thread = Thread(target=self.recv_func, daemon=True)
         self.recv_thread.start()
 
     def end_listening(self):
         """
-        停止监听并结束接收线程。
+        Stop listening and join recv thread.
 
-        必须先结束状态并关闭 UDP 套接字，使阻塞在 recvfrom 上的线程被唤醒；
-        否则仅 join 会永久等待，Ctrl+C 后主进程无法退出。
+        Must close UDP socket while thread blocks in recvfrom to wake it;
+        otherwise join hangs forever and Ctrl+C cannot exit main process.
         """
         self.cur_status = ServerStatus.END
         if self.sock is not None:
@@ -88,7 +88,7 @@ class GloveReceiver:
 
     def recv_func(self):
         """
-        接收数据主循环，收到数据后解析
+        Recv loop: parse incoming datagrams
         """
         while self.cur_status == ServerStatus.IN_LISTENING:
             if self.sock is None:
@@ -99,7 +99,7 @@ class GloveReceiver:
             except socket.timeout:
                 continue
             except OSError:
-                # 其它线程调用 sock.close() 退出时常见
+                # common when another thread closes sock
                 break
             except Exception as e:
                 if self.cur_status != ServerStatus.IN_LISTENING:
@@ -108,7 +108,7 @@ class GloveReceiver:
 
     def process_data(self, data: str):
         """
-        解析收到的JSON字符串，分离手套和控制器数据
+        Parse JSON payload into glove/controller buckets
         """
         try:
             value = json.loads(data)
@@ -121,7 +121,7 @@ class GloveReceiver:
                 for param in parameters:
                     name = param["Name"]
                     value = (param["Value"]) if "Value" in param else 0.0
-                    # 控制器数据以 l_ 或 r_ 开头
+                    # controller keys start with l_ or r_
                     if name[1] == '_' and (name[0] == 'l' or name[0] == 'r'):
                         controller_data["controllerDatas"][name] = value
                     else:
@@ -133,52 +133,52 @@ class GloveReceiver:
 
     def get_role_name_list(self) -> List[str]:
         """
-        获取所有角色名列表
+        List all role names
         """
         return [glove["roleName"] for glove in self.glove_data_list]
 
     def get_finger_data_for_o10hand(self, role_name: str, hand: str) -> List[float]:
         """
-        获取指定角色的10自由度机械手关节数据，转换为发送格式
+        Get 10-DOF joint targets for role, formatted for transmit
         """
         def to_10hand_rad(data: float, min_val: int, max_val: int) -> float:
-            # 按照最小到最大值范围裁剪
+            # clamp to min/max
             if data < min_val:
                 data = min_val
             if data > max_val:
                 data = max_val
-            # 数据归一化到弧度制，乘以pi/180
+            # scale to radians (* pi/180)
             x = data * math.pi / 180
             return x
         def reverse_to_10hand_rad(data: float, min_val: int, max_val: int) -> float:
-            # 按照最小到最大值范围裁剪
+            # clamp to min/max
             if data < min_val:
                 data = min_val
             if data > max_val:
                 data = max_val
-            # 数据归一化到弧度制，乘以pi/180
+            # scale to radians (* pi/180)
             x = data * math.pi / 180
             return -x
         def to_10hand_rad_minus(data: float, min_val: int, max_val: int) -> float:
-            # 数据翻转
+            # invert axis
             data = data * -1
-            # 按照最小到最大值范围裁剪
+            # clamp to min/max
             if data < min_val:
                 data = min_val
             if data > max_val:
                 data = max_val
-            # 数据归一化到弧度制，乘以pi/180
+            # scale to radians (* pi/180)
             x = data * math.pi / 180
             return x
         def reverse_to_10hand_rad_minus(data: float, min_val: int, max_val: int) -> float:
-            # 数据翻转
+            # invert axis
             data = data * -1
-            # 按照最小到最大值范围裁剪
+            # clamp to min/max
             if data < min_val:
                 data = min_val
             if data > max_val:
                 data = max_val
-            # 数据归一化到弧度制，乘以pi/180
+            # scale to radians (* pi/180)
             x = data * math.pi / 180
             return -x
         for glove in self.glove_data_list:

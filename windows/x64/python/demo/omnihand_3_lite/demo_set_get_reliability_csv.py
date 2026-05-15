@@ -10,9 +10,8 @@ Loop test for O4 (4 DOF):
 2. get_all_joint_positions()
 3. Log both target and reply positions with timestamps to CSV.
 
-Usage:
-  python demo_set_get_reliability_csv_o4.py -i 3 -n 1000 -o o4_set_get_reliability.csv
-  python demo_set_get_reliability_csv_o4.py --interval_ms 3 --iterations 5000 --output log_o4.csv -d zlgcan
+Supports multiple connection types: ZLG CANFD, HCAN, SocketCAN (Linux only).
+Run with -h or --help to see all available options and usage examples.
 """
 
 from omnihand import OmniHand3Lite, HandType
@@ -20,17 +19,49 @@ import time
 import csv
 import argparse
 
+EXAMPLES = """\
+examples:
+  # ZLG CANFD, device 0 channel 0, 3ms interval, 1000 iterations
+  python demo_set_get_reliability_csv.py -d zlgcan --canfd-device-id 0 --canfd-channel-id 0 -i 3 -n 1000 -o o4_set_get_reliability.csv
+
+  # HCAN, device 0 channel 1, 4ms interval, 5000 iterations
+  python demo_set_get_reliability_csv.py -d hcan --canfd-device-id 0 --canfd-channel-id 1 -i 4 -n 5000 -o log_o4.csv
+
+  # SocketCAN (Linux only)
+  python demo_set_get_reliability_csv.py -d socketcan --can-interface can0 -i 3 -n 1000
+"""
+
 
 def main():
     parser = argparse.ArgumentParser(
-        description="OmniHand 3 Lite S (O4) Set+Get reliability test (set position + get position), log results to CSV"
+        description="OmniHand 3 Lite S (O4) Set+Get reliability test (set position + get position), log results to CSV",
+        epilog=EXAMPLES,
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
         "-d",
         "--device",
-        choices=["zlgcan", "hcan"],
+        choices=["zlgcan", "hcan", "socketcan"],
         default="zlgcan",
         help="CAN device type (default: zlgcan)",
+    )
+    parser.add_argument(
+        "--canfd-device-id",
+        type=int,
+        default=0,
+        help="CANFD device index (default: 0)",
+    )
+    parser.add_argument(
+        "--canfd-channel-id",
+        type=int,
+        default=0,
+        help="CANFD channel index (default: 0)",
+    )
+    parser.add_argument(
+        "--can-interface",
+        type=str,
+        default="can0",
+        help="SocketCAN interface (Linux only), default: can0",
     )
     parser.add_argument(
         "-i",
@@ -84,15 +115,21 @@ def main():
             hand = OmniHand3Lite.create_hand_by_hcan(
                 hand_type=HandType.LEFT,
                 hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
-                canfd_device_id=0,
-                canfd_channel_id=0,
+                canfd_device_id=args.canfd_device_id,
+                canfd_channel_id=args.canfd_channel_id,
+            )
+        elif args.device == "socketcan":
+            hand = OmniHand3Lite.create_hand_socketcan(
+                hand_type=HandType.LEFT,
+                hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
+                can_interface=args.can_interface,
             )
         else:
             hand = OmniHand3Lite.create_hand_by_zlgcan(
                 hand_type=HandType.LEFT,
                 hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
-                canfd_device_id=0,
-                canfd_channel_id=0,
+                canfd_device_id=args.canfd_device_id,
+                canfd_channel_id=args.canfd_channel_id,
             )
     except Exception as e:
         print(f"Failed to create O4 hand: {e}")

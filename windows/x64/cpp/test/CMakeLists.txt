@@ -10,8 +10,8 @@ if(NOT BUILD_CPP_TESTS)
   return()
 endif()
 
-# GoogleTest：优先使用仓库内 cpp/third_party/googletest-1.14.0，直接 add_subdirectory，
-# 避免 FetchContent 生成 googletest-subbuild；工程整体迁移路径后 _deps 里 CMakeCache 绝对路径不一致会报错。
+# GoogleTest: prefer cpp/third_party/googletest-1.14.0 in repo and use add_subdirectory directly,
+# to avoid FetchContent generating googletest-subbuild; after project path migration, absolute paths in _deps CMakeCache may mismatch and fail.
 get_filename_component(_gtest_vendor_default "${CMAKE_CURRENT_LIST_DIR}/../third_party/googletest-1.14.0" ABSOLUTE)
 if(NOT googletest_LOCAL_SOURCE AND EXISTS "${_gtest_vendor_default}/CMakeLists.txt")
   set(googletest_LOCAL_SOURCE "${_gtest_vendor_default}" CACHE PATH "Local googletest source (skips FetchContent)")
