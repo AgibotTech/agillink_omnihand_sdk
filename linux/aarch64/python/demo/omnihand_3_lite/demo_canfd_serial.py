@@ -5,16 +5,38 @@
 OmniHand 3 Lite S (O4) - CANFD Serial Number Demo
 
 This demo shows how to create O4 instance using CANFD serial number.
+Supports multiple connection types: ZLG CANFD, HCAN, SocketCAN (Linux only).
+Run with -h or --help to see all available options and usage examples.
 """
 
 import argparse
 import time
 from omnihand import OmniHand3Lite, HandType
 
+EXAMPLES = """\
+examples:
+  # ZLG CANFD, empty serial matches first device, channel 0
+  python demo_canfd_serial.py -d zlgcan --canfd-channel-id 0
+
+  # HCAN, empty serial matches first device, channel 1
+  python demo_canfd_serial.py -d hcan --canfd-channel-id 1
+
+  # SocketCAN (Linux only)
+  python demo_canfd_serial.py -d socketcan --can-interface can0
+"""
+
 def main():
-    parser = argparse.ArgumentParser(description='OmniHand 3 Lite S (O4) - CANFD Serial Number Demo')
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
-                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    parser = argparse.ArgumentParser(
+        description='OmniHand 3 Lite S (O4) - CANFD Serial Number Demo',
+        epilog=EXAMPLES,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'socketcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD), hcan (HCAN USB CANFD), socketcan (Linux only), default: zlgcan')
+    parser.add_argument('--canfd-channel-id', type=int, default=0,
+                        help='CANFD channel index, default: 0')
+    parser.add_argument('--can-interface', type=str, default='can0',
+                        help='SocketCAN interface (Linux only), default: can0')
     args = parser.parse_args()
     
     # Create O4 hand instance using CANFD serial number based on device type
@@ -24,14 +46,20 @@ def main():
             hand_type=HandType.LEFT,
             hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
             hcan_serial_number="",  # Empty string will match first device
-            canfd_channel_id=0
+            canfd_channel_id=args.canfd_channel_id
+        )
+    elif args.device == 'socketcan':
+        hand = OmniHand3Lite.create_hand_socketcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
+            can_interface=args.can_interface
         )
     else:  # default: zlgcan
         hand = OmniHand3Lite.create_hand_by_zlgcan(
             hand_type=HandType.LEFT,
             hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
             usbcanfd_serial_number="",  # Empty string will match first device
-            canfd_channel_id=0
+            canfd_channel_id=args.canfd_channel_id
         )
     
     if hand is None:

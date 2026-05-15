@@ -5,6 +5,7 @@
 OmniHand 3 Lite S (O4) - SocketCAN Demo (Linux only)
 
 This demo shows how to create O4 instance using SocketCAN on Linux.
+Run with -h or --help to see all available options and usage examples.
 """
 
 import sys
@@ -15,14 +16,33 @@ if sys.platform != "linux":
     print("SocketCAN is only available on Linux")
     sys.exit(1)
 
+import argparse
 from omnihand import OmniHand3Lite, HandType
 
+EXAMPLES = """\
+examples:
+  # Default interface can0
+  python demo_socketcan.py
+
+  # Custom interface
+  python demo_socketcan.py --can-interface can1
+"""
+
 def main():
+    parser = argparse.ArgumentParser(
+        description='OmniHand 3 Lite S (O4) - SocketCAN Demo (Linux only)',
+        epilog=EXAMPLES,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('--can-interface', type=str, default='can0',
+                        help='SocketCAN interface, default: can0')
+    args = parser.parse_args()
+
     # Create O4 hand instance using SocketCAN
     hand = OmniHand3Lite.create_hand_socketcan(
         hand_type=HandType.LEFT,
         hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
-        can_interface="can0"  # CAN interface name
+        can_interface=args.can_interface  # CAN interface name
     )
     
     if hand is None:

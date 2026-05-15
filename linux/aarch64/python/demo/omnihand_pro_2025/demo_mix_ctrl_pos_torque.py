@@ -2,23 +2,48 @@
 # AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
-OmniHand Pro 2025 mix control demo (position + torque)
+OmniHand Pro 2025 - Mix Control Demo (Position + Torque)
 
 Demonstrates POSITION_TORQUE mode via mix_ctrl_joint_motor(),
 alternating between two sets of position/torque parameters.
 
 Note: O12 only supports POSITION_TORQUE. VELOCITY_TORQUE and
 POSITION_VELOCITY_TORQUE are defined in the protocol but not supported.
+
+Supports multiple connection types: ZLG CANFD, HCAN, SocketCAN (Linux only).
+Run with -h or --help to see all available options and usage examples.
 """
 
 import argparse
 import time
 from omnihand import OmniHandPro2025, HandType, MixCtrl, ControlMode
 
+EXAMPLES = """\
+examples:
+  # ZLG CANFD, device 0 channel 0
+  python demo_mix_ctrl_pos_torque.py -d zlgcan --canfd-device-id 0 --canfd-channel-id 0
+
+  # HCAN, device 0 channel 1
+  python demo_mix_ctrl_pos_torque.py -d hcan --canfd-device-id 0 --canfd-channel-id 1
+
+  # SocketCAN (Linux only)
+  python demo_mix_ctrl_pos_torque.py -d socketcan --can-interface can0
+"""
+
 def main():
-    parser = argparse.ArgumentParser(description='OmniHand Pro 2025 Mix Control Demo')
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
-                        help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
+    parser = argparse.ArgumentParser(
+        description='OmniHand Pro 2025 - Mix Control Demo',
+        epilog=EXAMPLES,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'socketcan'], default='zlgcan',
+                        help='CAN device type: zlgcan (ZLG USB CANFD), hcan (HCAN USB CANFD), socketcan (Linux only), default: zlgcan')
+    parser.add_argument('--canfd-device-id', type=int, default=0,
+                        help='CANFD device index, default: 0')
+    parser.add_argument('--canfd-channel-id', type=int, default=0,
+                        help='CANFD channel index, default: 0')
+    parser.add_argument('--can-interface', type=str, default='can0',
+                        help='SocketCAN interface (Linux only), default: can0')
     args = parser.parse_args()
 
     print("=" * 60)
@@ -27,9 +52,25 @@ def main():
     print("=" * 60)
 
     if args.device == 'hcan':
-        hand = OmniHandPro2025.create_hand_by_hcan(hand_type=HandType.LEFT)
+        hand = OmniHandPro2025.create_hand_by_hcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=OmniHandPro2025.kDefaultHandDeviceId,
+            canfd_device_id=args.canfd_device_id,
+            canfd_channel_id=args.canfd_channel_id
+        )
+    elif args.device == 'socketcan':
+        hand = OmniHandPro2025.create_hand_socketcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=OmniHandPro2025.kDefaultHandDeviceId,
+            can_interface=args.can_interface
+        )
     else:
-        hand = OmniHandPro2025.create_hand_by_zlgcan(hand_type=HandType.LEFT)
+        hand = OmniHandPro2025.create_hand_by_zlgcan(
+            hand_type=HandType.LEFT,
+            hand_device_id=OmniHandPro2025.kDefaultHandDeviceId,
+            canfd_device_id=args.canfd_device_id,
+            canfd_channel_id=args.canfd_channel_id
+        )
 
     if not hand.init():
         print("[Error]: Failed to initialize OmniHand Pro 2025 hand!")
