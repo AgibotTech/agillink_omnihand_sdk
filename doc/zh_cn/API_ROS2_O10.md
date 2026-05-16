@@ -24,7 +24,7 @@ O10 ROS2 节点提供 10 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电流阈值 `data[0..9]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 回读电流阈值 `data[0..9]` |
 | `tactile_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllTactileSensorData()` |
-| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 1D 触觉传感器数据 |
+| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 1D 触觉：`header` + `thumb`…`dorsum`（每区域 `uint8[]`） |
 
 **注意**: O10 有 10 个自由度。所有数组包含 10 个元素。
 
@@ -57,10 +57,7 @@ O10 配备 1D 触觉传感器，7 个区域：
 
 消息类型 `omnihand_2025_node_msgs/TactileSensor`：
 - `header` (std_msgs/Header)
-- `tactile_datas[]` (TactileSensorData[])
-  - 每个 `TactileSensorData`: `uint8[] tactiles`（单位: 1g, 最大 255g）
-
-`tactile_datas` 数组按上述区域顺序排列。
+- 每个区域一个 `uint8[]`（单位 1g，最大 255g）：`thumb`、`index`、`middle`、`ring`、`little`、`palm`、`dorsum`。典型长度：16、18、18、18、18、78、102。某次回读未返回的区域为空数组。
 
 ## O10 错误码 bitmask
 

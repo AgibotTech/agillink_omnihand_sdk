@@ -24,7 +24,7 @@ All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..9]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..9]` |
 | `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Trigger `GetAllTactileSensorData()` |
-| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile sensor data |
+| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile: `header` + `thumb`…`dorsum` (`uint8[]` per region) |
 
 **Note**: O10 has 10 degrees of freedom. All arrays contain 10 elements.
 
@@ -57,10 +57,7 @@ O10 is equipped with 1D tactile sensors across 7 regions:
 
 Message type `omnihand_2025_node_msgs/TactileSensor`:
 - `header` (std_msgs/Header)
-- `tactile_datas[]` (TactileSensorData[])
-  - Each `TactileSensorData`: `uint8[] tactiles` (unit: 1g, max 255g)
-
-`tactile_datas` array is ordered by the regions listed above.
+- One `uint8[]` per region (1g, max 255g): `thumb`, `index`, `middle`, `ring`, `little`, `palm`, `dorsum`. Expected lengths: 16, 18, 18, 18, 18, 78, 102. A region is an empty array if the hardware did not return it for that readback.
 
 ## O10 Error Bitmask
 

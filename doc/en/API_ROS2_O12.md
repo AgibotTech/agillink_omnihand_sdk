@@ -24,7 +24,7 @@ All topics are prefixed with `/o12/<side>/`, where `<side>` is `left` or `right`
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..11]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..11]` |
 | `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Trigger 3D tactile sensor query |
-| `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | Publish (you sub) | 3D tactile sensor data |
+| `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | Publish (you sub) | 3D tactile: `header` + `thumb`…`little` (`TactileSensorData` each) |
 
 **Note**: O12 has 12 degrees of freedom. All arrays contain 12 elements.
 
@@ -45,15 +45,13 @@ O12 is equipped with 3D tactile sensors on 5 fingers (THUMB, INDEX, MIDDLE, RING
 
 Message type `omnihand_pro_2025_node_msgs/TactileSensor`:
 - `header` (std_msgs/Header)
-- `tactile_datas[]` (TactileSensorData[])
+- One `TactileSensorData` per finger: `thumb`, `index`, `middle`, `ring`, `little`. Each contains:
   - `online_state` (uint8): 1=online, 0=offline
   - `channel_value[]` (uint32[]): 6 channels, 24-bit values
   - `normal_force` (uint16): Normal force (0.1N, max 3000)
   - `tangent_force` (uint16): Tangent force (0.1N)
   - `tangent_force_angle` (uint16): Tangent force angle (0-359°)
   - `capa_approach[]` (uint8[]): 4 self-capacitance approach values
-
-`tactile_datas` array is ordered: THUMB, INDEX, MIDDLE, RING, LITTLE.
 
 ## O12 Error Bitmask
 

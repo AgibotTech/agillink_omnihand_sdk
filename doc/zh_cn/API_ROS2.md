@@ -87,8 +87,8 @@ O10 和 O12 的触觉传感器数据结构不同，各自使用产品专属的�
 
 | 产品 | 消息类型 | 数据结构 |
 |------|---------|---------|
-| O10 | `omnihand_2025_node_msgs/TactileSensor` | 7 个区域（THUMB/INDEX/MIDDLE/RING/LITTLE/PALM/DORSUM），每个区域 `uint8[]` 压力值（1g, 最大 255g） |
-| O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | 5 个手指，每个包含 `online_state`, `channel_value[6]`, `normal_force`, `tangent_force`, `tangent_force_angle`, `capa_approach[4]` |
+| O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + 七个 `uint8[]` 区域字段：`thumb`、`index`、`middle`、`ring`、`little`、`palm`、`dorsum`（1g，最大 255g） |
+| O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + 五个 `TactileSensorData` 字段：`thumb`、`index`、`middle`、`ring`、`little`（`online_state`、`channel_value[6]`、力、角度、`capa_approach[4]`） |
 
 ### `std_msgs` 数组载荷
 

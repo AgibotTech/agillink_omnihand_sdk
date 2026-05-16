@@ -87,8 +87,8 @@ O10 and O12 have different tactile sensor data structures, each using product-sp
 
 | Product | Message Type | Data Structure |
 |---------|-------------|---------------|
-| O10 | `omnihand_2025_node_msgs/TactileSensor` | 7 regions (THUMB/INDEX/MIDDLE/RING/LITTLE/PALM/DORSUM), each with `uint8[]` pressure values (1g, max 255g) |
-| O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | 5 fingers, each with `online_state`, `channel_value[6]`, `normal_force`, `tangent_force`, `tangent_force_angle`, `capa_approach[4]` |
+| O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + seven `uint8[]` regions: `thumb`, `index`, `middle`, `ring`, `little`, `palm`, `dorsum` (1g, max 255g) |
+| O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + five `TactileSensorData` fields: `thumb`, `index`, `middle`, `ring`, `little` (`online_state`, `channel_value[6]`, forces, angle, `capa_approach[4]`) |
 
 ### `std_msgs` array payloads
 

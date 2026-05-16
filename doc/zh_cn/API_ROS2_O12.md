@@ -24,7 +24,7 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电流阈值 `data[0..11]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 回读电流阈值 `data[0..11]` |
 | `tactile_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 3D 触觉传感器查询 |
-| `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 3D 触觉传感器数据 |
+| `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 3D 触觉：`header` + `thumb`…`little`（每指一个 `TactileSensorData`） |
 
 **注意**: O12 有 12 个自由度。所有数组包含 12 个元素。
 
@@ -45,15 +45,13 @@ O12 配备 3D 触觉传感器，5 个手指（THUMB, INDEX, MIDDLE, RING, LITTLE
 
 消息类型 `omnihand_pro_2025_node_msgs/TactileSensor`：
 - `header` (std_msgs/Header)
-- `tactile_datas[]` (TactileSensorData[])
+- 每指一个 `TactileSensorData` 字段：`thumb`、`index`、`middle`、`ring`、`little`。每个子消息含：
   - `online_state` (uint8): 1=在线, 0=离线
   - `channel_value[]` (uint32[]): 6 个通道 24 位值
   - `normal_force` (uint16): 法向力 (0.1N, 最大 3000)
   - `tangent_force` (uint16): 切向力 (0.1N)
   - `tangent_force_angle` (uint16): 切向力角度 (0-359°)
   - `capa_approach[]` (uint8[]): 4 个自电容接近值
-
-`tactile_datas` 数组按 THUMB, INDEX, MIDDLE, RING, LITTLE 顺序排列。
 
 ## O12 错误码 bitmask
 

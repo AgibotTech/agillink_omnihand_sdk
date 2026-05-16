@@ -282,26 +282,40 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
 
   void OnO10Tactile(const O10Tactile::SharedPtr msg) {
     std::ostringstream oss;
-    oss << "tactile (O10, 1D): [";
-    for (size_t f = 0; f < msg->tactile_datas.size(); ++f) {
-      if (f > 0) oss << " | ";
-      for (size_t i = 0; i < msg->tactile_datas[f].tactiles.size(); ++i) {
+    oss << "tactile (O10, 1D):";
+    bool first = true;
+    auto append = [&oss, &first](const char* label, const std::vector<uint8_t>& v) {
+      if (v.empty()) return;
+      if (!first) oss << " | ";
+      first = false;
+      oss << " " << label << "[";
+      for (size_t i = 0; i < v.size(); ++i) {
         if (i > 0) oss << ",";
-        oss << static_cast<int>(msg->tactile_datas[f].tactiles[i]);
+        oss << static_cast<int>(v[i]);
       }
-    }
-    oss << "]";
+      oss << "]";
+    };
+    append("thumb", msg->thumb);
+    append("index", msg->index);
+    append("middle", msg->middle);
+    append("ring", msg->ring);
+    append("little", msg->little);
+    append("palm", msg->palm);
+    append("dorsum", msg->dorsum);
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
 
   void OnO12Tactile(const O12Tactile::SharedPtr msg) {
     std::ostringstream oss;
     oss << "tactile (O12, 3D): [";
-    for (size_t f = 0; f < msg->tactile_datas.size(); ++f) {
-      if (f > 0) oss << " | ";
-      oss << "Fn=" << msg->tactile_datas[f].normal_force * 0.1 << "N"
-          << ",Ft=" << msg->tactile_datas[f].tangent_force;
-    }
+    auto one = [&](const char* lab, const omnihand_pro_2025_node_msgs::msg::TactileSensorData& td) {
+      oss << lab << ":Fn=" << td.normal_force * 0.1 << "N,Ft=" << td.tangent_force << " | ";
+    };
+    one("thumb", msg->thumb);
+    one("index", msg->index);
+    one("middle", msg->middle);
+    one("ring", msg->ring);
+    one("little", msg->little);
     oss << "]";
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }

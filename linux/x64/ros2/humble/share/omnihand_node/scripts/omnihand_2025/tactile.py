@@ -11,9 +11,9 @@ Topic:
   pub: /<product>/<side>/tactile_cmd     (std_msgs/Empty)
   sub: /<product>/<side>/tactile_states  (omnihand_2025_node_msgs/TactileSensor)
 
-O10 has 7 tactile sensor regions:
-  THUMB(16), INDEX(18), MIDDLE(18), RING(18), LITTLE(18), PALM(78), DORSUM(102)
-Each element is uint8, unit: 1g, max: 255g.
+O10 has 7 tactile sensor regions (flat fields on `TactileSensor`):
+  thumb(16), index/middle/ring/little(18 each), palm(78), dorsum(102)
+Each element is uint8, unit: 1g, max: 255g. Field names match PlotJuggler paths (e.g. /thumb/0).
 
 Usage:  python3 tactile.py [left|right] [product] [hz]
         default: side=left, product=o10, hz=1
@@ -26,7 +26,16 @@ from rclpy.node import Node
 from std_msgs.msg import Empty
 from omnihand_2025_node_msgs.msg import TactileSensor
 
-REGION_NAMES = ['THUMB', 'INDEX', 'MIDDLE', 'RING', 'LITTLE', 'PALM', 'DORSUM']
+# (ros field name, log label)
+O10_REGIONS = (
+    ('thumb', 'THUMB'),
+    ('index', 'INDEX'),
+    ('middle', 'MIDDLE'),
+    ('ring', 'RING'),
+    ('little', 'LITTLE'),
+    ('palm', 'PALM'),
+    ('dorsum', 'DORSUM'),
+)
 
 # topic:
 # /o10/left/tactile_cmd; /o10/right/tactile_cmd;
@@ -50,12 +59,14 @@ class TactileNode(Node):
     def callback(self, msg: TactileSensor):
         stamp = f'{msg.header.stamp.sec}.{msg.header.stamp.nanosec:09d}'
         lines = [f'{self.product}/{self.hand_side} tactile_states (stamp={stamp}):']
-        for i, td in enumerate(msg.tactile_datas):
-            name = REGION_NAMES[i] if i < len(REGION_NAMES) else f'region_{i}'
-            data_str = ', '.join(str(v) for v in td.tactiles[:10])
-            if len(td.tactiles) > 10:
-                data_str += f', ... ({len(td.tactiles)} total)'
-            lines.append(f'  [{name:8s}] ({len(td.tactiles):3d} pts): [{data_str}]')
+        for attr, label in O10_REGIONS:
+            arr = list(getattr(msg, attr))
+            if not arr:
+                continue
+            data_str = ', '.join(str(v) for v in arr[:10])
+            if len(arr) > 10:
+                data_str += f', ... ({len(arr)} total)'
+            lines.append(f'  [{label:8s}] ({len(arr):3d} pts): [{data_str}]')
         self.get_logger().info('\n'.join(lines))
 
 

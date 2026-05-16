@@ -11,7 +11,8 @@ Topic:
   pub: /<product>/<side>/tactile_cmd     (std_msgs/Empty)
   sub: /<product>/<side>/tactile_states  (omnihand_pro_2025_node_msgs/TactileSensor)
 
-O12 has 5 fingers, each with 3D tactile data:
+O12 has 5 fingers; `TactileSensor` exposes one `TactileSensorData` per finger field
+(`thumb`, `index`, `middle`, `ring`, `little`). Each sub-message has:
   - online_state: 1=online, 0=offline
   - channel_value[6]: 24-bit channel values
   - normal_force: 0.1N (max 3000)
@@ -30,7 +31,13 @@ from rclpy.node import Node
 from std_msgs.msg import Empty
 from omnihand_pro_2025_node_msgs.msg import TactileSensor
 
-FINGER_NAMES = ['THUMB', 'INDEX', 'MIDDLE', 'RING', 'LITTLE']
+O12_FINGERS = (
+    ('thumb', 'THUMB'),
+    ('index', 'INDEX'),
+    ('middle', 'MIDDLE'),
+    ('ring', 'RING'),
+    ('little', 'LITTLE'),
+)
 
 # topic:
 # /o12/left/tactile_cmd; /o12/right/tactile_cmd;
@@ -54,11 +61,11 @@ class TactileNode(Node):
     def callback(self, msg: TactileSensor):
         stamp = f'{msg.header.stamp.sec}.{msg.header.stamp.nanosec:09d}'
         lines = [f'{self.product}/{self.hand_side} tactile_states (stamp={stamp}):']
-        for i, td in enumerate(msg.tactile_datas):
-            name = FINGER_NAMES[i] if i < len(FINGER_NAMES) else f'finger_{i}'
+        for attr, label in O12_FINGERS:
+            td = getattr(msg, attr)
             ch_str = ', '.join(str(v) for v in td.channel_value)
             ca_str = ', '.join(str(v) for v in td.capa_approach)
-            lines.append(f'  [{name:8s}] online={td.online_state} '
+            lines.append(f'  [{label:8s}] online={td.online_state} '
                          f'ch=[{ch_str}] '
                          f'Fn={td.normal_force * 0.1:.1f}N '
                          f'Ft={td.tangent_force * 0.1:.1f}N '
