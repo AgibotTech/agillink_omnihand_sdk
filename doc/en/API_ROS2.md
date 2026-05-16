@@ -50,10 +50,10 @@ All products follow the same topic naming and interaction pattern:
 | `joint_control_mode_states` | `std_msgs/Int8MultiArray` | Publish (you sub) | On `joint_control_mode_cmd` received | Readback control mode `data[]` (H3U_M only) |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | — | Write current threshold `data[]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_current_threshold_cmd` received | Readback current threshold `data[]` |
-| `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger tactile sensor query (O10/O12 only) |
-| `tactile_states` | Product-specific msg (see below) | Publish (you sub) | On `tactile_cmd` received | Tactile sensor data |
+| `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | — | Tactile stream: `data` = Hz (>0 start/restart, 0 stop); max **50 Hz** (O10) / **100 Hz** (O12), hardcoded in node |
+| `tactile_states` | Product-specific msg (see below) | Publish (you sub) | While tactile stream active | Tactile sensor data at the requested rate |
 
-**Design Principle — Trigger-based Readback**: The OmniHand ROS2 node **never publishes state autonomously on a periodic timer**. All state readbacks (joint position, temperature, current, error codes, etc.) are triggered externally — you must first publish a `*_cmd` message, then the node will perform one hardware query and publish the result on the corresponding `*_states` topic.
+**Design Principle — Trigger-based Readback**: The OmniHand ROS2 node **does not use periodic timers by default**. Temperature, current, error codes, etc. are triggered externally — publish the corresponding `*_cmd` once to get one `*_states` message. **Exception — tactile (O10/O12)**: publish `std_msgs/Float32` to `tactile_cmd` once to set the stream rate in Hz; the node runs an internal timer until you publish `0`. **Exception — joint position**: `joint_cmd` automatically publishes `joint_states` after control.
 
 The rationale behind this design:
 - **No interference with the control loop**: Periodic autonomous queries would consume CAN bus bandwidth and may affect the real-time performance of position control commands.
@@ -115,6 +115,8 @@ Parameters are organized under `left_hand` and `right_hand` namespaces. If a han
 | `uart_port` | string | "" | Serial port path (rs485/usb only, O10 only) |
 | `baudrate` | int | 460800 | Baudrate (rs485/usb only, O10 only) |
 
+Tactile stream maximum rate is **50 Hz** (O10) or **100 Hz** (O12), fixed in each product's `hand_node.h` (`kMaxTactilePublishHz`), not a YAML parameter.
+
 ### Usage
 
 **1. Using ros2 launch (recommended):**
@@ -163,8 +165,9 @@ python3 joint_current.py left o10
 # Mixed control (position + torque, O10/O12 only)
 python3 mix_control_pub.py left o10
 
-# Trigger and view tactile sensor (O10/O12 only)
-python3 tactile.py left o10
+# Start/stop tactile stream (O10/O12)
+python3 tactile.py left o10 10
+python3 tactile.py left o10 0
 
 # Set current threshold
 python3 joint_current_threshold_pub.py 500 left o10

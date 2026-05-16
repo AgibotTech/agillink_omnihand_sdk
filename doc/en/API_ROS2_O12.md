@@ -23,8 +23,8 @@ All topics are prefixed with `/o12/<side>/`, where `<side>` is `left` or `right`
 | `joint_current_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = current |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..11]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..11]` |
-| `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Trigger 3D tactile sensor query |
-| `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | Publish (you sub) | 3D tactile: `header` + `thumb`…`little` (`TactileSensorData` each) |
+| `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | Stream rate in Hz (`>0` start, `0` stop); max **100 Hz** (hardcoded in node) |
+| `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | Publish (you sub) | 3D tactile while stream active |
 
 **Note**: O12 has 12 degrees of freedom. All arrays contain 12 elements.
 
@@ -94,8 +94,9 @@ python3 scripts/omnihand_pro_2025/joint_current_threshold_pub.py 500 left
 # Mixed control (position + force, effort=0.01N)
 python3 scripts/omnihand_pro_2025/mix_control_pub.py left
 
-# Trigger and view tactile sensor
-python3 scripts/omnihand_pro_2025/tactile.py left
+# Start/stop tactile stream
+python3 scripts/omnihand_pro_2025/tactile.py left o12 10
+python3 scripts/omnihand_pro_2025/tactile.py left o12 0
 ```
 
 ### CLI Examples

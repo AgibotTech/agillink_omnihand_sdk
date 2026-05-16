@@ -50,15 +50,12 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 | `joint_control_mode_states` | `std_msgs/Int8MultiArray` | 发布 (你订阅) | 收到 `joint_control_mode_cmd` 时 | 回读控制模式 `data[]`（仅 H3U_M） |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | — | 写入电流阈值 `data[]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_current_threshold_cmd` 时 | 回读电流阈值 `data[]` |
-| `tactile_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发触觉传感器查询（仅 O10/O12） |
-| `tactile_states` | 产品专属消息（见下文） | 发布 (你订阅) | 收到 `tactile_cmd` 时 | 触觉传感器数据 |
+| `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | — | 触觉流：`data` = 频率 Hz（>0 启动/改频，0 停止）；上限 **50 Hz**（O10）/ **100 Hz**（O12），节点内写死 |
+| `tactile_states` | 产品专属消息（见下文） | 发布 (你订阅) | 触觉流开启期间 | 按设定频率发布触觉数据 |
 
-**设计原则 — 触发式回读**：OmniHand ROS2 节点**不会自动周期发布任何状态**。所有状态回读（关节位置、温度、电流、错误码等）都由外部显式触发——你必须先发送对应的 `*_cmd` 消息，节点才会执行一次硬件查询并在 `*_states` topic 上发布回读结果。
+**设计原则 — 触发式回读**：节点**默认不启用周期定时器**。温度、电流、错误码等需向对应 `*_cmd` 发一次消息，节点读一次硬件并发布一条 `*_states`。**例外 — 触觉（O10/O12）**：向 `tactile_cmd` 发布一次 `std_msgs/Float32`（`data` = Hz）即可在节点内周期读触觉并发布 `tactile_states`，再发 `data: 0` 停止。**例外 — 关节位置**：`joint_cmd` 控制后自动发布 `joint_states`。
 
-这种设计的目的是：
-- **不干扰控制回路节奏**：周期性自动查询会占用 CAN 总线带宽，可能影响位置控制指令的实时性。
-- **资源可控**：状态查询频率完全由用户决定，按需触发，避免不必要的总线负载。
-- **使用方式**：例如需要读取温度时，向 `joint_temperature_cmd` 发送一条 `std_msgs/Empty`，节点会查询硬件并在 `joint_temperature_states` 上发布一次数据。`joint_cmd` 是特殊的——发送位置指令后，节点自动在 `joint_states` 上回传位置回读，无需额外触发。
+这样设计是为了减少不必要的 CAN 占用；触觉频率由你在 `tactile_cmd` 中显式开启，上限为各产品 `hand_node.h` 内写死的 **50 Hz**（O10）或 **100 Hz**（O12）（`kMaxTactilePublishHz`）。
 
 ### 控制模式
 
@@ -164,7 +161,8 @@ python3 joint_current.py left o10
 python3 mix_control_pub.py left o10
 
 # 触发并查看触觉传感器 (仅 O10/O12)
-python3 tactile.py left o10
+python3 tactile.py left o10 10
+python3 tactile.py left o10 0
 
 # 设置电流阈值
 python3 joint_current_threshold_pub.py 500 left o10

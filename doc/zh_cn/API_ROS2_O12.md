@@ -23,8 +23,8 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 | `joint_current_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | `data[]` = 电流值 |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电流阈值 `data[0..11]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 回读电流阈值 `data[0..11]` |
-| `tactile_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 3D 触觉传感器查询 |
-| `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 3D 触觉：`header` + `thumb`…`little`（每指一个 `TactileSensorData`） |
+| `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | 触觉流频率 Hz（>0 启动，0 停止）；上限 **100 Hz**（节点内写死） |
+| `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 流开启期间周期发布 3D 触觉 |
 
 **注意**: O12 有 12 个自由度。所有数组包含 12 个元素。
 
@@ -95,7 +95,8 @@ python3 scripts/omnihand_pro_2025/joint_current_threshold_pub.py 500 left
 python3 scripts/omnihand_pro_2025/mix_control_pub.py left
 
 # 触发并查看触觉传感器
-python3 scripts/omnihand_pro_2025/tactile.py left
+python3 scripts/omnihand_pro_2025/tactile.py left o12 10
+python3 scripts/omnihand_pro_2025/tactile.py left o12 0
 ```
 
 ### 命令行示例

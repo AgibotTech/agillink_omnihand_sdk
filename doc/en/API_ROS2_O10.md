@@ -23,12 +23,12 @@ All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`
 | `joint_current_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = current |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..9]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..9]` |
-| `tactile_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Trigger `GetAllTactileSensorData()` |
-| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile: `header` + `thumb`…`dorsum` (`uint8[]` per region) |
+| `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | Stream rate in Hz (`>0` start, `0` stop); max **50 Hz** (hardcoded in node) |
+| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile while stream active: `header` + `thumb`…`dorsum` |
 
 **Note**: O10 has 10 degrees of freedom. All arrays contain 10 elements.
 
-**Trigger-based Readback**: The node never publishes state on a periodic timer. To read temperature, current, error codes, etc., you must first publish the corresponding `*_cmd` message (e.g. `joint_temperature_cmd`); the node will then query the hardware and publish one reading on `*_states`. The exception is `joint_cmd` — after sending a position command, the node automatically publishes position readback on `joint_states`. This avoids consuming CAN bus bandwidth and ensures real-time responsiveness of control commands.
+**Trigger-based Readback**: Temperature, current, and error codes use one-shot `*_cmd` → `*_states`. **Tactile** uses `tactile_cmd` (`std_msgs/Float32`, Hz) to start/stop an internal read timer; the node does **not** stream tactile until you publish a positive rate. `joint_cmd` still auto-publishes `joint_states` after control.
 
 ## Mixed Control
 
@@ -58,6 +58,19 @@ O10 is equipped with 1D tactile sensors across 7 regions:
 Message type `omnihand_2025_node_msgs/TactileSensor`:
 - `header` (std_msgs/Header)
 - One `uint8[]` per region (1g, max 255g): `thumb`, `index`, `middle`, `ring`, `little`, `palm`, `dorsum`. Expected lengths: 16, 18, 18, 18, 18, 78, 102. A region is an empty array if the hardware did not return it for that readback.
+
+**Stream control** (publish once; node reads periodically):
+
+```bash
+# Start 10 Hz tactile stream (immediate first sample, then timer)
+ros2 topic pub --once /o10/left/tactile_cmd std_msgs/msg/Float32 "{data: 10.0}"
+
+# Subscribe
+ros2 topic echo /o10/left/tactile_states
+
+# Stop
+ros2 topic pub --once /o10/left/tactile_cmd std_msgs/msg/Float32 "{data: 0.0}"
+```
 
 ## O10 Error Bitmask
 
@@ -100,8 +113,9 @@ python3 scripts/omnihand_2025/joint_current_threshold_pub.py 500 left
 # Mixed control (position + force)
 python3 scripts/omnihand_2025/mix_control_pub.py left
 
-# Trigger and view tactile sensor
-python3 scripts/omnihand_2025/tactile.py left
+# Start/stop tactile stream (Hz on tactile_cmd; echo tactile_states separately)
+python3 scripts/omnihand_2025/tactile.py left o10 10
+python3 scripts/omnihand_2025/tactile.py left o10 0
 ```
 
 ### CLI Examples
