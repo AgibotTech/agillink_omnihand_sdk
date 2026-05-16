@@ -24,7 +24,7 @@ All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..9]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..9]` |
 | `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | Stream rate in Hz (`>0` start, `0` stop); max **50 Hz** (hardcoded in node) |
-| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile while stream active: `header` + `thumb`…`dorsum` |
+| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile while stream active (downsampled, not Raw full resolution) |
 
 **Note**: O10 has 10 degrees of freedom. All arrays contain 10 elements.
 
@@ -43,21 +43,23 @@ The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No read
 
 ## Tactile Sensor (1D)
 
-O10 is equipped with 1D tactile sensors across 7 regions:
+O10 is equipped with 1D tactile sensors across 7 regions. The ROS node calls SDK **`GetAllTactileSensorData()`** (same as `GetTactileSensorData()`), publishing **downsampled** counts in the table below — **not** `GetAllTactileSensorDataRaw()` raw counts.
 
-| Region | Sensor Points |
-|--------|--------------|
-| THUMB | 16 |
-| INDEX | 18 |
-| MIDDLE | 18 |
-| RING | 18 |
-| LITTLE | 18 |
-| PALM | 78 |
-| DORSUM | 102 |
+| Region | Raw points | Downsampled points (`tactile_states` `uint8[]` per region) |
+|--------|------------|--------------------------------------------------------------|
+| THUMB | 16 | 16 |
+| INDEX | 18 | 16 |
+| MIDDLE | 18 | 16 |
+| RING | 18 | 16 |
+| LITTLE | 18 | 16 |
+| PALM | 78 | 25 |
+| DORSUM | 102 | 25 |
+
+Palm/dorsum downsampling matches [API_CPP_O10.md](API_CPP_O10.md) (~1 per 3 raw points on palm, ~1 per 4 on dorsum).
 
 Message type `omnihand_2025_node_msgs/TactileSensor`:
 - `header` (std_msgs/Header)
-- One `uint8[]` per region (1g, max 255g): `thumb`, `index`, `middle`, `ring`, `little`, `palm`, `dorsum`. Expected lengths: 16, 18, 18, 18, 18, 78, 102. A region is an empty array if the hardware did not return it for that readback.
+- One `uint8[]` per region (1g, max 255g): `thumb`, `index`, `middle`, `ring`, `little`, `palm`, `dorsum`. Array length equals **downsampled** point count; empty if that region was not returned for the readback.
 
 **Stream control** (publish once; node reads periodically):
 

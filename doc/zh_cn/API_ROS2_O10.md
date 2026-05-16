@@ -24,7 +24,7 @@ O10 ROS2 节点提供 10 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电流阈值 `data[0..9]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 回读电流阈值 `data[0..9]` |
 | `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | 触觉流频率 Hz（>0 启动，0 停止）；上限 **50 Hz**（节点内写死） |
-| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 流开启期间周期发布 1D 触觉 |
+| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 流开启期间周期发布 1D 触觉（降采样，非 Raw 全分辨率） |
 
 **注意**: O10 有 10 个自由度。所有数组包含 10 个元素。
 
@@ -43,21 +43,23 @@ O10 ROS2 节点提供 10 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 
 ## 触觉传感器 (1D)
 
-O10 配备 1D 触觉传感器，7 个区域：
+O10 配备 1D 触觉传感器，7 个区域。ROS 节点调用 SDK **`GetAllTactileSensorData()`**（与 `GetTactileSensorData()` 相同），发布的是下表 **降采样点数**，**不是** `GetAllTactileSensorDataRaw()` 的原始点数。
 
-| 区域 | 传感器点数 |
-|------|----------|
-| THUMB | 16 |
-| INDEX | 18 |
-| MIDDLE | 18 |
-| RING | 18 |
-| LITTLE | 18 |
-| PALM | 78 |
-| DORSUM | 102 |
+| 区域 | 原始点数 | 降采样点数（`tactile_states` 每区 `uint8[]`） |
+|------|---------|---------------------------------------------|
+| THUMB | 16 | 16 |
+| INDEX | 18 | 16 |
+| MIDDLE | 18 | 16 |
+| RING | 18 | 16 |
+| LITTLE | 18 | 16 |
+| PALM | 78 | 25 |
+| DORSUM | 102 | 25 |
+
+手心、手背降采样规则与 [API_CPP_O10.md](API_CPP_O10.md) 一致（手心约每 3 个原始点取 1，手背约每 4 个原始点取 1）。
 
 消息类型 `omnihand_2025_node_msgs/TactileSensor`：
 - `header` (std_msgs/Header)
-- 每个区域一个 `uint8[]`（单位 1g，最大 255g）：`thumb`、`index`、`middle`、`ring`、`little`、`palm`、`dorsum`。典型长度：16、18、18、18、18、78、102。某次回读未返回的区域为空数组。
+- 每个区域一个 `uint8[]`（单位 1g，最大 255g）：`thumb`、`index`、`middle`、`ring`、`little`、`palm`、`dorsum`，数组长度为 **降采样点数**；某次未返回的区域为空数组。
 
 ```bash
 ros2 topic pub --once /o10/left/tactile_cmd std_msgs/msg/Float32 "{data: 10.0}"
