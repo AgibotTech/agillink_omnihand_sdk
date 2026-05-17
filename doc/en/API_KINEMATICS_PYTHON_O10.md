@@ -1,4 +1,4 @@
-﻿# OmniHand 2025 (O10) Kinematics Solver Python API
+# OmniHand 2025 (O10) Kinematics Solver Python API
 
 ## Introduction
 
@@ -32,12 +32,13 @@ def set_hand_gesture(gesture: OmniHand2025Gesture) -> List[int]
 
 | gestureID | member | gesture name |
 |-----------|--------|--------------|
-| 0 | `OMNIHAND_2025_GESTURE_PAPER` | open hand |
-| 1 | `OMNIHAND_2025_GESTURE_FIST1` | fist 1 |
-| 2 | `OMNIHAND_2025_GESTURE_FIST2` | fist 2 |
+| 0 | `OMNIHAND_2025_GESTURE_ALL_ZERO` | all zero |
+| 1 | `OMNIHAND_2025_GESTURE_PAPER` | open hand |
+| 2 | `OMNIHAND_2025_GESTURE_FIST1` | fist 1 |
+| 3 | `OMNIHAND_2025_GESTURE_FIST2` | fist 2 |
 | … | … | … |
-| 16 | `OMNIHAND_2025_GESTURE_CLASPING` | clasping |
-| 17 | `OMNIHAND_2025_GESTURE_RESET` | reset (all active joints zero) |
+| 17 | `OMNIHAND_2025_GESTURE_CLASPING` | clasping |
+| 18 | `OMNIHAND_2025_GESTURE_ROCK` | Rock |
 
 Pass `OmniHand2025Gesture` members only (no raw menu integers).
 

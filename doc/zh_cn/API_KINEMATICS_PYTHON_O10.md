@@ -32,12 +32,13 @@ def set_hand_gesture(gesture: OmniHand2025Gesture) -> List[int]
 
 | 手势ID | 成员 | 手势名称 |
 |--------|------|----------|
-| 0 | `OMNIHAND_2025_GESTURE_PAPER` | 张开手 |
-| 1 | `OMNIHAND_2025_GESTURE_FIST1` | 拳头1 |
-| 2 | `OMNIHAND_2025_GESTURE_FIST2` | 拳头2 |
+| 0 | `OMNIHAND_2025_GESTURE_ALL_ZERO` | 全零位 |
+| 1 | `OMNIHAND_2025_GESTURE_PAPER` | 张开手 |
+| 2 | `OMNIHAND_2025_GESTURE_FIST1` | 拳头1 |
+| 3 | `OMNIHAND_2025_GESTURE_FIST2` | 拳头2 |
 | … | … | … |
-| 16 | `OMNIHAND_2025_GESTURE_CLASPING` | 合掌 |
-| 17 | `OMNIHAND_2025_GESTURE_RESET` | 复位 |
+| 17 | `OMNIHAND_2025_GESTURE_CLASPING` | 合掌 |
+| 18 | `OMNIHAND_2025_GESTURE_ROCK` | Rock |
 
 请传入 `OmniHand2025Gesture` 枚举成员，勿使用裸数字。
 

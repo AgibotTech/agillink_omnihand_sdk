@@ -32,14 +32,25 @@ std::vector<int> SetHandGesture(OmniHand2025Gesture gesture);
 
 | 手势ID | 枚举量 | 手势名称 | 手势图片 |
 |--------|--------|----------|----------|
-| 0 | `OMNIHAND_2025_GESTURE_PAPER` | 张开手 | <img src="../pic/open_hand.jpg" width="100" /> |
-| 1 | `OMNIHAND_2025_GESTURE_FIST1` | 拳头1 | <img src="../pic/fist_1.jpg" width="100" /> |
-| 2 | `OMNIHAND_2025_GESTURE_FIST2` | 拳头2 | <img src="../pic/fist_2.jpg" width="100" /> |
-| 3 | `OMNIHAND_2025_GESTURE_OK` | OK | <img src="../pic/OK.jpg" width="100" /> |
-| 4–16 | 见头文件 | 单手比心 / 数字 / 双手比心 / 合掌等 | |
-| 17 | `OMNIHAND_2025_GESTURE_RESET` | 复位（各主动关节角为 0） | |
-
-`OmniHand2025::SetHandGesture(int)` 仍保留，数值 0–17 与上表一致。
+| 0 | `OMNIHAND_2025_GESTURE_ALL_ZERO` | 全零位（各主动关节角为 0） | |
+| 1 | `OMNIHAND_2025_GESTURE_PAPER` | 张开手 | <img src="../pic/open_hand.jpg" width="100" /> |
+| 2 | `OMNIHAND_2025_GESTURE_FIST1` | 拳头1 | <img src="../pic/fist_1.jpg" width="100" /> |
+| 3 | `OMNIHAND_2025_GESTURE_FIST2` | 拳头2 | <img src="../pic/fist_2.jpg" width="100" /> |
+| 4 | `OMNIHAND_2025_GESTURE_OK` | OK | <img src="../pic/OK.jpg" width="100" /> |
+| 5 | `OMNIHAND_2025_GESTURE_ONE_HANDED_FINGER_HEART` | 单手比心 | <img src="../pic/One-handed_finger_heart.jpg" width="100" /> |
+| 6 | `OMNIHAND_2025_GESTURE_LIKE` | 点赞 | <img src="../pic/like.jpg" width="100" /> |
+| 7 | `OMNIHAND_2025_GESTURE_ILY` | ILY | <img src="../pic/ILY.jpg" width="100" /> |
+| 8 | `OMNIHAND_2025_GESTURE_NUM1` | 数字1 | <img src="../pic/number_1.jpg" width="100" /> |
+| 9 | `OMNIHAND_2025_GESTURE_NUM2` | 数字2 | <img src="../pic/number_2.jpg" width="100" /> |
+| 10 | `OMNIHAND_2025_GESTURE_NUM3` | 数字3 | <img src="../pic/number_3.jpg" width="100" /> |
+| 11 | `OMNIHAND_2025_GESTURE_NUM4` | 数字4 | <img src="../pic/number_4.jpg" width="100" /> |
+| 12 | `OMNIHAND_2025_GESTURE_NUM6` | 数字6 | <img src="../pic/number_6.jpg" width="100" /> |
+| 13 | `OMNIHAND_2025_GESTURE_NUM8` | 数字8 | <img src="../pic/number_8.jpg" width="100" /> |
+| 14 | `OMNIHAND_2025_GESTURE_HAND_HEART1` | 双手比心1 | <img src="../pic/hand_heart_1.jpg" width="100" /> |
+| 15 | `OMNIHAND_2025_GESTURE_HAND_HEART2` | 双手比心2 | <img src="../pic/hand_heart_2.jpg" width="100" /> |
+| 16 | `OMNIHAND_2025_GESTURE_HAND_HEART3` | 双手比心3 | <img src="../pic/hand_heart_3.jpg" width="100" /> |
+| 17 | `OMNIHAND_2025_GESTURE_CLASPING` | 合掌 | <img src="../pic/clasping.jpg" width="100" /> |
+| 18 | `OMNIHAND_2025_GESTURE_ROCK` | Rock | |
 
 ### 2. ActiveJointPos2ActuatorInput
 

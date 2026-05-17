@@ -56,7 +56,7 @@ GESTURE_MENU = (
     (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_HAND_HEART2, "Two-hand heart 2"),
     (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_HAND_HEART3, "Two-hand heart 3"),
     (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_CLASPING, "Prayer hands"),
-    (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_RESET, "Reset pose"),
+    (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_ALL_ZERO, "All zero"),
 )
 
 

@@ -40,10 +40,11 @@ std::vector<int> SetHandGesture(OmniHandPro2025Gesture gesture);
 
 | Gesture Enum                                      | Gesture Name |
 |---------------------------------------------------|--------------|
-| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_HOME  | HOME         |
-| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_PAPER | PAPER        |
-| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_FIST  | FIST         |
-| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_OK    | OK           |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_ALL_ZERO | ALL_ZERO     |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_PAPER    | PAPER        |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_FIST     | FIST         |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_OK       | OK           |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_PACK     | PACK         |
 
 ### 3. ConvertJoint2Actuator
 

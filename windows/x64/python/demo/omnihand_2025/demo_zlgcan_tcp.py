@@ -101,7 +101,7 @@ def main():
 
         # Step 2: open palm
     print("\nStep 2: Opening hand (reset position)...")
-    hand.set_hand_gesture(OmniHand2025Gesture.OMNIHAND_2025_GESTURE_RESET)
+    hand.set_hand_gesture(OmniHand2025Gesture.OMNIHAND_2025_GESTURE_ALL_ZERO)
     time.sleep(2)  # wait for open palm
     print("Hands opened (reset position)")
 
