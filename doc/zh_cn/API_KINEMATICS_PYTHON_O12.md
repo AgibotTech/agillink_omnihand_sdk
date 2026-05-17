@@ -32,18 +32,18 @@ def check_joint_pos(active_joint_angles: List[float]) -> bool
 ### 2. set_hand_gesture
 
 ```python
-def set_hand_gesture(gesture: int) -> List[int]
+def set_hand_gesture(gesture: OmniHandPro2025Gesture) -> List[int]
 ```
 
 - 设置预定义的手势。
 - 返回对应的执行器输入值。
 
-| 手势ID | 手势名称 |
-|--------|----------|
-| 0      | HOME     |
-| 1      | PAPER    |
-| 2      | FIST     |
-| 3      | OK       |
+| 手势枚举                                           | 手势名称 |
+|---------------------------------------------------|----------|
+| OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_HOME  | HOME     |
+| OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_PAPER | PAPER    |
+| OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_FIST  | FIST     |
+| OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_OK    | OK       |
 
 ### 3. convert_joint_to_actuator
 
@@ -116,7 +116,7 @@ active_joint_angles = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0
 valid = solver.check_joint_pos(active_joint_angles)
 
 # 设置手势
-actuator_input = solver.set_hand_gesture(1)  # PAPER 手势
+actuator_input = solver.set_hand_gesture(OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_PAPER)  # PAPER 手势
 
 # 将关节位置转换为执行器输入
 input_values = solver.convert_joint_to_actuator(active_joint_angles)

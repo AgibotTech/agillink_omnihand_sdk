@@ -32,18 +32,18 @@ bool CheckJointPos(std::vector<double> &active_joint_angles);
 ### 2. SetHandGesture
 
 ```cpp
-std::vector<int> SetHandGesture(const int& gesture);
+std::vector<int> SetHandGesture(OmniHandPro2025Gesture gesture);
 ```
 
 - 设置预定义的手势。
 - 返回对应的执行器输入值。
 
-| 手势ID | 手势名称 |
-|--------|----------|
-| 0      | HOME     |
-| 1      | PAPER    |
-| 2      | FIST     |
-| 3      | OK       |
+| 手势枚举                                           | 手势名称 |
+|---------------------------------------------------|----------|
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_HOME  | HOME     |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_PAPER | PAPER    |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_FIST  | FIST     |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_OK    | OK       |
 
 ### 3. ConvertJoint2Actuator
 
@@ -116,7 +116,7 @@ std::vector<double> active_joint_angles = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1
 bool valid = solver.CheckJointPos(active_joint_angles);
 
 // 设置手势
-std::vector<int> actuator_input = solver.SetHandGesture(1); // PAPER 手势
+std::vector<int> actuator_input = solver.SetHandGesture(OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_PAPER); // PAPER 手势
 
 // 将关节位置转换为执行器输入
 std::vector<int> input = solver.ConvertJoint2Actuator(active_joint_angles);

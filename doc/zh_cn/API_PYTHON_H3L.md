@@ -161,9 +161,25 @@ def init(self) -> bool:
     """初始化设备。创建实例后必须调用。失败返回 False。"""
 ```
 
-### 电机位置控制（推荐）
+### 手势控制
 
-> **H3L 无运动学求解器，请使用电机位置控制（ticks）。** 角度控制方法均为桩实现。
+```python
+class OmniHand3LiteGesture(enum.IntEnum):
+    OMNI_HAND_3_LITE_GESTURE_ALL_ZERO = 0  # 全零位
+    OMNI_HAND_3_LITE_GESTURE_FIST = 1      # 握拳
+    OMNI_HAND_3_LITE_GESTURE_OPEN = 2      # 张开
+
+def set_hand_gesture(self, gesture: OmniHand3LiteGesture) -> None:
+    """设置预设手势。
+
+    Args:
+        gesture: OmniHand3LiteGesture 枚举值。
+
+    预设手势位置以右手为基准，左手时求解器自动镜像电机 1 和电机 4。
+    """
+```
+
+### 电机位置控制
 
 ```python
 def set_joint_motor_posi(self, joint_motor_index: int, posi: int) -> int:
@@ -297,7 +313,7 @@ def show_data_details(self, show: bool) -> None:
 ## 完整示例
 
 ```python
-from omnihand import OmniHand3Lite, HandType
+from omnihand import OmniHand3Lite, HandType, OmniHand3LiteGesture
 
 # 创建手部实例
 hand = OmniHand3Lite.create_hand_by_zlgcan(
@@ -314,6 +330,9 @@ if not hand.init():
 # 获取厂商信息
 vendor = hand.get_vendor_info()
 print(vendor)
+
+# 使用预设手势（右手基准，左手自动镜像电机1/4）
+hand.set_hand_gesture(OmniHand3LiteGesture.OMNI_HAND_3_LITE_GESTURE_FIST)
 
 # 设置电机位置（4 个关节，0–4095）
 positions = [2048, 2048, 2048, 2048]

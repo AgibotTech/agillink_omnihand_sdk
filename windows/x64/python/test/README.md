@@ -41,6 +41,12 @@ pytest -v test_omnihand_dex_umi.py
 
 # UMI tests (running directly with Python)
 python3 test_omnihand_dex_umi.py
+
+# H3L tests (using pytest directly)
+pytest -v test_omnihand_3_lite.py
+
+# H3L tests (running directly with Python)
+python3 test_omnihand_3_lite.py
 ```
 
 **Note**: 
@@ -67,6 +73,7 @@ The tests are organized similar to the C++ gtest structure:
 
 - **test_omnihand_2025.py**: Tests for OmniHand 2025 (O10, 10 DOF)
 - **test_omnihand_pro_2025.py**: Tests for OmniHand Pro 2025 (O12, 12 DOF)
+- **test_omnihand_3_lite.py**: Tests for OmniHand 3 Lite (H3L, 4 DOF)
 - **test_omnihand_dex_umi.py**: Tests for OmniHand Dex UMI (UMI protocol)
 
 ## Test Coverage

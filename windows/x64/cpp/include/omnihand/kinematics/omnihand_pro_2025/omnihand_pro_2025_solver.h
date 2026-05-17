@@ -82,16 +82,17 @@ enum O12handProActuator {
   ActuatorCount
 };
 
-enum GestureID {
-  HOME,
-  PAPER,
-  FIST,
-  OK,
+enum class OmniHandPro2025Gesture : int {
+  OMNIHAND_PRO_2025_GESTURE_HOME = 0,
+  OMNIHAND_PRO_2025_GESTURE_PAPER,
+  OMNIHAND_PRO_2025_GESTURE_FIST,
+  OMNIHAND_PRO_2025_GESTURE_OK,
+  OMNIHAND_PRO_2025_GESTURE_PACK,
 };
 
 class AGIBOT_EXPORT OmniHandPro2025Solver {
  private:
-  bool hand_type_;  ///< True for left-hand, false for right-hand
+  bool is_left_hand_; ///< True for left-hand, false for right-hand
   std::vector<double> motor_max_ = {0.0, 0.0, 0.0, 0.0, 10e-3, 0.0,
                                     0.0, 0.0, 0.0, 0.0, 10e-3, 10e-3};
   std::vector<double> motor_min_ = {-14.56e-3, -14.56e-3, -14.56e-3, -14.56e-3,
@@ -279,7 +280,7 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
   void ClampAbadMcpJoint(double &x, double &y);
 
  public:
-  OmniHandPro2025Solver(const bool &hand_type);
+  OmniHandPro2025Solver(const bool &is_left_hand);
   ~OmniHandPro2025Solver();
 
   // check if the joint position is within the defined limits,if not, modify.
@@ -289,7 +290,7 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
   bool CheckActuatorInput(const std::vector<int> &actuator_input);
 
   // set the hand gesture, output the actuator input
-  std::vector<int> SetHandGesture(const int &gesture_num);
+  std::vector<int> SetHandGesture(OmniHandPro2025Gesture gesture);
 
   // Convert the active joint position to actuator input
   // Returns motor input values in range 0-2000 (different from O10 which is 0-4096)

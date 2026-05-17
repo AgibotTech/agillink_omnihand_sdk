@@ -12,7 +12,7 @@ Run with -h or --help to see all available options and usage examples.
 
 import argparse
 import time
-from omnihand import OmniHand3Lite, HandType
+from omnihand import OmniHand3Lite, HandType, OmniHand3LiteGesture
 
 EXAMPLES = """\
 examples:
@@ -64,6 +64,20 @@ def main():
             canfd_channel_id=args.canfd_channel_id
         )
     # hand.show_data_details(True)
+
+    # Test gesture control
+    print("\n=== Gesture Control ===")
+    print("Setting gesture: FIST...")
+    hand.set_hand_gesture(OmniHand3LiteGesture.OMNI_HAND_3_LITE_GESTURE_FIST)
+    time.sleep(1)
+    fist_positions = hand.get_all_joint_positions()
+    print("FIST positions:", fist_positions)
+
+    print("Setting gesture: OPEN...")
+    hand.set_hand_gesture(OmniHand3LiteGesture.OMNI_HAND_3_LITE_GESTURE_OPEN)
+    time.sleep(1)
+    open_positions = hand.get_all_joint_positions()
+    print("OPEN positions:", open_positions)
 
     # Set position of a single joint motor (index 1, position 200)
     hand.set_joint_position(1, 200)

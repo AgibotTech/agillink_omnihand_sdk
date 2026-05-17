@@ -32,18 +32,18 @@ def check_joint_pos(active_joint_angles: List[float]) -> bool
 ### 2. set_hand_gesture
 
 ```python
-def set_hand_gesture(gesture: int) -> List[int]
+def set_hand_gesture(gesture: OmniHandPro2025Gesture) -> List[int]
 ```
 
 - Sets a predefined hand gesture.
 - Returns the corresponding actuator input values.
 
-| gestureID | gesture name              |
-|-----------|---------------------------|
-| 0         | HOME                      |
-| 1         | PAPER                     |
-| 2         | FIST                      |
-| 3         | OK                        |
+| Gesture Enum                                      | Gesture Name |
+|---------------------------------------------------|--------------|
+| OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_HOME  | HOME         |
+| OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_PAPER | PAPER        |
+| OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_FIST  | FIST         |
+| OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_OK    | OK           |
 
 ### 3. convert_joint_to_actuator
 
@@ -116,7 +116,7 @@ active_joint_angles = [0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0
 valid = solver.check_joint_pos(active_joint_angles)
 
 # Set a gesture
-actuator_input = solver.set_hand_gesture(1)  # PAPER gesture
+actuator_input = solver.set_hand_gesture(OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_PAPER)  # PAPER gesture
 
 # Convert joint positions to actuator input
 input_values = solver.convert_joint_to_actuator(active_joint_angles)

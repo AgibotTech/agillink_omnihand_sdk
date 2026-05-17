@@ -37,6 +37,17 @@
 - `omnihand_pro_2025/demo_canfd_serial.py` - CANFD通信示例（通过序列号）
 - `omnihand_pro_2025/demo_socketcan.py` - SocketCAN 示例（仅 Linux）
 
+## OmniHand 3 Lite（4 自由度）示例
+- `omnihand_3_lite/demo_get_hardware_info.py` - 获取硬件信息
+- `omnihand_3_lite/demo_set_motor.py` - 电机位置控制和手势控制
+- `omnihand_3_lite/demo_set_motor_via_multicans.py` - 通过多个CANFD适配器控制
+- `omnihand_3_lite/demo_set_get_position_reliability.py` - 位置控制可靠性测试
+- `omnihand_3_lite/demo_set_get_reliability_csv.py` - 可靠性测试（CSV输出）
+- `omnihand_3_lite/demo_canfd_id.py` - CANFD通信示例（通过设备ID）
+- `omnihand_3_lite/demo_canfd_serial.py` - CANFD通信示例（通过序列号）
+- `omnihand_3_lite/demo_socketcan.py` - SocketCAN 示例（仅 Linux）
+- `omnihand_3_lite/demo_zlgcan_tcp.py` - ZLG CAN TCP 示例
+
 ## OmniHand Dex UMI（10 自由度，UMI 协议）示例
 - **运动学（Python）：** `OmniHandDexUMI.get_all_active_joint_angles()`、`get_all_joint_angles()`、`get_all_joint_angles(...)` 与 O10 共用求解器，只读（无 set 角度类接口）。
 - `omnihand_dex_umi/demo_get_hardware_info.py` - 获取硬件信息
@@ -57,5 +68,6 @@ pip list | findstr omnihand
 # 运行示例
 python omnihand_2025\demo_get_hardware_info.py
 python omnihand_pro_2025\demo_get_hardware_info.py
+python omnihand_3_lite\demo_get_hardware_info.py
 python omnihand_dex_umi\demo_get_hardware_info.py
 ```

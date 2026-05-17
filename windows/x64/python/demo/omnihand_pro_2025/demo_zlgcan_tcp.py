@@ -104,7 +104,7 @@ def main():
 
     # Step 1: Make hand into fist position
     print("Step 1: Making hand into fist position...")
-    hand.set_hand_gesture(2)  # FIST2
+    hand.set_hand_gesture(OmniHandPro2025Gesture.OMNIHAND_PRO_2025_GESTURE_FIST)  # FIST
     time.sleep(2)  # Wait for fist action to complete
     print("Fist position set for hand")
 

@@ -175,9 +175,21 @@ bool Init();
 
 所有工厂方法返回的实例在创建后需调用 `Init()` 完成初始化。`Init()` 失败时返回 `false`。
 
-### 电机位置控制（推荐）
+### 手势控制
 
-> **H3L 无运动学求解器，请使用电机位置控制（ticks）。** 角度控制方法（`SetAllActiveJointAngles` 等）均为桩实现，打印 warning 并返回空。
+```cpp
+enum class OmniHand3LiteGesture : int {
+  OMNI_HAND_3_LITE_GESTURE_ALL_ZERO = 0,  // 全零位
+  OMNI_HAND_3_LITE_GESTURE_FIST,          // 握拳
+  OMNI_HAND_3_LITE_GESTURE_OPEN,          // 张开
+};
+
+void SetHandGesture(OmniHand3LiteGesture gesture);
+```
+
+预设手势位置以右手为基准，左手时求解器自动镜像电机 1 和电机 4。
+
+### 电机位置控制
 
 ```cpp
 int16_t SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi);
@@ -277,6 +289,9 @@ int main() {
     // 设置电机位置（4 个关节，0–4095）
     std::vector<int16_t> positions = {2048, 2048, 2048, 2048};
     auto echo = hand->SetAllJointMotorPosi(positions);
+
+    // 使用预设手势（右手基准，左手自动镜像电机1/4）
+    hand->SetHandGesture(OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
 
     auto temps = hand->GetAllTemperatureReport();
     return 0;

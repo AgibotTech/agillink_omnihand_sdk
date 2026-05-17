@@ -37,6 +37,17 @@
 - `omnihand_pro_2025/demo_canfd_serial.py` - CANFD communication example (by serial number)
 - `omnihand_pro_2025/demo_socketcan.py` - SocketCAN example (Linux only)
 
+## OmniHand 3 Lite (4 DOF) Examples
+- `omnihand_3_lite/demo_get_hardware_info.py` - Get hardware information
+- `omnihand_3_lite/demo_set_motor.py` - Motor position control and gesture control
+- `omnihand_3_lite/demo_set_motor_via_multicans.py` - Control via multiple CANFD adapters
+- `omnihand_3_lite/demo_set_get_position_reliability.py` - Position control reliability test
+- `omnihand_3_lite/demo_set_get_reliability_csv.py` - Reliability test (CSV output)
+- `omnihand_3_lite/demo_canfd_id.py` - CANFD communication example (by device ID)
+- `omnihand_3_lite/demo_canfd_serial.py` - CANFD communication example (by serial number)
+- `omnihand_3_lite/demo_socketcan.py` - SocketCAN example (Linux only)
+- `omnihand_3_lite/demo_zlgcan_tcp.py` - ZLG CAN TCP example
+
 ## OmniHand Dex UMI (10 DOF, UMI Protocol) Examples
 - **Kinematics (Python):** `OmniHandDexUMI.get_all_active_joint_angles()`, `get_all_joint_angles()`, `get_all_joint_angles(...)` — same O10 solver as OmniHand 2025; read-only (no set-angle APIs).
 - `omnihand_dex_umi/demo_get_hardware_info.py` - Get hardware information
@@ -57,5 +68,6 @@ pip list | findstr omnihand
 # Run examples
 python omnihand_2025\demo_get_hardware_info.py
 python omnihand_pro_2025\demo_get_hardware_info.py
+python omnihand_3_lite\demo_get_hardware_info.py
 python omnihand_dex_umi\demo_get_hardware_info.py
 ```

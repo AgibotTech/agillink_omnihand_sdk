@@ -32,18 +32,18 @@ bool CheckJointPos(std::vector<double> &active_joint_angles);
 ### 2. SetHandGesture
 
 ```cpp
-std::vector<int> SetHandGesture(const int& gesture);
+std::vector<int> SetHandGesture(OmniHandPro2025Gesture gesture);
 ```
 
 - Sets a predefined hand gesture.
 - Returns the corresponding actuator input values.
 
-| gestureID | gesture name              |
-|-----------|---------------------------|
-| 0         | HOME                      |
-| 1         | PAPER                     |
-| 2         | FIST                      |
-| 3         | OK                        |
+| Gesture Enum                                      | Gesture Name |
+|---------------------------------------------------|--------------|
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_HOME  | HOME         |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_PAPER | PAPER        |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_FIST  | FIST         |
+| OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_OK    | OK           |
 
 ### 3. ConvertJoint2Actuator
 
@@ -116,7 +116,7 @@ std::vector<double> active_joint_angles = {0.5, -0.3, 0.6, 0.0, 1.0, 1.0, 0.0, 1
 bool valid = solver.CheckJointPos(active_joint_angles);
 
 // Set a gesture
-std::vector<int> actuator_input = solver.SetHandGesture(1); // PAPER gesture
+std::vector<int> actuator_input = solver.SetHandGesture(OmniHandPro2025Gesture::OMNIHAND_PRO_2025_GESTURE_PAPER); // PAPER gesture
 
 // Convert joint positions to actuator input
 std::vector<int> input = solver.ConvertJoint2Actuator(active_joint_angles);

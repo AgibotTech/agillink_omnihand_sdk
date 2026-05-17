@@ -161,9 +161,27 @@ def init(self) -> bool:
     """Initializes the device. Must be called after creating an instance. Returns False on failure."""
 ```
 
+### Gesture Control
+
+```python
+class OmniHand3LiteGesture(enum.IntEnum):
+    OMNI_HAND_3_LITE_GESTURE_ALL_ZERO = 0  # All-zero position
+    OMNI_HAND_3_LITE_GESTURE_FIST = 1      # Fist
+    OMNI_HAND_3_LITE_GESTURE_OPEN = 2      # Open hand
+
+def set_hand_gesture(self, gesture: OmniHand3LiteGesture) -> None:
+    """Sets a predefined hand gesture.
+
+    Args:
+        gesture: OmniHand3LiteGesture enum value.
+
+    Preset gesture positions are defined for the right hand. The solver automatically mirrors motors 1 and 4 for the left hand.
+    """
+```
+
 ### Motor Position Control (Recommended)
 
-> **H3L has no kinematics solver — use motor position control (ticks).** Angle control methods are stubs.
+> **H3L has no full kinematics solver — use motor position control (ticks).** Angle control methods are stubs. Gesture control is available via `set_hand_gesture()`.
 
 ```python
 def set_joint_motor_posi(self, joint_motor_index: int, posi: int) -> int:
@@ -314,6 +332,10 @@ if not hand.init():
 # Get vendor information
 vendor = hand.get_vendor_info()
 print(vendor)
+
+# Set a predefined gesture
+from omnihand import OmniHand3LiteGesture
+hand.set_hand_gesture(OmniHand3LiteGesture.OMNI_HAND_3_LITE_GESTURE_FIST)
 
 # Set motor positions (4 joints, 0-4095)
 positions = [2048, 2048, 2048, 2048]

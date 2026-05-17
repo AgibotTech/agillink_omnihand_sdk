@@ -6,7 +6,7 @@
 
 The H3L ROS2 node provides a unified topic interface for the 4 DOF dexterous hand, following the [Unified ROS2 Interface Specification](API_ROS2.md).
 
-> **Important**: H3L has no kinematics solver. `JointState.position` carries **motor ticks** (int16, range 0-4096), **NOT radians**. The node performs double ↔ int16 transparent conversion internally.
+> **Important**: H3L has no full kinematics solver for angle-based control. `JointState.position` carries **motor ticks** (int16, range 0-4096), **NOT radians**. The node performs double ↔ int16 transparent conversion internally. Gesture control is available via the SDK's `SetHandGesture()` API.
 
 ## ROS2 Topics
 

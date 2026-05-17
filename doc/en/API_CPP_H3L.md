@@ -175,9 +175,21 @@ bool Init();
 
 All factory methods return an instance that requires `Init()` to complete initialization. Returns `false` on failure.
 
-### Motor Position Control (Recommended)
+### Gesture Control
 
-> **H3L has no kinematics solver — use motor position control (ticks).** Angle control methods (`SetAllActiveJointAngles`, etc.) are stubs that print a warning and return empty.
+```cpp
+enum class OmniHand3LiteGesture : int {
+  OMNI_HAND_3_LITE_GESTURE_ALL_ZERO = 0,  // All-zero position
+  OMNI_HAND_3_LITE_GESTURE_FIST,          // Fist
+  OMNI_HAND_3_LITE_GESTURE_OPEN,          // Open hand
+};
+
+void SetHandGesture(OmniHand3LiteGesture gesture);
+```
+
+Preset gesture positions are defined for the right hand. The solver automatically mirrors motors 1 and 4 for the left hand.
+
+### Motor Position Control
 
 ```cpp
 int16_t SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi);

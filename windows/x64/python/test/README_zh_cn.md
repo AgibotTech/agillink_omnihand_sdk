@@ -41,6 +41,12 @@ pytest -v test_omnihand_dex_umi.py
 
 # UMI 测试（直接使用 Python 运行）
 python3 test_omnihand_dex_umi.py
+
+# H3L 测试（直接使用 pytest）
+pytest -v test_omnihand_3_lite.py
+
+# H3L 测试（直接使用 Python 运行）
+python3 test_omnihand_3_lite.py
 ```
 
 ### 使用请求间隔参数运行（仅 O10 和 O12）
@@ -87,6 +93,7 @@ pytest -s
 
 - **test_omnihand_2025.py**：OmniHand 2025 (O10, 10 DOF) 的测试
 - **test_omnihand_pro_2025.py**：OmniHand Pro 2025 (O12, 12 DOF) 的测试
+- **test_omnihand_3_lite.py**：OmniHand 3 Lite (H3L, 4 DOF) 的测试
 - **test_omnihand_dex_umi.py**：OmniHand Dex UMI (UMI 协议) 的测试
 
 ## 测试覆盖
