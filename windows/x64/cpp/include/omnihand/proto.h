@@ -348,7 +348,7 @@ struct AGIBOT_EXPORT MixCtrl {
 * 
 */
 inline uint8_t MilliampToRegister(int16_t ma) {
-  int val = static_cast<int>(ma) * 255 / 1000;
+  int val = static_cast<int>(ma) * 255 / 2000;
   if (val < 0) val = 0;
   if (val > 255) val = 255;
   return static_cast<uint8_t>(val);
