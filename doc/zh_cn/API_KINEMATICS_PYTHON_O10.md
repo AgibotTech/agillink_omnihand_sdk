@@ -37,8 +37,7 @@ def set_hand_gesture(gesture: OmniHand2025Gesture) -> List[int]
 | 2 | `OMNIHAND_2025_GESTURE_FIST1` | 拳头1 |
 | 3 | `OMNIHAND_2025_GESTURE_FIST2` | 拳头2 |
 | … | … | … |
-| 17 | `OMNIHAND_2025_GESTURE_CLASPING` | 合掌 |
-| 18 | `OMNIHAND_2025_GESTURE_ROCK` | Rock |
+| 17 | `OMNIHAND_2025_GESTURE_CLASPING` | 抓握 |
 
 请传入 `OmniHand2025Gesture` 枚举成员，勿使用裸数字。
 

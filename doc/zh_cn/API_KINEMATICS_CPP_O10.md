@@ -49,8 +49,7 @@ std::vector<int> SetHandGesture(OmniHand2025Gesture gesture);
 | 14 | `OMNIHAND_2025_GESTURE_HAND_HEART1` | 双手比心1 | <img src="../pic/hand_heart_1.jpg" width="100" /> |
 | 15 | `OMNIHAND_2025_GESTURE_HAND_HEART2` | 双手比心2 | <img src="../pic/hand_heart_2.jpg" width="100" /> |
 | 16 | `OMNIHAND_2025_GESTURE_HAND_HEART3` | 双手比心3 | <img src="../pic/hand_heart_3.jpg" width="100" /> |
-| 17 | `OMNIHAND_2025_GESTURE_CLASPING` | 合掌 | <img src="../pic/clasping.jpg" width="100" /> |
-| 18 | `OMNIHAND_2025_GESTURE_ROCK` | Rock | |
+| 17 | `OMNIHAND_2025_GESTURE_CLASPING` | 抓握 | <img src="../pic/clasping.jpg" width="100" /> |
 
 ### 2. ActiveJointPos2ActuatorInput
 

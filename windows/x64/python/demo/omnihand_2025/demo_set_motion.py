@@ -37,8 +37,9 @@ examples:
   python demo_set_motion.py -d tj --tj-ip 192.168.10.190
 """
 
-# Menu index matches OmniHand2025Gesture numeric value (0=PAPER … 17=RESET)
+# Menu index matches OmniHand2025Gesture numeric value (0=ALL_ZERO … 17=CLASPING)
 GESTURE_MENU = (
+    (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_ALL_ZERO, "All zero"),
     (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_PAPER, "Open palm"),
     (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_FIST1, "Fist style 1"),
     (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_FIST2, "Fist style 2"),
@@ -56,7 +57,6 @@ GESTURE_MENU = (
     (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_HAND_HEART2, "Two-hand heart 2"),
     (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_HAND_HEART3, "Two-hand heart 3"),
     (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_CLASPING, "Prayer hands"),
-    (OmniHand2025Gesture.OMNIHAND_2025_GESTURE_ALL_ZERO, "All zero"),
 )
 
 

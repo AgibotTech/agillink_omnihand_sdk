@@ -38,7 +38,6 @@ def set_hand_gesture(gesture: OmniHand2025Gesture) -> List[int]
 | 3 | `OMNIHAND_2025_GESTURE_FIST2` | fist 2 |
 | … | … | … |
 | 17 | `OMNIHAND_2025_GESTURE_CLASPING` | clasping |
-| 18 | `OMNIHAND_2025_GESTURE_ROCK` | Rock |
 
 Pass `OmniHand2025Gesture` members only (no raw menu integers).
 
