@@ -5,8 +5,8 @@
  * @file ros2_mix_ctrl_pos_vel_torque_demo.cpp
  * @brief ROS2 C++ demo - mix control (position + velocity + torque)
  *
- * WARNING: POSITION_VELOCITY_TORQUE mode is NOT YET AVAILABLE for O10/H3L.
- * This demo is provided as a reference for future support.
+ * O10 node selects POSITION_VELOCITY_TORQUE when velocity[] is published with position[] and effort[].
+ * H3L node does not support this mode (position+effort only).
  *
  * Demonstrates POSITION_VELOCITY_TORQUE mode via the joint_mix_control_cmd topic,
  * while also reading joint states, temperature, and current.

@@ -24,7 +24,7 @@ All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..9]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..9]` |
 | `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | Stream rate in Hz (`>0` start, `0` stop); max **50 Hz** (hardcoded in node) |
-| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile while stream active (downsampled, not Raw full resolution) |
+| `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile while stream active (Raw full resolution) |
 
 **Note**: O10 has 10 degrees of freedom. All arrays contain 10 elements.
 
@@ -32,34 +32,40 @@ All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`
 
 ## Mixed Control
 
-`joint_mix_control_cmd` uses `sensor_msgs/JointState` for position+torque mixed control:
+`joint_mix_control_cmd` uses `sensor_msgs/JointState`; the node picks the mix mode from the arrays you publish:
 
-- `position[]` = raw motor position (int16, range 0–4095)
-- `effort[]` = motor current (int16, unit: **mA**, range **0–1000**, not the standard N·m)
+| Published fields | Mode |
+|------------------|------|
+| `position[]` + `effort[]` only (no `velocity[]`, or too short) | **POSITION_TORQUE** (position + current) |
+| `position[]` + `velocity[]` + `effort[]` (`velocity` length ≥ number of joints commanded) | **POSITION_VELOCITY_TORQUE** (position + velocity + current) |
 
-> **Note**: The `effort` field carries current values in mA (0–1000), not ROS2 standard torque (N·m). The position + velocity + torque mode (POSITION_VELOCITY_TORQUE) is not yet available.
+- `position[]` = raw motor position (int16, 0–4095)
+- `velocity[]` = raw motor velocity (int16; required for position+velocity+torque mode)
+- `effort[]` = motor current (int16, **mA**, 0–1000, not standard N·m)
 
-The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No readback**.
+> **Note**: `effort` is current in mA, not ROS2 torque (N·m). All joints in one message share the same mode (one CAN mix-control frame).
+
+The node calls `MixCtrlJointMotor`. **No readback**.
 
 ## Tactile Sensor (1D)
 
-O10 is equipped with 1D tactile sensors across 7 regions. The ROS node calls SDK **`GetAllTactileSensorData()`** (same as `GetTactileSensorData()`), publishing **downsampled** counts in the table below — **not** `GetAllTactileSensorDataRaw()` raw counts.
+O10 is equipped with 1D tactile sensors across 7 regions. The ROS node calls SDK **`GetAllTactileSensorDataRaw()`**; `tactile_states` carries **full-resolution raw** counts (same as Toolbox raw tab / C++ `GetAllTactileSensorDataRaw()`). For downsampled data use SDK `GetTactileSensorData()` / `GetAllTactileSensorData()` — the ROS node does not publish those.
 
-| Region | Raw points | Downsampled points (`tactile_states` `uint8[]` per region) |
-|--------|------------|--------------------------------------------------------------|
-| THUMB | 16 | 16 |
-| INDEX | 18 | 16 |
-| MIDDLE | 18 | 16 |
-| RING | 18 | 16 |
-| LITTLE | 18 | 16 |
-| PALM | 78 | 25 |
-| DORSUM | 102 | 25 |
+| Region | `tactile_states` `uint8[]` length (raw points) |
+|--------|-----------------------------------------------|
+| THUMB | 16 |
+| INDEX | 18 |
+| MIDDLE | 18 |
+| RING | 18 |
+| LITTLE | 18 |
+| PALM | 78 |
+| DORSUM | 102 |
 
-Palm/dorsum downsampling matches [API_CPP_O10.md](API_CPP_O10.md) (~1 per 3 raw points on palm, ~1 per 4 on dorsum).
+> **Connection**: Raw uses one multi-frame read; requires the **public CAN API** (`socketcan` / `zlgcan`, `OmniHand2025CanImpl`). On **private protocol** (`PrivateOmniHand2025`), Raw is not implemented and `tactile_states` may stay empty.
 
 Message type `omnihand_2025_node_msgs/TactileSensor`:
 - `header` (std_msgs/Header)
-- One `uint8[]` per region (1g, max 255g): `thumb`, `index`, `middle`, `ring`, `little`, `palm`, `dorsum`. Array length equals **downsampled** point count; empty if that region was not returned for the readback.
+- One `uint8[]` per region (1g, max 255g): `thumb`, `index`, `middle`, `ring`, `little`, `palm`, `dorsum`. Lengths as in the table above; empty if that region was not returned for the readback.
 
 **Stream control** (publish once; node reads periodically):
 

@@ -61,7 +61,7 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 
 不同产品型号对控制模式的支持有所不同：
 
-**O10 / H3L**：不支持通过 `joint_control_mode_cmd` topic 切换控制模式，默认位置控制。可通过 `joint_mix_control_cmd` 实现位置+力矩混合控制；位置+速度+力矩模式暂未开放。注意：混合控制中 `effort` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。
+**O10**：不支持 `joint_control_mode_cmd`。`joint_mix_control_cmd` 仅发 `position[]`+`effort[]` 为位置+电流混合；同时提供 `velocity[]`（长度足够）则为位置+速度+电流混合。**H3L**：仅支持位置+电流混合（无速度项）。混合控制中 `effort` 为电流 **mA**（0–1000），非标准 N·m。
 
 **O12**：支持通过 `SetControlMode` 接口设置位置模式、伺服模式、速度模式、力矩模式，也可通过 `joint_mix_control_cmd` 实现位置+力混合控制（支持 5 种模式）。混合控制中 `effort` 字段单位为 **0.01N**（与触觉传感器法向力关联）。注意 O12 的 ROS2 node 当前未暴露 `joint_control_mode_cmd` topic，控制模式切换需通过 C++/Python SDK 直接调用。
 
@@ -84,7 +84,7 @@ O10 和 O12 的触觉传感器数据结构不同，各自使用产品专属的�
 
 | 产品 | 消息类型 | 数据结构 |
 |------|---------|---------|
-| O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + 七个 `uint8[]` 区域字段：`thumb`、`index`、`middle`、`ring`、`little`、`palm`、`dorsum`（1g，最大 255g） |
+| O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + 七个 `uint8[]`（Raw 全分辨率，`GetAllTactileSensorDataRaw()`）；典型长度：拇指 16、四指各 18、手心 78、手背 102（见 [API_ROS2_O10.md](API_ROS2_O10.md)） |
 | O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + 五个 `TactileSensorData` 字段：`thumb`、`index`、`middle`、`ring`、`little`（`online_state`、`channel_value[6]`、力、角度、`capa_approach[4]`） |
 
 ### `std_msgs` 数组载荷

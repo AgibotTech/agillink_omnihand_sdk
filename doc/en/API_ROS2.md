@@ -64,7 +64,7 @@ The rationale behind this design:
 
 Different product models have different control mode support:
 
-**O10 / H3L**: Do not support switching control modes via `joint_control_mode_cmd` topic. They operate in position control mode by default. Position + torque mixed control can be achieved through `joint_mix_control_cmd`; position + velocity + torque mode is not yet available. Note: in mixed control, the `effort` field actually corresponds to motor current in **mA**, range **0–1000** (not the standard N·m).
+**O10**: No `joint_control_mode_cmd`. On `joint_mix_control_cmd`, `position[]`+`effort[]` only → position+current mix; add `velocity[]` (sufficient length) → position+velocity+current mix. **H3L**: position+current mix only. In mixed control, `effort` is motor current in **mA** (0–1000), not standard N·m.
 
 **O12**: Supports setting position mode, servo mode, velocity mode, and torque mode via `SetControlMode` interface. Also supports position + force mixed control via `joint_mix_control_cmd` (5 modes supported). In mixed control, the `effort` field is in **0.01 N** (correlated with tactile sensor normal force). Note that the O12 ROS2 node does not currently expose a `joint_control_mode_cmd` topic; control mode switching should be done through the C++/Python SDK directly.
 
@@ -87,7 +87,7 @@ O10 and O12 have different tactile sensor data structures, each using product-sp
 
 | Product | Message Type | Data Structure |
 |---------|-------------|---------------|
-| O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + seven `uint8[]` regions: `thumb`, `index`, `middle`, `ring`, `little`, `palm`, `dorsum` (1g, max 255g) |
+| O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + seven `uint8[]` (Raw full resolution via `GetAllTactileSensorDataRaw()`); typical lengths: thumb 16, four fingers 18 each, palm 78, dorsum 102 (see [API_ROS2_O10.md](API_ROS2_O10.md)) |
 | O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + five `TactileSensorData` fields: `thumb`, `index`, `middle`, `ring`, `little` (`online_state`, `channel_value[6]`, forces, angle, `capa_approach[4]`) |
 
 ### `std_msgs` array payloads
