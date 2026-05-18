@@ -233,6 +233,20 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    */
   virtual void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period) = 0;
 
+  // ============ Position Mode Fine-Tune ============
+  /**
+   * @brief Enables or disables position mode fine-tune for all joint motors.
+   * @param enable true to enable, false to disable
+   * @note Only effective when all motors are in position control mode
+   */
+  virtual void SetPositionFineTuneMode(bool enable) = 0;
+
+  /**
+   * @brief Gets the current position mode fine-tune state.
+   * @return true if fine-tune is enabled, false if disabled
+   */
+  virtual bool GetPositionFineTuneMode() const = 0;
+
   // ============ Joint Naming ============
   /**
    * @brief Returns the 12 active joint names of O12 in motor-index order.
