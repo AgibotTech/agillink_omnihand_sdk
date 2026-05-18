@@ -354,10 +354,6 @@ inline uint8_t MilliampToRegister(int16_t ma) {
   return static_cast<uint8_t>(val);
 }
 
-inline int16_t RegisterToMilliamp(uint8_t reg) {
-  return static_cast<int16_t>(static_cast<int>(reg) * 1000 / 255);
-}
-
 }  // namespace omnihand
 }  // namespace agilink
 

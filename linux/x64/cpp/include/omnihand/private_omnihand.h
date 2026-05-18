@@ -136,7 +136,7 @@ struct AGIBOT_EXPORT FirmwareVersionInfo {
 struct AGIBOT_EXPORT SetAllAxisPosResponse {
   std::vector<uint16_t> positions;   ///< Position per axis (O10: 10, O4: 4)
   std::vector<int16_t> velocities; ///< Velocity per axis (same length as positions when present)
-  std::vector<int16_t> currents;   ///< Current per axis in mA, converted from 1-byte register value via RegisterToMilliamp (same length when present)
+  std::vector<int8_t> currents;   ///< Current per axis, 1 byte in protocol zero-extended to uint16 (same length when present)
   std::vector<int8_t> error_codes;  ///< Error code per axis, 1 byte per axis (same length when present)
   bool empty() const { return positions.empty(); }
 

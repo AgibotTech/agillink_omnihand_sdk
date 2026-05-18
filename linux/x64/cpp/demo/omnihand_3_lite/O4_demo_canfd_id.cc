@@ -88,6 +88,33 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
     std::cout << "  No errors detected" << std::endl;
   }
 
+  // ============ Gesture Control Demo ============
+  std::cout << "\n=== Gesture Control ===" << std::endl;
+
+  std::cout << "Setting gesture: FIST..." << std::endl;
+  hand->SetHandGesture(agilink::omnihand::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  auto fist_positions = hand->GetAllJointMotorPosi();
+  std::cout << "FIST positions: [";
+  for (size_t i = 0; i < fist_positions.size(); ++i) {
+    std::cout << fist_positions[i];
+    if (i < fist_positions.size() - 1) std::cout << ", ";
+  }
+  std::cout << "]" << std::endl;
+
+  std::cout << "Setting gesture: OPEN..." << std::endl;
+  hand->SetHandGesture(agilink::omnihand::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_OPEN);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  auto open_positions = hand->GetAllJointMotorPosi();
+  std::cout << "OPEN positions: [";
+  for (size_t i = 0; i < open_positions.size(); ++i) {
+    std::cout << open_positions[i];
+    if (i < open_positions.size() - 1) std::cout << ", ";
+  }
+  std::cout << "]" << std::endl;
+
   // ============ Motor Position Control Demo (O4 uses motor positions 0~4096, no angle control)============
   std::cout << "\nSetting joint motor positions (0~4096)..." << std::endl;
   std::vector<int16_t> positions(

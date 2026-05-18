@@ -264,7 +264,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @brief Sets the hand to a predefined gesture.
    * @param gesture_num Gesture number (ignored for O12, only one FIST type supported)
    */
-  void SetHandGesture(int gesture_num = 1) override;
+  void SetHandGesture(o12::OmniHandPro2025Gesture gesture);
 
  protected:
   /**

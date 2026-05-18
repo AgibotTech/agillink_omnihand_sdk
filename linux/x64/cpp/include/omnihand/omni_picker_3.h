@@ -17,6 +17,15 @@ namespace agilink {
 namespace omnihand {
 
 /**
+ * @brief OmniPicker 3 predefined gestures for SetHandGesture.
+ */
+enum class OmniPicker3Gesture : int {
+  OMNIPICKER_3_GESTURE_ZERO = 0,
+  OMNIPICKER_3_GESTURE_HALF_OPEN,
+  OMNIPICKER_3_GESTURE_FULL_OPEN,
+};
+
+/**
  * @brief OmniPicker 3 interface class - 1 DOF gripper
  *
  * This class provides the public interface for OmniPicker 3 product.
@@ -177,8 +186,13 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHandBase {
 #endif
 
   /**
-   * @brief Sets the gripper to a predefined gesture.
-   * @param gesture_num Gesture number (default: 1)
+   * @brief Sets the gripper to a predefined gesture (typed API).
+   */
+  void SetHandGesture(OmniPicker3Gesture gesture);
+
+  /**
+   * @brief Sets the gripper to a predefined gesture by numeric ID.
+   * @param gesture_num Gesture number (default: 1 = HALF_OPEN)
    */
   void SetHandGesture(int gesture_num = 1) override;
 

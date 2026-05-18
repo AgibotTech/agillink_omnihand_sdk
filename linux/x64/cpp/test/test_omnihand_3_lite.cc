@@ -206,13 +206,12 @@ TEST_F(OmniHand3LiteTest, JointAngleControl) {
   EXPECT_EQ(all_angles.size(), OmniHand3Lite::kDegreesOfActiveFreedom);
 }
 
-// Test hand gesture (not supported for O4, should output warning)
+// Test hand gesture (sets predefined motor positions)
 TEST_F(OmniHand3LiteTest, SetHandGesture) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
-  
-  // Test setting hand gesture (should output warning)
-  hand_->SetHandGesture(1);
-  std::cout << "[SetHandGesture] Called (should output warning)" << std::endl;
+
+  hand_->SetHandGesture(OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
+  std::cout << "[SetHandGesture] FIST gesture set" << std::endl;
 }
 
 // Test velocity control (requires hardware)
