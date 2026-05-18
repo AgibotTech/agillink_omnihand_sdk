@@ -150,6 +150,14 @@ class AGIBOT_EXPORT OmniHand {
     }
   }
 
+  /**
+   * @brief Exits (aborts) an ongoing OTA upgrade process
+   * @param code Abnormal-exit code sent to device (default 0)
+   * @return true if the device acknowledged the exit, false on timeout or unsupported
+   * @note Default implementation returns false (not supported). Products that support OTA override this.
+   */
+  virtual bool ExitOtaUpgrade(uint32_t /* code */ = 0) { return false; }
+
  protected:
   /**
    * @brief Constructor - protected to prevent direct instantiation

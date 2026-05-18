@@ -37,7 +37,19 @@ namespace omnihand {
  * | AGILINK_OTA_TRANSMISSION_TIMEOUT | -6 | Data transmission timeout |
  * | AGILINK_OTA_CRC_CHECK_FAILED | -7 | CRC checksum verification failed |
  * | AGILINK_OTA_DEVICE_DISCONNECTED | -8 | Device disconnected during OTA |
- * | >0 | varies | Device-returned error codes |
+ * | AGILINK_OTA_DEVICE_UNKNOWN_ERROR | 1 | Device: unknown error |
+ * | AGILINK_OTA_DEVICE_DATA_READ_ERROR | 2 | Device: data read error |
+ * | AGILINK_OTA_DEVICE_WRITE_ERROR | 3 | Device: write error |
+ * | AGILINK_OTA_DEVICE_FIRMWARE_CORRUPTION | 4 | Device: firmware corruption (checksum mismatch) |
+ * | AGILINK_OTA_DEVICE_INSUFFICIENT_SPACE | 5 | Device: insufficient storage space |
+ * | AGILINK_OTA_DEVICE_VERSION_MISMATCH | 6 | Device: firmware version mismatch |
+ * | AGILINK_OTA_DEVICE_ROLLBACK_FAILED | 7 | Device: firmware rollback failed |
+ * | AGILINK_OTA_DEVICE_SIGNATURE_INVALID | 8 | Device: firmware signature verification failed |
+ * | AGILINK_OTA_DEVICE_PARTITION_ERROR | 9 | Device: flash partition table error |
+ * | AGILINK_OTA_DEVICE_ERASE_FAILED | 10 | Device: flash erase failed |
+ * | AGILINK_OTA_DEVICE_PROGRAM_FAILED | 11 | Device: flash programming failed |
+ * | AGILINK_OTA_DEVICE_VERIFY_FAILED | 12 | Device: flash data verification failed |
+ * | AGILINK_OTA_DEVICE_TIMEOUT | 13 | Device: internal operation timeout |
  */
 enum class AGIBOT_EXPORT OtaErrorCode : int {
   AGILINK_SUCCESS = 0,                    // Operation successful
@@ -48,9 +60,64 @@ enum class AGIBOT_EXPORT OtaErrorCode : int {
   AGILINK_OTA_RESTART_TIMEOUT = -5,       // Restart response timeout
   AGILINK_OTA_TRANSMISSION_TIMEOUT = -6,  // Data transmission timeout
   AGILINK_OTA_CRC_CHECK_FAILED = -7,      // CRC checksum verification failed
-  AGILINK_OTA_DEVICE_DISCONNECTED = -8    // Device disconnected during transmission
-  // Positive values (>0) are device-returned error codes
+  AGILINK_OTA_DEVICE_DISCONNECTED = -8,   // Device disconnected during transmission
+  // Device-returned error codes (positive values from OTA result response 0x05)
+  AGILINK_OTA_DEVICE_UNKNOWN_ERROR = 1,       // Device: unknown error
+  AGILINK_OTA_DEVICE_DATA_READ_ERROR = 2,     // Device: data read error
+  AGILINK_OTA_DEVICE_WRITE_ERROR = 3,         // Device: write error
+  AGILINK_OTA_DEVICE_FIRMWARE_CORRUPTION = 4,  // Device: firmware corruption (checksum mismatch)
+  AGILINK_OTA_DEVICE_INSUFFICIENT_SPACE = 5,   // Device: insufficient storage space
+  AGILINK_OTA_DEVICE_VERSION_MISMATCH = 6,     // Device: firmware version mismatch
+  AGILINK_OTA_DEVICE_ROLLBACK_FAILED = 7,      // Device: firmware rollback failed
+  AGILINK_OTA_DEVICE_SIGNATURE_INVALID = 8,    // Device: firmware signature verification failed
+  AGILINK_OTA_DEVICE_PARTITION_ERROR = 9,      // Device: flash partition table error
+  AGILINK_OTA_DEVICE_ERASE_FAILED = 10,        // Device: flash erase failed
+  AGILINK_OTA_DEVICE_PROGRAM_FAILED = 11,      // Device: flash programming failed
+  AGILINK_OTA_DEVICE_VERIFY_FAILED = 12,       // Device: flash data verification failed
+  AGILINK_OTA_DEVICE_TIMEOUT = 13              // Device: internal operation timeout
 };
+
+/**
+ * @brief Converts an OtaErrorCode to a human-readable string
+ * @param code Error code (can be SDK-defined or device-returned)
+ * @return Description string
+ */
+inline const char* OtaErrorCodeToString(OtaErrorCode code) {
+  switch (code) {
+    case OtaErrorCode::AGILINK_SUCCESS:                     return "Success";
+    case OtaErrorCode::AGILINK_OTA_NOT_SUPPORTED:           return "OTA not supported";
+    case OtaErrorCode::AGILINK_OTA_FILE_NOT_FOUND:          return "Firmware file not found";
+    case OtaErrorCode::AGILINK_OTA_FILE_EMPTY:              return "Firmware file is empty";
+    case OtaErrorCode::AGILINK_OTA_REQUEST_TIMEOUT:         return "Upgrade request timeout";
+    case OtaErrorCode::AGILINK_OTA_RESTART_TIMEOUT:         return "Restart response timeout";
+    case OtaErrorCode::AGILINK_OTA_TRANSMISSION_TIMEOUT:    return "Data transmission timeout";
+    case OtaErrorCode::AGILINK_OTA_CRC_CHECK_FAILED:        return "CRC checksum verification failed";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_DISCONNECTED:     return "Device disconnected during OTA";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_UNKNOWN_ERROR:    return "Device: unknown error";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_DATA_READ_ERROR:  return "Device: data read error";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_WRITE_ERROR:      return "Device: write error";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_FIRMWARE_CORRUPTION: return "Device: firmware corruption";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_INSUFFICIENT_SPACE:  return "Device: insufficient space";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_VERSION_MISMATCH: return "Device: version mismatch";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_ROLLBACK_FAILED:  return "Device: rollback failed";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_SIGNATURE_INVALID: return "Device: signature invalid";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_PARTITION_ERROR:   return "Device: partition table error";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_ERASE_FAILED:     return "Device: flash erase failed";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_PROGRAM_FAILED:   return "Device: flash programming failed";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_VERIFY_FAILED:    return "Device: flash verification failed";
+    case OtaErrorCode::AGILINK_OTA_DEVICE_TIMEOUT:          return "Device: internal timeout";
+    default:                                                 return "Unknown error code";
+  }
+}
+
+/**
+ * @brief Converts an integer error code to a human-readable string
+ * @param code Integer error code (cast from OtaErrorCode or raw device value)
+ * @return Description string
+ */
+inline const char* OtaErrorCodeToString(int code) {
+  return OtaErrorCodeToString(static_cast<OtaErrorCode>(code));
+}
 
 /** OTA packet size in bytes, consistent with the 2KB chunking in the implementation */
 constexpr int kOtaPacketSizeBytes = 2048;
