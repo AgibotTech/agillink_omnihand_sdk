@@ -283,6 +283,16 @@ class AGIBOT_EXPORT OmniHand {
     (void)gesture_num;  // Suppress unused parameter warning
   }
 
+  /**
+   * @brief Returns the motor position array corresponding to a gesture, without sending to device.
+   * @param gesture_num Gesture number (implementation-specific)
+   * @return Motor position vector (0-4095 range). Empty if gesture_num is invalid or unsupported.
+   */
+  virtual std::vector<int16_t> GetHandGesture(int gesture_num) {
+    (void)gesture_num;
+    return {};
+  }
+
   // ============ Joint Naming Interface ============
   /**
    * @brief Gets the ordered joint names for this hand product.

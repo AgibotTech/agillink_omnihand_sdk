@@ -280,6 +280,11 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
    */
   void SetHandGesture(int gesture_num = 1) override;
 
+  /**
+   * @brief Returns motor positions for a gesture without sending to device.
+   */
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
+
  protected:
   /**
    * @brief Initialize base class members and kinematics solver

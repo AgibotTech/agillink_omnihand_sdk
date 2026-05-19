@@ -196,6 +196,8 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand {
    */
   void SetHandGesture(int gesture_num = 1) override;
 
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
+
  protected:
   /**
    * @brief Initialize base class members

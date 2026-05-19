@@ -281,6 +281,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    */
   void SetHandGesture(o12::OmniHandPro2025Gesture gesture);
 
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
+
  protected:
   /**
    * @brief Initialize base class members and kinematics solver

@@ -207,6 +207,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
    */
   void SetHandGesture(OmniHand3LiteGesture gesture);
 
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
+
  protected:
   /**
    * @brief Initialize base class members and kinematics solver

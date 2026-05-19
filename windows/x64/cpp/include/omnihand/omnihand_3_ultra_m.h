@@ -227,6 +227,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    */
   void SetHandGesture(int gesture_num = 1) override;
 
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
+
   // ============ O20 Extended API ============
 
   // ---- IOmniHandCalibrator interface ----
