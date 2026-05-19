@@ -15,9 +15,10 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
+#include "omnihand/i_control_mode.h"
 #include "omnihand/i_omnihand_calibrator.h"
 #include "omnihand/kinematics/omnihand_3_ultra_m/omnihand_3_ultra_m_solver.h"
-#include "omnihand/omnihand_base.h"
+#include "omnihand/omnihand.h"
 #include "omnihand/proto.h"
 
 namespace agilink {
@@ -93,7 +94,7 @@ inline std::string H3UMErrorReportToString(const JointMotorErrorReport& report) 
  *   SetHandGesture, and interfaces for accessing passive joints by single joint
  *   name/index are still placeholder implementations.
  */
-class AGIBOT_EXPORT OmniHand3UltraM : public OmniHandBase, public IOmniHandCalibrator {
+class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, public IOmniHandCalibrator {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // DoA

@@ -16,7 +16,8 @@
 #include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/kinematics/omnihand_3_lite/omnihand_3_lite_solver.h"
-#include "omnihand/omnihand_base.h"
+#include "omnihand/omnihand.h"
+#include "omnihand/private_omnihand.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 
@@ -33,7 +34,7 @@ namespace omnihand {
  *       Use motor position control (SetJointMotorPosi, SetAllJointMotorPosi) instead.
  *       Gesture control is available via SetHandGesture() with OmniHand3LiteGesture enum.
  */
-class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
+class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // DoA

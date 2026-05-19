@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
-#include "omnihand/omnihand_base.h"
+#include "omnihand/omnihand.h"
 #include "omnihand/i_o10_tactile_sensor_1d.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/proto.h"
@@ -33,7 +33,7 @@ namespace omnihand {
  * UMI uses a different protocol (Pn1-Pn8) and supports active position query.
  * Note: UMI does not support position/velocity/torque control (read-only position information).
  */
-class AGIBOT_EXPORT OmniHandDexUMI : public OmniHandBase, public IO10TactileSensor1D {
+class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // DoA

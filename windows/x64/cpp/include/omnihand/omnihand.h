@@ -21,6 +21,10 @@
 namespace agilink {
 namespace omnihand {
 
+// Forward declarations
+struct MixCtrl;
+struct JointMotorErrorReport;
+
 #define DEFAULT_DEVICE_ID 0x01
 
 /**
@@ -50,18 +54,234 @@ class AGIBOT_EXPORT OmniHand {
 
   // ============ Basic Information Interface ============
   /**
-   * @brief Gets vendor information.
+   * @brief 0x01: Gets vendor information.
    * @return Vendor information structure containing product model, serial number, hardware version, software version, supply voltage, DOF, etc.
    */
   virtual VendorInfo GetVendorInfo() const = 0;
   
   /**
-   * @brief Gets device information.
+   * @brief 0x02: Gets device information.
    * @return Device information structure containing device ID and communication parameters
    * @note Serial port communication (RS485) does not support this interface. 
    *       RS485 implementation returns an empty DeviceInfo structure.
    */
   virtual DeviceInfo GetDeviceInfo() const = 0;
+
+  // ============ Current Threshold ============
+  /**
+   * @brief 0x03: Sets the current threshold of a single joint motor.
+   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @param current_threshold Current threshold value
+   * @note Serial port communication (RS485) does not support this interface.
+   */
+  virtual void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold) { (void)joint_motor_index; (void)current_threshold; }
+  
+  /**
+   * @brief 0x03: Gets the current threshold of a single joint motor.
+   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @return Current threshold value
+   * @note Serial port communication (RS485) does not support this interface.
+   */
+  virtual int16_t GetCurrentThreshold(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
+  
+  /**
+   * @brief 0x03: Sets current thresholds of all joint motors in batch.
+   * @param current_thresholds Current threshold vector. Length depends on product type:
+   *                           - OmniHand 2025 (O10): 10 values
+   *                           - OmniHand Pro 2025 (O12): 12 values
+   * @note Serial port communication (RS485) does not support this interface.
+   */
+  virtual void SetAllCurrentThreshold(const std::vector<int16_t>& current_thresholds) { (void)current_thresholds; }
+  
+  /**
+   * @brief 0x03: Gets current thresholds of all joint motors in batch.
+   * @return Current threshold vector. Length depends on product type:
+   *         - OmniHand 2025 (O10): 10 values
+   *         - OmniHand Pro 2025 (O12): 12 values
+   * @note Serial port communication (RS485) does not support this interface.
+   */
+  virtual std::vector<int16_t> GetAllCurrentThreshold() const { return {}; }
+
+  // ============ Joint Motor Position Control ============
+  /**
+   * @brief 0x13: Sets the position of a single joint motor.
+   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @param posi Motor position. Range:
+   *             - OmniHand 2025 (O10): 0-4096
+   *             - OmniHand Pro 2025 (O12): 0-2000
+   * @return Actual position from device response. -1 on failure or if protocol has no reply (e.g. USB no-reply).
+   */
+  virtual int16_t SetJointMotorPosi(unsigned char joint_motor_index, int16_t posi) { (void)joint_motor_index; (void)posi; return -1; }
+  
+  /**
+   * @brief 0x13: Gets the position of a single joint motor.
+   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @return Current position value. Range:
+   *         - OmniHand 2025 (O10): 0-4096
+   *         - OmniHand Pro 2025 (O12): 0-2000
+   */
+  virtual int16_t GetJointMotorPosi(unsigned char joint_motor_index) const = 0;
+  
+  /**
+   * @brief 0x13: Sets positions of all joint motors in batch and returns the actual positions.
+   * @param vec_posi Target position vector. Length and range depend on product type:
+   *                 - OmniHand 2025 (O10): 10 values, each in range 0-4096
+   *                 - OmniHand Pro 2025 (O12): 12 values, each in range 0-2000
+   * @return Actual position vector from device response. Empty vector on failure.
+   */
+  virtual std::vector<int16_t> SetAllJointMotorPosi(const std::vector<int16_t>& vec_posi) { (void)vec_posi; return {}; }
+  
+  /**
+   * @brief 0x13: Gets positions of all joint motors in batch.
+   * @return Current position vector. Length and range depend on product type:
+   *         - OmniHand 2025 (O10): 10 values, each in range 0-4096
+   *         - OmniHand Pro 2025 (O12): 12 values, each in range 0-2000
+   */
+  virtual std::vector<int16_t> GetAllJointMotorPosi() const = 0;
+
+  // ============ Joint Angle Control ============
+  // Note: SetActiveJointAngle and GetActiveJointAngle are not defined in base class.
+  // They are conditionally defined in implementation classes via #if !DISABLE_FUNC.
+  
+  /**
+   * @brief Sets joint angles of all active joints in batch.
+   * @param angles Joint angle vector (unit: radians). Length depends on product type:
+   *               - OmniHand 2025 (O10): 10 values
+   *               - OmniHand Pro 2025 (O12): 12 values
+   * @return Actual joint angles from device (e.g. from SetAllJointMotorPosi response converted to angles). Empty on failure.
+   */
+  virtual std::vector<double> SetAllActiveJointAngles(const std::vector<double>& angles) { (void)angles; return {}; }
+  
+  /**
+   * @brief Gets joint angles of all active joints in batch.
+   * @return Joint angle vector (unit: radians). Length depends on product type:
+   *         - OmniHand 2025 (O10): 10 values
+   *         - OmniHand Pro 2025 (O12): 12 values
+   */
+  virtual std::vector<double> GetAllActiveJointAngles() const { return {}; }
+  
+  /**
+   * @brief Gets joint angles of all joints (including active and passive joints).
+   * @return All joint angle vector (unit: radians)
+   */
+  virtual std::vector<double> GetAllJointAngles() const { return {}; }
+  
+  /**
+   * @brief Calculates all joint angles (including active and passive joints) from active joint angles.
+   * @param active_joint_angles Active joint angle vector (unit: radians). Length depends on product type:
+   *                         - OmniHand 2025 (O10): 10 values
+   *                         - OmniHand Pro 2025 (O12): 12 values
+   * @return All joint angle vector (unit: radians), including active and passive joints
+   * @note This function does not perform hardware communication, only kinematics calculation.
+   */
+  virtual std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles) const { (void)active_joint_angles; return {}; }
+
+  // ============ Velocity Control ============
+  /**
+   * @brief 0x12: Sets the velocity of a single joint motor.
+   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @param velo Target velocity value
+   * @note Serial port communication (RS485) does not support this interface.
+   */
+  virtual void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo) { (void)joint_motor_index; (void)velo; }
+  
+  /**
+   * @brief 0x12: Gets the velocity of a single joint motor.
+   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @return Current velocity value
+   * @note Serial port communication (RS485) does not support this interface.
+   */
+  virtual int16_t GetJointMotorVelo(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
+  
+  /**
+   * @brief 0x12: Sets velocities of all joint motors in batch.
+   * @param vec_velo Target velocity vector. Length depends on product type:
+   *                 - OmniHand 2025 (O10): 10 values
+   *                 - OmniHand Pro 2025 (O12): 12 values
+   */
+  virtual void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo) { (void)vec_velo; }
+  
+  /**
+   * @brief 0x12: Gets velocities of all joint motors in batch.
+   * @return Current velocity vector. Length depends on product type:
+   *         - OmniHand 2025 (O10): 10 values
+   *         - OmniHand Pro 2025 (O12): 12 values
+   */
+  virtual std::vector<int16_t> GetAllJointMotorVelo() const { return {}; }
+
+  // ============ Torque Control ============
+  // Note: SetJointMotorTorque, GetJointMotorTorque, SetAllJointMotorTorque, GetAllJointMotorTorque
+  // are not defined in base class. They are conditionally defined in implementation classes via #if !DISABLE_FUNC.
+
+  // ============ Control Mode ============
+  // Note: SetControlMode, GetControlMode, SetAllControlMode, GetAllControlMode
+  // are not defined in base class. They are conditionally defined via interface IControlMode.
+  
+  // ============ Mixed Control ============
+  /**
+   * @brief 0x14: Mixed control for joint motors.
+   * @param mix_ctrls Mixed control parameter vector
+   * @note Pure torque control (TORQUE) is not supported: Both O10 and O12 do not support pure torque mode, only mixed control modes
+   */
+  virtual void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls) { (void)mix_ctrls; }
+
+  // ============ Error Report ============
+  /**
+   * @brief 0x20: Gets error report of a single joint motor.
+   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @return Error report structure
+   */
+  virtual JointMotorErrorReport GetErrorReport(unsigned char joint_motor_index) const { (void)joint_motor_index; return {}; }
+  
+  /**
+   * @brief 0x20: Gets error reports of all joint motors.
+   * @return Error report vector. Length depends on product type:
+   *         - OmniHand 2025 (O10): 10 values
+   *         - OmniHand Pro 2025 (O12): 12 values
+   */
+  virtual std::vector<JointMotorErrorReport> GetAllErrorReport() const { return {}; }
+  
+  // ============ Temperature Report ============
+  /**
+   * @brief 0x21: Gets temperature report of a single joint motor.
+   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @return Current temperature value (unit: Celsius)
+   */
+  virtual int16_t GetTemperatureReport(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
+  
+  /**
+   * @brief 0x21: Gets temperature reports of all joint motors in batch.
+   * @return Temperature value vector (unit: Celsius). Length depends on product type:
+   *         - OmniHand 2025 (O10): 10 values
+   *         - OmniHand Pro 2025 (O12): 12 values
+   */
+  virtual std::vector<int16_t> GetAllTemperatureReport() const { return {}; }
+  
+  // ============ Current Report ============
+  /**
+   * @brief 0x22: Gets current report of a single joint motor.
+   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @return Current value
+   */
+  virtual int16_t GetCurrentReport(unsigned char joint_motor_index) const { (void)joint_motor_index; return 0; }
+  
+  /**
+   * @brief 0x22: Gets current reports of all joint motors in batch.
+   * @return Current value vector. Length depends on product type:
+   *         - OmniHand 2025 (O10): 10 values
+   *         - OmniHand Pro 2025 (O12): 12 values
+   */
+  virtual std::vector<int16_t> GetAllCurrentReport() const { return {}; }
+  
+  // ============ Gesture Control ============
+  /**
+   * @brief Sets the hand to a predefined gesture.
+   * @param gesture_num Gesture number (implementation-specific, see derived classes for details)
+   * @note Default implementation is provided in OmniHand2025 and OmniHandPro2025
+   */
+  virtual void SetHandGesture(int gesture_num = 1) {
+    (void)gesture_num;  // Suppress unused parameter warning
+  }
 
   // ============ Joint Naming Interface ============
   /**

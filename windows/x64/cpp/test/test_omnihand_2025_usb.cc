@@ -31,7 +31,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "omnihand/private_omnihand_2025.h"
+#include "omnihand/omnihand_2025.h"
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -55,13 +55,13 @@ class OmniHand2025UsbTest : public ::testing::Test {
  protected:
   void SetUp() override {
     try {
-      auto private_hand = agilink::omnihand::PrivateOmniHand2025::createHandByUsb(
+      auto hand = agilink::omnihand::OmniHand2025::createHandByUsb(
           agilink::omnihand::HandType::LEFT,
           1,              // device_id
           g_usb_port,
           g_baudrate
       );
-      hand_ = std::move(private_hand);  // Convert PrivateOmniHand2025 to OmniHand2025
+      hand_ = std::move(hand);
       
       if (hand_) {
         hand_->SetRequestInterval(g_request_interval);
@@ -89,7 +89,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
     }
   }
 
-  std::unique_ptr<agilink::omnihand::PrivateOmniHand2025> hand_;
+  std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
   bool device_available_ = false;
 };
 
