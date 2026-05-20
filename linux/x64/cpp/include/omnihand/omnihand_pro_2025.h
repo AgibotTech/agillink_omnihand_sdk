@@ -15,7 +15,8 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
-#include "omnihand/omnihand_base.h"
+#include "omnihand/omnihand.h"
+#include "omnihand/i_control_mode.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_pro_2025/omnihand_pro_2025_solver.h"
@@ -29,7 +30,7 @@ namespace omnihand {
  * This class provides the public interface for OmniHand Pro 2025 product.
  * It includes all methods supported by O12, including 3D tactile sensors and report period settings.
  */
-class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
+class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 12;   // DoA
@@ -279,6 +280,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @param gesture_num Gesture number (ignored for O12, only one FIST type supported)
    */
   void SetHandGesture(o12::OmniHandPro2025Gesture gesture);
+
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
  protected:
   /**

@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
-#include "omnihand/omnihand_base.h"
+#include "omnihand/omnihand.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 
@@ -31,7 +31,7 @@ enum class OmniPicker3Gesture : int {
  * This class provides the public interface for OmniPicker 3 product.
  * It supports 1 active degree of freedom for gripping operations.
  */
-class AGIBOT_EXPORT OmniPicker3 : public OmniHandBase {
+class AGIBOT_EXPORT OmniPicker3 : public OmniHand {
  public:
   static constexpr unsigned char kDegreesOfActiveFreedom = 1;
   static constexpr uint8_t kDefaultHandDeviceId = 1u;
@@ -195,6 +195,8 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHandBase {
    * @param gesture_num Gesture number (default: 1 = HALF_OPEN)
    */
   void SetHandGesture(int gesture_num = 1) override;
+
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
  protected:
   /**

@@ -15,7 +15,7 @@
  *   - std_msgs/Float32              : tactile stream rate (Hz); 0 = stop (O10/O12)
  *   - std_msgs/Int16MultiArray      : temperature, current, and current-threshold (°C / mA)
  *   - omnihand_2025_node_msgs/TactileSensor     : O10 tactile (header + thumb/index/.../dorsum uint8[])
- *   - omnihand_pro_2025_node_msgs/TactileSensor : O12 tactile (header + thumb/index/.../little TactileSensorData)
+ *   - omnihand_pro_2025_node_msgs/TactileSensor : O12 tactile (header + thumb/index/.../palm TactileSensorData)
  *
  * ======================================================================
  * Quick Start (after obtaining the OmniHand release package)
@@ -310,6 +310,7 @@ class JointCmdDemo : public rclcpp::Node {
     one("middle", msg->middle);
     one("ring", msg->ring);
     one("little", msg->little);
+    one("palm", msg->palm);
     oss << "]";
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }

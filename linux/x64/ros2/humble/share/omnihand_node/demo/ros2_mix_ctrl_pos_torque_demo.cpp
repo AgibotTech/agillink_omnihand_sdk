@@ -320,6 +320,7 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
     one("middle", msg->middle);
     one("ring", msg->ring);
     one("little", msg->little);
+    one("palm", msg->palm);
     oss << "]";
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
