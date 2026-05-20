@@ -6,7 +6,7 @@
 
 **主要特性：**
 - 12 个主动自由度
-- 3D 触觉传感器（仅手指，不支持手心/手背）
+- 3D 触觉传感器（支持手指 + 手心，不支持手背）
 - 电机位置范围：0-2000
 - 仅支持 CAN（ZLG USB CANFD）通信
 - 支持 SocketCAN（仅 Linux）
@@ -205,7 +205,7 @@ def get_tactile_sensor_3d_data(self, eFinger: Finger) -> TactileSensor3DData:
     """获取指定手指的 3D 触觉传感器数据（仅 O12）。
     
     Args:
-        eFinger: 手指枚举值（O12 仅支持手指，不支持手心/手背）。
+        eFinger: 手指/手心枚举值（O12 支持手指 + 手心，不支持手背）。
     
     Returns:
         TactileSensor3DData: 3D 触觉传感器数据结构，包含：
@@ -217,7 +217,7 @@ def get_tactile_sensor_3d_data(self, eFinger: Finger) -> TactileSensor3DData:
                            - capacitive_approach: 电容接近值（4 个通道）
     
     Note:
-        O12 仅支持手指（THUMB, INDEX, MIDDLE, RING, LITTLE），不支持手心或手背。
+        O12 支持手指 + 手心（THUMB, INDEX, MIDDLE, RING, LITTLE, PALM），不支持手背。
     """
 ```
 

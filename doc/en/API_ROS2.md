@@ -88,7 +88,7 @@ O10 and O12 have different tactile sensor data structures, each using product-sp
 | Product | Message Type | Data Structure |
 |---------|-------------|---------------|
 | O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + seven `uint8[]` (Raw full resolution via `GetAllTactileSensorDataRaw()`); typical lengths: thumb 16, four fingers 18 each, palm 78, dorsum 102 (see [API_ROS2_O10.md](API_ROS2_O10.md)) |
-| O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + five `TactileSensorData` fields: `thumb`, `index`, `middle`, `ring`, `little` (`online_state`, `channel_value[6]`, forces, angle, `capa_approach[4]`) |
+| O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + six `TactileSensorData` fields: `thumb`, `index`, `middle`, `ring`, `little`, `palm` (`online_state`, `channel_value[6]`, forces, angle, `capa_approach[4]`) |
 
 ### `std_msgs` array payloads
 

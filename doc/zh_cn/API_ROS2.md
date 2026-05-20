@@ -85,7 +85,7 @@ O10 和 O12 的触觉传感器数据结构不同，各自使用产品专属的�
 | 产品 | 消息类型 | 数据结构 |
 |------|---------|---------|
 | O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + 七个 `uint8[]`（Raw 全分辨率，`GetAllTactileSensorDataRaw()`）；典型长度：拇指 16、四指各 18、手心 78、手背 102（见 [API_ROS2_O10.md](API_ROS2_O10.md)） |
-| O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + 五个 `TactileSensorData` 字段：`thumb`、`index`、`middle`、`ring`、`little`（`online_state`、`channel_value[6]`、力、角度、`capa_approach[4]`） |
+| O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + 六个 `TactileSensorData` 字段：`thumb`、`index`、`middle`、`ring`、`little`、`palm`（`online_state`、`channel_value[6]`、力、角度、`capa_approach[4]`） |
 
 ### `std_msgs` 数组载荷
 

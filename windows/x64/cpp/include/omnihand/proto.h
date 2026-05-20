@@ -77,7 +77,7 @@ inline std::string ToString(ProductType product_type) {
 
 /**
  * @brief Finger enumeration (Unified for O10 and O12)
- * @note O12 does not support PALM and DORSUM sensors, using these will result in runtime error
+ * @note O12 does not support DORSUM sensors, using DORSUM will result in runtime error
  */
 enum class AGIBOT_EXPORT Finger : unsigned char {
   THUMB = 0x01,    // Thumb
@@ -85,7 +85,7 @@ enum class AGIBOT_EXPORT Finger : unsigned char {
   MIDDLE = 0x03,   // Middle finger
   RING = 0x04,     // Ring finger
   LITTLE = 0x05,   // Little finger
-  PALM = 0x06,     // Palm (O10 only, not supported by O12)
+  PALM = 0x06,     // Palm
   DORSUM = 0x07,   // Dorsum (O10 only, not supported by O12)
   UNKNOWN = 0xff   // Unknown finger
 };

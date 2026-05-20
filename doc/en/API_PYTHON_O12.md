@@ -6,7 +6,7 @@
 
 **Key Features:**
 - 12 active degrees of freedom
-- 3D tactile sensors (fingers only, not palm/dorsum)
+- 3D tactile sensors (fingers + palm, not dorsum)
 - Motor position range: 0-2000
 - Supports CAN (ZLG USB CANFD) communication only
 - Supports SocketCAN (Linux only)
@@ -43,7 +43,7 @@ class Finger(IntEnum):
     UNKNOWN = 255
 ```
 
-**Note**: O12 only supports fingers (THUMB, INDEX, MIDDLE, RING, LITTLE), not palm or dorsum.
+**Note**: O12 supports fingers + palm (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM), not dorsum.
 
 ### ControlMode
 
@@ -478,8 +478,8 @@ def get_all_joint_velocities(self) -> List[int]:
 ## Tactile Sensor Data
 
 OmniHand Pro 2025 (O12) uses **3D tactile sensors** with the following characteristics:
-- **Sensor locations**: Fingers only (THUMB, INDEX, MIDDLE, RING, LITTLE)
-- **Not supported**: Palm and dorsum sensors
+- **Sensor locations**: Fingers + palm (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM)
+- **Not supported**: Dorsum sensor
 - **Data structure**: TactileSensor3DData with normal force, tangent force, tangent force angle, etc.
 
 ```python
@@ -487,7 +487,7 @@ def get_tactile_sensor_3d_data(self, eFinger: Finger) -> TactileSensor3DData:
     """Gets 3D tactile sensor data for the specified finger (O12 only).
     
     Args:
-        eFinger: Finger enum value (O12 supports fingers only, not palm/dorsum).
+        eFinger: Finger/palm enum value (O12 supports fingers + palm, not dorsum).
     
     Returns:
         TactileSensor3DData: 3D tactile sensor data structure containing:
@@ -499,7 +499,7 @@ def get_tactile_sensor_3d_data(self, eFinger: Finger) -> TactileSensor3DData:
                            - capacitive_approach: Capacitive approach values (4 channels)
     
     Note:
-        O12 only supports fingers (THUMB, INDEX, MIDDLE, RING, LITTLE), not palm or dorsum.
+        O12 supports fingers + palm (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM), not dorsum.
     """
 ```
 

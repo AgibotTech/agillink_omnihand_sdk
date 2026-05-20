@@ -41,11 +41,11 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 
 ## 触觉传感器 (3D)
 
-O12 配备 3D 触觉传感器，5 个手指（THUMB, INDEX, MIDDLE, RING, LITTLE）。
+O12 配备 3D 触觉传感器，5 个手指 + 手心（THUMB, INDEX, MIDDLE, RING, LITTLE, PALM）。
 
 消息类型 `omnihand_pro_2025_node_msgs/TactileSensor`：
 - `header` (std_msgs/Header)
-- 每指一个 `TactileSensorData` 字段：`thumb`、`index`、`middle`、`ring`、`little`。每个子消息含：
+- 每指/手心一个 `TactileSensorData` 字段：`thumb`、`index`、`middle`、`ring`、`little`、`palm`。每个子消息含：
   - `online_state` (uint8): 1=在线, 0=离线
   - `channel_value[]` (uint32[]): 6 个通道 24 位值
   - `normal_force` (uint16): 法向力 (0.1N, 最大 3000)

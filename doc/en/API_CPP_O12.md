@@ -6,7 +6,7 @@
 
 **Key Features:**
 - 12 active degrees of freedom
-- 3D tactile sensors (fingers only, not palm/dorsum)
+- 3D tactile sensors (fingers + palm, not dorsum)
 - Motor position range: 0-2000
 - Supports CAN (ZLG USB CANFD) communication only
 - Supports SocketCAN (Linux only)
@@ -46,7 +46,7 @@ enum class Finger : unsigned char {
 };
 ```
 
-**Note**: O12 only supports fingers (THUMB, INDEX, MIDDLE, RING, LITTLE), not palm or dorsum.
+**Note**: O12 supports fingers + palm (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM), not dorsum.
 
 ### ControlMode
 
@@ -398,14 +398,14 @@ std::vector<int16_t> GetAllJointMotorVelo() const;
 ## Tactile Sensor Data
 
 OmniHand Pro 2025 (O12) uses **3D tactile sensors** with the following characteristics:
-- **Sensor locations**: Fingers only (THUMB, INDEX, MIDDLE, RING, LITTLE)
-- **Not supported**: Palm and dorsum sensors
+- **Sensor locations**: Fingers + palm (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM)
+- **Not supported**: Dorsum sensor
 - **Data structure**: TactileSensor3DData with normal force, tangent force, tangent force angle, etc.
 
 ```cpp
 /**
  * @brief Gets 3D tactile sensor data for the specified finger (O12 only).
- * @param eFinger Finger enum value (O12 supports fingers only, not palm/dorsum)
+ * @param eFinger Finger/palm enum value (O12 supports fingers + palm, not dorsum)
  * @return TactileSensor3DData structure containing:
  *         - online_state: Sensor online status (1=online, 0=offline)
  *         - channel_value[6]: Six native channel values
@@ -413,7 +413,7 @@ OmniHand Pro 2025 (O12) uses **3D tactile sensors** with the following character
  *         - tangent_force: Tangent force
  *         - tangent_force_angle: Tangent force angle (0-359 degrees, fingertip up = 0°, clockwise)
  *         - capa_approach[4]: Capacitive approach values
- * @note O12 only supports fingers (THUMB, INDEX, MIDDLE, RING, LITTLE), not palm or dorsum.
+ * @note O12 supports fingers + palm (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM), not dorsum.
  */
 TactileSensor3DData GetTactileSensor3DData(Finger eFinger) const;
 ```

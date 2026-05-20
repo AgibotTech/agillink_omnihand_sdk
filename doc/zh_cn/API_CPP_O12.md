@@ -6,7 +6,7 @@
 
 **主要特性：**
 - 12 个主动自由度
-- 3D 触觉传感器（仅手指，不支持手心/手背）
+- 3D 触觉传感器（支持手指 + 手心，不支持手背）
 - 电机位置范围：0-2000
 - 仅支持 CAN（ZLG USB CANFD）通信
 - 支持 SocketCAN（仅 Linux）
@@ -50,7 +50,7 @@ enum class Finger : unsigned char {
 }  // namespace agilink
 ```
 
-**注意**：O12 仅支持手指传感器（THUMB, INDEX, MIDDLE, RING, LITTLE），不支持手心（PALM）和手背（DORSUM）传感器。
+**注意**：O12 支持手指 + 手心传感器（THUMB, INDEX, MIDDLE, RING, LITTLE, PALM），不支持手背（DORSUM）传感器。
 
 ### ControlMode
 
@@ -244,7 +244,7 @@ std::vector<int16_t> GetAllJointMotorPosi() const;
 ```cpp
 /**
  * @brief 获取指定手指的 3D 触觉传感器数据（仅 O12）。
- * @param eFinger 手指枚举值（O12 仅支持手指，不支持手心/手背）
+ * @param eFinger 手指/手心枚举值（O12 支持手指 + 手心，不支持手背）
  * @return TactileSensor3DData 结构，包含：
  *         - online_state: 传感器在线状态
  *         - channel_value[6]: 六个原生通道值

@@ -41,11 +41,11 @@ The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No read
 
 ## Tactile Sensor (3D)
 
-O12 is equipped with 3D tactile sensors on 5 fingers (THUMB, INDEX, MIDDLE, RING, LITTLE).
+O12 is equipped with 3D tactile sensors on 5 fingers + palm (THUMB, INDEX, MIDDLE, RING, LITTLE, PALM).
 
 Message type `omnihand_pro_2025_node_msgs/TactileSensor`:
 - `header` (std_msgs/Header)
-- One `TactileSensorData` per finger: `thumb`, `index`, `middle`, `ring`, `little`. Each contains:
+- One `TactileSensorData` per finger/palm: `thumb`, `index`, `middle`, `ring`, `little`, `palm`. Each contains:
   - `online_state` (uint8): 1=online, 0=offline
   - `channel_value[]` (uint32[]): 6 channels, 24-bit values
   - `normal_force` (uint16): Normal force (0.1N, max 3000)
