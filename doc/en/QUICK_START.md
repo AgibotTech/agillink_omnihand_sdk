@@ -68,7 +68,7 @@ Connect the OmniHand to your computer via RS485 serial cable.
 ### Linux
 
 ```bash
-cd release/linux/x64
+cd linux/x64
 ./install.sh
 
 # Configure USB permissions (first time only, required for both CANFD adapters and RS485 serial ports)
@@ -80,7 +80,7 @@ sudo ./setup_udev.sh
 
 Run as Administrator:
 ```cmd
-cd release\windows\x64
+cd windows\x64
 install.bat
 ```
 
@@ -207,34 +207,22 @@ ros2 launch omnihand_node omnihand_2025_node.launch.py
 ros2 run omnihand_node omnihand_2025_node
 ```
 
-**Control via ROS2 Services (Recommended):**
-
-```bash
-# Set joint angles (10 values in radians)
-ros2 service call /omnihand/omnihand_2025/left/set_joint_angles \
-  omnihand_2025_node_msgs/srv/SetJointAngles \
-  "{target_angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], timeout: 5.0}"
-
-# Get joint angles
-ros2 service call /omnihand/omnihand_2025/left/get_joint_angles \
-  omnihand_2025_node_msgs/srv/GetJointAngles \
-  "{ }"
-```
-
 **Control via ROS2 Topics:**
 
 ```bash
-# List available topics
-ros2 topic list | grep omnihand
+# Set joint positions (10 values, using sensor_msgs/JointState)
+ros2 topic pub /o10/left/joint_cmd sensor_msgs/msg/JointState \
+  "{position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
 
-# Set joint angles (10 values in radians)
-ros2 topic pub /omnihand/omnihand_2025/left/motor_angle_cmd \
-  omnihand_2025_node_msgs/msg/MotorAngle \
-  "{angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
+# Read joint states
+ros2 topic echo /o10/left/joint_states
 
-# Read joint angles
-ros2 topic echo /omnihand/omnihand_2025/left/motor_angle
+# Request current data (trigger-based readback)
+ros2 topic pub /o10/left/joint_current_cmd std_msgs/msg/Empty "{}"
+ros2 topic echo /o10/left/joint_current_states
 ```
+
+> See [ROS2 API Documentation](API_ROS2.md) for the full topic list and product-specific differences.
 
 ## Step 5: Explore Demos
 

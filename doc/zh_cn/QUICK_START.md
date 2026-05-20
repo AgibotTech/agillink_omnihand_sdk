@@ -206,34 +206,22 @@ ros2 launch omnihand_node omnihand_2025_node.launch.py
 ros2 run omnihand_node omnihand_2025_node
 ```
 
-**通过 ROS2 Service 控制（推荐）：**
+**通过 ROS2 Topic 控制：**
 
 ```bash
-# 设置关节角度（10 个值，单位弧度）
-ros2 service call /omnihand/omnihand_2025/left/set_joint_angles \
-  omnihand_2025_node_msgs/srv/SetJointAngles \
-  "{target_angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], timeout: 5.0}"
+# 设置关节位置（10 个值，使用 sensor_msgs/JointState）
+ros2 topic pub /o10/left/joint_cmd sensor_msgs/msg/JointState \
+  "{position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
 
-# 获取关节角度
-ros2 service call /omnihand/omnihand_2025/left/get_joint_angles \
-  omnihand_2025_node_msgs/srv/GetJointAngles \
-  "{ }"
+# 读取关节状态
+ros2 topic echo /o10/left/joint_states
+
+# 请求电流数据（触发式回读）
+ros2 topic pub /o10/left/joint_current_cmd std_msgs/msg/Empty "{}"
+ros2 topic echo /o10/left/joint_current_states
 ```
 
-**通过 ROS2 话题控制：**
-
-```bash
-# 列出可用话题
-ros2 topic list | grep omnihand
-
-# 设置关节角度（10 个值，单位弧度）
-ros2 topic pub /omnihand/omnihand_2025/left/motor_angle_cmd \
-  omnihand_2025_node_msgs/msg/MotorAngle \
-  "{angles: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
-
-# 读取关节角度
-ros2 topic echo /omnihand/omnihand_2025/left/motor_angle
-```
+> 详细 Topic 列表和各产品差异请参考 [ROS2 API 文档](API_ROS2.md)。
 
 ## 步骤 5：探索示例
 
