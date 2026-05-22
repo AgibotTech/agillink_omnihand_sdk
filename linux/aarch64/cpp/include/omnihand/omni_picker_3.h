@@ -9,7 +9,8 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
-#include "omnihand/omnihand_base.h"
+#include "omnihand/omnihand.h"
+#include "omnihand/i_o10_tactile_sensor_1d.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 
@@ -17,12 +18,21 @@ namespace agilink {
 namespace omnihand {
 
 /**
+ * @brief OmniPicker 3 predefined gestures for SetHandGesture.
+ */
+enum class OmniPicker3Gesture : int {
+  OMNIPICKER_3_GESTURE_ZERO = 0,
+  OMNIPICKER_3_GESTURE_HALF_OPEN,
+  OMNIPICKER_3_GESTURE_FULL_OPEN,
+};
+
+/**
  * @brief OmniPicker 3 interface class - 1 DOF gripper
  *
  * This class provides the public interface for OmniPicker 3 product.
  * It supports 1 active degree of freedom for gripping operations.
  */
-class AGIBOT_EXPORT OmniPicker3 : public OmniHandBase {
+class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public IO10TactileSensor1D {
  public:
   static constexpr unsigned char kDegreesOfActiveFreedom = 1;
   static constexpr uint8_t kDefaultHandDeviceId = 1u;
@@ -177,10 +187,17 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHandBase {
 #endif
 
   /**
-   * @brief Sets the gripper to a predefined gesture.
-   * @param gesture_num Gesture number (default: 1)
+   * @brief Sets the gripper to a predefined gesture (typed API).
+   */
+  void SetHandGesture(OmniPicker3Gesture gesture);
+
+  /**
+   * @brief Sets the gripper to a predefined gesture by numeric ID.
+   * @param gesture_num Gesture number (default: 1 = HALF_OPEN)
    */
   void SetHandGesture(int gesture_num = 1) override;
+
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
  protected:
   /**

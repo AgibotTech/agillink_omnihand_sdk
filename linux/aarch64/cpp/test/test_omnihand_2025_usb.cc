@@ -31,7 +31,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "omnihand/private_omnihand_2025.h"
+#include "omnihand/omnihand_2025.h"
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -55,13 +55,13 @@ class OmniHand2025UsbTest : public ::testing::Test {
  protected:
   void SetUp() override {
     try {
-      auto private_hand = agilink::omnihand::PrivateOmniHand2025::createHandByUsb(
+      auto hand = agilink::omnihand::OmniHand2025::createHandByUsb(
           agilink::omnihand::HandType::LEFT,
           1,              // device_id
           g_usb_port,
           g_baudrate
       );
-      hand_ = std::move(private_hand);  // Convert PrivateOmniHand2025 to OmniHand2025
+      hand_ = std::move(hand);
       
       if (hand_) {
         hand_->SetRequestInterval(g_request_interval);
@@ -89,7 +89,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
     }
   }
 
-  std::unique_ptr<agilink::omnihand::PrivateOmniHand2025> hand_;
+  std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
   bool device_available_ = false;
 };
 
@@ -743,7 +743,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdPosSpeedCur) {
   std::cout << "[StreamCmd] Testing all axis pos/speed/cur commands(0x32):" << std::endl;
   std::vector<uint16_t> ps_positions(10, 2048);
   std::vector<int16_t> ps_speeds(10, 0);
-  std::vector<uint8_t> ps_torques(10, 0);
+  std::vector<uint16_t> ps_torques(10, 0);
   const agilink::omnihand::SetAllAxisPosResponse pos_speed_torque_resp = hand_->SetPosSpeedTorqueData(ps_positions, ps_speeds, ps_torques);
   if (pos_speed_torque_resp.positions.empty()) GTEST_SKIP() << "SetPosSpeedTorqueData failed";
   EXPECT_EQ(pos_speed_torque_resp.positions.size(), 10u);

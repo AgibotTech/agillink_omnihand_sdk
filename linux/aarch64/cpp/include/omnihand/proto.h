@@ -77,7 +77,7 @@ inline std::string ToString(ProductType product_type) {
 
 /**
  * @brief Finger enumeration (Unified for O10 and O12)
- * @note O12 does not support PALM and DORSUM sensors, using these will result in runtime error
+ * @note O12 does not support DORSUM sensors, using DORSUM will result in runtime error
  */
 enum class AGIBOT_EXPORT Finger : unsigned char {
   THUMB = 0x01,    // Thumb
@@ -85,7 +85,7 @@ enum class AGIBOT_EXPORT Finger : unsigned char {
   MIDDLE = 0x03,   // Middle finger
   RING = 0x04,     // Ring finger
   LITTLE = 0x05,   // Little finger
-  PALM = 0x06,     // Palm (O10 only, not supported by O12)
+  PALM = 0x06,     // Palm
   DORSUM = 0x07,   // Dorsum (O10 only, not supported by O12)
   UNKNOWN = 0xff   // Unknown finger
 };
@@ -343,20 +343,6 @@ struct AGIBOT_EXPORT MixCtrl {
 };
 
 #pragma pack(pop)
-
-/*
-* 
-*/
-inline uint8_t MilliampToRegister(int16_t ma) {
-  int val = static_cast<int>(ma) * 255 / 2000;
-  if (val < 0) val = 0;
-  if (val > 255) val = 255;
-  return static_cast<uint8_t>(val);
-}
-
-inline int16_t RegisterToMilliamp(uint8_t reg) {
-  return static_cast<int16_t>(static_cast<int>(reg) * 1000 / 255);
-}
 
 }  // namespace omnihand
 }  // namespace agilink

@@ -31,7 +31,7 @@
  *   - sensor_msgs/JointState        : mix control (position[] + effort[])
  *       position[] = raw motor position (0–4095)
  *       effort[]   = motor current in mA (range 0–1000, non-standard, not N·m)
- *   - std_msgs/Int16MultiArray : current / temperature readback (mA / °C)
+ *   - std_msgs/Int16MultiArray : current / temperature / current-threshold (mA / °C)
  *   - std_msgs/Empty                : temperature / current query triggers
  *
  * ======================================================================
@@ -62,17 +62,22 @@
  *
  * 6. Run the demo:
  *      ros2 run omnihand_ros2_demo ros2_mix_ctrl_pos_torque_demo left o10
+ *      ros2 run omnihand_ros2_demo ros2_mix_ctrl_pos_torque_demo left o10 500   # optional threshold (mA)
+ *
+ * Arguments: [left|right] [o10|o12|h3l|h3u_m] [current_threshold_mA]
  *
  * ======================================================================
- * Topic list (<product> = o10/o12/h3u_m, <side> = left/right)
+ * Topic list (<product> = o10/o12/h3l/h3u_m, <side> = left/right)
  * ======================================================================
  *   pub: /<product>/<side>/joint_mix_control_cmd  (sensor_msgs/JointState, position+effort)
  *   pub: /<product>/<side>/joint_temperature_cmd  (std_msgs/Empty, trigger)
  *   pub: /<product>/<side>/joint_current_cmd      (std_msgs/Empty, trigger)
- *   pub: /<product>/<side>/tactile_cmd            (std_msgs/Empty, trigger)
+ *   pub: /<product>/<side>/tactile_cmd            (std_msgs/Float32, Hz, O10/O12)
  *   sub: /<product>/<side>/joint_states           (sensor_msgs/JointState)
  *   sub: /<product>/<side>/joint_temperature_states (std_msgs/Int16MultiArray)
  *   sub: /<product>/<side>/joint_current_states     (std_msgs/Int16MultiArray)
+ *   pub: /<product>/<side>/joint_current_threshold_cmd  (std_msgs/Int16MultiArray, write)
+ *   sub: /<product>/<side>/joint_current_threshold_states (std_msgs/Int16MultiArray, readback)
  *   sub: /<product>/<side>/tactile_states           (omnihand_2025_node_msgs/TactileSensor or omnihand_pro_2025_node_msgs/TactileSensor)
  *
  * Trigger-based Readback:
@@ -81,6 +86,8 @@
  *   you send the corresponding *_cmd message.
  *   Example: publish Empty to joint_temperature_cmd → receive one joint_temperature_states.
  *   Exception: joint_cmd / joint_mix_control_cmd automatically trigger joint_states readback.
+ *   Current threshold: publish Int16MultiArray to joint_current_threshold_cmd once;
+ *   the node sets thresholds and publishes readback on joint_current_threshold_states.
  *   Rationale: avoid consuming CAN bus bandwidth, ensure real-time control responsiveness.
  *
  * ======================================================================
@@ -116,13 +123,17 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/empty.hpp"
+#include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/int16_multi_array.hpp"
 #include "omnihand_2025_node_msgs/msg/tactile_sensor.hpp"
 #include "omnihand_pro_2025_node_msgs/msg/tactile_sensor.hpp"
+#include "ros_multi_array_demo.hpp"
 
 using namespace std::chrono_literals;
+using agilink::omnihand::ros2::PackInt16MultiArray1D;
 using sensor_msgs::msg::JointState;
 using std_msgs::msg::Empty;
+using std_msgs::msg::Float32;
 using std_msgs::msg::Int16MultiArray;
 using O10Tactile = omnihand_2025_node_msgs::msg::TactileSensor;
 using O12Tactile = omnihand_pro_2025_node_msgs::msg::TactileSensor;
@@ -130,11 +141,12 @@ using O12Tactile = omnihand_pro_2025_node_msgs::msg::TactileSensor;
 class MixCtrlPosTorqueDemo : public rclcpp::Node {
  public:
   MixCtrlPosTorqueDemo(const std::string& product, const std::string& side,
-                       int num_joints)
+                       int num_joints, int16_t current_threshold_ma)
       : Node(product + "_" + side + "_mix_ctrl_pos_torque_demo"),
         product_(product),
         side_(side),
         num_joints_(num_joints),
+        current_threshold_ma_(current_threshold_ma),
         cycle_(0) {
     std::string prefix = "/" + product + "/" + side;
 
@@ -156,16 +168,27 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
         prefix + "/joint_current_states", 10,
         std::bind(&MixCtrlPosTorqueDemo::OnCurrent, this, std::placeholders::_1));
 
-    tactile_cmd_pub_ = this->create_publisher<Empty>(
-        prefix + "/tactile_cmd", 10);
-    if (product == "o10") {
-      o10_tactile_sub_ = this->create_subscription<O10Tactile>(
-          prefix + "/tactile_states", 10,
-          std::bind(&MixCtrlPosTorqueDemo::OnO10Tactile, this, std::placeholders::_1));
-    } else if (product == "o12") {
-      o12_tactile_sub_ = this->create_subscription<O12Tactile>(
-          prefix + "/tactile_states", 10,
-          std::bind(&MixCtrlPosTorqueDemo::OnO12Tactile, this, std::placeholders::_1));
+    current_threshold_cmd_pub_ = this->create_publisher<Int16MultiArray>(
+        prefix + "/joint_current_threshold_cmd", 10);
+    current_threshold_states_sub_ = this->create_subscription<Int16MultiArray>(
+        prefix + "/joint_current_threshold_states", 10,
+        std::bind(&MixCtrlPosTorqueDemo::OnCurrentThreshold, this, std::placeholders::_1));
+
+    if (product == "o10" || product == "o12") {
+      tactile_cmd_pub_ = this->create_publisher<Float32>(
+          prefix + "/tactile_cmd", 10);
+      if (product == "o10") {
+        o10_tactile_sub_ = this->create_subscription<O10Tactile>(
+            prefix + "/tactile_states", 10,
+            std::bind(&MixCtrlPosTorqueDemo::OnO10Tactile, this, std::placeholders::_1));
+      } else {
+        o12_tactile_sub_ = this->create_subscription<O12Tactile>(
+            prefix + "/tactile_states", 10,
+            std::bind(&MixCtrlPosTorqueDemo::OnO12Tactile, this, std::placeholders::_1));
+      }
+      Float32 tactile_rate;
+      tactile_rate.data = 5.0f;
+      tactile_cmd_pub_->publish(tactile_rate);
     }
 
     timer_ = this->create_wall_timer(1500ms,
@@ -180,6 +203,9 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
                 prefix.c_str());
     RCLCPP_INFO(this->get_logger(), "  pub -> %s/joint_current_cmd (std_msgs/Empty, trigger)",
                 prefix.c_str());
+    RCLCPP_INFO(this->get_logger(),
+                "  pub -> %s/joint_current_threshold_cmd (std_msgs/Int16MultiArray, %d mA x %d joints)",
+                prefix.c_str(), current_threshold_ma_, num_joints_);
   }
 
  private:
@@ -201,12 +227,15 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
                 mix_cmd.effort[0]);
     mix_ctrl_pub_->publish(mix_cmd);
 
+    // Write current thresholds once on the first cycle (node readbacks on *_states).
+    if (cycle_ == 0) {
+      std::vector<int16_t> thresholds(num_joints_, current_threshold_ma_);
+      current_threshold_cmd_pub_->publish(PackInt16MultiArray1D(thresholds));
+    }
+
     temp_cmd_pub_->publish(Empty());
 
     current_cmd_pub_->publish(Empty());
-
-    Empty tactile_trigger;
-    tactile_cmd_pub_->publish(tactile_trigger);
 
     cycle_++;
   }
@@ -244,28 +273,54 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
 
-  void OnO10Tactile(const O10Tactile::SharedPtr msg) {
+  void OnCurrentThreshold(const Int16MultiArray::SharedPtr msg) {
     std::ostringstream oss;
-    oss << "tactile (O10, 1D): [";
-    for (size_t f = 0; f < msg->tactile_datas.size(); ++f) {
-      if (f > 0) oss << " | ";
-      for (size_t i = 0; i < msg->tactile_datas[f].tactiles.size(); ++i) {
-        if (i > 0) oss << ",";
-        oss << static_cast<int>(msg->tactile_datas[f].tactiles[i]);
-      }
+    oss << "current_threshold (mA): [";
+    for (size_t i = 0; i < msg->data.size(); ++i) {
+      if (i > 0) oss << ", ";
+      oss << msg->data[i];
     }
     oss << "]";
+    RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
+  }
+
+  void OnO10Tactile(const O10Tactile::SharedPtr msg) {
+    std::ostringstream oss;
+    oss << "tactile (O10, 1D):";
+    bool first = true;
+    auto append = [&oss, &first](const char* label, const std::vector<uint8_t>& v) {
+      if (v.empty()) return;
+      if (!first) oss << " | ";
+      first = false;
+      oss << " " << label << "[";
+      for (size_t i = 0; i < v.size(); ++i) {
+        if (i > 0) oss << ",";
+        oss << static_cast<int>(v[i]);
+      }
+      oss << "]";
+    };
+    append("thumb", msg->thumb);
+    append("index", msg->index);
+    append("middle", msg->middle);
+    append("ring", msg->ring);
+    append("little", msg->little);
+    append("palm", msg->palm);
+    append("dorsum", msg->dorsum);
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
 
   void OnO12Tactile(const O12Tactile::SharedPtr msg) {
     std::ostringstream oss;
     oss << "tactile (O12, 3D): [";
-    for (size_t f = 0; f < msg->tactile_datas.size(); ++f) {
-      if (f > 0) oss << " | ";
-      oss << "Fn=" << msg->tactile_datas[f].normal_force * 0.1 << "N"
-          << ",Ft=" << msg->tactile_datas[f].tangent_force;
-    }
+    auto one = [&](const char* lab, const omnihand_pro_2025_node_msgs::msg::TactileSensorData& td) {
+      oss << lab << ":Fn=" << td.normal_force * 0.1 << "N,Ft=" << td.tangent_force << " | ";
+    };
+    one("thumb", msg->thumb);
+    one("index", msg->index);
+    one("middle", msg->middle);
+    one("ring", msg->ring);
+    one("little", msg->little);
+    one("palm", msg->palm);
     oss << "]";
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
@@ -276,7 +331,9 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
   rclcpp::Subscription<Int16MultiArray>::SharedPtr temp_states_sub_;
   rclcpp::Publisher<Empty>::SharedPtr current_cmd_pub_;
   rclcpp::Subscription<Int16MultiArray>::SharedPtr current_states_sub_;
-  rclcpp::Publisher<Empty>::SharedPtr tactile_cmd_pub_;
+  rclcpp::Publisher<Int16MultiArray>::SharedPtr current_threshold_cmd_pub_;
+  rclcpp::Subscription<Int16MultiArray>::SharedPtr current_threshold_states_sub_;
+  rclcpp::Publisher<Float32>::SharedPtr tactile_cmd_pub_;
   rclcpp::Subscription<O10Tactile>::SharedPtr o10_tactile_sub_;
   rclcpp::Subscription<O12Tactile>::SharedPtr o12_tactile_sub_;
 
@@ -284,6 +341,7 @@ class MixCtrlPosTorqueDemo : public rclcpp::Node {
   std::string product_;
   std::string side_;
   int num_joints_;
+  int16_t current_threshold_ma_;
   int cycle_;
 };
 
@@ -296,13 +354,18 @@ int main(int argc, char* argv[]) {
   if (argc > 1) side = argv[1];
   if (argc > 2) product = argv[2];
 
+  int16_t current_threshold_ma = 500;
+  if (argc > 3) current_threshold_ma = static_cast<int16_t>(std::stoi(argv[3]));
+
   int num_joints = 10;
   if (product == "o12")
     num_joints = 12;
+  else if (product == "h3l")
+    num_joints = 4;
   else if (product == "h3u_m")
     num_joints = 20;
 
-  auto node = std::make_shared<MixCtrlPosTorqueDemo>(product, side, num_joints);
+  auto node = std::make_shared<MixCtrlPosTorqueDemo>(product, side, num_joints, current_threshold_ma);
   rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;

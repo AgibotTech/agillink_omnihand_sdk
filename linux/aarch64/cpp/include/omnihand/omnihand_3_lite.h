@@ -15,7 +15,9 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
-#include "omnihand/omnihand_base.h"
+#include "omnihand/kinematics/omnihand_3_lite/omnihand_3_lite_solver.h"
+#include "omnihand/omnihand.h"
+#include "omnihand/private_omnihand.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 
@@ -28,10 +30,11 @@ namespace omnihand {
  * This class provides the public interface for OmniHand 3 Lite S product.
  * 
  * @note O4 does not have tactile sensors. Tactile sensor methods return empty data.
- * @note Currently does not support angle-based control (SetAllActiveJointAngles) as kinematics solver is not available.
+ * @note Currently does not support angle-based control (SetAllActiveJointAngles) as full kinematics solver is not available.
  *       Use motor position control (SetJointMotorPosi, SetAllJointMotorPosi) instead.
+ *       Gesture control is available via SetHandGesture() with OmniHand3LiteGesture enum.
  */
-class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
+class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // DoA
@@ -200,25 +203,25 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHandBase {
   }
   // ============ Gesture Control ============
   /**
-   * @brief Sets the hand to a predefined gesture.
-   * @param gesture_num Gesture number (not supported without kinematics solver)
-   * @note This function is not supported for O4 as kinematics solver is not available.
-   *       Use SetAllJointMotorPosi() to set motor positions directly instead.
+   * @brief Sets the hand to a predefined gesture (typed API).
    */
-  void SetHandGesture(int gesture_num = 1) override;
+  void SetHandGesture(OmniHand3LiteGesture gesture);
+
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
  protected:
   /**
-   * @brief Initialize base class members
+   * @brief Initialize base class members and kinematics solver
    * @param device_id Device ID
    * @param hand_type Hand type (left/right)
-   * @note This method initializes the base class without kinematics solver
    * @note Product type is fixed to ProductType::OMNIHAND_3_LITE for this class
    */
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_3_LITE, device_id, hand_type);
-    // Note: No kinematics solver for O4
+    solver_ = std::make_unique<OmniHand3LiteSolver>(is_left_hand_);
   }
+
+  std::unique_ptr<OmniHand3LiteSolver> solver_;
 };
 
 }  // namespace omnihand

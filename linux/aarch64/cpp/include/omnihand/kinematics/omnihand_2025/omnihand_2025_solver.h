@@ -62,11 +62,10 @@ enum OmnihandJoint {
 
 /**
  * @brief O10 predefined hand gestures for SetHandGesture.
- * @note Integer values 0–16 match the historic gesture index (PAPER … CLASPING).
- *       OMNIHAND_2025_GESTURE_RESET is 17 so existing numeric codes stay stable.
  */
 enum class OmniHand2025Gesture : int {
-  OMNIHAND_2025_GESTURE_PAPER = 0,
+  OMNIHAND_2025_GESTURE_ALL_ZERO = 0,
+  OMNIHAND_2025_GESTURE_PAPER,
   OMNIHAND_2025_GESTURE_FIST1,
   OMNIHAND_2025_GESTURE_FIST2,
   OMNIHAND_2025_GESTURE_OK,
@@ -83,7 +82,6 @@ enum class OmniHand2025Gesture : int {
   OMNIHAND_2025_GESTURE_HAND_HEART2,
   OMNIHAND_2025_GESTURE_HAND_HEART3,
   OMNIHAND_2025_GESTURE_CLASPING,
-  OMNIHAND_2025_GESTURE_RESET,
 };
 
 /**
