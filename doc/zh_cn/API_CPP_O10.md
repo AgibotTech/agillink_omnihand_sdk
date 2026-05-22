@@ -284,41 +284,6 @@ DeviceInfo GetDeviceInfo() const;
  */
 void SetDeviceId(unsigned char hand_device_id);
 
-/**
- * @brief 从广播地址（hand_device_id = 0x00）获取设备信息
- * @param canfd_device_id USB CANFD 适配器设备索引
- * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器（USBCANFD-200U）： can0=0, can1=1；单通道适配器（USBCANFD-100U）： 始终为 0
- * @return DeviceInfo 结构，如果请求失败则返回空的 DeviceInfo
- * @note 此函数发送广播请求以发现 CAN 总线上的设备
- * @note 仅适用于 CAN 通信，RS485 不支持
- */
-static DeviceInfo GetDeviceInfoFromBroadcast(
-    uint8_t canfd_device_id,
-    uint8_t canfd_channel_id = 0);
-
-/**
- * @brief 从广播地址（hand_device_id = 0x00）通过序列号获取设备信息
- * @param usbcanfd_serial_number USB CANFD 设备序列号（支持部分匹配）
- * @param canfd_channel_id CAN 通道索引（默认：0）。双通道适配器（USBCANFD-200U）： can0=0, can1=1；单通道适配器（USBCANFD-100U）： 始终为 0
- * @return DeviceInfo 结构，如果找不到设备或请求失败则返回空的 DeviceInfo
- * @note 此函数发送广播请求以发现 CAN 总线上的设备
- * @note 仅适用于 CAN 通信，RS485 不支持
- */
-static DeviceInfo GetDeviceInfoFromBroadcast(
-    const std::string& usbcanfd_serial_number,
-    uint8_t canfd_channel_id = 0);
-
-#ifdef __linux__
-/**
- * @brief 从广播地址（hand_device_id = 0x00）通过 SocketCAN 获取设备信息
- * @param can_interface CAN 接口名称（例如："can0", "can1"）
- * @return DeviceInfo 结构，如果请求失败则返回空的 DeviceInfo
- * @note 此函数发送广播请求以发现 CAN 总线上的设备
- * @note 仅适用于 SocketCAN（Linux 专用）
- */
-static DeviceInfo GetDeviceInfoFromBroadcastSocketCan(
-    const std::string& can_interface);
-#endif
 ```
 
 ## 关节角度控制

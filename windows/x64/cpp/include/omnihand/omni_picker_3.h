@@ -10,6 +10,7 @@
 #include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/omnihand.h"
+#include "omnihand/i_o10_tactile_sensor_1d.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 
@@ -31,7 +32,7 @@ enum class OmniPicker3Gesture : int {
  * This class provides the public interface for OmniPicker 3 product.
  * It supports 1 active degree of freedom for gripping operations.
  */
-class AGIBOT_EXPORT OmniPicker3 : public OmniHand {
+class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public IO10TactileSensor1D {
  public:
   static constexpr unsigned char kDegreesOfActiveFreedom = 1;
   static constexpr uint8_t kDefaultHandDeviceId = 1u;

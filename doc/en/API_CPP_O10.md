@@ -15,11 +15,11 @@
 
 ```cpp
 #include "omnihand/omnihand_2025.h"
-#include <cstdint>  // std::uint8_t for factory/broadcast parameters (also pulled in by the header)
+#include <cstdint>  // std::uint8_t for factory parameters (also pulled in by the header)
 using namespace agilink::omnihand;
 ```
 
-**Note:** Factory methods and broadcast discovery use **`std::uint8_t`** for `hand_device_id` and CAN adapter indices (`canfd_device_id`, `canfd_channel_id`). Joint motor indices and `SetDeviceId` still use `unsigned char` as in the SDK headers.
+**Note:** Factory methods use **`std::uint8_t`** for `hand_device_id` and CAN adapter indices (`canfd_device_id`, `canfd_channel_id`). Joint motor indices and `SetDeviceId` still use `unsigned char` as in the SDK headers.
 
 ## Enums
 
@@ -276,41 +276,6 @@ DeviceInfo GetDeviceInfo() const;
  */
 void SetDeviceId(unsigned char hand_device_id);
 
-/**
- * @brief Get device information from broadcast address (hand_device_id = 0x00)
- * @param canfd_device_id USB CANFD adapter device index
- * @param canfd_channel_id CAN channel index (default 0)
- * @return DeviceInfo structure, or empty DeviceInfo if request failed
- * @note This function sends a broadcast request to discover devices on the CAN bus
- * @note Only works with CAN communication, not supported for RS485
- */
-static DeviceInfo GetDeviceInfoFromBroadcast(
-    uint8_t canfd_device_id,
-    uint8_t canfd_channel_id = 0);
-
-/**
- * @brief Get device information from broadcast address (hand_device_id = 0x00) by serial number
- * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
- * @param canfd_channel_id CAN channel index (default 0)
- * @return DeviceInfo structure, or empty DeviceInfo if device not found or request failed
- * @note This function sends a broadcast request to discover devices on the CAN bus
- * @note Only works with CAN communication, not supported for RS485
- */
-static DeviceInfo GetDeviceInfoFromBroadcast(
-    const std::string& usbcanfd_serial_number,
-    uint8_t canfd_channel_id = 0);
-
-#ifdef __linux__
-/**
- * @brief Get device information from broadcast address (hand_device_id = 0x00) via SocketCAN
- * @param can_interface CAN interface name (e.g., "can0", "can1")
- * @return DeviceInfo structure, or empty DeviceInfo if request failed
- * @note This function sends a broadcast request to discover devices on the CAN bus
- * @note Only works with SocketCAN (Linux only)
- */
-static DeviceInfo GetDeviceInfoFromBroadcastSocketCan(
-    const std::string& can_interface);
-#endif
 ```
 
 ## Joint Angle Control
