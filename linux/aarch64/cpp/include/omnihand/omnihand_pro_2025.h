@@ -15,7 +15,8 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
-#include "omnihand/omnihand_base.h"
+#include "omnihand/omnihand.h"
+#include "omnihand/i_control_mode.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_pro_2025/omnihand_pro_2025_solver.h"
@@ -29,7 +30,7 @@ namespace omnihand {
  * This class provides the public interface for OmniHand Pro 2025 product.
  * It includes all methods supported by O12, including 3D tactile sensors and report period settings.
  */
-class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
+class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 12;   // DoA
@@ -233,6 +234,20 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    */
   virtual void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period) = 0;
 
+  // ============ Position Mode Fine-Tune ============
+  /**
+   * @brief Enables or disables position mode fine-tune for all joint motors.
+   * @param enable true to enable, false to disable
+   * @note Only effective when all motors are in position control mode
+   */
+  virtual void SetPositionFineTuneMode(bool enable) = 0;
+
+  /**
+   * @brief Gets the current position mode fine-tune state.
+   * @return true if fine-tune is enabled, false if disabled
+   */
+  virtual bool GetPositionFineTuneMode() const = 0;
+
   // ============ Joint Naming ============
   /**
    * @brief Returns the 12 active joint names of O12 in motor-index order.
@@ -264,7 +279,9 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHandBase {
    * @brief Sets the hand to a predefined gesture.
    * @param gesture_num Gesture number (ignored for O12, only one FIST type supported)
    */
-  void SetHandGesture(int gesture_num = 1) override;
+  void SetHandGesture(o12::OmniHandPro2025Gesture gesture);
+
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
  protected:
   /**

@@ -2,9 +2,10 @@
 
 **API note:** For **OmniHand 2025 (O10)** and **OmniHand Dex UMI**, factory and broadcast APIs in the C++ headers use `std::uint8_t` for `hand_device_id` and `canfd_*` indices; tests use integer literals with implicit conversion. See `release/doc/en/API_CPP_O10.md` and `API_CPP_O10_UMI.md`.
 
-This directory contains GoogleTest-based unit tests for all three OmniHand products:
+This directory contains GoogleTest-based unit tests for all OmniHand products:
 - **OmniHand 2025 (O10)** - 10 DOF with 1D tactile sensors
 - **OmniHand Pro 2025 (O12)** - 12 DOF with 3D tactile sensors
+- **OmniHand 3 Lite (H3L)** - 4 DOF, gesture control via OmniHand3LiteGesture enum
 - **OmniHand Dex UMI (O10 UMI)** - 10 DOF with UMI protocol
 
 ## Building Tests
@@ -49,6 +50,9 @@ Or run individual test executables:
 
 # Run O10 UMI tests
 ./cpp/test/test_omnihand_dex_umi
+
+# Run H3L tests
+./cpp/test/test_omnihand_3_lite
 ```
 
 ### Request Frequency Parameter

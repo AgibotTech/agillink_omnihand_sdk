@@ -14,7 +14,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "omnihand/omnihand_base.h"
+#include "omnihand/omnihand.h"
+#include "omnihand/private_omnihand.h"
 #include "omnihand/i_o10_tactile_sensor_1d.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
@@ -31,7 +32,7 @@ namespace omnihand {
  * 
  * @note Inherits from IO10TactileSensor1D for 1D tactile sensor interface.
  */
-class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor1D {
+class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, public IO10TactileSensor1D {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // DoA
@@ -278,6 +279,11 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHandBase, public IO10TactileSensor
    *        17 = RESET (all active joints zero). Default 1 = FIST1.
    */
   void SetHandGesture(int gesture_num = 1) override;
+
+  /**
+   * @brief Returns motor positions for a gesture without sending to device.
+   */
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
  protected:
   /**
