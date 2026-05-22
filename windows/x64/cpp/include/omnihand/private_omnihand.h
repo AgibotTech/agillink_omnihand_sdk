@@ -396,12 +396,12 @@ class AGIBOT_EXPORT PrivateOmniHand : public IOmniHandCalibrator {
    * @brief 0x32: Set all axes position, speed, and torque targets
    * @param positions Vector of positions (20 bytes, 10 axes * 2 bytes each, range 0-4096)
    * @param speeds Vector of speeds (20 bytes, 10 axes * 2 bytes each, int16, range -4095~4096)
-   * @param torques Vector of torques (10 bytes, 1 byte per axis, range 0-255)
+   * @param torques Vector of torque values in mA (range 0-2000mA)
    * @return Response data (60 bytes: positions, velocities, torques, fault states)
    */
   virtual SetAllAxisPosResponse SetPosSpeedTorqueData(const std::vector<uint16_t>& positions,
                                                       const std::vector<int16_t>& speeds,
-                                                      const std::vector<uint8_t>& torques) = 0;
+                                                      const std::vector<uint16_t>& torques) = 0;
 
   /**
    * @brief 0x33: Get finger tactile force summary data
@@ -455,6 +455,13 @@ class AGIBOT_EXPORT PrivateOmniHand : public IOmniHandCalibrator {
    * @note Users should use PrivateOmniHand2025 or PrivateOmniHand3Lite
    */
   PrivateOmniHand() = default;
+  
+  inline uint8_t MilliampToRegister(int16_t ma) {
+    int val = static_cast<int>(ma) * 255 / 2000;
+    if (val < 0) val = 0;
+    if (val > 255) val = 255;
+    return static_cast<uint8_t>(val);
+  }
 };
 
 }  // namespace omnihand

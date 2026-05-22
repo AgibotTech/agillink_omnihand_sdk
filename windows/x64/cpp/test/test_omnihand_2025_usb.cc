@@ -743,7 +743,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdPosSpeedCur) {
   std::cout << "[StreamCmd] Testing all axis pos/speed/cur commands(0x32):" << std::endl;
   std::vector<uint16_t> ps_positions(10, 2048);
   std::vector<int16_t> ps_speeds(10, 0);
-  std::vector<uint8_t> ps_torques(10, 0);
+  std::vector<uint16_t> ps_torques(10, 0);
   const agilink::omnihand::SetAllAxisPosResponse pos_speed_torque_resp = hand_->SetPosSpeedTorqueData(ps_positions, ps_speeds, ps_torques);
   if (pos_speed_torque_resp.positions.empty()) GTEST_SKIP() << "SetPosSpeedTorqueData failed";
   EXPECT_EQ(pos_speed_torque_resp.positions.size(), 10u);

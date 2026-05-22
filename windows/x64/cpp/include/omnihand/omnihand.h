@@ -422,6 +422,13 @@ class AGIBOT_EXPORT OmniHand {
     device_id_ = device_id;
     is_left_hand_ = (hand_type == HandType::LEFT);
   }
+  
+  inline uint8_t StdMilliampToRegister(int16_t ma) {
+    int val = static_cast<int>(ma) * 255 / 1000;
+    if (val < 0) val = 0;
+    if (val > 255) val = 255;
+    return static_cast<uint8_t>(val);
+  }
 
   ProductType product_type_{ProductType::UNKNOWN};
   unsigned char device_id_{DEFAULT_DEVICE_ID};
