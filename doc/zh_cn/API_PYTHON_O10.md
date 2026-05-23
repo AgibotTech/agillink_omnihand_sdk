@@ -312,7 +312,7 @@ def set_joint_velocity(self, joint_motor_index: int, velocity: int) -> None:
     
     Args:
         joint_motor_index: 关节电机索引（1-10）。
-        velocity: 目标速度。
+        velocity: 目标速度（范围：0-32767）。
     
     Note:
         串口通信（RS485）不支持此接口。
@@ -335,7 +335,7 @@ def set_all_joint_velocities(self, velocities: List[int]) -> None:
     """批量设置所有关节电机的速度。
     
     Args:
-        velocities: 目标速度列表。必须包含 10 个值。
+        velocities: 目标速度列表。必须包含 10 个值，每个值范围：0-32767。
     """
 
 def get_all_joint_velocities(self) -> List[int]:
@@ -408,7 +408,7 @@ def get_all_current_thresholds(self) -> List[int]:
 
 ## 混合控制
 
-> **注意**：O10/H3L 的混合控制中，`tgt_torque` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
+> **注意**：O10/H3L 的混合控制中，`tgt_torque` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。`tgt_velo` 速度参数为 `int`，范围 **0–32767**。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
 
 ```python
 def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:

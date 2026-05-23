@@ -420,7 +420,7 @@ def set_joint_velocity(self, joint_motor_index: int, velocity: int) -> None:
     
     Args:
         joint_motor_index: Joint motor index (1-10).
-        velocity: Target velocity.
+        velocity: Target velocity (range: 0-32767).
     
     Note:
         This interface is not supported for serial port communication (RS485).
@@ -443,7 +443,7 @@ def set_all_joint_velocities(self, velocities: List[int]) -> None:
     """Sets the velocities of all joint motors in batch.
     
     Args:
-        velocities: List of target velocities. Must have 10 values.
+        velocities: List of target velocities. Must have 10 values (range: 0-32767).
     """
 
 def get_all_joint_velocities(self) -> List[int]:
@@ -598,7 +598,7 @@ def get_all_current_thresholds(self) -> List[int]:
 
 ## Mixed Control
 
-> **Note**: For O10/H3L, `tgt_torque` actually corresponds to motor current in **mA**, range **0–1000** (not the standard N·m). `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
+> **Note**: For O10/H3L, `tgt_torque` actually corresponds to motor current in **mA**, range **0–1000** (not the standard N·m). `tgt_velo` velocity parameter is `int`, range **0–32767**. `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
 
 ```python
 def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:

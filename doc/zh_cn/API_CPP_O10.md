@@ -388,7 +388,7 @@ std::vector<int16_t> GetAllJointMotorPosi() const;
 /**
  * @brief 设置单个关节电机的速度）
  * @param joint_motor_index 关节电机索引（1-10）。
- * @param velo 目标速度值）
+ * @param velo 目标速度值（范围：0-32767）
  * @note 串口通信（RS485）不支持此接口）
  */
 void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo);
@@ -403,7 +403,7 @@ int16_t GetJointMotorVelo(unsigned char joint_motor_index) const;
 
 /**
  * @brief 批量设置所有关节电机的速度）
- * @param vec_velo 目标速度向量。必须包含 10 个值）
+ * @param vec_velo 目标速度向量。必须包含 10 个值，每个值范围：0-32767）
  */
 void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo);
 
@@ -503,7 +503,7 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 
 ## 混合控制
 
-> **注意**：O10/H3L 的混合控制中，`tgt_torque_` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
+> **注意**：O10/H3L 的混合控制中，`tgt_torque_` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。`tgt_velo_` 速度参数类型为 `int16_t`，范围 **0–32767**。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
 
 ```cpp
 /**

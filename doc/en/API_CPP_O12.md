@@ -55,18 +55,20 @@ enum class ControlMode : unsigned char {
     POSITION           = 0,    // Position mode
     SERVO          = 1,    // Servo mode
     VELOCITY           = 2,    // Velocity mode
-    TORQUE         = 3,    // Torque mode (Not supported: pure torque control not available)
+    TORQUE         = 3,    // Torque mode
     POSITION_TORQUE     = 4,    // Position-Force mode (Mixed control: position + force, unit: 0.01N)
-    VELOCITY_TORQUE     = 5,    // Velocity-Force mode (Mixed control: velocity + force, unit: 0.01N)
-    POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Force mode (Mixed control: position + velocity + force, unit: 0.01N)
+    VELOCITY_TORQUE     = 5,    // Velocity-Force mode (not yet supported)
+POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Force mode (not yet supported)
     UNKNOWN        = 10    // Unknown mode
 };
 ```
 
 **Note**: 
-- **SERVO mode (1)**: Servo control mode
-- **Pure torque control (TORQUE) is not supported**: Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead
-- **Force unit**: In mixed control modes, the `tgt_torque_` field is in **0.01 N** (correlated with tactile sensor normal force)
+- **Position mode (0)**: Position control, used with `SetJointMotorPosition`.
+- **Servo mode (1)**: Servo control mode. This mode requires position command frequency ≥ 50Hz. The motor adjusts its speed based on the difference between target and actual position.
+- **Velocity mode (2)**: Velocity control, used with `SetJointMotorVelo`.
+- **Torque mode (3)**: Torque control, used with `SetJointMotorTorque`.
+- **Mixed control**: Position+torque is achieved via `MixCtrlJointMotor` (POSITION_TORQUE), torque unit: 0.01 N.
 
 ## Data Structures
 
@@ -371,7 +373,7 @@ std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_an
 /**
  * @brief Sets the velocity of a single joint motor.
  * @param joint_motor_index The index of the joint motor (1-12).
- * @param velo The target velocity value.
+ * @param velo The target velocity value (recommended: 200-2500).
  */
 void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo);
 
@@ -384,7 +386,7 @@ int16_t GetJointMotorVelo(unsigned char joint_motor_index) const;
 
 /**
  * @brief Sets the velocities of all joint motors in batch.
- * @param vec_velo A vector of target velocities. Must have 12 values.
+ * @param vec_velo A vector of target velocities. Must have 12 values (recommended: 200-2500).
  */
 void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo);
 
@@ -425,19 +427,19 @@ O12 supports switching control modes via `SetControlMode`. The following 5 contr
 | Mode Enum | Value | Description |
 |---|---|---|
 | `POSITION` | 0 | Position control (default) |
-| `SERVO` | 1 | Servo control mode |
+| `SERVO` | 1 | Servo control mode (requires position command frequency ≥ 50Hz) |
 | `VELOCITY` | 2 | Velocity control mode |
 | `TORQUE` | 3 | Torque control mode |
 | `POSITION_TORQUE` | 4 | Position + force mixed control (via `MixCtrlJointMotor`, force unit: 0.01 N) |
 
-**Note**: In mixed control, `tgt_torque_` is in **0.01 N**, correlated with tactile sensor normal force. Pure torque control (TORQUE) can be set via `SetControlMode`, but mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) should be used through `MixCtrlJointMotor`.
+**Note**: In mixed control, `tgt_torque_` is in **0.01 N**, correlated with tactile sensor normal force. Pure torque control (TORQUE) can be set via `SetControlMode`, while POSITION_TORQUE is used through `MixCtrlJointMotor`. VELOCITY_TORQUE and POSITION_VELOCITY_TORQUE are not yet supported.
 
 ```cpp
 /**
  * @brief Sets the control mode of a single joint motor.
  * @param joint_motor_index The index of the joint motor (1-12).
  * @param mode The control mode enum value.
- * @note Pure torque control (TORQUE) is not supported. Use mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) instead.
+ * @note Pure torque control (TORQUE) is available via `SetControlMode`. In mixed control, only POSITION_TORQUE is supported.
  */
 void SetControlMode(unsigned char joint_motor_index, ControlMode mode);
 
@@ -493,10 +495,10 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 
 ## Mixed Control
 
-**Note**: Pure torque control (TORQUE) is not supported. Only mixed control modes are supported:
+**Note**: Pure torque control (TORQUE) is available via `SetControlMode`. In mixed control, only the following mode is supported:
 - **POSITION_TORQUE**: Position + Force control
-- **VELOCITY_TORQUE**: Velocity + Force control
-- **POSITION_VELOCITY_TORQUE**: Position + Velocity + Force control
+
+VELOCITY_TORQUE and POSITION_VELOCITY_TORQUE are not yet supported.
 
 `tgt_torque_` is in **0.01 N** (correlated with tactile sensor normal force).
 
@@ -505,9 +507,9 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
  * @brief Controls joint motors in mixed mode.
  * @param mix_ctrls A vector of mixed control parameters. Each element contains:
  *                   - joint_index_: Joint index (1-12)
- *                   - ctrl_mode_: Control mode (only mixed control modes: POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE)
- *                   - tgt_posi_: Target position (optional, required for POSITION_TORQUE and POSITION_VELOCITY_TORQUE modes)
- *                   - tgt_velo_: Target velocity (optional, required for VELOCITY_TORQUE and POSITION_VELOCITY_TORQUE modes)
+ *                   - ctrl_mode_: Control mode (only POSITION_TORQUE is supported in mixed control)
+*                   - tgt_posi_: Target position (optional, required for POSITION_TORQUE mode)
+*                   - tgt_velo_: Target velocity (optional, not yet supported for mixed control)
  *                   - tgt_torque_: Target force in 0.01 N (correlated with tactile normal force)
  * @note Pure torque control (TORQUE) is not supported. Use mixed control modes instead.
  */

@@ -209,9 +209,9 @@ std::vector<double> GetAllActiveJointAngles() const;
 ### Velocity Control
 
 ```cpp
-void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo);
+void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo);     // velo range: 0-32767
 int16_t GetJointMotorVelo(unsigned char joint_motor_index) const;
-void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo);
+void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo);          // range: 0-32767
 std::vector<int16_t> GetAllJointMotorVelo() const;
 ```
 

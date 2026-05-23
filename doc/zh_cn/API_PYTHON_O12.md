@@ -290,7 +290,7 @@ def set_joint_velocity(self, joint_motor_index: int, velocity: int) -> None:
     
     Args:
         joint_motor_index: 关节电机索引（1-12）。
-        velocity: 目标速度。
+        velocity: 目标速度（建议范围：200-2500）。
     """
 
 def get_joint_velocity(self, joint_motor_index: int) -> int:
@@ -307,7 +307,7 @@ def set_all_joint_velocities(self, velocities: List[int]) -> None:
     """批量设置所有关节电机的速度。
     
     Args:
-        velocities: 目标速度列表。必须包含 12 个值。
+        velocities: 目标速度列表。必须包含 12 个值，每个值建议范围：200-2500。
     """
 
 def get_all_joint_velocities(self) -> List[int]:
@@ -325,12 +325,12 @@ O12 支持通过 `set_control_mode` 指令切换控制模式，支持以下 5 �
 | 模式枚举 | 值 | 说明 |
 |---|---|---|
 | `ControlMode.POSITION` | 0 | 位置控制（默认） |
-| `ControlMode.SERVO` | 1 | 伺服控制模式 |
+| `ControlMode.SERVO` | 1 | 伺服控制模式（要求位置指令频率 ≥ 50Hz） |
 | `ControlMode.VELOCITY` | 2 | 速度控制模式 |
 | `ControlMode.TORQUE` | 3 | 力矩控制模式 |
 | `ControlMode.POSITION_TORQUE` | 4 | 位置 + 力混合控制（通过 `mix_ctrl_joint_motor`，力单位 0.01N） |
 
-**注意**：混合控制中 `tgt_torque` 字段单位为 **0.01N**，与触觉传感器法向力关联。纯力矩控制（TORQUE）可通过 `set_control_mode` 设置，但混合控制模式（POSITION_TORQUE、VELOCITY_TORQUE、POSITION_VELOCITY_TORQUE）需通过 `mix_ctrl_joint_motor` 指令使用。
+**注意**：混合控制中 `tgt_torque` 字段单位为 **0.01N**，与触觉传感器法向力关联。纯力矩控制（TORQUE）通过 `set_control_mode` 设置，混合控制模式 POSITION_TORQUE 通过 `mix_ctrl_joint_motor` 指令使用。VELOCITY_TORQUE 和 POSITION_VELOCITY_TORQUE 暂不支持。
 
 ```python
 def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
@@ -342,7 +342,6 @@ def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
     
     Note:
         - 所有控制模式都支持
-        - 纯 TORQUE 模式不支持
     """
 
 def get_control_mode(self, joint_motor_index: int) -> int:
@@ -416,7 +415,7 @@ def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
         mix_ctrls: 混合控制参数列表。
     
     Note:
-        纯力控模式 (TORQUE) 不支持。请使用混合控制模式。
+        纯力控模式 (TORQUE) 通过 `set_control_mode` 使用。位置+力矩混合控制使用 POSITION_TORQUE 模式。
     """
 ```
 

@@ -52,16 +52,17 @@ class ControlMode(IntEnum):
     POSITIONTION = 0
     SERVO = 1            # Servo mode
     VELOCITYCITY = 2
-    TORQUE = 3           # Not supported (use mixed modes instead)
+    TORQUE = 3           # Torque mode
     POSITIONTION_TORQUE = 4  # Mixed control
-    VELOCITYCITY_TORQUE = 5  # Mixed control
-    POSITIONTION_VELOCITYCITY_TORQUE = 6  # Mixed control
+    VELOCITYCITY_TORQUE = 5  # Not yet supported
+POSITIONTION_VELOCITYCITY_TORQUE = 6  # Not yet supported
     UNKNOWN = 10
 ```
 
 **Note**: 
-- **SERVO mode**: Servo control mode
-- **Pure torque control (TORQUE)**: Not supported. Use mixed control modes instead
+- **SERVO mode**: Servo control mode. This mode requires position command frequency ≥ 50Hz. The motor adjusts its speed based on the difference between target and actual position.
+- **Position, Velocity, Torque modes**: All basic modes are supported.
+- **Mixed control**: Position+torque is achieved via `mix_ctrl_joint_motor`.
 
 ## Data Structures
 
@@ -447,7 +448,7 @@ def set_joint_velocity(self, joint_motor_index: int, velocity: int) -> None:
     
     Args:
         joint_motor_index: Joint motor index (1-12).
-        velocity: Target velocity.
+        velocity: Target velocity (recommended: 200-2500).
     """
 
 def get_joint_velocity(self, joint_motor_index: int) -> int:
@@ -464,7 +465,7 @@ def set_all_joint_velocities(self, velocities: List[int]) -> None:
     """Sets the velocities of all joint motors in batch.
     
     Args:
-        velocities: List of target velocities. Must have 12 values.
+        velocities: List of target velocities. Must have 12 values (recommended: 200-2500).
     """
 
 def get_all_joint_velocities(self) -> List[int]:
@@ -510,12 +511,12 @@ O12 supports switching control modes via `set_control_mode`. The following 5 con
 | Mode Enum | Value | Description |
 |---|---|---|
 | `ControlMode.POSITION` | 0 | Position control (default) |
-| `ControlMode.SERVO` | 1 | Servo control mode |
+| `ControlMode.SERVO` | 1 | Servo control mode (requires position command frequency ≥ 50Hz) |
 | `ControlMode.VELOCITY` | 2 | Velocity control mode |
 | `ControlMode.TORQUE` | 3 | Torque control mode |
 | `ControlMode.POSITION_TORQUE` | 4 | Position + force mixed control (via `mix_ctrl_joint_motor`, force unit: 0.01 N) |
 
-**Note**: In mixed control, `tgt_torque` is in **0.01 N**, correlated with tactile sensor normal force. Pure torque control (TORQUE) can be set via `set_control_mode`, but mixed control modes (POSITION_TORQUE, VELOCITY_TORQUE, POSITION_VELOCITY_TORQUE) should be used through `mix_ctrl_joint_motor`.
+**Note**: In mixed control, `tgt_torque` is in **0.01 N**, correlated with tactile sensor normal force. Pure torque control (TORQUE) is available via `set_control_mode`, while POSITION_TORQUE is used through `mix_ctrl_joint_motor`. VELOCITY_TORQUE and POSITION_VELOCITY_TORQUE are not yet supported.
 
 ```python
 def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
@@ -527,7 +528,6 @@ def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
     
     Note:
         - All control modes are supported
-        - Pure TORQUE mode is not supported
     """
 
 def get_control_mode(self, joint_motor_index: int) -> int:
@@ -601,7 +601,7 @@ def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
         mix_ctrls: List of mixed control parameters.
     
     Note:
-        Pure torque control (TORQUE) is not supported. Use mixed control modes instead.
+        Pure torque control (TORQUE) is available via `set_control_mode`. Use POSITION_TORQUE mode for position+torque mixed control.
     """
 ```
 

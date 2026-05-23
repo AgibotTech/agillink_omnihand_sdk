@@ -380,7 +380,7 @@ std::vector<int16_t> GetAllJointMotorPosi() const;
 /**
  * @brief Sets the velocity of a single joint motor.
  * @param joint_motor_index The index of the joint motor (1-10).
- * @param velo The target velocity value.
+ * @param velo The target velocity value (range: 0-32767).
  * @note This interface is not supported for serial port communication (RS485).
  */
 void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo);
@@ -395,7 +395,7 @@ int16_t GetJointMotorVelo(unsigned char joint_motor_index) const;
 
 /**
  * @brief Sets the velocities of all joint motors in batch.
- * @param vec_velo A vector of target velocities. Must have 10 values.
+ * @param vec_velo A vector of target velocities. Must have 10 values (range: 0-32767).
  */
 void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo);
 
@@ -524,7 +524,7 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 
 ## Mixed Control
 
-> **Note**: For O10/H3L, `tgt_torque_` actually corresponds to motor current in **mA**, range **0–1000** (not the standard N·m). `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
+> **Note**: For O10/H3L, `tgt_torque_` actually corresponds to motor current in **mA**, range **0–1000** (not the standard N·m). `tgt_velo_` velocity parameter is `int16_t`, range **0–32767**. `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
 
 Only the following mode is currently available:
 - **POSITION_TORQUE**: Position + current (mA) control
