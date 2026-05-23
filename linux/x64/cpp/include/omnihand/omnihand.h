@@ -220,8 +220,7 @@ class AGIBOT_EXPORT OmniHand {
   // ============ Mixed Control ============
   /**
    * @brief 0x14: Mixed control for joint motors.
-   * @param mix_ctrls Mixed control parameter vector
-   * @note Pure torque control (TORQUE) is not supported: Both O10 and O12 do not support pure torque mode, only mixed control modes
+   * @param mix_ctrls Mixed control parameter vector.
    */
   virtual void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls) { (void)mix_ctrls; }
 

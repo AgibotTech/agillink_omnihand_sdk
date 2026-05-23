@@ -19,10 +19,9 @@ class AGIBOT_EXPORT IControlMode {
  public:
   /**
    * @brief Sets the control mode of a single joint motor.
-   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @param joint_motor_index Joint motor index (device-dependent)
    * @param mode Control mode enum value
-   * @note SERVO mode (1) is available for servo control
-   * @note Pure torque control (TORQUE) is not supported: Both O10 and O12 do not support pure torque mode, only mixed control modes
+   * @note Supported by products that implement control mode switching.
    */
   virtual void SetControlMode(unsigned char joint_motor_index, ControlMode mode) { (void)joint_motor_index; (void)mode; }
   

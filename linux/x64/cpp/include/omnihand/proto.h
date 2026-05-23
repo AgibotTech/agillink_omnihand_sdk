@@ -109,23 +109,17 @@ inline std::string ToString(Finger finger) {
 }
 
 /**
- * @brief Control mode enumeration (Unified for O10 and O12)
- * @note O10 and O12 use the same control mode protocol (Pn16):
- *       POSITION=0, SERVO=1, VELOCITY=2, TORQUE=3, POSITION_TORQUE=4, VELOCITY_TORQUE=5, POSITION_VELOCITY_TORQUE=6
- * @note Supported modes by product:
- *       - POSITION, SERVO, VELOCITY, TORQUE: basic control modes (availability varies by product)
- *       - POSITION_TORQUE: position + force mixed control, force unit 0.01N
- *       - VELOCITY_TORQUE and POSITION_VELOCITY_TORQUE: not yet supported
+ * @brief Control mode enumeration
  */
 enum class AGIBOT_EXPORT ControlMode : unsigned char {
   POSITION = 0,                    // Position control mode (supported, default mode, CSP)
   SERVO = 1,                       // Servo control mode
   VELOCITY = 2,                    // Velocity control mode
   TORQUE = 3,                      // Torque control mode
-  POSITION_TORQUE = 4,             // Position-Torque mixed control, force unit: 0.01N
-  VELOCITY_TORQUE = 5,             // Velocity-Torque mixed control (not yet supported)
-  POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mixed control (not yet supported)
-  PROFILE_POSITION = 7,            // Profile-Position control mode (only h3u_m supported, PP)
+  POSITION_TORQUE = 4,             // Position-Torque mixed control
+  VELOCITY_TORQUE = 5,             // Velocity-Torque mixed control
+  POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mixed control
+  PROFILE_POSITION = 7,            // Profile-Position control mode
   UNKNOWN = 10                     // Unknown control mode
 };
 
