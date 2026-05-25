@@ -221,8 +221,12 @@ class AGIBOT_EXPORT OmniHand {
   /**
    * @brief 0x14: Mixed control for joint motors.
    * @param mix_ctrls Mixed control parameter vector.
+   * @return Standard CAN write-reply echo (empty if unsupported or failed).
    */
-  virtual void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls) { (void)mix_ctrls; }
+  virtual std::vector<MixCtrl> MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls) {
+    (void)mix_ctrls;
+    return {};
+  }
 
   // ============ Error Report ============
   /**
@@ -421,19 +425,25 @@ class AGIBOT_EXPORT OmniHand {
     device_id_ = device_id;
     is_left_hand_ = (hand_type == HandType::LEFT);
   }
-  
-  inline uint8_t StdMilliampToRegister(int16_t ma) {
-    int val = static_cast<int>(ma) * 255 / 1000;
-    if (val < 0) val = 0;
-    if (val > 255) val = 255;
-    return static_cast<uint8_t>(val);
-  }
 
   ProductType product_type_{ProductType::UNKNOWN};
   unsigned char device_id_{DEFAULT_DEVICE_ID};
   bool is_left_hand_{true};
   bool is_init_{false};
 };
+
+/** mA to 1-byte mix-control torque register (O10/H3L). */
+inline uint8_t StdMilliampToRegister(int16_t ma) {
+  int val = static_cast<int>(ma) * 255 / 1000;
+  if (val < 0) val = 0;
+  if (val > 255) val = 255;
+  return static_cast<uint8_t>(val);
+}
+
+/** Inverse of StdMilliampToRegister (O10/H3L mix-control reply). */
+inline int16_t RegisterToStdMilliamp(uint8_t reg) {
+  return static_cast<int16_t>((static_cast<int>(reg) * 1000) / 255);
+}
 
 }  // namespace omnihand
 }  // namespace agilink
