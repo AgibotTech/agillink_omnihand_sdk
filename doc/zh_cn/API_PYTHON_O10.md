@@ -348,7 +348,7 @@ def get_all_joint_velocities(self) -> List[int]:
 
 ## 控制模式
 
-O10 不支持通过 `set_control_mode` 指令切换控制模式，默认工作在**位置控制模式**。可通过混合控制指令 `mix_ctrl_joint_motor` 实现多种控制方式，支持以下控制模式：
+O10 不支持通过 `set_control_mode` 指令切换控制模式，默认工作在**位置控制模式**。可通过 `mix_control_by_pt` / `mix_control_by_pvt` 实现混合控制，支持以下控制模式：
 
 | 模式枚举 | 值 | 说明 |
 |---|---|---|
@@ -411,7 +411,9 @@ def get_all_current_thresholds(self) -> List[int]:
 > **注意**：O10/H3L 的混合控制中，`tgt_torque` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。`tgt_velo` 速度参数为 `int`，范围 **0–32767**。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
 
 ```python
-def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
+def mix_control_by_pt(self, positions: List[int], torques: List[int]) -> List[MixCtrl]: ...
+def mix_control_by_pvt(self, positions: List[int], velocities: List[int], torques: List[int]) -> List[MixCtrl]: ...
+# legacy removed: mix_ctrl_joint_motor
     """以混合模式控制关节电机。
     
     Args:

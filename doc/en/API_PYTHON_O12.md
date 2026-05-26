@@ -62,7 +62,7 @@ POSITIONTION_VELOCITYCITY_TORQUE = 6  # Not yet supported
 **Note**: 
 - **SERVO mode**: Servo control mode. This mode requires position command frequency ≥ 50Hz. The motor adjusts its speed based on the difference between target and actual position.
 - **Position, Velocity, Torque modes**: All basic modes are supported.
-- **Mixed control**: Position+torque is achieved via `mix_ctrl_joint_motor`.
+- **Mixed control**: Position+torque is achieved via `mix_control_by_pt`.
 
 ## Data Structures
 
@@ -514,7 +514,7 @@ O12 supports switching control modes via `set_control_mode`. The following 5 con
 | `ControlMode.SERVO` | 1 | Servo control mode (requires position command frequency ≥ 50Hz) |
 | `ControlMode.VELOCITY` | 2 | Velocity control mode |
 | `ControlMode.TORQUE` | 3 | Torque control mode |
-| `ControlMode.POSITION_TORQUE` | 4 | Position + force mixed control (via `mix_ctrl_joint_motor`, force unit: 0.01 N) |
+| `ControlMode.POSITION_TORQUE` | 4 | Position + force mixed control (via `mix_control_by_pt`, force unit: 0.01 N) |
 
 **Note**: In mixed control, `tgt_torque` is in **0.01 N**, correlated with tactile sensor normal force. Pure torque control (TORQUE) is available via `set_control_mode`, while POSITION_TORQUE is used through `mix_ctrl_joint_motor`. VELOCITY_TORQUE and POSITION_VELOCITY_TORQUE are not yet supported.
 
@@ -594,7 +594,7 @@ def get_all_current_thresholds(self) -> List[int]:
 ## Mixed Control
 
 ```python
-def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
+def mix_control_by_pt(self, positions: List[int], torques: List[int]) -> List[MixCtrl]: ...
     """Controls joint motors in mixed mode.
     
     Args:

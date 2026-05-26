@@ -77,7 +77,7 @@ Different product models have different control mode support:
 - `position[]` = raw int16 motor position
 - `effort[]` = raw int16 motor torque (O10/H3L: current in mA, range 0–1000; O12: 0.01 N)
 
-The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No readback**.
+The node calls `MixControlByPT` or `MixControlByPVT` (full-DOF arrays required). **No readback**.
 
 **Note**: `joint_cmd` uses `position[]` in radians with automatic conversion. `joint_mix_control_cmd` uses raw int16 motor values for both `position[]` and `effort[]`, without unit conversion.
 

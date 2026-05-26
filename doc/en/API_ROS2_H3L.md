@@ -37,7 +37,7 @@ All topics are prefixed with `/h3l/<side>/`, where `<side>` is `left` or `right`
 - `position[]` = raw motor position (int16 ticks, range 0-4095)
 - `effort[]` = motor current (int16, unit: mA)
 
-> **Note**: The `effort` field carries current values in mA, not ROS2 standard torque (N·m). H3L only supports `POSITION_TORQUE` mixed mode. The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No readback**.
+> **Note**: The `effort` field carries current values in mA, not ROS2 standard torque (N·m). H3L uses `MixControlByPT` (4 position + effort values). **No readback**.
 
 ## H3L Error Bitmask
 

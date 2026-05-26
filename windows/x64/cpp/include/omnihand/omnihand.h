@@ -219,12 +219,39 @@ class AGIBOT_EXPORT OmniHand {
   
   // ============ Mixed Control ============
   /**
-   * @brief 0x14: Mixed control for joint motors.
-   * @param mix_ctrls Mixed control parameter vector.
-   * @return Standard CAN write-reply echo (empty if unsupported or failed).
+   * @brief 0x14: Position + torque mixed control (MixControlMode::POSITION_TORQUE).
+   * @param positions Target position per joint; array[i] maps to mix-control joint id i (0-based).
+   * @param torques Target torque/current per joint (product-specific unit).
+   * @return CAN write-reply echo (empty if unsupported or failed).
    */
-  virtual std::vector<MixCtrl> MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls) {
-    (void)mix_ctrls;
+  virtual std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
+                                              const std::vector<int16_t>& torques) {
+    (void)positions;
+    (void)torques;
+    return {};
+  }
+
+  /**
+   * @brief 0x14: Velocity + torque mixed control (MixControlMode::VELOCITY_TORQUE).
+   * @param velocities Target velocity per joint; array[i] maps to mix-control joint id i (0-based).
+   * @param torques Target torque/current per joint.
+   */
+  virtual std::vector<MixCtrl> MixControlByPV(const std::vector<int16_t>& velocities,
+                                              const std::vector<int16_t>& torques) {
+    (void)velocities;
+    (void)torques;
+    return {};
+  }
+
+  /**
+   * @brief 0x14: Position + velocity + torque mixed control (MixControlMode::POSITION_VELOCITY_TORQUE).
+   */
+  virtual std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
+                                               const std::vector<int16_t>& velocities,
+                                               const std::vector<int16_t>& torques) {
+    (void)positions;
+    (void)velocities;
+    (void)torques;
     return {};
   }
 

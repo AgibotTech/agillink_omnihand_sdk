@@ -8,6 +8,7 @@ OmniHand SDK 为四种不同的产品提供了**产品特定的接口**：
 - **OmniHand Pro 2025 (O12)**: 12 自由度灵巧手，配备 3D 触觉传感器
 - **OmniHand 3 Lite (H3L)**: 4 自由度轻量级灵巧手
 - **OmniHand Dex UMI (O10 UMI)**: 10 自由度灵巧手，支持 UMI 协议
+- **OmniPicker 3 (OP3)**: 1 自由度夹爪
 
 每个产品都有自己的接口类（`OmniHand2025`、`OmniHandPro2025`、`OmniHand3Lite`、`OmniHandDexUMI`），具有产品特定的工厂方法和 API。与使用 `ProductType` 的统一接口相比，这种设计提供了更好的类型安全性和更清晰的 API 组织。
 
@@ -19,6 +20,7 @@ OmniHand SDK 为四种不同的产品提供了**产品特定的接口**：
 - **[OmniHand Pro 2025 (O12) C++ API](API_CPP_O12.md)** - 12 自由度，3D 触觉传感器，仅支持 CAN
 - **[OmniHand 3 Lite (H3L) C++ API](API_CPP_H3L.md)** - 4 自由度，无触觉传感器，仅支持 CAN
 - **[OmniHand Dex UMI (O10 UMI) C++ API](API_CPP_O10_UMI.md)** - 10 自由度，UMI 协议，主动查询，仅支持 CAN
+- **[OmniPicker 3 (OP3) C++ API](API_CPP_OP3.md)** - 1 自由度夹爪；混合控制仅 `MixControlByPT`
 
 ## 通用枚举和数据结构
 

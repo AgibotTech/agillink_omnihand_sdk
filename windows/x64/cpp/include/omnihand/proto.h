@@ -116,9 +116,6 @@ enum class AGIBOT_EXPORT ControlMode : unsigned char {
   SERVO = 1,                       // Servo control mode
   VELOCITY = 2,                    // Velocity control mode
   TORQUE = 3,                      // Torque control mode
-  POSITION_TORQUE = 4,             // Position-Torque mixed control
-  VELOCITY_TORQUE = 5,             // Velocity-Torque mixed control
-  POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Torque mixed control
   PROFILE_POSITION = 7,            // Profile-Position control mode
   UNKNOWN = 10                     // Unknown control mode
 };
@@ -134,9 +131,31 @@ inline std::string ToString(ControlMode mode) {
     case ControlMode::SERVO: return "Servo";
     case ControlMode::VELOCITY: return "Velocity";
     case ControlMode::TORQUE: return "Torque";
-    case ControlMode::POSITION_TORQUE: return "Position-Torque";
-    case ControlMode::VELOCITY_TORQUE: return "Velocity-Torque";
-    case ControlMode::POSITION_VELOCITY_TORQUE: return "Position-Velocity-Torque";
+    case ControlMode::PROFILE_POSITION: return "Profile-Position";
+    default: return "Unknown";
+  }
+}
+
+/**
+ * @brief Mix control mode enumeration: 0x0 ~ 0x7 (3 bits in CAN mix-control byte)
+ */
+enum class AGIBOT_EXPORT MixControlMode : unsigned char {
+  POSITION_TORQUE = 0x3,             // Position-Torque mixed control
+  VELOCITY_TORQUE = 0x4,             // Velocity-Torque mixed control
+  POSITION_VELOCITY_TORQUE = 0x5,    // Position-Velocity-Torque mixed control
+};
+
+/** @deprecated Use MixControlMode. Kept for backward-compatible spelling. */
+using MixCtrolMode = MixControlMode;
+
+/**
+ * @brief Convert MixControlMode enum to string
+ */
+inline std::string ToString(MixControlMode mode) {
+  switch (mode) {
+    case MixControlMode::POSITION_TORQUE: return "Position-Torque";
+    case MixControlMode::VELOCITY_TORQUE: return "Velocity-Torque";
+    case MixControlMode::POSITION_VELOCITY_TORQUE: return "Position-Velocity-Torque";
     default: return "Unknown";
   }
 }
@@ -319,10 +338,11 @@ struct AGIBOT_EXPORT DeviceInfo {
 
 /**
  * @brief Mixed control parameters
+ * @note joint_index_ is 0-based (0 .. DOF-1), unlike SetJointMotorPosi etc. (1-based).
  * @note Default constructor ensures bit-fields are automatically initialized to 0 for safer usage
  */
 struct AGIBOT_EXPORT MixCtrl {
-  unsigned char joint_index_ : 5;
+  unsigned char joint_index_ : 5;  // mix-control joint id, 0-based
   unsigned char ctrl_mode_ : 3;
   std::optional<short> tgt_posi_;
   std::optional<short> tgt_velo_;

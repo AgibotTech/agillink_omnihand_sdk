@@ -252,7 +252,8 @@ def get_all_current_thresholds(self) -> List[int]: ...
 ### Mixed Control
 
 ```python
-def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
+def mix_control_by_pt(self, positions: List[int], torques: List[int]) -> List[MixCtrl]: ...
+def mix_control_by_pvt(self, positions: List[int], velocities: List[int], torques: List[int]) -> List[MixCtrl]: ...
     """Controls joint motors in mixed mode.
 
     MixCtrl fields:

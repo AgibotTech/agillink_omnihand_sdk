@@ -2,13 +2,16 @@
 # AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 """
-OmniHand Pro 2025 - Mix Control Demo (Position + Torque)
+OmniHand Pro 2025 (O12) - Mix Control Demo (Position + Force)
 
-Demonstrates POSITION_TORQUE mode via mix_ctrl_joint_motor(),
-alternating between two sets of position/torque parameters.
+Demonstrates position+force mixed control via mix_control_by_pt(),
+alternating between two sets of position/force parameters.
 
-Note: O12 only supports POSITION_TORQUE. VELOCITY_TORQUE and
-POSITION_VELOCITY_TORQUE are defined in the protocol but not supported.
+O12 and OP3 only support position+force mixed control (MixControlMode::POSITION_TORQUE /
+mix_control_by_pt). mix_control_by_pv and mix_control_by_pvt are not available on these
+products. Torque on O12/OP3 is int16 with unit 0.01 N (not motor current mA).
+
+Array length must match active DOF (O12: 12). Index i maps to mix-control joint id i (0-based).
 
 Supports multiple connection types: ZLG CANFD, HCAN, SocketCAN (Linux only).
 Run with -h or --help to see all available options and usage examples.
@@ -16,7 +19,7 @@ Run with -h or --help to see all available options and usage examples.
 
 import argparse
 import time
-from omnihand import OmniHandPro2025, HandType, MixCtrl, ControlMode
+from omnihand import OmniHandPro2025, HandType
 
 EXAMPLES = """\
 examples:
@@ -47,8 +50,9 @@ def main():
     args = parser.parse_args()
 
     print("=" * 60)
-    print("OmniHand Pro 2025 Mix Control Demo")
-    print("  Supported mode: POSITION_TORQUE only")
+    print("OmniHand Pro 2025 (O12) Mix Control Demo")
+    print("  O12 / OP3: position + force only (mix_control_by_pt)")
+    print("  Force unit: 0.01 N per joint")
     print("=" * 60)
 
     if args.device == 'hcan':
@@ -82,22 +86,15 @@ def main():
     NUM_JOINTS = 12
 
     for cycle in range(6):
-        mix_ctrls = []
-        for i in range(NUM_JOINTS):
-            mc = MixCtrl()
-            mc.joint_index = i + 1
-            mc.ctrl_mode = int(ControlMode.POSITION_TORQUE)
-            if cycle % 2 == 0:
-                mc.tgt_posi = 1000
-                mc.tgt_torque = 50
-            else:
-                mc.tgt_posi = 500
-                mc.tgt_torque = 150
-            mix_ctrls.append(mc)
+        if cycle % 2 == 0:
+            positions = [1000] * NUM_JOINTS
+            torques = [50] * NUM_JOINTS
+        else:
+            positions = [500] * NUM_JOINTS
+            torques = [150] * NUM_JOINTS
 
-        print(f"[Cycle {cycle}] mode=POSITION_TORQUE, pos={mc.tgt_posi}, torque={mc.tgt_torque}")
-
-        hand.mix_ctrl_joint_motor(mix_ctrls)
+        print(f"[Cycle {cycle}] mix_control_by_pt pos[0]={positions[0]} force[0]={torques[0]} (0.01N)")
+        hand.mix_control_by_pt(positions, torques)
         time.sleep(1.5)
 
     print("\n[Done]: Mix control demo completed!")

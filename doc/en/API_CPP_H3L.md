@@ -227,7 +227,11 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 ### Mixed Control
 
 ```cpp
-void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);
+std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
+                                    const std::vector<int16_t>& torques);
+std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
+                                     const std::vector<int16_t>& velocities,
+                                     const std::vector<int16_t>& torques);
 ```
 - `ctrl_mode_`: only `POSITION_TORQUE` is available
 - `tgt_posi_`: target position (0-4095 encoder raw value)

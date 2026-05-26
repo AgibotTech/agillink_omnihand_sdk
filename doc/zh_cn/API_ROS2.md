@@ -74,7 +74,7 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 - `position[]` = 电机原始位置 (int16)
 - `effort[]` = 电机原始力矩 (int16, O10/H3L: 电流 mA 范围 0–1000, O12: 0.01N)
 
-节点内部以 POSITION_TORQUE 模式调用 `MixCtrlJointMotor`，**无回读**。
+节点内部调用 `MixControlByPT` 或 `MixControlByPVT`（须填满关节数），**无回读**。
 
 **注意**：`joint_cmd` 的 `position[]` 单位是弧度 (rad)，会自动转换。`joint_mix_control_cmd` 的 `position[]` 和 `effort[]` 都使用电机原始 int16 值，不做单位转换。
 

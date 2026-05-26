@@ -478,7 +478,7 @@ The 16 sensors on the finger are arranged as shown below:
 
 ## Control Mode
 
-O10 does not support switching control modes via `SetControlMode`. It operates in **position control mode** by default. Multiple control modes can be achieved through the mixed control command `MixCtrlJointMotor`. The following control modes are supported:
+O10 does not support switching control modes via `SetControlMode`. It operates in **position control mode** by default. Mixed control uses `MixControlByPT` and `MixControlByPVT` (`MixControlMode` 0x3 / 0x5); array length must match active DOF (10). The following control modes are supported:
 
 | Mode Enum | Value | Description |
 |---|---|---|
@@ -540,7 +540,11 @@ Only the following mode is currently available:
  * @note Pure torque control (TORQUE) is not supported.
  * @note This interface is not supported for serial port communication (RS485).
  */
-void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);
+std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
+                                    const std::vector<int16_t>& torques);
+std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
+                                     const std::vector<int16_t>& velocities,
+                                     const std::vector<int16_t>& torques);
 ```
 
 ## Error Handling

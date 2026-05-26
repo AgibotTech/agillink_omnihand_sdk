@@ -37,7 +37,7 @@ All topics are prefixed with `/o12/<side>/`, where `<side>` is `left` or `right`
 - `position[]` = raw motor position (int16, range 0–4095)
 - `effort[]` = fingertip force (int16, unit: **0.01 N**, correlated with tactile sensor normal force)
 
-The node internally calls `MixCtrlJointMotor` in POSITION_TORQUE mode. **No readback**.
+The node calls `MixControlByPT` (12 position + effort values). **No readback**.
 
 ## Tactile Sensor (3D)
 

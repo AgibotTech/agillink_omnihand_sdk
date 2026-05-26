@@ -482,15 +482,14 @@ static const std::vector<Finger>& GetSensorOrder();
 
 ## 控制模式
 
-O10 不支持通过 `SetControlMode` 指令切换控制模式，默认工作在**位置控制模式**。可通过混合控制指令 `MixCtrlJointMotor` 实现多种控制方式，支持以下控制模式：
+O10 不支持通过 `SetControlMode` 指令切换控制模式，默认工作在**位置控制模式**。混合控制通过 `MixControlByPT` / `MixControlByPVT` 下发（`MixControlMode` 0x3 / 0x5），数组长度须等于 **10**（主动自由度）。
 
-| 模式枚举 | 值 | 说明 |
-|---|---|---|
-| `POSITION` | 0 | 位置控制（默认） |
-| `POSITION_TORQUE` | 4 | 位置 + 力矩混合控制 |
-| `POSITION_VELOCITY_TORQUE` | 6 | 位置 + 速度 + 力矩混合控制（**暂未开放**） |
+| API | 说明 |
+|---|---|
+| `MixControlByPT` | 位置 + 电流（mA，0–1000） |
+| `MixControlByPVT` | 位置 + 速度 + 电流 |
 
-> **非标单位说明**：`POSITION_TORQUE` 模式中的"力矩"实际对应电机电流值，单位为 **mA**，范围 **0–1000**，而非 ROS2 标准的 N·m。
+> **非标单位说明**：混合控制中的“力矩/电流”字段对应电机电流 **mA**（0–1000），非 ROS2 标准 N·m。数组下标 `i` 对应混合控制关节 id `i`（0-based）；回读 `joint_index_` 为 1-based。
 
 ## 电流阈值控制
 
@@ -503,19 +502,12 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 
 ## 混合控制
 
-> **注意**：O10/H3L 的混合控制中，`tgt_torque_` 字段实际对应电机电流，单位为 **mA**，范围 **0–1000**（非标准 N·m）。`tgt_velo_` 速度参数类型为 `int16_t`，范围 **0–32767**。`POSITION_VELOCITY_TORQUE` 模式暂未开放（速度值当前被内部写死）。
-
 ```cpp
-/**
- * @brief 以混合模式控制关节电机。
- * @param mix_ctrls 混合控制参数向量
- *   - ctrl_mode_: 控制模式（仅 POSITION_TORQUE 可用）
- *   - tgt_posi_: 目标位置（0–4095 编码器原始值）
- *   - tgt_torque_: 目标电流（单位 mA，范围 0–1000，非 N·m）
- * @note 纯力控模式(TORQUE) 不支持。
- * @note 串口通信（RS485）不支持此接口。
- */
-void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);
+std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
+                                    const std::vector<int16_t>& torques);
+std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
+                                     const std::vector<int16_t>& velocities,
+                                     const std::vector<int16_t>& torques);
 ```
 
 ## 错误处理

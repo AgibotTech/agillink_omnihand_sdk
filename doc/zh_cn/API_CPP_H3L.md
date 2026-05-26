@@ -227,11 +227,13 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 ### 混合控制
 
 ```cpp
-void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);
+std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
+                                    const std::vector<int16_t>& torques);
+std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
+                                     const std::vector<int16_t>& velocities,
+                                     const std::vector<int16_t>& torques);
 ```
-- `ctrl_mode_`：仅 `POSITION_TORQUE` 可用
-- `tgt_posi_`：目标位置（0–4095 编码器原始值）
-- `tgt_torque_`：目标电流（单位 mA）
+- 数组长度须等于 **4**（主动自由度）；`torques` 单位为 **mA**
 
 ### 错误处理
 

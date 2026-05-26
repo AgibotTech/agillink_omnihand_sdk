@@ -538,7 +538,7 @@ def get_sensor_order() -> List[int]:
 
 ## Control Mode
 
-O10 does not support switching control modes via `set_control_mode`. It operates in **position control mode** by default. Multiple control modes can be achieved through the mixed control command `mix_ctrl_joint_motor`. The following control modes are supported:
+O10 does not support switching control modes via `set_control_mode`. It operates in **position control mode** by default. Multiple control modes can be achieved via `mix_control_by_pt` / `mix_control_by_pvt`. The following control modes are supported:
 
 | Mode Enum | Value | Description |
 |---|---|---|
@@ -601,7 +601,8 @@ def get_all_current_thresholds(self) -> List[int]:
 > **Note**: For O10/H3L, `tgt_torque` actually corresponds to motor current in **mA**, range **0–1000** (not the standard N·m). `tgt_velo` velocity parameter is `int`, range **0–32767**. `POSITION_VELOCITY_TORQUE` mode is **not yet available** (velocity is currently hardcoded internally).
 
 ```python
-def mix_ctrl_joint_motor(self, mix_ctrls: List[MixCtrl]) -> None:
+def mix_control_by_pt(self, positions: List[int], torques: List[int]) -> List[MixCtrl]: ...
+def mix_control_by_pvt(self, positions: List[int], velocities: List[int], torques: List[int]) -> List[MixCtrl]: ...
     """Controls joint motors in mixed mode.
     
     Args:

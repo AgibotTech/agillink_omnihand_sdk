@@ -37,7 +37,7 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 - `position[]` = 电机原始位置 (int16, 范围 0–4095)
 - `effort[]` = 指尖力 (int16, 单位 **0.01N**，与触觉传感器法向力关联)
 
-节点内部以 POSITION_TORQUE 模式调用 `MixCtrlJointMotor`，**无回读**。
+节点内部调用 `MixControlByPT`（12 路 position/effort），**无回读**。
 
 ## 触觉传感器 (3D)
 

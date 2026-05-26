@@ -4,7 +4,7 @@
 """
 OmniHand 2025 mix control demo (position + torque).
 
-Demonstrates POSITION_TORQUE mode via mix_ctrl_joint_motor(),
+Demonstrates position+torque mixed control via mix_control_by_pt(),
 alternating between two sets of position/torque parameters.
 
 Supports multiple connection types: ZLG CANFD, HCAN, RS485, ZLG TCP, USB CDC serial, SocketCAN, TJ.
@@ -13,7 +13,7 @@ Run with -h or --help to see all available options and usage examples.
 
 import argparse
 import time
-from omnihand import OmniHand2025, HandType, MixCtrl, ControlMode
+from omnihand import OmniHand2025, HandType
 
 EXAMPLES = """\
 examples:
@@ -125,22 +125,15 @@ def main():
     NUM_JOINTS = 10
 
     for cycle in range(6):
-        mix_ctrls = []
-        for i in range(NUM_JOINTS):
-            mc = MixCtrl()
-            mc.joint_index = i + 1
-            mc.ctrl_mode = int(ControlMode.POSITION_TORQUE)
-            if cycle % 2 == 0:
-                mc.tgt_posi = 2000
-                mc.tgt_torque = 50
-            else:
-                mc.tgt_posi = 1000
-                mc.tgt_torque = 150
-            mix_ctrls.append(mc)
+        if cycle % 2 == 0:
+            positions = [2000] * NUM_JOINTS
+            torques = [50] * NUM_JOINTS
+        else:
+            positions = [1000] * NUM_JOINTS
+            torques = [150] * NUM_JOINTS
 
-        print(f"[Cycle {cycle}] mode=POSITION_TORQUE, pos={mc.tgt_posi}, torque={mc.tgt_torque}")
-
-        hand.mix_ctrl_joint_motor(mix_ctrls)
+        print(f"[Cycle {cycle}] mix_control_by_pt pos[0]={positions[0]} torque[0]={torques[0]}")
+        hand.mix_control_by_pt(positions, torques)
         time.sleep(1.5)
 
     print("\n[Done]: Mix control demo completed!")

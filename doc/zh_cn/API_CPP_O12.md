@@ -76,7 +76,7 @@ POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（暂不支持�
 - **伺服模式 (1)**：伺服控制模式。此模式要求位置指令频率 ≥ 50Hz，电机根据目标位置与实际位置的差值进行补运算，自动调节运动速度。
 - **速度模式 (2)**：速度控制，配合 `SetJointMotorVelo` 使用。
 - **力控模式 (3)**：力控模式，配合 `SetJointMotorTorque` 使用。
-- **混合控制**：位置+力矩通过 `MixCtrlJointMotor`（POSITION_TORQUE）实现，力矩单位 0.01N。
+- **混合控制**：位置+力矩通过 `MixControlByPT` 实现，力矩单位 0.01N。
 
 ## 工厂方法
 
@@ -278,9 +278,9 @@ O12 支持通过 `SetControlMode` 指令切换控制模式，支持以下 5 种�
 | `SERVO` | 1 | 伺服控制模式（要求位置指令频率 ≥ 50Hz） |
 | `VELOCITY` | 2 | 速度控制模式 |
 | `TORQUE` | 3 | 力矩控制模式 |
-| `POSITION_TORQUE` | 4 | 位置 + 力混合控制（通过 `MixCtrlJointMotor`，力单位 0.01N） |
+| `MixControlMode::POSITION_TORQUE` | 0x3 | 位置 + 力混合控制（`MixControlByPT`，力单位 0.01N） |
 
-**注意**：混合控制中 `tgt_torque_` 字段单位为 **0.01N**，与触觉传感器法向力关联。纯力矩控制（TORQUE）可通过 `SetControlMode` 设置，混合控制模式 POSITION_TORQUE 通过 `MixCtrlJointMotor` 指令使用。VELOCITY_TORQUE 和 POSITION_VELOCITY_TORQUE 暂不支持。
+**注意**：混合控制中力矩字段单位为 **0.01N**。`MixControlByPV` / `MixControlByPVT` 在 O12 上不可用。
 
 ```cpp
 void SetControlMode(unsigned char joint_motor_index, ControlMode mode);  // 设置单个关节控制模式，索引 1-12
@@ -300,10 +300,16 @@ std::vector<int16_t> GetAllCurrentThreshold() const;                            
 
 ### 混合控制
 
-**注意**：仅支持混合控制模式（位置+力、速度+力、位置+速度+力），不支持纯力矩模式。`tgt_torque_` 单位为 **0.01N**（与触觉法向力关联）。
+**注意**：O12 仅支持 **`MixControlByPT`（位置 + 力）**。`MixControlByPV`、`MixControlByPVT` 在接口中存在，但调用返回空向量且不下发指令。`tgt_torque_` 单位为 **0.01N**（与触觉法向力关联）。数组下标 `i` 对应混合控制关节 id `i`（0-based）；回读 echo 中 `joint_index_` 为 1-based。
 
 ```cpp
-void MixCtrlJointMotor(const std::vector<MixCtrl>& mix_ctrls);  // 混合控制，每项含 joint_index_(1-12)、ctrl_mode_、tgt_posi_/tgt_velo_(0-32767)/tgt_torque_(0.01N)
+std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
+                                    const std::vector<int16_t>& torques);  // 支持
+std::vector<MixCtrl> MixControlByPV(const std::vector<int16_t>& velocities,
+                                    const std::vector<int16_t>& torques);   // 不支持
+std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
+                                     const std::vector<int16_t>& velocities,
+                                     const std::vector<int16_t>& torques);  // 不支持
 ```
 
 ### 错误上报

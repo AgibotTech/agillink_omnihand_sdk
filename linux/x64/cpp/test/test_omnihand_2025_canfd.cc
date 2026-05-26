@@ -463,26 +463,17 @@ TEST_F(OmniHand2025CanfdTest, SetGetAllCurrentThreshold) {
 // Mixed Control Tests
 // ============================================================================
 
-TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor) {
+TEST_F(OmniHand2025CanfdTest, MixControlByPVT) {
   RequireDevice();
   
   // Safe positions from Python demo (per joint)
   const int16_t safe_pos[10] = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
+  std::vector<int16_t> positions(safe_pos, safe_pos + 10);
+  std::vector<int16_t> velocities(10, 50);
+  std::vector<int16_t> torques(10, 0);
   
-  // POSITION_VELOCITY_TORQUE mode: max 8 joints
-  std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
-  for (int i = 1; i <= 8; ++i) {
-    agilink::omnihand::MixCtrl ctrl;  // Default ctor zero-initializes bitfields
-    ctrl.joint_index_ = static_cast<unsigned char>(i);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_VELOCITY_TORQUE);
-    ctrl.tgt_posi_ = safe_pos[i - 1];
-    ctrl.tgt_velo_ = 50;
-    ctrl.tgt_torque_ = 0;
-    mix_ctrls.push_back(ctrl);
-  }
-  
-  hand_->MixCtrlJointMotor(mix_ctrls);
-  std::cout << "[MixCtrlJointMotor] POSITION_VELOCITY_TORQUE mode for 8 joints" << std::endl;
+  (void)hand_->MixControlByPVT(positions, velocities, torques);
+  std::cout << "[MixControlByPVT] all 10 joints" << std::endl;
   
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   auto positions = hand_->GetAllJointMotorPosi();
@@ -496,21 +487,12 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor) {
   EXPECT_EQ(positions.size(), 10);
 }
 
-TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_VeloTorque) {
+TEST_F(OmniHand2025CanfdTest, SetJointMotorVelo) {
   RequireDevice();
   
-  std::cout << "[MixCtrlJointMotor] VELOCITY_TORQUE mode for all 10 joints:" << std::endl;
+  std::cout << "[SetJointMotorVelo] per joint:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
-    std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
-    agilink::omnihand::MixCtrl ctrl;  // Default ctor zero-initializes bitfields
-    ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::VELOCITY_TORQUE);
-    ctrl.tgt_posi_ = std::nullopt;
-    ctrl.tgt_velo_ = 100;
-    ctrl.tgt_torque_ = 0;
-    mix_ctrls.push_back(ctrl);
-    
-    hand_->MixCtrlJointMotor(mix_ctrls);
+    hand_->SetJointMotorVelo(static_cast<unsigned char>(joint), 100);
     std::cout << "  J" << joint << ": velo=100" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
@@ -518,27 +500,16 @@ TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_VeloTorque) {
   SUCCEED();
 }
 
-TEST_F(OmniHand2025CanfdTest, MixCtrlJointMotor_PosiTorque) {
+TEST_F(OmniHand2025CanfdTest, MixControlByPT) {
   RequireDevice();
   
-  // Safe positions from Python demo (per joint)
   const int16_t safe_pos[10] = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
+  std::vector<int16_t> positions(safe_pos, safe_pos + 10);
+  std::vector<int16_t> torques(10, 0);
   
-  std::cout << "[MixCtrlJointMotor] POSITION_TORQUE mode for all 10 joints:" << std::endl;
-  for (int joint = 1; joint <= 10; ++joint) {
-    std::vector<agilink::omnihand::MixCtrl> mix_ctrls;
-    agilink::omnihand::MixCtrl ctrl;  // Default ctor zero-initializes bitfields
-    ctrl.joint_index_ = static_cast<unsigned char>(joint);
-    ctrl.ctrl_mode_ = static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION_TORQUE);
-    ctrl.tgt_posi_ = safe_pos[joint - 1];
-    ctrl.tgt_velo_ = std::nullopt;
-    ctrl.tgt_torque_ = 0;
-    mix_ctrls.push_back(ctrl);
-    
-    hand_->MixCtrlJointMotor(mix_ctrls);
-    std::cout << "  J" << joint << ": posi=" << safe_pos[joint - 1] << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  }
+  (void)hand_->MixControlByPT(positions, torques);
+  std::cout << "[MixControlByPT] all 10 joints" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   
   SUCCEED();
 }

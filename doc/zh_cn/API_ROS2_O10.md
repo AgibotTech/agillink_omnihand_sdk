@@ -45,7 +45,7 @@ O10 ROS2 节点提供 10 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 
 > **注意**：`effort` 为电流（mA），非 ROS2 标准力矩（N·m）。一次消息内各关节使用同一模式（由首关节 `ctrl_mode` 决定 CAN 帧格式）。
 
-节点调用 `MixCtrlJointMotor`，**无回读**。
+节点调用 `MixControlByPT` / `MixControlByPVT`（`position[]`/`effort[]`/`velocity[]` 长度须为 10），**无回读**。
 
 ## 触觉传感器 (1D)
 

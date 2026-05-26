@@ -37,7 +37,7 @@ H3L ROS2 节点提供 4 自由度灵巧手的统一 Topic 接口，遵循 [ROS2 
 - `position[]` = 电机原始位置（int16 ticks，范围 0–4095）
 - `effort[]` = 电机电流（int16，单位 mA）
 
-> **注意**：`effort` 字段传递的是电流值（mA），而非 ROS2 标准的力矩（N·m）。H3L 仅支持 `POSITION_TORQUE` 混合模式。节点内部以 `POSITION_TORQUE` 模式调用 `MixCtrlJointMotor`，**无回读**。
+> **注意**：`effort` 字段传递的是电流值（mA），而非 ROS2 标准的力矩（N·m）。H3L 混合控制使用 `MixControlByPT`（4 路 position/effort），**无回读**。
 
 ## H3L 错误码 bitmask
 

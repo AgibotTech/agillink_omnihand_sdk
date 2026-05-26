@@ -45,7 +45,7 @@ All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`
 
 > **Note**: `effort` is current in mA, not ROS2 torque (N·m). All joints in one message share the same mode (one CAN mix-control frame).
 
-The node calls `MixCtrlJointMotor`. **No readback**.
+The node calls `MixControlByPT` / `MixControlByPVT` (arrays must have length 10). **No readback**.
 
 ## Tactile Sensor (1D)
 
