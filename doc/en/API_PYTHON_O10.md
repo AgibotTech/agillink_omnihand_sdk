@@ -702,7 +702,7 @@ def get_all_current_reports(self) -> List[int]:
 ## Debugging Features
 
 ```python
-def show_data_details(self, show: bool) -> None:
+def show_data_details(self, show: bool, callback: Callable[[str], None] | None = None) -> None:
     """Toggles the display of raw send/receive data details.
     
     Args:

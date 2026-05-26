@@ -70,7 +70,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
         if (!device_available_) {
           std::cout << "[Warning]: USB device created but Init() failed." << std::endl;
         }
-        hand_->ShowDataDetails(true);
+        hand_->ShowDataDetails(true);  // default: stdout
       }
     } catch (const std::exception& e) {
       std::cout << "[Warning]: Failed to open USB port: " << e.what() << std::endl;

@@ -530,7 +530,7 @@ def set_all_current_report_periods(self, periods: List[int]) -> None:
 ## 调试功能
 
 ```python
-def show_data_details(self, show: bool) -> None:
+def show_data_details(self, show: bool, callback: Callable[[str], None] | None = None) -> None:
     """切换显示原始发送/接收数据详情。
     
     Args:

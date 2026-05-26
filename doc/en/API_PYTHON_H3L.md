@@ -309,7 +309,7 @@ def set_device_id(self, device_id: int) -> None: ...
 ### Debugging
 
 ```python
-def show_data_details(self, show: bool) -> None:
+def show_data_details(self, show: bool, callback: Callable[[str], None] | None = None) -> None:
     """Toggles the display of raw send/receive data details."""
 ```
 

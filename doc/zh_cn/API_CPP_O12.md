@@ -338,7 +338,8 @@ void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period);               
 ### 调试
 
 ```cpp
-void ShowDataDetails(bool show) const;  // 是否打印收发原始数据详情
+void ShowDataDetails(bool show, DataDetailsLogCallback log_callback = nullptr) const;
+// 是否打印收发原始数据详情；log_callback 非空时按行回调，否则 stdout
 ```
 
 ## 完整示例

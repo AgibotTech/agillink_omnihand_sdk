@@ -363,7 +363,8 @@ static const std::vector<Finger>& GetSensorOrder();
  * @brief Toggles the display of raw send/receive data details.
  * @param show Whether to show the data details.
  */
-void ShowDataDetails(bool show) const;
+void ShowDataDetails(bool show, DataDetailsLogCallback log_callback = nullptr) const;
+// When log_callback is set, each line is delivered to the callback; otherwise stdout (see omnihand/utils.h).
 ```
 
 ## Important Notes

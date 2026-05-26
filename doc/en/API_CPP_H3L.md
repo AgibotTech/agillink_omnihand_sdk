@@ -269,7 +269,8 @@ void SetDeviceId(unsigned char device_id);
 ### Debugging
 
 ```cpp
-void ShowDataDetails(bool show) const;
+void ShowDataDetails(bool show, DataDetailsLogCallback log_callback = nullptr) const;
+// When log_callback is set, each line is delivered to the callback; otherwise stdout (see omnihand/utils.h).
 ```
 
 ## Complete Example

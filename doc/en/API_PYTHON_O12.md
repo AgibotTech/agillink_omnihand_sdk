@@ -716,7 +716,7 @@ def set_all_current_report_periods(self, periods: List[int]) -> None:
 ## Debugging Features
 
 ```python
-def show_data_details(self, show: bool) -> None:
+def show_data_details(self, show: bool, callback: Callable[[str], None] | None = None) -> None:
     """Toggles the display of raw send/receive data details.
     
     Args:

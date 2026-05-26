@@ -267,7 +267,8 @@ void SetDeviceId(unsigned char device_id);
 ### 调试功能
 
 ```cpp
-void ShowDataDetails(bool show) const;
+void ShowDataDetails(bool show, DataDetailsLogCallback log_callback = nullptr) const;
+// log_callback 非空时按行回调；为空时输出到 stdout（类型见 omnihand/utils.h）
 ```
 
 ## 完整示例

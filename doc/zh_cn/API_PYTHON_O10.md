@@ -513,11 +513,12 @@ def get_all_current_reports(self) -> List[int]:
 ## 调试功能
 
 ```python
-def show_data_details(self, show: bool) -> None:
+def show_data_details(self, show: bool, callback: Callable[[str], None] | None = None) -> None:
     """切换显示原始发送/接收数据详情。
     
     Args:
         show: 是否显示数据详情。
+        callback: 可选，每行日志回调；省略则输出到 stdout。
     """
 ```
 

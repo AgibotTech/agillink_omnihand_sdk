@@ -307,7 +307,7 @@ def set_device_id(self, device_id: int) -> None: ...
 ### 调试功能
 
 ```python
-def show_data_details(self, show: bool) -> None:
+def show_data_details(self, show: bool, callback: Callable[[str], None] | None = None) -> None:
     """切换显示原始收发数据详情。"""
 ```
 
