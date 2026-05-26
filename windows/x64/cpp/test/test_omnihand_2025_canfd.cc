@@ -476,15 +476,15 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPVT) {
   std::cout << "[MixControlByPVT] all 10 joints" << std::endl;
   
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  auto positions = hand_->GetAllJointMotorPosi();
+  auto feedback_pos = hand_->GetAllJointMotorPosi();
   std::cout << "[GetAllJointMotorPosi] ";
-  for (size_t i = 0; i < positions.size(); ++i) {
-    std::cout << positions[i];
-    if (i < positions.size() - 1) std::cout << ", ";
+  for (size_t i = 0; i < feedback_pos.size(); ++i) {
+    std::cout << feedback_pos[i];
+    if (i < feedback_pos.size() - 1) std::cout << ", ";
   }
   std::cout << std::endl;
   
-  EXPECT_EQ(positions.size(), 10);
+  EXPECT_EQ(feedback_pos.size(), 10);
 }
 
 TEST_F(OmniHand2025CanfdTest, SetJointMotorVelo) {
