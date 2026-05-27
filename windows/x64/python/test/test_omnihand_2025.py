@@ -216,15 +216,15 @@ def test_joint_angle_control(hand):
     print(f"[get_all_active_joint_angles] Active Joint Angles (rad): {active_angles}")
     assert len(active_angles) == 10
     
-    # Use get_all_joint_pos instead of get_all_joint_angles to avoid double hardware communication
+    # Use get_all_joint_angles instead of get_all_joint_angles to avoid double hardware communication
     # get_all_joint_angles() internally calls GetAllActiveJointAngles() again, which may fail
-    # get_all_joint_pos() only does kinematics calculation without hardware communication
-    all_angles = hand.get_all_joint_pos(active_angles)
+    # get_all_joint_angles() only does kinematics calculation without hardware communication
+    all_angles = hand.get_all_joint_angles(active_angles)
     # Check if calculation succeeded
     if not all_angles or len(all_angles) == 0:
         pytest.skip("Failed to calculate all joint angles")
     
-    print(f"[get_all_joint_pos] All Joint Angles (rad, {len(all_angles)} joints): {all_angles[:10]}...")
+    print(f"[get_all_joint_angles] All Joint Angles (rad, {len(all_angles)} joints): {all_angles[:10]}...")
     assert len(all_angles) == 16  # 10 active + 6 passive
 
 
@@ -371,8 +371,8 @@ def test_kinematics_solver(hand):
     
     # Test forward kinematics
     active_angles = [0.0] * 10
-    all_angles = hand.get_all_joint_pos(active_angles)
-    print(f"\n[get_all_joint_pos] Forward Kinematics (input: 10 active angles, output: {len(all_angles)} joint angles): "
+    all_angles = hand.get_all_joint_angles(active_angles)
+    print(f"\n[get_all_joint_angles] Forward Kinematics (input: 10 active angles, output: {len(all_angles)} joint angles): "
           f"{all_angles[:10]}...")
     assert len(all_angles) == 16  # 10 active + 6 passive
 
