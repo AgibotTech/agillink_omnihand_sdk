@@ -17,6 +17,7 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/i_control_mode.h"
 #include "omnihand/i_omnihand_calibrator.h"
+#include "omnihand/i_omnihand_motor_range.h"
 #include "omnihand/kinematics/omnihand_3_ultra_m/omnihand_3_ultra_m_solver.h"
 #include "omnihand/omnihand.h"
 #include "omnihand/proto.h"
@@ -94,7 +95,7 @@ inline std::string H3UMErrorReportToString(const JointMotorErrorReport& report) 
  *   SetHandGesture, and interfaces for accessing passive joints by single joint
  *   name/index are still placeholder implementations.
  */
-class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, public IOmniHandCalibrator {
+class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, public IOmniHandCalibrator, public IOmniHandMotorRange {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // DoA
@@ -217,14 +218,64 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
     };
   }
 
+
+  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinMotorPos() const override {
+    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinMotorPos = {
+      {0, 4095},  // 1: pinky_abad_joint
+      {0, 4095},  // 2: pinky_mcp_joint
+      {0, 4095},  // 3: pinky_pip_joint
+      {0, 4095},  // 4: pinky_dip_joint
+      {0, 4095},  // 5: ring_abad_joint
+      {0, 4095},  // 6: ring_mcp_joint
+      {0, 4095},  // 7: ring_pip_joint
+      {0, 4095},  // 8: ring_dip_joint
+      {0, 4095},  // 9: middle_abad_joint
+      {0, 4095},  // 10: middle_mcp_joint
+      {0, 4095},  // 11: middle_pip_joint
+      {0, 4095},  // 12: middle_dip_joint
+      {0, 4095},  // 13: index_abad_joint
+      {0, 4095},  // 14: index_mcp_joint
+      {0, 4095},  // 15: index_pip_joint
+      {0, 4095},  // 16: index_dip_joint
+      {0, 4095},  // 17: thumb_abad_joint
+      {0, 4095},  // 18: thumb_mcp_joint
+      {0, 4095},  // 19: thumb_pip_joint
+      {0, 4095},  // 20: thumb_dip_joint
+    };
+    return kAllMaxMinMotorPos;
+  }
+
+  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinActualMotorPos() const override {
+    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinActualMotorPos = {
+      {-1800, 1800},  // 1: pinky_abad_joint
+      {-1800, 1800},  // 2: pinky_mcp_joint
+      {-1800, 1800},  // 3: pinky_pip_joint
+      {-1800, 1800},  // 4: pinky_dip_joint
+      {-1800, 1800},  // 5: ring_abad_joint
+      {-1800, 1800},  // 6: ring_mcp_joint
+      {-1800, 1800},  // 7: ring_pip_joint
+      {-1800, 1800},  // 8: ring_dip_joint
+      {-1800, 1800},  // 9: middle_abad_joint
+      {-1800, 1800},  // 10: middle_mcp_joint
+      {-1800, 1800},  // 11: middle_pip_joint
+      {-1800, 1800},  // 12: middle_dip_joint
+      {-1800, 1800},  // 13: index_abad_joint
+      {-1800, 1800},  // 14: index_mcp_joint
+      {-1800, 1800},  // 15: index_pip_joint
+      {-1800, 1800},  // 16: index_dip_joint
+      {-1800, 1800},  // 17: thumb_abad_joint
+      {-1800, 1800},  // 18: thumb_mcp_joint
+      {-1800, 1800},  // 19: thumb_pip_joint
+      {-1800, 1800},  // 20: thumb_dip_joint
+    };
+    return kAllMaxMinActualMotorPos;
+  }
+
   // ============ Gesture Control ============
-  /**
-   * @brief Sets the hand to a predefined gesture.
-   * @param gesture_num Gesture number
-   * TODO(O20): To be implemented after gesture library integration; currently a no-op.
-   * Upper layers should use SetAllActiveJointAngles(rad) to send whole-hand joint targets,
-   * or SetAllJointMotorPosi(0-4095 ticks) for the raw actuator channel.
-   */
+  void SetHandGesture(h3um::H3UMGesture gesture);
+
+  std::vector<int16_t> GetHandGesture(h3um::H3UMGesture gesture);
+
   void SetHandGesture(int gesture_num = 1) override;
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
