@@ -70,7 +70,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
         if (!device_available_) {
           std::cout << "[Warning]: USB device created but Init() failed." << std::endl;
         }
-        hand_->ShowDataDetails(true);
+        hand_->ShowDataDetails(true);  // default: stdout
       }
     } catch (const std::exception& e) {
       std::cout << "[Warning]: Failed to open USB port: " << e.what() << std::endl;
@@ -350,15 +350,15 @@ TEST_F(OmniHand2025UsbTest, MixControlByPVT) {
   (void)hand_->MixControlByPVT(positions, velocities, torques);
   std::cout << "[MixControlByPVT] all 10 joints" << std::endl;
   
-  auto positions = hand_->GetAllJointMotorPosi();
+  auto feedback_pos = hand_->GetAllJointMotorPosi();
   std::cout << "[GetAllJointMotorPosi] After mixed control: ";
-  for (size_t i = 0; i < positions.size(); ++i) {
-    std::cout << positions[i];
-    if (i < positions.size() - 1) std::cout << ", ";
+  for (size_t i = 0; i < feedback_pos.size(); ++i) {
+    std::cout << feedback_pos[i];
+    if (i < feedback_pos.size() - 1) std::cout << ", ";
   }
   std::cout << std::endl;
   
-  EXPECT_EQ(positions.size(), 10);
+  EXPECT_EQ(feedback_pos.size(), 10);
 }
 
 TEST_F(OmniHand2025UsbTest, SetAllJointMotorVelo) {

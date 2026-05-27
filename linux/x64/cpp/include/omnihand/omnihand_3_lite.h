@@ -16,6 +16,7 @@
 #include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/kinematics/omnihand_3_lite/omnihand_3_lite_solver.h"
+#include "omnihand/i_omnihand_motor_range.h"
 #include "omnihand/omnihand.h"
 #include "omnihand/private_omnihand.h"
 #include "omnihand/proto.h"
@@ -34,7 +35,7 @@ namespace omnihand {
  *       Use motor position control (SetJointMotorPosi, SetAllJointMotorPosi) instead.
  *       Gesture control is available via SetHandGesture() with OmniHand3LiteGesture enum.
  */
-class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
+class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, public IOmniHandMotorRange {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // DoA
@@ -199,13 +200,43 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
   std::vector<std::string> GetJointNames() const override {
     const std::string p = is_left_hand_ ? "L_" : "R_";
     // because of doesn't have URDF, so we hardcode the joint names
-    return {p + "joint1", p + "joint2", p + "joint3", p + "joint4"};
+    return {
+      p + "joint1",  // 1
+      p + "joint2",  // 2
+      p + "joint3",  // 3
+      p + "joint4",  // 4
+    };
   }
+
+  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinMotorPos() const override {
+    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinMotorPos = {
+      {0, 4095},  // 1
+      {0, 4095},  // 2
+      {0, 4095},  // 3
+      {0, 4095},  // 4
+    };
+    return kAllMaxMinMotorPos;
+  }
+
+  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinActualMotorPos() const override {
+    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinActualMotorPos = {
+      {0, 4095},  // 1
+      {0, 4095},  // 2
+      {0, 4095},  // 3
+      {0, 4095},  // 4
+    };
+    return kAllMaxMinActualMotorPos;
+  }
+
   // ============ Gesture Control ============
   /**
    * @brief Sets the hand to a predefined gesture (typed API).
    */
   void SetHandGesture(OmniHand3LiteGesture gesture);
+
+  std::vector<int16_t> GetHandGesture(OmniHand3LiteGesture gesture);
+
+  void SetHandGesture(int gesture_num) override;
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
 

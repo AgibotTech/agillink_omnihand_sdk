@@ -17,6 +17,7 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/omnihand.h"
 #include "omnihand/i_control_mode.h"
+#include "omnihand/i_omnihand_motor_range.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_pro_2025/omnihand_pro_2025_solver.h"
@@ -30,7 +31,7 @@ namespace omnihand {
  * This class provides the public interface for OmniHand Pro 2025 product.
  * It includes all methods supported by O12, including 3D tactile sensors and report period settings.
  */
-class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
+class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode, public IOmniHandMotorRange {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 12;   // DoA
@@ -259,19 +260,55 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
   std::vector<std::string> GetJointNames() const override {
     const std::string p = is_left_hand_ ? "L_" : "R_";
     return {
-        p + "thumb_roll_joint",
-        p + "thumb_abad_joint",
-        p + "thumb_mcp_joint",
-        p + "thumb_pip_joint",
-        p + "index_abad_joint",
-        p + "index_mcp_joint",
-        p + "index_pip_joint",
-        p + "middle_abad_joint",
-        p + "middle_mcp_joint",
-        p + "middle_pip_joint",
-        p + "ring_mcp_joint",
-        p + "pinky_mcp_joint",
+      p + "thumb_roll_joint",
+      p + "thumb_abad_joint",
+      p + "thumb_mcp_joint",
+      p + "thumb_pip_joint",
+      p + "index_abad_joint",
+      p + "index_mcp_joint",
+      p + "index_pip_joint",
+      p + "middle_abad_joint",
+      p + "middle_mcp_joint",
+      p + "middle_pip_joint",
+      p + "ring_mcp_joint",
+      p + "pinky_mcp_joint",
     };
+  }
+
+  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinMotorPos() const override {
+    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinMotorPos = {
+      {0, 2000},  // 1: thumb_roll_joint
+      {0, 2000},  // 2: thumb_abad_joint
+      {0, 2000},  // 3: thumb_mcp_joint
+      {0, 2000},  // 4: thumb_pip_joint
+      {0, 2000},  // 5: index_abad_joint
+      {0, 2000},  // 6: index_mcp_joint
+      {0, 2000},  // 7: index_pip_joint
+      {0, 2000},  // 8: middle_abad_joint
+      {0, 2000},  // 9: middle_mcp_joint
+      {0, 2000},  // 10: middle_pip_joint
+      {0, 2000},  // 11: ring_mcp_joint
+      {0, 2000},  // 12: pinky_mcp_joint
+    };
+    return kAllMaxMinMotorPos;
+  }
+
+  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinActualMotorPos() const override {
+    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinActualMotorPos = {
+      {0, 2000},  // 1: thumb_roll_joint
+      {0, 2000},  // 2: thumb_abad_joint
+      {0, 2000},  // 3: thumb_mcp_joint
+      {0, 2000},  // 4: thumb_pip_joint
+      {0, 2000},  // 5: index_abad_joint
+      {0, 2000},  // 6: index_mcp_joint
+      {0, 2000},  // 7: index_pip_joint
+      {0, 2000},  // 8: middle_abad_joint
+      {0, 2000},  // 9: middle_mcp_joint
+      {0, 2000},  // 10: middle_pip_joint
+      {0, 2000},  // 11: ring_mcp_joint
+      {0, 2000},  // 12: pinky_mcp_joint
+    };
+    return kAllMaxMinActualMotorPos;
   }
 
   // ============ Gesture Control ============
@@ -280,6 +317,10 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @param gesture_num Gesture number (ignored for O12, only one FIST type supported)
    */
   void SetHandGesture(o12::OmniHandPro2025Gesture gesture);
+
+  void SetHandGesture(int gesture_num) override;
+
+  std::vector<int16_t> GetHandGesture(o12::OmniHandPro2025Gesture gesture);
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
 

@@ -58,6 +58,10 @@ enum class H3UMActiveJoint {
   H3U_M_ACTIVE_JOINT_COUNT  ///< Total active-joint count = 20.
 };
 
+enum class H3UMGesture : int {
+  H3U_M_GESTURE_ALL_ZERO = 0,
+};
+
 /**
  * @class OmniHand3UltraMSolver
  * @brief Per-joint linear rad <-> actuator-input solver for OmniHand 3 Ultra
@@ -135,6 +139,9 @@ class AGIBOT_EXPORT OmniHand3UltraMSolver {
   /// Direct access to the calibration table currently in use (length = kActiveJointCount).
   const JointMotorCalib* CalibTable() const { return table_; }
   bool IsLeftHand() const { return is_left_hand_; }
+
+
+  std::vector<int16_t> SetHandGesture(H3UMGesture gesture) const;
 
  private:
   bool is_left_hand_;
