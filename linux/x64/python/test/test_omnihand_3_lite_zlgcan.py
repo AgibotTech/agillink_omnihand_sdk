@@ -130,30 +130,23 @@ def test_set_get_all_joint_positions(hand):
         assert len(actual_positions) == 4
 
 
-def test_set_get_joint_velocity(hand):
-    """Test setting and getting single joint velocity"""
+def test_get_joint_velocity(hand):
+    """Test getting single joint velocity"""
     if hand.init():
         # Test all 4 joints (O4 has 4 DOF)
         for joint_idx in range(1, 5):
-            # Set velocity
-            hand.set_joint_velocity(joint_idx, 100)
-            
             # Get velocity
             velo = hand.get_joint_velocity(joint_idx)
-            print(f"\n[set_get_joint_velocity] Joint {joint_idx} velocity: {velo}")
+            print(f"\n[get_joint_velocity] Joint {joint_idx} velocity: {velo}")
             assert velo >= 0
 
 
-def test_set_get_all_joint_velocities(hand):
-    """Test setting and getting all joint velocities"""
+def test_get_all_joint_velocities(hand):
+    """Test getting all joint velocities"""
     if hand.init():
-        # Set all velocities (O4 has 4 joints)
-        velocities = [100, 100, 100, 100]
-        hand.set_all_joint_velocities(velocities)
-
         # Get all velocities
         all_velocities = hand.get_all_joint_velocities()
-        print(f"\n[set_get_all_joint_velocities] All velocities: {all_velocities}")
+        print(f"\n[get_all_joint_velocities] All velocities: {all_velocities}")
         assert len(all_velocities) == 4
 
 

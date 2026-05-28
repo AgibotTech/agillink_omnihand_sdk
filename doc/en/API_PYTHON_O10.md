@@ -415,17 +415,6 @@ def get_all_joint_angles(self) -> List[float]:
 ## Velocity Control
 
 ```python
-def set_joint_velocity(self, joint_motor_index: int, velocity: int) -> None:
-    """Sets the velocity of a single joint motor.
-    
-    Args:
-        joint_motor_index: Joint motor index (1-10).
-        velocity: Target velocity (range: 0-32767).
-    
-    Note:
-        This interface is not supported for serial port communication (RS485).
-    """
-
 def get_joint_velocity(self, joint_motor_index: int) -> int:
     """Gets the velocity of a single joint motor.
     
@@ -436,14 +425,7 @@ def get_joint_velocity(self, joint_motor_index: int) -> int:
         int: Current velocity.
     
     Note:
-        This interface is not supported for serial port communication (RS485).
-    """
-
-def set_all_joint_velocities(self, velocities: List[int]) -> None:
-    """Sets the velocities of all joint motors in batch.
-    
-    Args:
-        velocities: List of target velocities. Must have 10 values (range: 0-32767).
+        O10 velocity set interfaces are disabled; this interface is read-only.
     """
 
 def get_all_joint_velocities(self) -> List[int]:

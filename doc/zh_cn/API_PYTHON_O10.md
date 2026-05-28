@@ -307,17 +307,6 @@ def get_sensor_order() -> List[int]:
 ## 速度控制
 
 ```python
-def set_joint_velocity(self, joint_motor_index: int, velocity: int) -> None:
-    """设置单个关节电机的速度。
-    
-    Args:
-        joint_motor_index: 关节电机索引（1-10）。
-        velocity: 目标速度（范围：0-32767）。
-    
-    Note:
-        串口通信（RS485）不支持此接口。
-    """
-
 def get_joint_velocity(self, joint_motor_index: int) -> int:
     """获取单个关节电机的速度。
     
@@ -328,14 +317,7 @@ def get_joint_velocity(self, joint_motor_index: int) -> int:
         int: 当前速度。
     
     Note:
-        串口通信（RS485）不支持此接口。
-    """
-
-def set_all_joint_velocities(self, velocities: List[int]) -> None:
-    """批量设置所有关节电机的速度。
-    
-    Args:
-        velocities: 目标速度列表。必须包含 10 个值，每个值范围：0-32767。
+        O10 已禁用速度设置接口，此接口为只读。
     """
 
 def get_all_joint_velocities(self) -> List[int]:

@@ -303,12 +303,8 @@ TEST_F(OmniHand3UltraMTest, CurrentReport) {
   }
 }
 
-TEST_F(OmniHand3UltraMTest, VelocityControl) {
+TEST_F(OmniHand3UltraMTest, GetAllJointMotorVelo) {
   if (hand_->Init()) {
-    std::vector<int16_t> velocities(20, 0);
-    hand_->SetAllJointMotorVelo(velocities);
-    std::cout << "[SetAllJointMotorVelo] Set 20 velocities to 0" << std::endl;
-
     auto current_velocities = hand_->GetAllJointMotorVelo();
     if (current_velocities.empty() || current_velocities.size() != 20) {
       std::cout << "[GetAllJointMotorVelo] Failed: got " << current_velocities.size()

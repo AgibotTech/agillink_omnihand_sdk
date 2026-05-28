@@ -411,14 +411,9 @@ TEST_F(OmniHand2025CanfdTest, GetAllTactileSensorDataRaw) {
 // Motor Velocity Control Tests
 // ============================================================================
 
-TEST_F(OmniHand2025CanfdTest, SetGetAllJointMotorVelo) {
+TEST_F(OmniHand2025CanfdTest, GetAllJointMotorVelo) {
   RequireDevice();
-  
-  std::vector<int16_t> velocities(10, 100);
-  hand_->SetAllJointMotorVelo(velocities);
-  std::cout << "[SetAllJointMotorVelo] All joints -> 100" << std::endl;
-  
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
   auto current_velo = hand_->GetAllJointMotorVelo();
   std::cout << "[GetAllJointMotorVelo] ";
   for (size_t i = 0; i < current_velo.size(); ++i) {
@@ -441,7 +436,7 @@ TEST_F(OmniHand2025CanfdTest, SetGetAllJointMotorVelo) {
 TEST_F(OmniHand2025CanfdTest, SetGetAllCurrentThreshold) {
   RequireDevice();
   
-  std::vector<int16_t> thresholds(10, 1000);
+  std::vector<int16_t> thresholds(10, 1500);
   hand_->SetAllCurrentThreshold(thresholds);
   std::cout << "[SetAllCurrentThreshold] All joints -> 1000mA" << std::endl;
   
@@ -488,16 +483,15 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPVT) {
   EXPECT_EQ(feedback_pos.size(), 10);
 }
 
-TEST_F(OmniHand2025CanfdTest, SetJointMotorVelo) {
+TEST_F(OmniHand2025CanfdTest, GetJointMotorVelo) {
   RequireDevice();
-  
-  std::cout << "[SetJointMotorVelo] per joint:" << std::endl;
+
+  std::cout << "[GetJointMotorVelo] per joint:" << std::endl;
   for (int joint = 1; joint <= 10; ++joint) {
-    hand_->SetJointMotorVelo(static_cast<unsigned char>(joint), 100);
-    std::cout << "  J" << joint << ": velo=100" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    auto velo = hand_->GetJointMotorVelo(static_cast<unsigned char>(joint));
+    std::cout << "  J" << joint << ": velo=" << velo << std::endl;
   }
-  
+
   SUCCEED();
 }
 

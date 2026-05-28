@@ -386,26 +386,12 @@ std::vector<int16_t> GetAllJointMotorPosi() const;
 
 ```cpp
 /**
- * @brief 设置单个关节电机的速度）
- * @param joint_motor_index 关节电机索引（1-10）。
- * @param velo 目标速度值（范围：0-32767）
- * @note 串口通信（RS485）不支持此接口）
- */
-void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo);
-
-/**
  * @brief 获取单个关节电机的速度）
  * @param joint_motor_index 关节电机索引（1-10）。
  * @return 当前速度值）
- * @note 串口通信（RS485）不支持此接口）
+ * @note O10 已禁用速度设置接口，仅支持速度读取）
  */
 int16_t GetJointMotorVelo(unsigned char joint_motor_index) const;
-
-/**
- * @brief 批量设置所有关节电机的速度）
- * @param vec_velo 目标速度向量。必须包含 10 个值，每个值范围：0-32767）
- */
-void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo);
 
 /**
  * @brief 批量获取所有关节电机的速度）

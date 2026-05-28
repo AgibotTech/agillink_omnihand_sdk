@@ -319,7 +319,7 @@ TEST_F(OmniHand2025UsbTest, GetTactileSensorData) {
 TEST_F(OmniHand2025UsbTest, SetAllCurrentThreshold) {
   RequireDevice();
   
-  std::vector<int16_t> thresholds(10, 1000);  // 1000mA
+  std::vector<int16_t> thresholds(10, 1500);  // 1500mA
   hand_->SetAllCurrentThreshold(thresholds);
   std::cout << "[SetAllCurrentThreshold] All joints -> 1000mA" << std::endl;
   
@@ -361,13 +361,22 @@ TEST_F(OmniHand2025UsbTest, MixControlByPVT) {
   EXPECT_EQ(feedback_pos.size(), 10);
 }
 
-TEST_F(OmniHand2025UsbTest, SetAllJointMotorVelo) {
+TEST_F(OmniHand2025UsbTest, GetAllJointMotorVelo) {
   RequireDevice();
-  
-  std::vector<int16_t> velocities(10, 100);
-  hand_->SetAllJointMotorVelo(velocities);
-  std::cout << "[SetAllJointMotorVelo] all 10 joints velo=100" << std::endl;
-  SUCCEED();
+
+  auto current_velo = hand_->GetAllJointMotorVelo();
+  std::cout << "[GetAllJointMotorVelo] ";
+  for (size_t i = 0; i < current_velo.size(); ++i) {
+    std::cout << current_velo[i];
+    if (i < current_velo.size() - 1) std::cout << ", ";
+  }
+  std::cout << std::endl;
+
+  if (current_velo.empty()) {
+    GTEST_SKIP() << "GetAllJointMotorVelo timeout";
+  }
+
+  EXPECT_EQ(current_velo.size(), 10);
 }
 
 TEST_F(OmniHand2025UsbTest, MixControlByPT) {

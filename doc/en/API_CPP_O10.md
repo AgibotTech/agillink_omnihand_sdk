@@ -378,26 +378,12 @@ std::vector<int16_t> GetAllJointMotorPosi() const;
 
 ```cpp
 /**
- * @brief Sets the velocity of a single joint motor.
- * @param joint_motor_index The index of the joint motor (1-10).
- * @param velo The target velocity value (range: 0-32767).
- * @note This interface is not supported for serial port communication (RS485).
- */
-void SetJointMotorVelo(unsigned char joint_motor_index, int16_t velo);
-
-/**
  * @brief Gets the velocity of a single joint motor.
  * @param joint_motor_index The index of the joint motor (1-10).
  * @return The current velocity value.
- * @note This interface is not supported for serial port communication (RS485).
+ * @note Velocity set interfaces are disabled for O10; only readback is supported.
  */
 int16_t GetJointMotorVelo(unsigned char joint_motor_index) const;
-
-/**
- * @brief Sets the velocities of all joint motors in batch.
- * @param vec_velo A vector of target velocities. Must have 10 values (range: 0-32767).
- */
-void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo);
 
 /**
  * @brief Gets the velocities of all joint motors in batch.
