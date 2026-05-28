@@ -17,7 +17,7 @@ using namespace agilink::omnihand;
 
 // Global variable to store request interval from command line argument
 static int g_request_interval = 5;  // Default: 5ms
-
+static int g_frame_recv_timeout = 100;  // Default: 100ms
 // Global variable to store device type from command line argument
 static std::string g_device_type = "zlgcan";  // Default: zlgcan
 
@@ -53,6 +53,9 @@ class OmniHand3LiteTest : public ::testing::Test {
     }
     int request_interval = GetRequestInterval();
     hand_->SetRequestInterval(request_interval);
+    hand_->SetFrameRecvTimeout(100);
+    std::cout << "[Info]: Using frame recv timeout: " << hand_->GetFrameRecvTimeout() << " ms" << std::endl;
+    hand_->ShowDataDetails(true);
     if (request_interval != 0) {
       std::cout << "[Info]: Using request interval: " << request_interval << " ms" << std::endl;
     }
@@ -94,40 +97,40 @@ TEST_F(OmniHand3LiteTest, GetDeviceInfo) {
   EXPECT_EQ(device_info.hand_device_id, 1);
 }
 
-// Test setting device ID
-// Note: SetDeviceId may change device ID on hardware, making device inaccessible with original ID.
-// Use with caution and only in controlled test environments.
-TEST_F(OmniHand3LiteTest, SetDeviceId) {
-  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+// // Test setting device ID
+// // Note: SetDeviceId may change device ID on hardware, making device inaccessible with original ID.
+// // Use with caution and only in controlled test environments.
+// TEST_F(OmniHand3LiteTest, SetDeviceId) {
+//   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
-  // Get current device ID first
-  auto current_device_info = hand_->GetDeviceInfo();
-  unsigned char current_id = current_device_info.hand_device_id;
+//   // Get current device ID first
+//   auto current_device_info = hand_->GetDeviceInfo();
+//   unsigned char current_id = current_device_info.hand_device_id;
   
-  // Only test if we got a valid device ID
-  if (current_id == 0) {
-    // Request failed (timeout), skip test
-    return;
-  }
+//   // Only test if we got a valid device ID
+//   if (current_id == 0) {
+//     // Request failed (timeout), skip test
+//     return;
+//   }
   
-  // Set to target ID (2) using current ID
-  unsigned char target_id = 2;
-  hand_->SetDeviceId(target_id);
-  std::cout << "[SetDeviceId] Set Device ID: " << static_cast<int>(target_id) << std::endl;
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
+//   // Set to target ID (2) using current ID
+//   unsigned char target_id = 2;
+//   hand_->SetDeviceId(target_id);
+//   std::cout << "[SetDeviceId] Set Device ID: " << static_cast<int>(target_id) << std::endl;
+//   std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
 
-  auto device_info = hand_->GetDeviceInfo();
-  EXPECT_EQ(device_info.hand_device_id, 2);
+//   auto device_info = hand_->GetDeviceInfo();
+//   EXPECT_EQ(device_info.hand_device_id, 2);
   
-  // Reset to original
-  unsigned char original_id = 1;
-  hand_->SetDeviceId(original_id);
-  std::cout << "[SetDeviceId] Reset Device ID: " << static_cast<int>(original_id) << std::endl;
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
+//   // Reset to original
+//   unsigned char original_id = 1;
+//   hand_->SetDeviceId(original_id);
+//   std::cout << "[SetDeviceId] Reset Device ID: " << static_cast<int>(original_id) << std::endl;
+//   std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
   
-  auto device_info1 = hand_->GetDeviceInfo();
-  EXPECT_EQ(device_info1.hand_device_id, 1);
-}
+//   auto device_info1 = hand_->GetDeviceInfo();
+//   EXPECT_EQ(device_info1.hand_device_id, 1);
+// }
 
 // Test motor position control (requires hardware)
 TEST_F(OmniHand3LiteTest, MotorPositionControl) {

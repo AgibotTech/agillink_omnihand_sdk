@@ -47,6 +47,7 @@ class OmniHand2025Test : public ::testing::Test {
     }
     int request_interval = GetRequestInterval();
     hand_->SetRequestInterval(request_interval);
+    hand_->ShowDataDetails(true);
     if (request_interval != 0) {
       std::cout << "[Info]: Using request interval: " << request_interval << " ms" << std::endl;
     }

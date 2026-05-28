@@ -100,6 +100,7 @@ class OmniHand2025CanfdTest : public ::testing::Test {
 
     if (hand_) {
       hand_->SetRequestInterval(g_request_interval);
+      hand_->ShowDataDetails(true);
       device_available_ = hand_->Init();
       if (!device_available_) {
         std::cout << "[Warning]: CANFD device created but Init() failed." << std::endl;
