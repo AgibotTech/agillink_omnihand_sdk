@@ -251,64 +251,49 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode, publ
 
   // ============ Joint Naming ============
   /**
-   * @brief Returns the 12 active joint names of O12 in motor-index order.
-   * @note Order MUST match the ActiveJointID enum used by the kinematics solver
-   *       and SetAllJointMotorPosi / GetAllJointMotorPosi. Names are prefixed
-   *       with "L_"/"R_" to match the URDF in
-   *       `omnihand_sdk/assets/o12_hand_description`.
+   * @brief Returns names for physical motors 1–12 (O12handProActuator order).
+   * @note Order MUST match SetAllJointMotorPosi / GetAllJointMotorPosi and
+   *       o12::O12handProActuator in omnihand_pro_2025_solver.h. Motors 1–2 are
+   *       index coupled tendons (not thumb); thumb roll/abad are motors 5–6.
    */
   std::vector<std::string> GetJointNames() const override {
     const std::string p = is_left_hand_ ? "L_" : "R_";
     return {
-      p + "thumb_roll_joint",
-      p + "thumb_abad_joint",
-      p + "thumb_mcp_joint",
-      p + "thumb_pip_joint",
-      p + "index_abad_joint",
-      p + "index_mcp_joint",
-      p + "index_pip_joint",
-      p + "middle_abad_joint",
-      p + "middle_mcp_joint",
-      p + "middle_pip_joint",
-      p + "ring_mcp_joint",
-      p + "pinky_mcp_joint",
+      p + "index_abad_joint",   // 1 ActuatorIndex1 (near thumb)
+      p + "index_mcp_joint",    // 2 ActuatorIndex2
+      p + "middle_abad_joint",  // 3 ActuatorMiddle1
+      p + "middle_mcp_joint",   // 4 ActuatorMiddle2
+      p + "thumb_abad_joint",   // 5 ActuatorThumbABAD
+      p + "thumb_roll_joint",   // 6 ActuatorThumbRoll
+      p + "index_pip_joint",    // 7 ActuatorIndex3
+      p + "middle_pip_joint",   // 8 ActuatorMiddle3
+      p + "ring_mcp_joint",     // 9 ActuatorRing
+      p + "pinky_mcp_joint",    // 10 ActuatorPinky
+      p + "thumb_pip_joint",    // 11 ActuatorThumbPIP
+      p + "thumb_mcp_joint",    // 12 ActuatorThumbMCP
     };
   }
 
   std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinMotorPos() const override {
     static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinMotorPos = {
-      {0, 2000},  // 1: thumb_roll_joint
-      {0, 2000},  // 2: thumb_abad_joint
-      {0, 2000},  // 3: thumb_mcp_joint
-      {0, 2000},  // 4: thumb_pip_joint
-      {0, 2000},  // 5: index_abad_joint
-      {0, 2000},  // 6: index_mcp_joint
-      {0, 2000},  // 7: index_pip_joint
-      {0, 2000},  // 8: middle_abad_joint
-      {0, 2000},  // 9: middle_mcp_joint
-      {0, 2000},  // 10: middle_pip_joint
-      {0, 2000},  // 11: ring_mcp_joint
-      {0, 2000},  // 12: pinky_mcp_joint
+      {0, 2000},  // 1: index ActuatorIndex1
+      {0, 2000},  // 2: index ActuatorIndex2
+      {0, 2000},  // 3: middle ActuatorMiddle1
+      {0, 2000},  // 4: middle ActuatorMiddle2
+      {0, 2000},  // 5: thumb_abad ActuatorThumbABAD
+      {0, 2000},  // 6: thumb_roll ActuatorThumbRoll
+      {0, 2000},  // 7: index_pip ActuatorIndex3
+      {0, 2000},  // 8: middle_pip ActuatorMiddle3
+      {0, 2000},  // 9: ring_mcp ActuatorRing
+      {0, 2000},  // 10: pinky_mcp ActuatorPinky
+      {0, 2000},  // 11: thumb_pip ActuatorThumbPIP
+      {0, 2000},  // 12: thumb_mcp ActuatorThumbMCP
     };
     return kAllMaxMinMotorPos;
   }
 
   std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinActualMotorPos() const override {
-    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinActualMotorPos = {
-      {0, 2000},  // 1: thumb_roll_joint
-      {0, 2000},  // 2: thumb_abad_joint
-      {0, 2000},  // 3: thumb_mcp_joint
-      {0, 2000},  // 4: thumb_pip_joint
-      {0, 2000},  // 5: index_abad_joint
-      {0, 2000},  // 6: index_mcp_joint
-      {0, 2000},  // 7: index_pip_joint
-      {0, 2000},  // 8: middle_abad_joint
-      {0, 2000},  // 9: middle_mcp_joint
-      {0, 2000},  // 10: middle_pip_joint
-      {0, 2000},  // 11: ring_mcp_joint
-      {0, 2000},  // 12: pinky_mcp_joint
-    };
-    return kAllMaxMinActualMotorPos;
+    return GetAllMaxMinMotorPos();
   }
 
   // ============ Gesture Control ============
