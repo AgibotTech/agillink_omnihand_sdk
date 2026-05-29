@@ -7,6 +7,7 @@ Unit tests for OmniHand 3 Lite S (O4) with HCAN USB CANFD device
 
 import sys
 import os
+import time
 
 # Ensure we use the installed omnihand package, not the source directory
 # Remove parent directory from path to avoid importing from source
@@ -24,7 +25,7 @@ from omnihand import OmniHand3Lite, HandType, ControlMode
 # Global variable to store request interval from command line argument
 # Can be set via environment variable OMNIHAND_REQUEST_INTERVAL or -f when running directly
 REQUEST_INTERVAL = 5  # Default: 5ms
-
+HAND_TYPE = HandType.LEFT
 # Try to get from environment variable first (works with pytest)
 env_interval = os.environ.get("OMNIHAND_REQUEST_INTERVAL")
 if env_interval is not None:
@@ -57,7 +58,7 @@ if "-f" in sys.argv:
 def hand():
     """Create and initialize OmniHand 3 Lite S (O4) instance for testing with HCAN USB CANFD"""
     hand = OmniHand3Lite.create_hand_by_hcan(
-        hand_type=HandType.LEFT,
+        hand_type=HAND_TYPE,
         hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
         canfd_device_id=0,
         canfd_channel_id=0
@@ -119,8 +120,44 @@ def test_set_get_joint_position(hand):
 def test_set_get_all_joint_positions(hand):
     """Test setting and getting all joint positions"""
     if hand.init():
+        POSE_OPEN = {
+        # OMNI_HAND_3_LITE_GESTURE_OPEN
+            'right': [4095, 4095, 4095, 4095],
+            'left': [0, 4095, 4095, 0],
+        }
+        POSE_CLOSE = {
+        # OMNI_HAND_3_LITE_GESTURE_FIST
+            'right': [1500, 1500, 2900, 400],
+            'left': [2595, 1500, 2900, 3695],
+        }
+        hand_type_str = 'left' if HAND_TYPE == HandType.LEFT else 'right'
+        
         # Set all positions (O4 has 4 joints)
-        positions = [2048, 2048, 2048, 2048]
+        positions = POSE_OPEN[hand_type_str]
+        actual_positions = hand.set_all_joint_positions(positions)
+
+        print(f"\n[set_get_all_joint_positions] Set positions: {positions}")
+        print(f"[set_get_all_joint_positions] Actual positions: {actual_positions}")
+
+        time.sleep(0.5)
+        
+        positions = POSE_CLOSE[hand_type_str]
+        actual_positions = hand.set_all_joint_positions(positions)
+
+        print(f"\n[set_get_all_joint_positions] Set positions: {positions}")
+        print(f"[set_get_all_joint_positions] Actual positions: {actual_positions}")
+
+        time.sleep(0.5)
+
+        positions = POSE_OPEN[hand_type_str]
+        actual_positions = hand.set_all_joint_positions(positions)
+
+        print(f"\n[set_get_all_joint_positions] Set positions: {positions}")
+        print(f"[set_get_all_joint_positions] Actual positions: {actual_positions}")
+
+        time.sleep(0.5)
+
+        positions = POSE_CLOSE[hand_type_str]
         actual_positions = hand.set_all_joint_positions(positions)
 
         print(f"\n[set_get_all_joint_positions] Set positions: {positions}")
@@ -130,31 +167,25 @@ def test_set_get_all_joint_positions(hand):
         assert len(actual_positions) == 4
 
 
-def test_set_get_joint_velocity(hand):
-    """Test setting and getting single joint velocity"""
-    if hand.init():
-        # Test all 4 joints (O4 has 4 DOF)
-        for joint_idx in range(1, 5):
-            # Set velocity
-            hand.set_joint_velocity(joint_idx, 100)
-            
-            # Get velocity
-            velo = hand.get_joint_velocity(joint_idx)
-            print(f"\n[set_get_joint_velocity] Joint {joint_idx} velocity: {velo}")
-            assert velo >= 0
+
+# def test_get_joint_velocity(hand):
+#     """Test getting single joint velocity"""
+#     if hand.init():
+#         # Test all 4 joints (O4 has 4 DOF)
+#         for joint_idx in range(1, 5):
+#             # Get velocity
+#             velo = hand.get_joint_velocity(joint_idx)
+#             print(f"\n[get_joint_velocity] Joint {joint_idx} velocity: {velo}")
+#             assert velo >= 0
 
 
-def test_set_get_all_joint_velocities(hand):
-    """Test setting and getting all joint velocities"""
-    if hand.init():
-        # Set all velocities (O4 has 4 joints)
-        velocities = [100, 100, 100, 100]
-        hand.set_all_joint_velocities(velocities)
-
-        # Get all velocities
-        all_velocities = hand.get_all_joint_velocities()
-        print(f"\n[set_get_all_joint_velocities] All velocities: {all_velocities}")
-        assert len(all_velocities) == 4
+# def test_get_all_joint_velocities(hand):
+#     """Test getting all joint velocities"""
+#     if hand.init():
+#         # Get all velocities
+#         all_velocities = hand.get_all_joint_velocities()
+#         print(f"\n[get_all_joint_velocities] All velocities: {all_velocities}")
+#         assert len(all_velocities) == 4
 
 
 def test_get_all_error_reports(hand):

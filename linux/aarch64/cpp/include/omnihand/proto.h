@@ -80,6 +80,7 @@ inline std::string ToString(ProductType product_type) {
  * @note O12 does not support DORSUM sensors, using DORSUM will result in runtime error
  */
 enum class AGIBOT_EXPORT Finger : unsigned char {
+  ALL_FINGERS = 0x00,// All fingers
   THUMB = 0x01,    // Thumb
   INDEX = 0x02,    // Index finger
   MIDDLE = 0x03,   // Middle finger

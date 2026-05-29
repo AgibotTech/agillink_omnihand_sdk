@@ -11,6 +11,7 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/omnihand.h"
 #include "omnihand/i_o10_tactile_sensor_1d.h"
+#include "omnihand/i_omnihand_motor_range.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 
@@ -32,7 +33,7 @@ enum class OmniPicker3Gesture : int {
  * This class provides the public interface for OmniPicker 3 product.
  * It supports 1 active degree of freedom for gripping operations.
  */
-class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public IO10TactileSensor1D {
+class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public IO10TactileSensor1D, public IOmniHandMotorRange {
  public:
   static constexpr unsigned char kDegreesOfActiveFreedom = 1;
   static constexpr uint8_t kDefaultHandDeviceId = 1u;
@@ -186,10 +187,35 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public IO10TactileSensor1D {
       const std::string& can_interface = "can0");
 #endif
 
+  std::vector<std::string> GetJointNames() const override {
+    return {
+      "joint1",
+    };
+  }
+
+  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinMotorPos() const override {
+    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinMotorPos = {
+      {0, 4095},  // 1: joint1
+    };
+    return kAllMaxMinMotorPos;
+  }
+
+  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinActualMotorPos() const override {
+    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinActualMotorPos = {
+      {0, 4095},  // 1: joint1
+    };
+    return kAllMaxMinActualMotorPos;
+  }
+
   /**
    * @brief Sets the gripper to a predefined gesture (typed API).
    */
   void SetHandGesture(OmniPicker3Gesture gesture);
+
+  /**
+   * @brief Returns gesture target motor position by typed gesture.
+   */
+  std::vector<int16_t> GetHandGesture(OmniPicker3Gesture gesture);
 
   /**
    * @brief Sets the gripper to a predefined gesture by numeric ID.
