@@ -17,6 +17,7 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -339,8 +340,9 @@ class AGIBOT_EXPORT OmniHand {
   /**
    * @brief Shows send/receive data details.
    * @param show Whether to show data details (true=show, false=hide)
+   * @param log_callback When set, each log line is passed here; otherwise printed to stdout.
    */
-  virtual void ShowDataDetails(bool show) const = 0;
+  virtual void ShowDataDetails(bool show, DataDetailsLogCallback log_callback = nullptr) const = 0;
 
   // ============ Request Interval Control ============
   /**

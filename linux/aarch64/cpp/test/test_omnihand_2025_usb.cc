@@ -70,7 +70,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
         if (!device_available_) {
           std::cout << "[Warning]: USB device created but Init() failed." << std::endl;
         }
-        hand_->ShowDataDetails(true);
+        hand_->ShowDataDetails(true);  // default: stdout
       }
     } catch (const std::exception& e) {
       std::cout << "[Warning]: Failed to open USB port: " << e.what() << std::endl;
@@ -319,7 +319,7 @@ TEST_F(OmniHand2025UsbTest, GetTactileSensorData) {
 TEST_F(OmniHand2025UsbTest, SetAllCurrentThreshold) {
   RequireDevice();
   
-  std::vector<int16_t> thresholds(10, 1000);  // 1000mA
+  std::vector<int16_t> thresholds(10, 1500);  // 1500mA
   hand_->SetAllCurrentThreshold(thresholds);
   std::cout << "[SetAllCurrentThreshold] All joints -> 1000mA" << std::endl;
   
@@ -350,24 +350,33 @@ TEST_F(OmniHand2025UsbTest, MixControlByPVT) {
   (void)hand_->MixControlByPVT(positions, velocities, torques);
   std::cout << "[MixControlByPVT] all 10 joints" << std::endl;
   
-  auto positions = hand_->GetAllJointMotorPosi();
+  auto feedback_pos = hand_->GetAllJointMotorPosi();
   std::cout << "[GetAllJointMotorPosi] After mixed control: ";
-  for (size_t i = 0; i < positions.size(); ++i) {
-    std::cout << positions[i];
-    if (i < positions.size() - 1) std::cout << ", ";
+  for (size_t i = 0; i < feedback_pos.size(); ++i) {
+    std::cout << feedback_pos[i];
+    if (i < feedback_pos.size() - 1) std::cout << ", ";
   }
   std::cout << std::endl;
   
-  EXPECT_EQ(positions.size(), 10);
+  EXPECT_EQ(feedback_pos.size(), 10);
 }
 
-TEST_F(OmniHand2025UsbTest, SetAllJointMotorVelo) {
+TEST_F(OmniHand2025UsbTest, GetAllJointMotorVelo) {
   RequireDevice();
-  
-  std::vector<int16_t> velocities(10, 100);
-  hand_->SetAllJointMotorVelo(velocities);
-  std::cout << "[SetAllJointMotorVelo] all 10 joints velo=100" << std::endl;
-  SUCCEED();
+
+  auto current_velo = hand_->GetAllJointMotorVelo();
+  std::cout << "[GetAllJointMotorVelo] ";
+  for (size_t i = 0; i < current_velo.size(); ++i) {
+    std::cout << current_velo[i];
+    if (i < current_velo.size() - 1) std::cout << ", ";
+  }
+  std::cout << std::endl;
+
+  if (current_velo.empty()) {
+    GTEST_SKIP() << "GetAllJointMotorVelo timeout";
+  }
+
+  EXPECT_EQ(current_velo.size(), 10);
 }
 
 TEST_F(OmniHand2025UsbTest, MixControlByPT) {

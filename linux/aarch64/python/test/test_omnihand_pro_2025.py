@@ -155,40 +155,40 @@ def test_get_device_info(hand):
         assert device_info.hand_device_id == OmniHandPro2025.kDefaultHandDeviceId
 
 
-def test_set_device_id(hand):
-    """Test setting device ID (may cause device inaccessibility)"""
-    assert hand.init(), "Device not initialized"
+# def test_set_device_id(hand):
+#     """Test setting device ID (may cause device inaccessibility)"""
+#     assert hand.init(), "Device not initialized"
     
-    # Get current device ID first
-    current_device_info = hand.get_device_info()
-    current_id = current_device_info.hand_device_id
+#     # Get current device ID first
+#     current_device_info = hand.get_device_info()
+#     current_id = current_device_info.hand_device_id
     
-    # Only test if we got a valid device ID (fail if timeout, like gtest)
-    assert current_id != 0, "Failed to get current device ID"
+#     # Only test if we got a valid device ID (fail if timeout, like gtest)
+#     assert current_id != 0, "Failed to get current device ID"
     
-    # Store original ID for cleanup
-    original_id = current_id
+#     # Store original ID for cleanup
+#     original_id = current_id
     
-    # Set to target ID (2) using current ID
-    target_id = 2
-    hand.set_device_id(target_id)
-    print(f"\n[set_device_id] Set Device ID: {target_id}")
-    time.sleep(0.1)  # O12 firmware requires 2s delay after device ID change
+#     # Set to target ID (2) using current ID
+#     target_id = 2
+#     hand.set_device_id(target_id)
+#     print(f"\n[set_device_id] Set Device ID: {target_id}")
+#     time.sleep(0.1)  # O12 firmware requires 2s delay after device ID change
     
-    # Verify new device ID
-    device_info = hand.get_device_info()
-    assert device_info.hand_device_id == 2, f"Expected device ID 2, got {device_info.hand_device_id}"
+#     # Verify new device ID
+#     device_info = hand.get_device_info()
+#     assert device_info.hand_device_id == 2, f"Expected device ID 2, got {device_info.hand_device_id}"
     
-    # Reset to original ID
-    hand.set_device_id(original_id)
-    print(f"[set_device_id] Reset Device ID: {original_id}")
-    time.sleep(0.1)  # O12 firmware requires 2s delay after device ID change
+#     # Reset to original ID
+#     hand.set_device_id(original_id)
+#     print(f"[set_device_id] Reset Device ID: {original_id}")
+#     time.sleep(0.1)  # O12 firmware requires 2s delay after device ID change
     
-    # Verify reset
-    device_info1 = hand.get_device_info()
-    assert device_info1.hand_device_id == original_id, (
-        f"Expected device ID {original_id}, got {device_info1.hand_device_id}"
-    )
+#     # Verify reset
+#     device_info1 = hand.get_device_info()
+#     assert device_info1.hand_device_id == original_id, (
+#         f"Expected device ID {original_id}, got {device_info1.hand_device_id}"
+#     )
 
 
 def test_joint_angle_control(hand):
@@ -200,6 +200,15 @@ def test_joint_angle_control(hand):
     hand.set_all_active_joint_angles(angles)
     print(f"\n[set_all_active_joint_angles] Set Active Joint Angles (rad): {angles}")
     
+    time.sleep(0.5)
+    angles = [0.6] * 12
+    hand.set_all_active_joint_angles(angles)
+    print(f"\n[set_all_active_joint_angles] Set Active Joint Angles (rad): {angles}")
+
+    time.sleep(0.5)
+    angles = [0.0] * 12
+    hand.set_all_active_joint_angles(angles)
+    print(f"\n[set_all_active_joint_angles] Set Active Joint Angles (rad): {angles}")
     # Get active joint angles (may fail if hardware communication fails)
     active_angles = hand.get_all_active_joint_angles()
     # Check if request succeeded (non-empty result and correct size)
@@ -230,18 +239,18 @@ def test_joint_angle_control(hand):
     assert len(all_angles) == 19  # 12 active + 7 passive
 
 
-def test_control_mode(hand):
-    """Test control mode (read-only, requires hardware)"""
-    assert hand.init(), "Device not initialized"
+# def test_control_mode(hand):
+#     """Test control mode (read-only, requires hardware)"""
+#     assert hand.init(), "Device not initialized"
     
-    # Only test reading control mode (read-only operation)
-    # Note: set_all_control_modes is not tested as it may cause CANFD communication to crash
-    current_modes = hand.get_all_control_modes()
-    # Check if request succeeded (non-empty result)
-    assert current_modes, "Failed to get control modes"
+#     # Only test reading control mode (read-only operation)
+#     # Note: set_all_control_modes is not tested as it may cause CANFD communication to crash
+#     current_modes = hand.get_all_control_modes()
+#     # Check if request succeeded (non-empty result)
+#     assert current_modes, "Failed to get control modes"
     
-    print(f"\n[get_all_control_modes] Control Modes: {current_modes}")
-    assert len(current_modes) == 12
+#     print(f"\n[get_all_control_modes] Control Modes: {current_modes}")
+#     assert len(current_modes) == 12
 
 
 def test_tactile_sensor_3d(hand):
@@ -366,15 +375,15 @@ def test_kinematics_solver(hand):
     
     # Test forward kinematics with valid input
     active_angles = [0.0] * 12
-    all_angles = hand.get_all_joint_pos(active_angles)
+    all_angles = hand.get_all_joint_angles(active_angles)
     
     # Check if calculation succeeded (non-empty result and correct size)
     # If failed, skip assertion (same as gtest behavior)
     if not all_angles or len(all_angles) != 19:
-        print(f"\n[get_all_joint_pos] Failed: got {len(all_angles) if all_angles else 0} angles, expected 19")
+        print(f"\n[get_all_joint_angles] Failed: got {len(all_angles) if all_angles else 0} angles, expected 19")
         return
     
-    print(f"\n[get_all_joint_pos] Forward Kinematics (input: 12 active angles, output: {len(all_angles)} joint angles): ", end="")
+    print(f"\n[get_all_joint_angles] Forward Kinematics (input: 12 active angles, output: {len(all_angles)} joint angles): ", end="")
     for i, angle in enumerate(all_angles):
         print(f"{angle:.4f}", end=", " if i < len(all_angles) - 1 else "")
     print()

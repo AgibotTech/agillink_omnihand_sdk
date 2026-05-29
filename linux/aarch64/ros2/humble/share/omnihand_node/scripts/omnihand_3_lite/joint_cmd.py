@@ -6,6 +6,19 @@ from sensor_msgs.msg import JointState
 
 NUM_JOINTS = 4
 
+# Motor tick per joint [axis_1, axis_2, axis_3, axis_4], range 0~4095.
+# From OmniHand3LiteSolver::SetHandGesture (OPEN / FIST); left/right listed separately.
+POSE_OPEN = {
+  # OMNI_HAND_3_LITE_GESTURE_OPEN
+    'right': [4095, 4095, 4095, 4095],
+    'left': [0, 4095, 4095, 0],
+}
+POSE_CLOSE = {
+  # OMNI_HAND_3_LITE_GESTURE_FIST
+    'right': [1500, 1500, 2900, 400],
+    'left': [2595, 1500, 2900, 3695],
+}
+
 
 class JointCmdNode(Node):
     def __init__(self, hand_side: str, product: str):
@@ -29,19 +42,24 @@ class JointCmdNode(Node):
 
         self.timer = self.create_timer(1.5, self.publish_joint_cmd)
 
+        if hand_side not in POSE_OPEN:
+            raise ValueError(f"hand_side must be 'left' or 'right', got {hand_side!r}")
+
         self.get_logger().info(
-            f"{product}/{hand_side} joint_cmd started (H3L, f{NUM_JOINTS} DOF, position in rad)"
+            f"{product}/{hand_side} joint_cmd started "
+            f"(H3L, {NUM_JOINTS} DOF, position = motor tick 0~4095)"
         )
     
-    def _make_msg(self, positions_rad: list[float]) -> JointState:
+    def _make_msg(self, positions: list[int]) -> JointState:
         msg = JointState()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.position = positions_rad.copy()
+        msg.position = [float(p) for p in positions]
         return msg
 
     def publish_joint_cmd(self):
-        pose_open = [0.0] * NUM_JOINTS
-        pose_close = [0.6] * NUM_JOINTS
+        side = self.hand_side
+        pose_open = POSE_OPEN[side]
+        pose_close = POSE_CLOSE[side]
         self.publisher.publish(self._make_msg(pose_open))
         time.sleep(0.5)
         self.publisher.publish(self._make_msg(pose_close))
@@ -50,7 +68,7 @@ class JointCmdNode(Node):
     def callback(self, msg:JointState) -> None:
         self.get_logger().info(
             f'{self.product}/{self.hand_side} joint_states '
-            f'(stamp={msg.header.stamp.sec}.{msg.header.stamp.nanosec:09d}, rad): '
+            f'(stamp={msg.header.stamp.sec}.{msg.header.stamp.nanosec:09d}, tick): '
             f'{[round(p, 3) for p in msg.position]}')
 
 def main(args=None):
