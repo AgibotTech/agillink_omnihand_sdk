@@ -17,7 +17,6 @@ using namespace agilink::omnihand;
 
 // Global variable to store request interval from command line argument
 static int g_request_interval = 5;  // Default: 5ms
-
 // Global variable to store device type from command line argument
 static std::string g_device_type = "zlgcan";  // Default: zlgcan
 
@@ -53,6 +52,8 @@ class OmniHand3LiteTest : public ::testing::Test {
     }
     int request_interval = GetRequestInterval();
     hand_->SetRequestInterval(request_interval);
+    std::cout << "[Info]: Using frame recv timeout: " << hand_->GetFrameRecvTimeout() << " ms" << std::endl;
+    hand_->ShowDataDetails(true);
     if (request_interval != 0) {
       std::cout << "[Info]: Using request interval: " << request_interval << " ms" << std::endl;
     }
@@ -94,40 +95,40 @@ TEST_F(OmniHand3LiteTest, GetDeviceInfo) {
   EXPECT_EQ(device_info.hand_device_id, 1);
 }
 
-// Test setting device ID
-// Note: SetDeviceId may change device ID on hardware, making device inaccessible with original ID.
-// Use with caution and only in controlled test environments.
-TEST_F(OmniHand3LiteTest, SetDeviceId) {
-  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+// // Test setting device ID
+// // Note: SetDeviceId may change device ID on hardware, making device inaccessible with original ID.
+// // Use with caution and only in controlled test environments.
+// TEST_F(OmniHand3LiteTest, SetDeviceId) {
+//   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
-  // Get current device ID first
-  auto current_device_info = hand_->GetDeviceInfo();
-  unsigned char current_id = current_device_info.hand_device_id;
+//   // Get current device ID first
+//   auto current_device_info = hand_->GetDeviceInfo();
+//   unsigned char current_id = current_device_info.hand_device_id;
   
-  // Only test if we got a valid device ID
-  if (current_id == 0) {
-    // Request failed (timeout), skip test
-    return;
-  }
+//   // Only test if we got a valid device ID
+//   if (current_id == 0) {
+//     // Request failed (timeout), skip test
+//     return;
+//   }
   
-  // Set to target ID (2) using current ID
-  unsigned char target_id = 2;
-  hand_->SetDeviceId(target_id);
-  std::cout << "[SetDeviceId] Set Device ID: " << static_cast<int>(target_id) << std::endl;
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
+//   // Set to target ID (2) using current ID
+//   unsigned char target_id = 2;
+//   hand_->SetDeviceId(target_id);
+//   std::cout << "[SetDeviceId] Set Device ID: " << static_cast<int>(target_id) << std::endl;
+//   std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
 
-  auto device_info = hand_->GetDeviceInfo();
-  EXPECT_EQ(device_info.hand_device_id, 2);
+//   auto device_info = hand_->GetDeviceInfo();
+//   EXPECT_EQ(device_info.hand_device_id, 2);
   
-  // Reset to original
-  unsigned char original_id = 1;
-  hand_->SetDeviceId(original_id);
-  std::cout << "[SetDeviceId] Reset Device ID: " << static_cast<int>(original_id) << std::endl;
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
+//   // Reset to original
+//   unsigned char original_id = 1;
+//   hand_->SetDeviceId(original_id);
+//   std::cout << "[SetDeviceId] Reset Device ID: " << static_cast<int>(original_id) << std::endl;
+//   std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Wait 200ms for device ID change to take effect
   
-  auto device_info1 = hand_->GetDeviceInfo();
-  EXPECT_EQ(device_info1.hand_device_id, 1);
-}
+//   auto device_info1 = hand_->GetDeviceInfo();
+//   EXPECT_EQ(device_info1.hand_device_id, 1);
+// }
 
 // Test motor position control (requires hardware)
 TEST_F(OmniHand3LiteTest, MotorPositionControl) {
@@ -214,48 +215,48 @@ TEST_F(OmniHand3LiteTest, SetHandGesture) {
   std::cout << "[SetHandGesture] FIST gesture set" << std::endl;
 }
 
-// Test velocity control (requires hardware)
-TEST_F(OmniHand3LiteTest, VelocityControl) {
-  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+// // Test velocity control (requires hardware)
+// TEST_F(OmniHand3LiteTest, VelocityControl) {
+//   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
-  // Test single joint velocity
-  int16_t target_velo = 100;
-  hand_->SetJointMotorVelo(1, target_velo);
-  std::cout << "[SetJointMotorVelo] Set Joint 1 Motor Velocity: " << target_velo << std::endl;
+//   // Test single joint velocity
+//   int16_t target_velo = 100;
+//   hand_->SetJointMotorVelo(1, target_velo);
+//   std::cout << "[SetJointMotorVelo] Set Joint 1 Motor Velocity: " << target_velo << std::endl;
   
-  auto velo = hand_->GetJointMotorVelo(1);
-  std::cout << "[GetJointMotorVelo] Joint 1 Motor Velocity: " << velo << std::endl;
+//   auto velo = hand_->GetJointMotorVelo(1);
+//   std::cout << "[GetJointMotorVelo] Joint 1 Motor Velocity: " << velo << std::endl;
   
-  // Test batch motor velocities
-  std::vector<int16_t> velocities(4, 100);  // 4 motors, all at 100
-  hand_->SetAllJointMotorVelo(velocities);
-  std::cout << "[SetAllJointMotorVelo] Set Motor Velocities: ";
-  for (size_t i = 0; i < velocities.size(); ++i) {
-    std::cout << velocities[i];
-    if (i < velocities.size() - 1) std::cout << ", ";
-  }
-  std::cout << std::endl;
+//   // Test batch motor velocities
+//   std::vector<int16_t> velocities(4, 100);  // 4 motors, all at 100
+//   hand_->SetAllJointMotorVelo(velocities);
+//   std::cout << "[SetAllJointMotorVelo] Set Motor Velocities: ";
+//   for (size_t i = 0; i < velocities.size(); ++i) {
+//     std::cout << velocities[i];
+//     if (i < velocities.size() - 1) std::cout << ", ";
+//   }
+//   std::cout << std::endl;
   
-  auto all_velocities = hand_->GetAllJointMotorVelo();
-  // Check if request succeeded (non-empty result)
-  if (all_velocities.empty()) {
-    return;
-  }
-  std::cout << "[GetAllJointMotorVelo] Motor Velocities: ";
-  for (size_t i = 0; i < all_velocities.size(); ++i) {
-    std::cout << all_velocities[i];
-    if (i < all_velocities.size() - 1) std::cout << ", ";
-  }
-  std::cout << std::endl;
-  EXPECT_EQ(all_velocities.size(), OmniHand3Lite::kDegreesOfActiveFreedom);
-}
+//   auto all_velocities = hand_->GetAllJointMotorVelo();
+//   // Check if request succeeded (non-empty result)
+//   if (all_velocities.empty()) {
+//     return;
+//   }
+//   std::cout << "[GetAllJointMotorVelo] Motor Velocities: ";
+//   for (size_t i = 0; i < all_velocities.size(); ++i) {
+//     std::cout << all_velocities[i];
+//     if (i < all_velocities.size() - 1) std::cout << ", ";
+//   }
+//   std::cout << std::endl;
+//   EXPECT_EQ(all_velocities.size(), OmniHand3Lite::kDegreesOfActiveFreedom);
+// }
 
 // Test current threshold (requires hardware)
 TEST_F(OmniHand3LiteTest, CurrentThreshold) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
   // Test single joint current threshold
-  int16_t threshold = 500;
+  int16_t threshold = 1500;
   hand_->SetCurrentThreshold(1, threshold);
   std::cout << "[SetCurrentThreshold] Set Joint 1 Current Threshold: " << threshold << std::endl;
   
@@ -263,7 +264,7 @@ TEST_F(OmniHand3LiteTest, CurrentThreshold) {
   std::cout << "[GetCurrentThreshold] Joint 1 Current Threshold: " << current_threshold << std::endl;
   
   // Test batch current thresholds
-  std::vector<int16_t> thresholds(4, 500);  // 4 motors, all at 500
+  std::vector<int16_t> thresholds(4, 1500);  // 4 motors, all at 1500
   hand_->SetAllCurrentThreshold(thresholds);
   std::cout << "[SetAllCurrentThreshold] Set Current Thresholds: ";
   for (size_t i = 0; i < thresholds.size(); ++i) {

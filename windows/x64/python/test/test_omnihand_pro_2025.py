@@ -366,15 +366,15 @@ def test_kinematics_solver(hand):
     
     # Test forward kinematics with valid input
     active_angles = [0.0] * 12
-    all_angles = hand.get_all_joint_pos(active_angles)
+    all_angles = hand.get_all_joint_angles(active_angles)
     
     # Check if calculation succeeded (non-empty result and correct size)
     # If failed, skip assertion (same as gtest behavior)
     if not all_angles or len(all_angles) != 19:
-        print(f"\n[get_all_joint_pos] Failed: got {len(all_angles) if all_angles else 0} angles, expected 19")
+        print(f"\n[get_all_joint_angles] Failed: got {len(all_angles) if all_angles else 0} angles, expected 19")
         return
     
-    print(f"\n[get_all_joint_pos] Forward Kinematics (input: 12 active angles, output: {len(all_angles)} joint angles): ", end="")
+    print(f"\n[get_all_joint_angles] Forward Kinematics (input: 12 active angles, output: {len(all_angles)} joint angles): ", end="")
     for i, angle in enumerate(all_angles):
         print(f"{angle:.4f}", end=", " if i < len(all_angles) - 1 else "")
     print()
