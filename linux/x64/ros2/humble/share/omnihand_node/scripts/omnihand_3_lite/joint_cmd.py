@@ -5,6 +5,29 @@ from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
 NUM_JOINTS = 4
+ACTUATOR_MAX = 4095
+
+# Right-hand reference (OmniHand3LiteSolver::SetHandGesture, before left mirror).
+_POSE_OPEN_R = [4095, 4095, 4095, 4095]
+_POSE_CLOSE_R = [1500, 1500, 2900, 400]  # FIST
+
+
+def _mirror_joints_0_and_3(motor: list[int]) -> list[int]:
+    """Same as solver: left hand mirrors motor 0 and 3."""
+    out = motor.copy()
+    out[0] = ACTUATOR_MAX - out[0]
+    out[3] = ACTUATOR_MAX - out[3]
+    return out
+
+
+POSE_OPEN = {
+    'right': _POSE_OPEN_R,
+    'left': _mirror_joints_0_and_3(_POSE_OPEN_R),
+}
+POSE_CLOSE = {
+    'right': _POSE_CLOSE_R,
+    'left': _mirror_joints_0_and_3(_POSE_CLOSE_R),
+}
 
 
 class JointCmdNode(Node):
@@ -29,19 +52,24 @@ class JointCmdNode(Node):
 
         self.timer = self.create_timer(1.5, self.publish_joint_cmd)
 
+        if hand_side not in POSE_OPEN:
+            raise ValueError(f"hand_side must be 'left' or 'right', got {hand_side!r}")
+
         self.get_logger().info(
-            f"{product}/{hand_side} joint_cmd started (H3L, f{NUM_JOINTS} DOF, position in rad)"
+            f"{product}/{hand_side} joint_cmd started "
+            f"(H3L, {NUM_JOINTS} DOF, position = motor tick 0~{ACTUATOR_MAX})"
         )
     
-    def _make_msg(self, positions_rad: list[float]) -> JointState:
+    def _make_msg(self, positions: list[int]) -> JointState:
         msg = JointState()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.position = positions_rad.copy()
+        msg.position = [float(p) for p in positions]
         return msg
 
     def publish_joint_cmd(self):
-        pose_open = [0.0] * NUM_JOINTS
-        pose_close = [0.6] * NUM_JOINTS
+        side = self.hand_side
+        pose_open = POSE_OPEN[side]
+        pose_close = POSE_CLOSE[side]
         self.publisher.publish(self._make_msg(pose_open))
         time.sleep(0.5)
         self.publisher.publish(self._make_msg(pose_close))
@@ -50,7 +78,7 @@ class JointCmdNode(Node):
     def callback(self, msg:JointState) -> None:
         self.get_logger().info(
             f'{self.product}/{self.hand_side} joint_states '
-            f'(stamp={msg.header.stamp.sec}.{msg.header.stamp.nanosec:09d}, rad): '
+            f'(stamp={msg.header.stamp.sec}.{msg.header.stamp.nanosec:09d}, tick): '
             f'{[round(p, 3) for p in msg.position]}')
 
 def main(args=None):

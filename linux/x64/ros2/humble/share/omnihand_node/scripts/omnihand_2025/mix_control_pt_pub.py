@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-@Description: Publish position + working-current mixed-control commands for H3L.
+@Description: Publish position + working-current mixed-control commands for O10.
 
 Mixed control topic: /<product>/<side>/joint_mix_control_cmd  (JointState)
-  position[] = motor tick (int16, 0~4095), same open/close as joint_cmd.py / solver
-  effort[]   = working current threshold (mA), cast to int16 on the node
+  position[] = motor tick (int16)
+  effort[]   = working current threshold (mA)
 
 Usage:  python3 mix_control_pub.py [left|right] [product]
-        default: side=left, product=h3l
+        default: side=left, product=o10
+        topic: /o10/left/joint_mix_control_cmd; /o10/right/joint_mix_control_cmd;
 """
 
 import sys
@@ -16,11 +17,18 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
-from joint_cmd import NUM_JOINTS, POSE_CLOSE, POSE_OPEN
-
+NUM_JOINTS = 10
 WORK_CURRENT_MA = 300
 
-# topic: /h3l/left/joint_mix_control_cmd; /h3l/right/joint_mix_control_cmd;
+# Calibrated motor ticks (pos_axis_1 .. pos_axis_10)
+POSE_OPEN = {
+    'right': [4087, 18, 3963, 4085, 4094, 4094, 2072, 4094, 39, 4093],
+    'left': [4087, 4077, 3963, 10, 4094, 4094, 2023, 4094, 4056, 4093],
+}
+POSE_CLOSE = {
+    'right': [4087, 4085, 1634, 4085, 3, 3, 2035, 2, 9, 3],
+    'left': [4087, 10, 1634, 10, 3, 3, 2060, 2, 4086, 3],
+}
 
 
 class MixControlPublisher(Node):
@@ -38,8 +46,8 @@ class MixControlPublisher(Node):
         )
         self.timer = self.create_timer(1.5, self.publish_mix_control)
         self.get_logger().info(
-            f'{product}/{hand_side} mix_control publisher started '
-            f'(H3L, {NUM_JOINTS} DOF, position=tick, effort={WORK_CURRENT_MA}mA)'
+            f'{product}/{hand_side} mix_control started '
+            f'(O10, effort={WORK_CURRENT_MA}mA)'
         )
 
     def publish_mix_control(self):
@@ -60,7 +68,7 @@ class MixControlPublisher(Node):
 def main(args=None):
     rclpy.init(args=args)
     hand_side = sys.argv[1].lower() if len(sys.argv) > 1 else 'left'
-    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'h3l'
+    product = sys.argv[2].lower() if len(sys.argv) > 2 else 'o10'
     node = MixControlPublisher(hand_side, product)
     try:
         rclpy.spin(node)
