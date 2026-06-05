@@ -4,35 +4,38 @@
 /**
  * @file O12_demo_canfd_id.cc
  * @brief OmniHand Pro 2025 control demo - CANFD communication (via canfd_id)
- * 
+ *
  * This demo shows how to use canfd_id create and control OmniHand Pro 2025 dexterous hand
  * Supports single-hand (left/right) and dual-hand (both) control
- * 
+ *
  * Build: cmake .. && make
- * Run: 
- *   ./demo_omnihand_pro_2025_canfd_id left    # Control left hand
- *   ./demo_omnihand_pro_2025_canfd_id right   # Control right hand
- *   ./demo_omnihand_pro_2025_canfd_id both    # Control both left and right hands simultaneously
+ * Run:
+ *   ./demo_omnihand_pro_2025_canfd_id left              # Control left hand with ZLG CAN
+ *   ./demo_omnihand_pro_2025_canfd_id right -d hcan     # Control right hand with HCAN
+ *   ./demo_omnihand_pro_2025_canfd_id both -d zlgcan    # Control both left and right hands simultaneously
  */
 
-#include <iostream>
-#include <iomanip>
-#include <vector>
-#include <thread>
-#include <chrono>
-#include <string>
 #include <algorithm>
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <vector>
 #include "omnihand/omnihand_pro_2025.h"
 
 void printUsage(const char* program_name) {
-  std::cout << "Usage: " << program_name << " [left|right|both]" << std::endl;
+  std::cout << "Usage: " << program_name << " [left|right|both] [-d zlgcan|hcan]" << std::endl;
   std::cout << "  left   - Control left hand only" << std::endl;
   std::cout << "  right  - Control right hand only" << std::endl;
   std::cout << "  both   - Control both hands simultaneously" << std::endl;
+  std::cout << "  -d, --device DEVICE" << std::endl;
+  std::cout << "         Set CAN device type (zlgcan or hcan, default: zlgcan)" << std::endl;
   std::cout << std::endl;
   std::cout << "Example:" << std::endl;
   std::cout << "  " << program_name << " left" << std::endl;
-  std::cout << "  " << program_name << " both" << std::endl;
+  std::cout << "  " << program_name << " right -d hcan" << std::endl;
+  std::cout << "  " << program_name << " both -d zlgcan" << std::endl;
 }
 
 void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand, const std::string& hand_name) {
@@ -47,7 +50,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
 
   // ============ Read Sensor Data ============
   std::cout << "\n=== Reading Sensor Data ===" << std::endl;
-  
+
   // Read 3D tactile sensor data (O12-specific)
   std::cout << "\n3D Tactile Sensor Data (O12 only):" << std::endl;
   try {
@@ -63,7 +66,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
       if (i + 1 < agilink::omnihand::TactileSensor3DData::kChannelCount) std::cout << ", ";
     }
     std::cout << "]" << std::endl;
-    
+
     auto index_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::INDEX);
     std::cout << "  Index:" << std::endl;
     std::cout << "    Online State: " << (index_sensor.online_state ? "Online" : "Offline") << std::endl;
@@ -98,7 +101,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
   std::cout << "\nError Reports:" << std::endl;
   auto errors = hand->GetAllErrorReport();
   for (size_t i = 0; i < errors.size(); ++i) {
-    if (errors[i].bits.stalled_ || errors[i].bits.overheat_ || errors[i].bits.over_current_ || 
+    if (errors[i].bits.stalled_ || errors[i].bits.overheat_ || errors[i].bits.over_current_ ||
         errors[i].bits.motor_except_ || errors[i].bits.commu_except_) {
       std::cout << "  Joint " << (i + 1) << ": ";
       if (errors[i].bits.stalled_) std::cout << "Stalled ";
@@ -110,7 +113,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     }
   }
   if (std::all_of(errors.begin(), errors.end(), [](const auto& e) {
-        return !e.bits.stalled_ && !e.bits.overheat_ && !e.bits.over_current_ && 
+        return !e.bits.stalled_ && !e.bits.overheat_ && !e.bits.over_current_ &&
                !e.bits.motor_except_ && !e.bits.commu_except_;
       })) {
     std::cout << "  No errors detected" << std::endl;
@@ -129,7 +132,17 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
   // ============ Joint Angle Control Demo ============
   // Use joint-angle control (recommended; underlying layer auto-converts)
   std::cout << "\nSetting joint angles..." << std::endl;
-  std::vector<double> angles(12, 0.0);  // O12 has 12 active joints
+  for (int i = 1; i <= agilink::omnihand::OmniHandPro2025::kDegreesOfActiveFreedom; i++)
+    hand->SetControlMode(i, agilink::omnihand::ControlMode::POSITION);
+
+  std::vector<double> angles(12, 0.6);  // O12 has 12 active joints
+  hand->SetAllActiveJointAngles(angles);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  for (auto& angle : angles) {
+    angle = 0.0;
+  }
   hand->SetAllActiveJointAngles(angles);
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -151,17 +164,29 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     if (i < all_angles.size() - 1) std::cout << ", ";
   }
   std::cout << "]" << std::endl;
-
 }
 
 int main(int argc, char** argv) {
   // Parse command-line arguments
-  std::string mode = "left";  // default left hand
-  if (argc > 1) {
-    std::string arg = argv[1];
+  std::string mode = "left";           // default left hand
+  std::string device_type = "zlgcan";  // default zlgcan
+
+  for (int i = 1; i < argc; ++i) {
+    std::string arg = argv[i];
     if (arg == "--help" || arg == "-h") {
       printUsage(argv[0]);
       return 0;
+    } else if (arg == "-d" || arg == "--device") {
+      if (i + 1 >= argc) {
+        std::cerr << "[Error]: " << arg << " requires a value (zlgcan or hcan)" << std::endl;
+        printUsage(argv[0]);
+        return 1;
+      }
+      device_type = argv[++i];
+      if (device_type != "zlgcan" && device_type != "hcan") {
+        std::cerr << "[Error]: -d value must be 'zlgcan' or 'hcan', got: " << device_type << std::endl;
+        return 1;
+      }
     } else if (arg == "left" || arg == "right" || arg == "both") {
       mode = arg;
     } else {
@@ -174,19 +199,30 @@ int main(int argc, char** argv) {
   std::cout << "============================================" << std::endl;
   std::cout << "OmniHand Pro 2025 - CANFD Control (by canfd_id)" << std::endl;
   std::cout << "Mode: " << mode << std::endl;
+  std::cout << "Device: " << device_type << std::endl;
   std::cout << "============================================" << std::endl;
 
   unsigned char device_id = 1;
   unsigned char canfd_id = 0;
 
-  if (mode == "left") {
-    // Create left-hand instance
-    auto left_hand = agilink::omnihand::OmniHandPro2025::createHandByZlgcan(
-        agilink::omnihand::HandType::LEFT,
+  auto createHand = [&](agilink::omnihand::HandType hand_type, unsigned char channel_id) {
+    if (device_type == "hcan") {
+      return agilink::omnihand::OmniHandPro2025::createHandByHcan(
+          hand_type,
+          device_id,
+          canfd_id,
+          channel_id);
+    }
+    return agilink::omnihand::OmniHandPro2025::createHandByZlgcan(
+        hand_type,
         device_id,
         canfd_id,
-        0  // channel_id (first channel)
-    );
+        channel_id);
+  };
+
+  if (mode == "left") {
+    // Create left-hand instance
+    auto left_hand = createHand(agilink::omnihand::HandType::LEFT, 0);
 
     if (!left_hand) {
       std::cerr << "[Error]: Failed to create left hand instance" << std::endl;
@@ -202,12 +238,7 @@ int main(int argc, char** argv) {
     controlSingleHand(left_hand, "Left");
   } else if (mode == "right") {
     // Create right-hand instance
-    auto right_hand = agilink::omnihand::OmniHandPro2025::createHandByZlgcan(
-        agilink::omnihand::HandType::RIGHT,
-        device_id,
-        canfd_id,
-        0  // channel_id (first channel)
-    );
+    auto right_hand = createHand(agilink::omnihand::HandType::RIGHT, 0);
 
     if (!right_hand) {
       std::cerr << "[Error]: Failed to create right hand instance" << std::endl;
@@ -223,19 +254,8 @@ int main(int argc, char** argv) {
     controlSingleHand(right_hand, "Right");
   } else if (mode == "both") {
     // both mode: create both hands
-    auto left_hand = agilink::omnihand::OmniHandPro2025::createHandByZlgcan(
-        agilink::omnihand::HandType::LEFT,
-        device_id,
-        canfd_id,
-        0  // channel_id (first channel)
-    );
-
-    auto right_hand = agilink::omnihand::OmniHandPro2025::createHandByZlgcan(
-        agilink::omnihand::HandType::RIGHT,
-        device_id,
-        canfd_id,
-        1  // channel_id (second channel)
-    );
+    auto left_hand = createHand(agilink::omnihand::HandType::LEFT, 0);
+    auto right_hand = createHand(agilink::omnihand::HandType::RIGHT, 1);
 
     if (!left_hand || !right_hand) {
       std::cerr << "[Error]: Failed to create hand instances" << std::endl;
@@ -256,19 +276,18 @@ int main(int argc, char** argv) {
 
     // Control both hands simultaneously
     std::cout << "\n=== Dual Hand Control ===" << std::endl;
-    
+
     // Get device info
     auto left_vendor = left_hand->GetVendorInfo();
     auto right_vendor = right_hand->GetVendorInfo();
-    
+
     std::cout << "\nLeft Hand Info:" << std::endl;
     std::cout << "  Model: " << left_vendor.productModel << std::endl;
     std::cout << "  Serial: " << left_vendor.productSeqNum << std::endl;
-    
+
     std::cout << "\nRight Hand Info:" << std::endl;
     std::cout << "  Model: " << right_vendor.productModel << std::endl;
     std::cout << "  Serial: " << right_vendor.productSeqNum << std::endl;
-
 
     // Use joint-angle control
     std::cout << "\nSetting joint angles..." << std::endl;
