@@ -5,28 +5,18 @@ from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
 NUM_JOINTS = 4
-ACTUATOR_MAX = 4095
 
-# Right-hand reference (OmniHand3LiteSolver::SetHandGesture, before left mirror).
-_POSE_OPEN_R = [4095, 4095, 4095, 4095]
-_POSE_CLOSE_R = [1500, 1500, 2900, 400]  # FIST
-
-
-def _mirror_joints_0_and_3(motor: list[int]) -> list[int]:
-    """Same as solver: left hand mirrors motor 0 and 3."""
-    out = motor.copy()
-    out[0] = ACTUATOR_MAX - out[0]
-    out[3] = ACTUATOR_MAX - out[3]
-    return out
-
-
+# Motor tick per joint [axis_1, axis_2, axis_3, axis_4], range 0~4095.
+# From OmniHand3LiteSolver::SetHandGesture (OPEN / FIST); left/right listed separately.
 POSE_OPEN = {
-    'right': _POSE_OPEN_R,
-    'left': _mirror_joints_0_and_3(_POSE_OPEN_R),
+  # OMNI_HAND_3_LITE_GESTURE_OPEN
+    'right': [4095, 4095, 4095, 4095],
+    'left': [0, 4095, 4095, 0],
 }
 POSE_CLOSE = {
-    'right': _POSE_CLOSE_R,
-    'left': _mirror_joints_0_and_3(_POSE_CLOSE_R),
+  # OMNI_HAND_3_LITE_GESTURE_FIST
+    'right': [1500, 1500, 2900, 400],
+    'left': [2595, 1500, 2900, 3695],
 }
 
 
@@ -57,7 +47,7 @@ class JointCmdNode(Node):
 
         self.get_logger().info(
             f"{product}/{hand_side} joint_cmd started "
-            f"(H3L, {NUM_JOINTS} DOF, position = motor tick 0~{ACTUATOR_MAX})"
+            f"(H3L, {NUM_JOINTS} DOF, position = motor tick 0~4095)"
         )
     
     def _make_msg(self, positions: list[int]) -> JointState:
