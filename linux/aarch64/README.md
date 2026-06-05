@@ -1,4 +1,4 @@
-# AGILINK OmniHand SDK - Linux (aarch64) - Version 1.1.3
+# AGILINK OmniHand SDK - Linux (aarch64) - Version 1.1.4
 
 [中文文档](README_zh_cn.md) | [Overview & API Docs](../../README.md)
 

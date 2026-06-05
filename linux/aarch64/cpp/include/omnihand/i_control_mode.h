@@ -24,7 +24,13 @@ class AGIBOT_EXPORT IControlMode {
    * @note Supported by products that implement control mode switching.
    */
   virtual void SetControlMode(unsigned char joint_motor_index, ControlMode mode) { (void)joint_motor_index; (void)mode; }
-  
+
+  /**
+   * @brief Verifies if a control mode is supported.
+   * @param mode Control mode enum value
+   * @return Valid control mode enum value (may differ from input if not supported)
+   */
+  virtual uint8_t VerifyControlMode(const ControlMode& mode) const = 0;
   /**
    * @brief Gets the control mode of a single joint motor.
    * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
