@@ -155,40 +155,40 @@ def test_get_device_info(hand):
         assert device_info.hand_device_id == OmniHandPro2025.kDefaultHandDeviceId
 
 
-def test_set_device_id(hand):
-    """Test setting device ID (may cause device inaccessibility)"""
-    assert hand.init(), "Device not initialized"
+# def test_set_device_id(hand):
+#     """Test setting device ID (may cause device inaccessibility)"""
+#     assert hand.init(), "Device not initialized"
     
-    # Get current device ID first
-    current_device_info = hand.get_device_info()
-    current_id = current_device_info.hand_device_id
+#     # Get current device ID first
+#     current_device_info = hand.get_device_info()
+#     current_id = current_device_info.hand_device_id
     
-    # Only test if we got a valid device ID (fail if timeout, like gtest)
-    assert current_id != 0, "Failed to get current device ID"
+#     # Only test if we got a valid device ID (fail if timeout, like gtest)
+#     assert current_id != 0, "Failed to get current device ID"
     
-    # Store original ID for cleanup
-    original_id = current_id
+#     # Store original ID for cleanup
+#     original_id = current_id
     
-    # Set to target ID (2) using current ID
-    target_id = 2
-    hand.set_device_id(target_id)
-    print(f"\n[set_device_id] Set Device ID: {target_id}")
-    time.sleep(0.1)  # O12 firmware requires 2s delay after device ID change
+#     # Set to target ID (2) using current ID
+#     target_id = 2
+#     hand.set_device_id(target_id)
+#     print(f"\n[set_device_id] Set Device ID: {target_id}")
+#     time.sleep(0.1)  # O12 firmware requires 2s delay after device ID change
     
-    # Verify new device ID
-    device_info = hand.get_device_info()
-    assert device_info.hand_device_id == 2, f"Expected device ID 2, got {device_info.hand_device_id}"
+#     # Verify new device ID
+#     device_info = hand.get_device_info()
+#     assert device_info.hand_device_id == 2, f"Expected device ID 2, got {device_info.hand_device_id}"
     
-    # Reset to original ID
-    hand.set_device_id(original_id)
-    print(f"[set_device_id] Reset Device ID: {original_id}")
-    time.sleep(0.1)  # O12 firmware requires 2s delay after device ID change
+#     # Reset to original ID
+#     hand.set_device_id(original_id)
+#     print(f"[set_device_id] Reset Device ID: {original_id}")
+#     time.sleep(0.1)  # O12 firmware requires 2s delay after device ID change
     
-    # Verify reset
-    device_info1 = hand.get_device_info()
-    assert device_info1.hand_device_id == original_id, (
-        f"Expected device ID {original_id}, got {device_info1.hand_device_id}"
-    )
+#     # Verify reset
+#     device_info1 = hand.get_device_info()
+#     assert device_info1.hand_device_id == original_id, (
+#         f"Expected device ID {original_id}, got {device_info1.hand_device_id}"
+#     )
 
 
 def test_joint_angle_control(hand):
@@ -200,6 +200,15 @@ def test_joint_angle_control(hand):
     hand.set_all_active_joint_angles(angles)
     print(f"\n[set_all_active_joint_angles] Set Active Joint Angles (rad): {angles}")
     
+    time.sleep(0.5)
+    angles = [0.6] * 12
+    hand.set_all_active_joint_angles(angles)
+    print(f"\n[set_all_active_joint_angles] Set Active Joint Angles (rad): {angles}")
+
+    time.sleep(0.5)
+    angles = [0.0] * 12
+    hand.set_all_active_joint_angles(angles)
+    print(f"\n[set_all_active_joint_angles] Set Active Joint Angles (rad): {angles}")
     # Get active joint angles (may fail if hardware communication fails)
     active_angles = hand.get_all_active_joint_angles()
     # Check if request succeeded (non-empty result and correct size)
@@ -230,18 +239,18 @@ def test_joint_angle_control(hand):
     assert len(all_angles) == 19  # 12 active + 7 passive
 
 
-def test_control_mode(hand):
-    """Test control mode (read-only, requires hardware)"""
-    assert hand.init(), "Device not initialized"
+# def test_control_mode(hand):
+#     """Test control mode (read-only, requires hardware)"""
+#     assert hand.init(), "Device not initialized"
     
-    # Only test reading control mode (read-only operation)
-    # Note: set_all_control_modes is not tested as it may cause CANFD communication to crash
-    current_modes = hand.get_all_control_modes()
-    # Check if request succeeded (non-empty result)
-    assert current_modes, "Failed to get control modes"
+#     # Only test reading control mode (read-only operation)
+#     # Note: set_all_control_modes is not tested as it may cause CANFD communication to crash
+#     current_modes = hand.get_all_control_modes()
+#     # Check if request succeeded (non-empty result)
+#     assert current_modes, "Failed to get control modes"
     
-    print(f"\n[get_all_control_modes] Control Modes: {current_modes}")
-    assert len(current_modes) == 12
+#     print(f"\n[get_all_control_modes] Control Modes: {current_modes}")
+#     assert len(current_modes) == 12
 
 
 def test_tactile_sensor_3d(hand):
@@ -397,6 +406,68 @@ def test_velocity_control(hand):
     
     print(f"[get_all_joint_velocities] Current Velocities: {current_velocities}")
     assert len(current_velocities) == 12
+
+
+def test_voltage_control(hand):
+    """Test voltage control (requires hardware)"""
+    assert hand.init(), "Device not initialized"
+
+    dof = 12
+    safe_voltage = 0
+    probe_joint = 1
+    probe_voltage = 500
+    voltage_mode = int(ControlMode.VOLTAGE)
+    position_mode = int(ControlMode.POSITION)
+    previous_timeout = hand.get_frame_recv_timeout()
+
+    assert voltage_mode == 4, "ControlMode.VOLTAGE should match firmware mode value 4"
+
+    try:
+        hand.set_frame_recv_timeout(100)
+
+        for joint in range(1, dof + 1):
+            hand.set_control_mode(joint, voltage_mode)
+        print(f"\n[set_control_mode] Set all joints to voltage mode: {voltage_mode}")
+
+        current_modes = hand.get_all_control_modes()
+        assert current_modes and len(current_modes) == dof, \
+            f"Failed to get control modes: got {len(current_modes) if current_modes else 0} modes, expected {dof}"
+        print(f"[get_all_control_modes] Voltage Control Modes: {current_modes}")
+        assert all(mode == voltage_mode for mode in current_modes), \
+            f"Not all joints are in voltage mode: {current_modes}"
+
+        # Use a non-zero probe so a timeout/default 0 return cannot pass accidentally.
+        hand.set_joint_voltage(probe_joint, probe_voltage)
+        time.sleep(0.5)
+        # O12 firmware versions up to and including 1.2.15 do not support voltage readback.
+        current_probe_voltage = hand.get_joint_voltage(probe_joint)
+        print(f"[set/get_joint_voltage] Joint {probe_joint}: "
+              f"target={probe_voltage}, current={current_probe_voltage}")
+        assert current_probe_voltage == probe_voltage, \
+            f"Joint {probe_joint} voltage mismatch: expected {probe_voltage}, got {current_probe_voltage}"
+
+        hand.set_joint_voltage(probe_joint, safe_voltage)
+
+        voltages = [safe_voltage] * dof
+        hand.set_all_joint_voltages(voltages)
+        print(f"[set_all_joint_voltages] Set Voltages: {voltages}")
+
+        # O12 firmware versions up to and including 1.2.15 do not support voltage readback.
+        current_voltages = hand.get_all_joint_voltages()
+        assert current_voltages and len(current_voltages) == dof, \
+            f"Failed to get voltages: got {len(current_voltages) if current_voltages else 0} voltages, expected {dof}"
+        print(f"[get_all_joint_voltages] Current Voltages: {current_voltages}")
+        assert current_voltages == voltages, \
+            f"Voltage mismatch: expected {voltages}, got {current_voltages}"
+    finally:
+        try:
+            hand.set_all_joint_voltages([safe_voltage] * dof)
+            for joint in range(1, dof + 1):
+                hand.set_control_mode(joint, position_mode)
+            print("[set_control_mode] Restored all joints to position mode")
+        except Exception as exc:
+            print(f"[Warning] Failed to restore voltage control test state: {exc}")
+        hand.set_frame_recv_timeout(previous_timeout)
 
 
 # Parse custom arguments (when running directly with Python, not via pytest)

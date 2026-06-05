@@ -117,6 +117,7 @@ enum class AGIBOT_EXPORT ControlMode : unsigned char {
   SERVO = 1,                       // Servo control mode
   VELOCITY = 2,                    // Velocity control mode
   TORQUE = 3,                      // Torque control mode
+  VOLTAGE = 4,                     // Voltage control mode
   PROFILE_POSITION = 7,            // Profile-Position control mode
   UNKNOWN = 10                     // Unknown control mode
 };
@@ -132,6 +133,7 @@ inline std::string ToString(ControlMode mode) {
     case ControlMode::SERVO: return "Servo";
     case ControlMode::VELOCITY: return "Velocity";
     case ControlMode::TORQUE: return "Torque";
+    case ControlMode::VOLTAGE: return "Voltage";
     case ControlMode::PROFILE_POSITION: return "Profile-Position";
     default: return "Unknown";
   }
