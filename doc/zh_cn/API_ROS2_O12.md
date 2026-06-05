@@ -21,6 +21,10 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 | `joint_temperature_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | `data[]` = 温度值 |
 | `joint_current_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllCurrentReport()` |
 | `joint_current_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | `data[]` = 电流值 |
+| `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | 订阅 (你发布) | 写入控制模式 `data[0..11]`；电压模式为 `4` |
+| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | 发布 (你订阅) | 回读控制模式 `data[0..11]` |
+| `joint_voltage_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电压指令 `data[0..11]` |
+| `joint_voltage_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 回读电压指令 `data[0..11]` |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电流阈值 `data[0..11]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 回读电流阈值 `data[0..11]` |
 | `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | 触觉流频率 Hz（>0 启动，0 停止）；上限 **100 Hz**（节点内写死） |
@@ -34,10 +38,21 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 
 `joint_mix_control_cmd` 使用 `sensor_msgs/JointState` 进行位置+力混合控制：
 
-- `position[]` = 电机原始位置 (int16, 范围 0–4095)
+- `position[]` = 电机原始位置 (int16, 范围 0–2000)
 - `effort[]` = 指尖力 (int16, 单位 **0.01N**，与触觉传感器法向力关联)
 
 节点内部调用 `MixControlByPT`（12 路 position/effort），**无回读**。
+
+## 电压控制
+
+电压控制使用两组 topic：
+
+- `joint_control_mode_cmd/states` (`std_msgs/Int8MultiArray`)：将 12 个关节切换到 `ControlMode.VOLTAGE` (`4`)。
+- `joint_voltage_cmd/states` (`std_msgs/Int16MultiArray`)：写入并回读电压指令。
+
+> 注意：O12 固件截至 1.2.15（含）尚不支持电压读回，因此 `joint_voltage_states` 仅适用于后续支持该能力的固件。
+
+每次向命令 topic 发布完整的 12 元素数组。节点不会隐式切换控制模式；发送非零电压指令前，请先发布控制模式 `4`。
 
 ## 触觉传感器 (3D)
 
@@ -91,6 +106,10 @@ python3 scripts/omnihand_pro_2025/joint_current.py left
 # 设置电流阈值
 python3 scripts/omnihand_pro_2025/joint_current_threshold_pub.py 500 left
 
+# 设置所有关节为电压模式，然后发布电压指令
+python3 scripts/omnihand_pro_2025/joint_control_mode_pub.py 4 left
+python3 scripts/omnihand_pro_2025/joint_voltage_pub.py 0 left
+
 # 混合控制 (位置+力, effort=0.01N)
 python3 scripts/omnihand_pro_2025/mix_control_pub.py left
 
@@ -114,6 +133,17 @@ ros2 topic pub --once /o12/left/joint_error_cmd std_msgs/msg/Empty '{}'
 
 # 查看错误码
 ros2 topic echo /o12/left/joint_error_states
+
+# 设置所有关节为电压模式
+ros2 topic pub --once /o12/left/joint_control_mode_cmd std_msgs/msg/Int8MultiArray \
+  "{data: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]}"
+
+# 发送零电压指令
+ros2 topic pub --once /o12/left/joint_voltage_cmd std_msgs/msg/Int16MultiArray \
+  "{data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}"
+
+# 查看电压回读
+ros2 topic echo /o12/left/joint_voltage_states
 
 # 混合控制: 位置+力 (raw int16)
 ros2 topic pub --once /o12/left/joint_mix_control_cmd sensor_msgs/msg/JointState \

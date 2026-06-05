@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 """
-@Description: Publish position + working-current mixed-control commands for H3L.
+@Description: Publish position + velocity + torque mixed-control (PVT) for H3L.
 
-Mixed control topic: /<product>/<side>/joint_mix_control_cmd  (JointState)
-  position[] = motor tick (int16, 0~4095), same open/close as joint_cmd.py / solver
-  effort[]   = working current threshold (mA), cast to int16 on the node
+**NOT SUPPORTED YET** — H3L PVT mixed control is not available on hardware/firmware.
+This script is kept as an API example only. Use joint_cmd.py (position-only) until a future release.
 
-Usage:  python3 mix_control_pub.py [left|right] [product]
+H3L node selects MixControlByPVT when JointState.velocity[] has 4 elements
+(position[] + velocity[] + effort[] on joint_mix_control_cmd).
+
+  position[] = motor tick (int16, 0~4095)
+  velocity[] = motor velocity setpoint (int16, device raw unit)
+  effort[]   = working current threshold (mA)
+
+Usage:  python3 mix_control_pvt_pub.py [left|right] [product]
         default: side=left, product=h3l
+        topic: /h3l/<side>/joint_mix_control_cmd
 """
 
 import sys
@@ -16,16 +23,24 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
-from joint_cmd import NUM_JOINTS, POSE_CLOSE, POSE_OPEN
-
+NUM_JOINTS = 4
 WORK_CURRENT_MA = 300
+MOTOR_VELOCITY = 8000
 
-# topic: /h3l/left/joint_mix_control_cmd; /h3l/right/joint_mix_control_cmd;
+# OmniHand3LiteSolver::SetHandGesture (OPEN / FIST), motor tick
+POSE_OPEN = {
+    'right': [4095, 4095, 4095, 4095],
+    'left': [0, 4095, 4095, 0],
+}
+POSE_CLOSE = {
+    'right': [1500, 1500, 2900, 400],
+    'left': [2595, 1500, 2900, 3695],
+}
 
 
-class MixControlPublisher(Node):
+class MixControlPvtPublisher(Node):
     def __init__(self, hand_side: str, product: str):
-        super().__init__(f'{product}_{hand_side}_mix_control_publisher')
+        super().__init__(f'{product}_{hand_side}_mix_control_pvt_publisher')
         if hand_side not in POSE_OPEN:
             raise ValueError(f"hand_side must be 'left' or 'right', got {hand_side!r}")
         self.hand_side = hand_side
@@ -38,8 +53,8 @@ class MixControlPublisher(Node):
         )
         self.timer = self.create_timer(1.5, self.publish_mix_control)
         self.get_logger().info(
-            f'{product}/{hand_side} mix_control publisher started '
-            f'(H3L, {NUM_JOINTS} DOF, position=tick, effort={WORK_CURRENT_MA}mA)'
+            f'{product}/{hand_side} mix_control PVT started '
+            f'(H3L, vel={MOTOR_VELOCITY}, effort={WORK_CURRENT_MA}mA)'
         )
 
     def publish_mix_control(self):
@@ -50,10 +65,12 @@ class MixControlPublisher(Node):
         msg = JointState()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.position = [float(p) for p in pose]
+        msg.velocity = [float(MOTOR_VELOCITY)] * NUM_JOINTS
         msg.effort = [float(WORK_CURRENT_MA)] * NUM_JOINTS
         self.publisher.publish(msg)
         self.get_logger().info(
-            f'Published mix_control ({label}, pos={pose}, current={WORK_CURRENT_MA}mA)'
+            f'Published mix_control PVT ({label}, pos={pose}, '
+            f'vel={MOTOR_VELOCITY}, current={WORK_CURRENT_MA}mA)'
         )
 
 
@@ -61,7 +78,7 @@ def main(args=None):
     rclpy.init(args=args)
     hand_side = sys.argv[1].lower() if len(sys.argv) > 1 else 'left'
     product = sys.argv[2].lower() if len(sys.argv) > 2 else 'h3l'
-    node = MixControlPublisher(hand_side, product)
+    node = MixControlPvtPublisher(hand_side, product)
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:

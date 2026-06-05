@@ -15,27 +15,27 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
-#include "omnihand/omnihand.h"
 #include "omnihand/i_control_mode.h"
 #include "omnihand/i_omnihand_motor_range.h"
-#include "omnihand/proto.h"
-#include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_pro_2025/omnihand_pro_2025_solver.h"
+#include "omnihand/omnihand.h"
+#include "omnihand/ota_types.h"
+#include "omnihand/proto.h"
 
 namespace agilink {
 namespace omnihand {
 
 /**
  * @brief OmniHand Pro 2025 (O12) interface class - 12 DOF
- * 
+ *
  * This class provides the public interface for OmniHand Pro 2025 product.
  * It includes all methods supported by O12, including 3D tactile sensors and report period settings.
  */
 class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode, public IOmniHandMotorRange {
  public:
   // Constants
-  static constexpr unsigned char kDegreesOfActiveFreedom = 12;   // DoA
-  static constexpr unsigned char kDegreesOfPassiveFreedom = 7;   // DoP
+  static constexpr unsigned char kDegreesOfActiveFreedom = 12;  // DoA
+  static constexpr unsigned char kDegreesOfPassiveFreedom = 7;  // DoP
   static constexpr uint8_t kDefaultHandDeviceId = 1u;
 
   virtual ~OmniHandPro2025() = default;
@@ -235,6 +235,35 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode, publ
    */
   virtual void SetAllCurrentReportPeriod(std::vector<uint16_t> vec_period) = 0;
 
+  // ============ Voltage Control ============
+  /**
+   * @brief Sets the voltage command of a single joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @param voltage Voltage command, clamped by implementation to the supported range
+   */
+  virtual void SetJointMotorVoltage(unsigned char joint_motor_index, int16_t voltage) = 0;
+
+  /**
+   * @brief Sets voltage commands of all joint motors in batch.
+   * @param vec_voltage Voltage command vector, length 12
+   */
+  virtual void SetAllJointMotorVoltage(const std::vector<int16_t>& vec_voltage) = 0;
+
+  /**
+   * @brief Gets the voltage command of a single joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @return Current voltage command
+   * @note O12 firmware versions up to and including 1.2.15 do not support voltage readback.
+   */
+  virtual int16_t GetJointMotorVoltage(unsigned char joint_motor_index) const = 0;
+
+  /**
+   * @brief Gets voltage commands of all joint motors in batch.
+   * @return Voltage command vector, length 12 when the request succeeds
+   * @note O12 firmware versions up to and including 1.2.15 do not support voltage readback.
+   */
+  virtual std::vector<int16_t> GetAllJointMotorVoltage() const = 0;
+
   // ============ Position Mode Fine-Tune ============
   /**
    * @brief Enables or disables position mode fine-tune for all joint motors.
@@ -259,35 +288,35 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode, publ
   std::vector<std::string> GetJointNames() const override {
     const std::string p = is_left_hand_ ? "L_" : "R_";
     return {
-      p + "index_abad_joint",   // 1 ActuatorIndex1 (near thumb)
-      p + "index_mcp_joint",    // 2 ActuatorIndex2
-      p + "middle_abad_joint",  // 3 ActuatorMiddle1
-      p + "middle_mcp_joint",   // 4 ActuatorMiddle2
-      p + "thumb_abad_joint",   // 5 ActuatorThumbABAD
-      p + "thumb_roll_joint",   // 6 ActuatorThumbRoll
-      p + "index_pip_joint",    // 7 ActuatorIndex3
-      p + "middle_pip_joint",   // 8 ActuatorMiddle3
-      p + "ring_mcp_joint",     // 9 ActuatorRing
-      p + "pinky_mcp_joint",    // 10 ActuatorPinky
-      p + "thumb_pip_joint",    // 11 ActuatorThumbPIP
-      p + "thumb_mcp_joint",    // 12 ActuatorThumbMCP
+        p + "index_abad_joint",   // 1 ActuatorIndex1 (near thumb)
+        p + "index_mcp_joint",    // 2 ActuatorIndex2
+        p + "middle_abad_joint",  // 3 ActuatorMiddle1
+        p + "middle_mcp_joint",   // 4 ActuatorMiddle2
+        p + "thumb_abad_joint",   // 5 ActuatorThumbABAD
+        p + "thumb_roll_joint",   // 6 ActuatorThumbRoll
+        p + "index_pip_joint",    // 7 ActuatorIndex3
+        p + "middle_pip_joint",   // 8 ActuatorMiddle3
+        p + "ring_mcp_joint",     // 9 ActuatorRing
+        p + "pinky_mcp_joint",    // 10 ActuatorPinky
+        p + "thumb_pip_joint",    // 11 ActuatorThumbPIP
+        p + "thumb_mcp_joint",    // 12 ActuatorThumbMCP
     };
   }
 
   std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinMotorPos() const override {
     static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinMotorPos = {
-      {0, 2000},  // 1: index ActuatorIndex1
-      {0, 2000},  // 2: index ActuatorIndex2
-      {0, 2000},  // 3: middle ActuatorMiddle1
-      {0, 2000},  // 4: middle ActuatorMiddle2
-      {0, 2000},  // 5: thumb_abad ActuatorThumbABAD
-      {0, 2000},  // 6: thumb_roll ActuatorThumbRoll
-      {0, 2000},  // 7: index_pip ActuatorIndex3
-      {0, 2000},  // 8: middle_pip ActuatorMiddle3
-      {0, 2000},  // 9: ring_mcp ActuatorRing
-      {0, 2000},  // 10: pinky_mcp ActuatorPinky
-      {0, 2000},  // 11: thumb_pip ActuatorThumbPIP
-      {0, 2000},  // 12: thumb_mcp ActuatorThumbMCP
+        {0, 2000},  // 1: index ActuatorIndex1
+        {0, 2000},  // 2: index ActuatorIndex2
+        {0, 2000},  // 3: middle ActuatorMiddle1
+        {0, 2000},  // 4: middle ActuatorMiddle2
+        {0, 2000},  // 5: thumb_abad ActuatorThumbABAD
+        {0, 2000},  // 6: thumb_roll ActuatorThumbRoll
+        {0, 2000},  // 7: index_pip ActuatorIndex3
+        {0, 2000},  // 8: middle_pip ActuatorMiddle3
+        {0, 2000},  // 9: ring_mcp ActuatorRing
+        {0, 2000},  // 10: pinky_mcp ActuatorPinky
+        {0, 2000},  // 11: thumb_pip ActuatorThumbPIP
+        {0, 2000},  // 12: thumb_mcp ActuatorThumbMCP
     };
     return kAllMaxMinMotorPos;
   }

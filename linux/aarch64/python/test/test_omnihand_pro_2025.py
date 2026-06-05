@@ -408,6 +408,68 @@ def test_velocity_control(hand):
     assert len(current_velocities) == 12
 
 
+def test_voltage_control(hand):
+    """Test voltage control (requires hardware)"""
+    assert hand.init(), "Device not initialized"
+
+    dof = 12
+    safe_voltage = 0
+    probe_joint = 1
+    probe_voltage = 500
+    voltage_mode = int(ControlMode.VOLTAGE)
+    position_mode = int(ControlMode.POSITION)
+    previous_timeout = hand.get_frame_recv_timeout()
+
+    assert voltage_mode == 4, "ControlMode.VOLTAGE should match firmware mode value 4"
+
+    try:
+        hand.set_frame_recv_timeout(100)
+
+        for joint in range(1, dof + 1):
+            hand.set_control_mode(joint, voltage_mode)
+        print(f"\n[set_control_mode] Set all joints to voltage mode: {voltage_mode}")
+
+        current_modes = hand.get_all_control_modes()
+        assert current_modes and len(current_modes) == dof, \
+            f"Failed to get control modes: got {len(current_modes) if current_modes else 0} modes, expected {dof}"
+        print(f"[get_all_control_modes] Voltage Control Modes: {current_modes}")
+        assert all(mode == voltage_mode for mode in current_modes), \
+            f"Not all joints are in voltage mode: {current_modes}"
+
+        # Use a non-zero probe so a timeout/default 0 return cannot pass accidentally.
+        hand.set_joint_voltage(probe_joint, probe_voltage)
+        time.sleep(0.5)
+        # O12 firmware versions up to and including 1.2.15 do not support voltage readback.
+        current_probe_voltage = hand.get_joint_voltage(probe_joint)
+        print(f"[set/get_joint_voltage] Joint {probe_joint}: "
+              f"target={probe_voltage}, current={current_probe_voltage}")
+        assert current_probe_voltage == probe_voltage, \
+            f"Joint {probe_joint} voltage mismatch: expected {probe_voltage}, got {current_probe_voltage}"
+
+        hand.set_joint_voltage(probe_joint, safe_voltage)
+
+        voltages = [safe_voltage] * dof
+        hand.set_all_joint_voltages(voltages)
+        print(f"[set_all_joint_voltages] Set Voltages: {voltages}")
+
+        # O12 firmware versions up to and including 1.2.15 do not support voltage readback.
+        current_voltages = hand.get_all_joint_voltages()
+        assert current_voltages and len(current_voltages) == dof, \
+            f"Failed to get voltages: got {len(current_voltages) if current_voltages else 0} voltages, expected {dof}"
+        print(f"[get_all_joint_voltages] Current Voltages: {current_voltages}")
+        assert current_voltages == voltages, \
+            f"Voltage mismatch: expected {voltages}, got {current_voltages}"
+    finally:
+        try:
+            hand.set_all_joint_voltages([safe_voltage] * dof)
+            for joint in range(1, dof + 1):
+                hand.set_control_mode(joint, position_mode)
+            print("[set_control_mode] Restored all joints to position mode")
+        except Exception as exc:
+            print(f"[Warning] Failed to restore voltage control test state: {exc}")
+        hand.set_frame_recv_timeout(previous_timeout)
+
+
 # Parse custom arguments (when running directly with Python, not via pytest)
 # This is a fallback in case the earlier parsing didn't work
 if __name__ == "__main__":

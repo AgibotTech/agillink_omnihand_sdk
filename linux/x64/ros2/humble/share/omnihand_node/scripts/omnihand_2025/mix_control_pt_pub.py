@@ -6,7 +6,7 @@ Mixed control topic: /<product>/<side>/joint_mix_control_cmd  (JointState)
   position[] = motor tick (int16)
   effort[]   = working current threshold (mA)
 
-Usage:  python3 mix_control_pub.py [left|right] [product]
+Usage:  python3 mix_control_pt_pub.py [left|right] [product]
         default: side=left, product=o10
         topic: /o10/left/joint_mix_control_cmd; /o10/right/joint_mix_control_cmd;
 """

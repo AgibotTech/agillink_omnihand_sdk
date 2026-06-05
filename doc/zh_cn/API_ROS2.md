@@ -46,8 +46,10 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 | `joint_temperature_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_temperature_cmd` 时 | `data[]` = 温度值 |
 | `joint_current_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发电流查询 |
 | `joint_current_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_current_cmd` 时 | `data[]` = 电流值 |
-| `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | 订阅 (你发布) | — | 写入控制模式 `data[]`（仅 H3U_M） |
-| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | 发布 (你订阅) | 收到 `joint_control_mode_cmd` 时 | 回读控制模式 `data[]`（仅 H3U_M） |
+| `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | 订阅 (你发布) | — | 写入控制模式 `data[]`（仅 O12/H3U_M） |
+| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | 发布 (你订阅) | 收到 `joint_control_mode_cmd` 时 | 回读控制模式 `data[]`（仅 O12/H3U_M） |
+| `joint_voltage_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | — | 写入电压指令 `data[]`（仅 O12） |
+| `joint_voltage_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_voltage_cmd` 时 | 回读电压指令 `data[]`（仅 O12；O12 固件 <= 1.2.15 不可用） |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | — | 写入电流阈值 `data[]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_current_threshold_cmd` 时 | 回读电流阈值 `data[]` |
 | `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | — | 触觉流：`data` = 频率 Hz（>0 启动/改频，0 停止）；上限 **50 Hz**（O10）/ **100 Hz**（O12），节点内写死 |
@@ -63,7 +65,7 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 
 **O10**：不支持 `joint_control_mode_cmd`。`joint_mix_control_cmd` 仅发 `position[]`+`effort[]` 为位置+电流混合；同时提供 `velocity[]`（长度足够）则为位置+速度+电流混合。**H3L**：仅支持位置+电流混合（无速度项）。混合控制中 `effort` 为电流 **mA**（0–1000），非标准 N·m。
 
-**O12**：支持通过 `SetControlMode` 接口设置位置模式、伺服模式、速度模式、力矩模式，也可通过 `joint_mix_control_cmd` 实现位置+力混合控制（支持 5 种模式）。混合控制中 `effort` 字段单位为 **0.01N**（与触觉传感器法向力关联）。注意 O12 的 ROS2 node 当前未暴露 `joint_control_mode_cmd` topic，控制模式切换需通过 C++/Python SDK 直接调用。
+**O12**：支持通过 `joint_control_mode_cmd` topic 切换控制模式（0=POSITION，1=SERVO，2=VELOCITY，3=TORQUE，4=VOLTAGE，7=PROFILE_POSITION）。电压指令使用 `joint_voltage_cmd`；发送电压指令前，请先将目标关节切换到模式 `4`。O12 也可通过 `joint_mix_control_cmd` 实现位置 + 力混合控制。混合控制中 `effort` 字段单位为 **0.01N**（与触觉传感器法向力关联）。
 
 **H3U_M**：支持通过 `joint_control_mode_cmd` topic 切换控制模式（0=CSP 位置模式，7=PP 规划位置模式）。
 
@@ -89,7 +91,7 @@ O10 和 O12 的触觉传感器数据结构不同，各自使用产品专属的�
 
 ### `std_msgs` 数组载荷
 
-错误、温度、电流与电流阈值 topic 使用 `std_msgs/Int16MultiArray` 承载每个关节的 `int16`（`data[]`，`layout.dim` 为一维）。H3U_M 的控制模式使用 `std_msgs/Int8MultiArray`，用法相同。触觉数据仍使用各产品 `omnihand_*_node_msgs` 中的类型。
+错误、温度、电流、电流阈值与 O12 电压 topic 使用 `std_msgs/Int16MultiArray` 承载每个关节的 `int16`（`data[]`，`layout.dim` 为一维）。O12/H3U_M 的控制模式使用 `std_msgs/Int8MultiArray`，用法相同。触觉数据仍使用各产品 `omnihand_*_node_msgs` 中的类型。
 
 ## 配置
 
@@ -167,8 +169,12 @@ python3 tactile.py left o10 0
 # 设置电流阈值
 python3 joint_current_threshold_pub.py 500 left o10
 
-# 设置控制模式 (仅 H3U_M, 0=CSP, 7=PP)
+# 设置控制模式 (O12: 4=VOLTAGE; H3U_M: 0=CSP, 7=PP)
 python3 joint_control_mode_pub.py 0 left h3u_m
+
+# O12 电压控制：先切到 VOLTAGE 模式，再发送电压指令
+python3 joint_control_mode_pub.py 4 left o12
+python3 joint_voltage_pub.py 0 left o12
 ```
 
 **4. 连接方式：**

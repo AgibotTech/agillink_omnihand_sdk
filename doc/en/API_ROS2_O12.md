@@ -21,6 +21,10 @@ All topics are prefixed with `/o12/<side>/`, where `<side>` is `left` or `right`
 | `joint_temperature_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = temperature |
 | `joint_current_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllCurrentReport()` |
 | `joint_current_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = current |
+| `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | Subscribe (you pub) | Write control mode `data[0..11]`; use `4` for voltage mode |
+| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | Publish (you sub) | Readback control mode `data[0..11]` |
+| `joint_voltage_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write voltage command `data[0..11]` |
+| `joint_voltage_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback voltage command `data[0..11]` |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..11]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..11]` |
 | `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | Stream rate in Hz (`>0` start, `0` stop); max **100 Hz** (hardcoded in node) |
@@ -34,10 +38,21 @@ All topics are prefixed with `/o12/<side>/`, where `<side>` is `left` or `right`
 
 `joint_mix_control_cmd` uses `sensor_msgs/JointState` for position+force mixed control:
 
-- `position[]` = raw motor position (int16, range 0–4095)
+- `position[]` = raw motor position (int16, range 0–2000)
 - `effort[]` = fingertip force (int16, unit: **0.01 N**, correlated with tactile sensor normal force)
 
 The node calls `MixControlByPT` (12 position + effort values). **No readback**.
+
+## Voltage Control
+
+Voltage control uses two topic pairs:
+
+- `joint_control_mode_cmd/states` (`std_msgs/Int8MultiArray`) for switching all 12 joints to `ControlMode.VOLTAGE` (`4`).
+- `joint_voltage_cmd/states` (`std_msgs/Int16MultiArray`) for writing and reading back voltage commands.
+
+> Note: O12 firmware versions up to and including 1.2.15 do not support voltage readback, so `joint_voltage_states` is only usable on newer firmware.
+
+Publish a full 12-element array to each command topic. The node does not switch modes implicitly; send control mode `4` before publishing non-zero voltage commands.
 
 ## Tactile Sensor (3D)
 
@@ -91,6 +106,10 @@ python3 scripts/omnihand_pro_2025/joint_current.py left
 # Set current threshold
 python3 scripts/omnihand_pro_2025/joint_current_threshold_pub.py 500 left
 
+# Set all joints to voltage mode, then publish voltage commands
+python3 scripts/omnihand_pro_2025/joint_control_mode_pub.py 4 left
+python3 scripts/omnihand_pro_2025/joint_voltage_pub.py 0 left
+
 # Mixed control (position + force, effort=0.01N)
 python3 scripts/omnihand_pro_2025/mix_control_pub.py left
 
@@ -114,6 +133,17 @@ ros2 topic pub --once /o12/left/joint_error_cmd std_msgs/msg/Empty '{}'
 
 # View error reports
 ros2 topic echo /o12/left/joint_error_states
+
+# Set all joints to voltage mode
+ros2 topic pub --once /o12/left/joint_control_mode_cmd std_msgs/msg/Int8MultiArray \
+  "{data: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]}"
+
+# Send zero voltage command
+ros2 topic pub --once /o12/left/joint_voltage_cmd std_msgs/msg/Int16MultiArray \
+  "{data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}"
+
+# View voltage readback
+ros2 topic echo /o12/left/joint_voltage_states
 
 # Mixed control: position + force (raw int16)
 ros2 topic pub --once /o12/left/joint_mix_control_cmd sensor_msgs/msg/JointState \

@@ -10,6 +10,7 @@
 - 电机位置范围：0-2000
 - 仅支持 CAN（ZLG USB CANFD）通信
 - 支持 SocketCAN（仅 Linux）
+- 支持电压指令控制
 - 支持温度和电流上报周期设置
 
 ## 包含头文件
@@ -62,9 +63,8 @@ enum class ControlMode : unsigned char {
     SERVO                     = 1,    // 伺服模式
     VELOCITY                  = 2,    // 速度模式
     TORQUE                    = 3,    // 力控模式
-    POSITION_TORQUE           = 4,    // 位置-力控模式（混合控制：位置 + 力，力单位 0.01N）
-    VELOCITY_TORQUE           = 5,    // 速度-力控模式（暂不支持）
-POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（暂不支持）
+    VOLTAGE                   = 4,    // 电压模式
+    PROFILE_POSITION          = 7,    // 轮廓位置模式
     UNKNOWN                   = 10    // 未知模式
 };
 }  // namespace omnihand
@@ -72,11 +72,12 @@ POSITION_VELOCITY_TORQUE  = 6,    // 位置-速度-力控模式（暂不支持�
 ```
 
 **注意**：
-- **位置模式 (0)**：位置控制，配合 `SetJointMotorPosition` 使用。
+- **位置模式 (0)**：位置控制，配合 `SetJointMotorPosi` 使用。
 - **伺服模式 (1)**：伺服控制模式。此模式要求位置指令频率 ≥ 50Hz，电机根据目标位置与实际位置的差值进行补运算，自动调节运动速度。
 - **速度模式 (2)**：速度控制，配合 `SetJointMotorVelo` 使用。
 - **力控模式 (3)**：力控模式，配合 `SetJointMotorTorque` 使用。
-- **混合控制**：位置+力矩通过 `MixControlByPT` 实现，力矩单位 0.01N。
+- **电压模式 (4)**：电压指令控制，配合 `SetJointMotorVoltage` / `SetAllJointMotorVoltage` 使用。
+- **混合控制**：位置 + 力通过专用 `MixControlByPT` 指令实现，不是 `ControlMode::VOLTAGE`。
 
 ## 工厂方法
 
@@ -268,9 +269,22 @@ void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo);         // 批�
 std::vector<int16_t> GetAllJointMotorVelo() const;                       // 批量获取速度，返回 12 个值
 ```
 
+### 电压控制
+
+发送电压指令前，请先将对应关节电机切换到 `ControlMode::VOLTAGE`。
+
+> 注意：O12 固件截至 1.2.15（含）尚不支持电压读回；下面的读取接口预留给后续固件使用。
+
+```cpp
+void SetJointMotorVoltage(unsigned char joint_motor_index, int16_t voltage);        // 设置单个关节电机电压指令，索引 1-12；单关节接口会限制到支持范围
+void SetAllJointMotorVoltage(const std::vector<int16_t>& vec_voltage);              // 批量设置电压指令，12 个值
+int16_t GetJointMotorVoltage(unsigned char joint_motor_index) const;                // 获取单个关节电机电压指令；O12 固件截至 1.2.15（含）尚不支持
+std::vector<int16_t> GetAllJointMotorVoltage() const;                               // 批量获取电压指令；O12 固件截至 1.2.15（含）尚不支持
+```
+
 ### 控制模式
 
-O12 支持通过 `SetControlMode` 指令切换控制模式，支持以下 5 种控制模式：
+O12 支持通过 `SetControlMode` 指令切换电机控制模式，常用指令模式如下：
 
 | 模式枚举 | 值 | 说明 |
 |---|---|---|
@@ -278,9 +292,9 @@ O12 支持通过 `SetControlMode` 指令切换控制模式，支持以下 5 种�
 | `SERVO` | 1 | 伺服控制模式（要求位置指令频率 ≥ 50Hz） |
 | `VELOCITY` | 2 | 速度控制模式 |
 | `TORQUE` | 3 | 力矩控制模式 |
-| `MixControlMode::POSITION_TORQUE` | 0x3 | 位置 + 力混合控制（`MixControlByPT`，力单位 0.01N） |
+| `VOLTAGE` | 4 | 电压指令控制 |
 
-**注意**：混合控制中力矩字段单位为 **0.01N**。`MixControlByPV` / `MixControlByPVT` 在 O12 上不可用。
+**注意**：位置 + 力混合控制通过专用 `MixControlByPT` 接口实现。混合控制中力矩字段单位为 **0.01N**。`MixControlByPV` / `MixControlByPVT` 在 O12 上不可用。
 
 ```cpp
 void SetControlMode(unsigned char joint_motor_index, ControlMode mode);  // 设置单个关节控制模式，索引 1-12
