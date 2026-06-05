@@ -49,7 +49,7 @@ All products follow the same topic naming and interaction pattern:
 | `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | Subscribe (you pub) | — | Write control mode `data[]` (O12/H3U_M only) |
 | `joint_control_mode_states` | `std_msgs/Int8MultiArray` | Publish (you sub) | On `joint_control_mode_cmd` received | Readback control mode `data[]` (O12/H3U_M only) |
 | `joint_voltage_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | — | Write voltage command `data[]` (O12 only) |
-| `joint_voltage_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_voltage_cmd` received | Readback voltage command `data[]` (O12 only) |
+| `joint_voltage_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_voltage_cmd` received | Readback voltage command `data[]` (O12 only; unavailable on O12 firmware <= 1.2.15) |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | — | Write current threshold `data[]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_current_threshold_cmd` received | Readback current threshold `data[]` |
 | `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | — | Tactile stream: `data` = Hz (>0 start/restart, 0 stop); max **50 Hz** (O10) / **100 Hz** (O12), hardcoded in node |

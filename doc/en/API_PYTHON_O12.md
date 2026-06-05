@@ -480,6 +480,8 @@ def get_all_joint_velocities(self) -> List[int]:
 
 Set the corresponding joint motors to `ControlMode.VOLTAGE` before sending voltage commands.
 
+> Note: O12 firmware versions up to and including 1.2.15 do not support voltage readback; the read APIs below are reserved for newer firmware.
+
 ```python
 def set_joint_voltage(self, joint_motor_index: int, voltage: int) -> None:
     """Sets the voltage command of a single joint motor.
@@ -491,6 +493,9 @@ def set_joint_voltage(self, joint_motor_index: int, voltage: int) -> None:
 
 def get_joint_voltage(self, joint_motor_index: int) -> int:
     """Gets the voltage command of a single joint motor.
+
+    Note:
+        O12 firmware versions up to and including 1.2.15 do not support voltage readback.
 
     Args:
         joint_motor_index: Joint motor index (1-12).
@@ -508,6 +513,9 @@ def set_all_joint_voltages(self, voltages: List[int]) -> None:
 
 def get_all_joint_voltages(self) -> List[int]:
     """Gets voltage commands of all joint motors in batch.
+
+    Note:
+        O12 firmware versions up to and including 1.2.15 do not support voltage readback.
 
     Returns:
         List[int]: Voltage command list. Returns 12 values when the request succeeds.

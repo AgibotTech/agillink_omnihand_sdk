@@ -323,6 +323,8 @@ def get_all_joint_velocities(self) -> List[int]:
 
 发送电压指令前，请先将对应关节电机切换到 `ControlMode.VOLTAGE`。
 
+> 注意：O12 固件截至 1.2.15（含）尚不支持电压读回；下面的读取接口预留给后续固件使用。
+
 ```python
 def set_joint_voltage(self, joint_motor_index: int, voltage: int) -> None:
     """设置单个关节电机的电压指令。
@@ -334,6 +336,9 @@ def set_joint_voltage(self, joint_motor_index: int, voltage: int) -> None:
 
 def get_joint_voltage(self, joint_motor_index: int) -> int:
     """获取单个关节电机的电压指令。
+
+    Note:
+        O12 固件截至 1.2.15（含）尚不支持电压读回。
 
     Args:
         joint_motor_index: 关节电机索引（1-12）。
@@ -351,6 +356,9 @@ def set_all_joint_voltages(self, voltages: List[int]) -> None:
 
 def get_all_joint_voltages(self) -> List[int]:
     """批量获取所有关节电机的电压指令。
+
+    Note:
+        O12 固件截至 1.2.15（含）尚不支持电压读回。
 
     Returns:
         List[int]: 电压指令列表。请求成功时返回 12 个值。

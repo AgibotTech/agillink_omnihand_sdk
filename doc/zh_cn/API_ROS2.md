@@ -49,7 +49,7 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 | `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | 订阅 (你发布) | — | 写入控制模式 `data[]`（仅 O12/H3U_M） |
 | `joint_control_mode_states` | `std_msgs/Int8MultiArray` | 发布 (你订阅) | 收到 `joint_control_mode_cmd` 时 | 回读控制模式 `data[]`（仅 O12/H3U_M） |
 | `joint_voltage_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | — | 写入电压指令 `data[]`（仅 O12） |
-| `joint_voltage_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_voltage_cmd` 时 | 回读电压指令 `data[]`（仅 O12） |
+| `joint_voltage_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_voltage_cmd` 时 | 回读电压指令 `data[]`（仅 O12；O12 固件 <= 1.2.15 不可用） |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | — | 写入电流阈值 `data[]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 收到 `joint_current_threshold_cmd` 时 | 回读电流阈值 `data[]` |
 | `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | — | 触觉流：`data` = 频率 Hz（>0 启动/改频，0 停止）；上限 **50 Hz**（O10）/ **100 Hz**（O12），节点内写死 |

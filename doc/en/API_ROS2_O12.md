@@ -50,6 +50,8 @@ Voltage control uses two topic pairs:
 - `joint_control_mode_cmd/states` (`std_msgs/Int8MultiArray`) for switching all 12 joints to `ControlMode.VOLTAGE` (`4`).
 - `joint_voltage_cmd/states` (`std_msgs/Int16MultiArray`) for writing and reading back voltage commands.
 
+> Note: O12 firmware versions up to and including 1.2.15 do not support voltage readback, so `joint_voltage_states` is only usable on newer firmware.
+
 Publish a full 12-element array to each command topic. The node does not switch modes implicitly; send control mode `4` before publishing non-zero voltage commands.
 
 ## Tactile Sensor (3D)
