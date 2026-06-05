@@ -46,8 +46,10 @@ All products follow the same topic naming and interaction pattern:
 | `joint_temperature_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_temperature_cmd` received | `data[]` = temperature |
 | `joint_current_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger current query |
 | `joint_current_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_current_cmd` received | `data[]` = current |
-| `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | Subscribe (you pub) | — | Write control mode `data[]` (H3U_M only) |
-| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | Publish (you sub) | On `joint_control_mode_cmd` received | Readback control mode `data[]` (H3U_M only) |
+| `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | Subscribe (you pub) | — | Write control mode `data[]` (O12/H3U_M only) |
+| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | Publish (you sub) | On `joint_control_mode_cmd` received | Readback control mode `data[]` (O12/H3U_M only) |
+| `joint_voltage_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | — | Write voltage command `data[]` (O12 only) |
+| `joint_voltage_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_voltage_cmd` received | Readback voltage command `data[]` (O12 only) |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | — | Write current threshold `data[]` |
 | `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_current_threshold_cmd` received | Readback current threshold `data[]` |
 | `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | — | Tactile stream: `data` = Hz (>0 start/restart, 0 stop); max **50 Hz** (O10) / **100 Hz** (O12), hardcoded in node |
@@ -66,7 +68,7 @@ Different product models have different control mode support:
 
 **O10**: No `joint_control_mode_cmd`. On `joint_mix_control_cmd`, `position[]`+`effort[]` only → position+current mix; add `velocity[]` (sufficient length) → position+velocity+current mix. **H3L**: position+current mix only. In mixed control, `effort` is motor current in **mA** (0–1000), not standard N·m.
 
-**O12**: Supports setting position mode, servo mode, velocity mode, and torque mode via `SetControlMode` interface. Also supports position + force mixed control via `joint_mix_control_cmd` (5 modes supported). In mixed control, the `effort` field is in **0.01 N** (correlated with tactile sensor normal force). Note that the O12 ROS2 node does not currently expose a `joint_control_mode_cmd` topic; control mode switching should be done through the C++/Python SDK directly.
+**O12**: Supports switching control modes via `joint_control_mode_cmd` topic (0=POSITION, 1=SERVO, 2=VELOCITY, 3=TORQUE, 4=VOLTAGE, 7=PROFILE_POSITION). Voltage commands use `joint_voltage_cmd`; switch the target joints to mode `4` before sending voltage commands. O12 also supports position + force mixed control via `joint_mix_control_cmd`. In mixed control, the `effort` field is in **0.01 N** (correlated with tactile sensor normal force).
 
 **H3U_M**: Supports switching control modes via `joint_control_mode_cmd` topic (0=CSP position mode, 7=PP profile position mode).
 
@@ -92,7 +94,7 @@ O10 and O12 have different tactile sensor data structures, each using product-sp
 
 ### `std_msgs` array payloads
 
-Error, temperature, current, and current-threshold topics carry per-joint `int16` values in `std_msgs/Int16MultiArray` (`data[]`, with a 1-D `layout.dim` entry). H3U_M control modes use `std_msgs/Int8MultiArray` the same way. Tactile data remains in product-specific `omnihand_*_node_msgs` types.
+Error, temperature, current, current-threshold, and O12 voltage topics carry per-joint `int16` values in `std_msgs/Int16MultiArray` (`data[]`, with a 1-D `layout.dim` entry). O12/H3U_M control modes use `std_msgs/Int8MultiArray` the same way. Tactile data remains in product-specific `omnihand_*_node_msgs` types.
 
 ## Configuration
 
@@ -172,8 +174,12 @@ python3 tactile.py left o10 0
 # Set current threshold
 python3 joint_current_threshold_pub.py 500 left o10
 
-# Set control mode (H3U_M only, 0=CSP, 7=PP)
+# Set control mode (O12: 4=VOLTAGE; H3U_M: 0=CSP, 7=PP)
 python3 joint_control_mode_pub.py 0 left h3u_m
+
+# O12 voltage control: switch to VOLTAGE mode, then send voltage command
+python3 joint_control_mode_pub.py 4 left o12
+python3 joint_voltage_pub.py 0 left o12
 ```
 
 **4. Connection types:**

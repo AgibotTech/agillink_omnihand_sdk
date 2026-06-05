@@ -10,6 +10,7 @@
 - Motor position range: 0-2000
 - Supports CAN (ZLG USB CANFD) communication only
 - Supports SocketCAN (Linux only)
+- Supports voltage command control
 - Supports temperature and current report period settings
 
 ## Include Header
@@ -52,23 +53,23 @@ enum class Finger : unsigned char {
 
 ```cpp
 enum class ControlMode : unsigned char {
-    POSITION           = 0,    // Position mode
-    SERVO          = 1,    // Servo mode
-    VELOCITY           = 2,    // Velocity mode
-    TORQUE         = 3,    // Torque mode
-    POSITION_TORQUE     = 4,    // Position-Force mode (Mixed control: position + force, unit: 0.01N)
-    VELOCITY_TORQUE     = 5,    // Velocity-Force mode (not yet supported)
-POSITION_VELOCITY_TORQUE = 6,    // Position-Velocity-Force mode (not yet supported)
-    UNKNOWN        = 10    // Unknown mode
+    POSITION         = 0,    // Position mode
+    SERVO            = 1,    // Servo mode
+    VELOCITY         = 2,    // Velocity mode
+    TORQUE           = 3,    // Torque mode
+    VOLTAGE          = 4,    // Voltage mode
+    PROFILE_POSITION = 7,    // Profile-position mode
+    UNKNOWN          = 10    // Unknown mode
 };
 ```
 
 **Note**: 
-- **Position mode (0)**: Position control, used with `SetJointMotorPosition`.
+- **Position mode (0)**: Position control, used with `SetJointMotorPosi`.
 - **Servo mode (1)**: Servo control mode. This mode requires position command frequency ≥ 50Hz. The motor adjusts its speed based on the difference between target and actual position.
 - **Velocity mode (2)**: Velocity control, used with `SetJointMotorVelo`.
 - **Torque mode (3)**: Torque control, used with `SetJointMotorTorque`.
-- **Mixed control**: Position+force via `MixControlByPT`, unit 0.01 N.
+- **Voltage mode (4)**: Voltage command control, used with `SetJointMotorVoltage` / `SetAllJointMotorVoltage`.
+- **Mixed control**: Position+force is a dedicated mixed-control command via `MixControlByPT`, not `ControlMode::VOLTAGE`.
 
 ## Data Structures
 
@@ -397,6 +398,38 @@ void SetAllJointMotorVelo(const std::vector<int16_t>& vec_velo);
 std::vector<int16_t> GetAllJointMotorVelo() const;
 ```
 
+## Voltage Control
+
+Set the corresponding joint motors to `ControlMode::VOLTAGE` before sending voltage commands.
+
+```cpp
+/**
+ * @brief Sets the voltage command of a single joint motor.
+ * @param joint_motor_index The index of the joint motor (1-12).
+ * @param voltage The voltage command. The implementation clamps it to the supported range.
+ */
+void SetJointMotorVoltage(unsigned char joint_motor_index, int16_t voltage);
+
+/**
+ * @brief Sets voltage commands of all joint motors in batch.
+ * @param vec_voltage A vector of voltage commands. Must have 12 values.
+ */
+void SetAllJointMotorVoltage(const std::vector<int16_t>& vec_voltage) const;
+
+/**
+ * @brief Gets the voltage command of a single joint motor.
+ * @param joint_motor_index The index of the joint motor (1-12).
+ * @return The current voltage command.
+ */
+int16_t GetJointMotorVoltage(unsigned char joint_motor_index) const;
+
+/**
+ * @brief Gets voltage commands of all joint motors in batch.
+ * @return A vector of voltage commands. Returns 12 values when the request succeeds.
+ */
+std::vector<int16_t> GetAllJointMotorVoltage() const;
+```
+
 ## Tactile Sensor Data
 
 OmniHand Pro 2025 (O12) uses **3D tactile sensors** with the following characteristics:
@@ -422,7 +455,7 @@ TactileSensor3DData GetTactileSensor3DData(Finger eFinger) const;
 
 ## Control Mode
 
-O12 supports switching control modes via `SetControlMode`. The following 5 control modes are supported:
+O12 supports switching motor control modes via `SetControlMode`. The commonly used command modes are:
 
 | Mode Enum | Value | Description |
 |---|---|---|
@@ -430,16 +463,16 @@ O12 supports switching control modes via `SetControlMode`. The following 5 contr
 | `SERVO` | 1 | Servo control mode (requires position command frequency ≥ 50Hz) |
 | `VELOCITY` | 2 | Velocity control mode |
 | `TORQUE` | 3 | Torque control mode |
-| `MixControlMode::POSITION_TORQUE` | 0x3 | Position + force (`MixControlByPT`, unit 0.01 N) |
+| `VOLTAGE` | 4 | Voltage command control |
 
-**Note**: `MixControlByPV` / `MixControlByPVT` are not supported on O12.
+**Note**: Position + force mixed control uses the dedicated `MixControlByPT` API. `MixControlByPV` / `MixControlByPVT` are not supported on O12.
 
 ```cpp
 /**
  * @brief Sets the control mode of a single joint motor.
  * @param joint_motor_index The index of the joint motor (1-12).
  * @param mode The control mode enum value.
- * @note Pure torque control (TORQUE) is available via `SetControlMode`. In mixed control, only POSITION_TORQUE is supported.
+ * @note Set `ControlMode::VOLTAGE` before using the voltage command APIs.
  */
 void SetControlMode(unsigned char joint_motor_index, ControlMode mode);
 
