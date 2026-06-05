@@ -414,7 +414,7 @@ void SetJointMotorVoltage(unsigned char joint_motor_index, int16_t voltage);
  * @brief Sets voltage commands of all joint motors in batch.
  * @param vec_voltage A vector of voltage commands. Must have 12 values.
  */
-void SetAllJointMotorVoltage(const std::vector<int16_t>& vec_voltage) const;
+void SetAllJointMotorVoltage(const std::vector<int16_t>& vec_voltage);
 
 /**
  * @brief Gets the voltage command of a single joint motor.

@@ -275,7 +275,7 @@ std::vector<int16_t> GetAllJointMotorVelo() const;                       // 批�
 
 ```cpp
 void SetJointMotorVoltage(unsigned char joint_motor_index, int16_t voltage);        // 设置单个关节电机电压指令，索引 1-12；单关节接口会限制到支持范围
-void SetAllJointMotorVoltage(const std::vector<int16_t>& vec_voltage) const;        // 批量设置电压指令，12 个值
+void SetAllJointMotorVoltage(const std::vector<int16_t>& vec_voltage);              // 批量设置电压指令，12 个值
 int16_t GetJointMotorVoltage(unsigned char joint_motor_index) const;                // 获取单个关节电机电压指令
 std::vector<int16_t> GetAllJointMotorVoltage() const;                               // 批量获取电压指令，成功时返回 12 个值
 ```
