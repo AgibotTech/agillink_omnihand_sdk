@@ -50,6 +50,8 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 - `joint_control_mode_cmd/states` (`std_msgs/Int8MultiArray`)：将 12 个关节切换到 `ControlMode.VOLTAGE` (`4`)。
 - `joint_voltage_cmd/states` (`std_msgs/Int16MultiArray`)：写入并回读电压指令。
 
+> 注意：O12 固件截至 1.2.15（含）尚不支持电压读回，因此 `joint_voltage_states` 仅适用于后续支持该能力的固件。
+
 每次向命令 topic 发布完整的 12 元素数组。节点不会隐式切换控制模式；发送非零电压指令前，请先发布控制模式 `4`。
 
 ## 触觉传感器 (3D)

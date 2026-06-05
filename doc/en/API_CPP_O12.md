@@ -402,6 +402,8 @@ std::vector<int16_t> GetAllJointMotorVelo() const;
 
 Set the corresponding joint motors to `ControlMode::VOLTAGE` before sending voltage commands.
 
+> Note: O12 firmware versions up to and including 1.2.15 do not support voltage readback; the read APIs below are reserved for newer firmware.
+
 ```cpp
 /**
  * @brief Sets the voltage command of a single joint motor.
@@ -420,12 +422,14 @@ void SetAllJointMotorVoltage(const std::vector<int16_t>& vec_voltage);
  * @brief Gets the voltage command of a single joint motor.
  * @param joint_motor_index The index of the joint motor (1-12).
  * @return The current voltage command.
+ * @note O12 firmware versions up to and including 1.2.15 do not support voltage readback.
  */
 int16_t GetJointMotorVoltage(unsigned char joint_motor_index) const;
 
 /**
  * @brief Gets voltage commands of all joint motors in batch.
  * @return A vector of voltage commands. Returns 12 values when the request succeeds.
+ * @note O12 firmware versions up to and including 1.2.15 do not support voltage readback.
  */
 std::vector<int16_t> GetAllJointMotorVoltage() const;
 ```
