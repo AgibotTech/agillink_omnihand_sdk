@@ -10,6 +10,7 @@
 - 电机位置范围：0-2000
 - 仅支持 CAN（ZLG USB CANFD）通信
 - 支持 SocketCAN（仅 Linux）
+- 支持电压指令控制
 - 支持温度和电流上报周期设置
 
 ## 导入
@@ -318,9 +319,47 @@ def get_all_joint_velocities(self) -> List[int]:
     """
 ```
 
+## 电压控制
+
+发送电压指令前，请先将对应关节电机切换到 `ControlMode.VOLTAGE`。
+
+```python
+def set_joint_voltage(self, joint_motor_index: int, voltage: int) -> None:
+    """设置单个关节电机的电压指令。
+
+    Args:
+        joint_motor_index: 关节电机索引（1-12）。
+        voltage: 电压指令。单关节接口会限制到支持范围。
+    """
+
+def get_joint_voltage(self, joint_motor_index: int) -> int:
+    """获取单个关节电机的电压指令。
+
+    Args:
+        joint_motor_index: 关节电机索引（1-12）。
+
+    Returns:
+        int: 当前电压指令。
+    """
+
+def set_all_joint_voltages(self, voltages: List[int]) -> None:
+    """批量设置所有关节电机的电压指令。
+
+    Args:
+        voltages: 电压指令列表。必须包含 12 个值。
+    """
+
+def get_all_joint_voltages(self) -> List[int]:
+    """批量获取所有关节电机的电压指令。
+
+    Returns:
+        List[int]: 电压指令列表。请求成功时返回 12 个值。
+    """
+```
+
 ## 控制模式
 
-O12 支持通过 `set_control_mode` 指令切换控制模式，支持以下 5 种控制模式：
+O12 支持通过 `set_control_mode` 指令切换电机控制模式，常用指令模式如下：
 
 | 模式枚举 | 值 | 说明 |
 |---|---|---|
@@ -328,9 +367,9 @@ O12 支持通过 `set_control_mode` 指令切换控制模式，支持以下 5 �
 | `ControlMode.SERVO` | 1 | 伺服控制模式（要求位置指令频率 ≥ 50Hz） |
 | `ControlMode.VELOCITY` | 2 | 速度控制模式 |
 | `ControlMode.TORQUE` | 3 | 力矩控制模式 |
-| `ControlMode.POSITION_TORQUE` | 4 | 位置 + 力混合控制（通过 `mix_control_by_pt`，力单位 0.01N） |
+| `ControlMode.VOLTAGE` | 4 | 电压指令控制 |
 
-**注意**：混合控制中 `tgt_torque` 字段单位为 **0.01N**，与触觉传感器法向力关联。纯力矩控制（TORQUE）通过 `set_control_mode` 设置，混合控制模式 POSITION_TORQUE 通过 `mix_control_by_pt` 指令使用。VELOCITY_TORQUE 和 POSITION_VELOCITY_TORQUE 暂不支持。
+**注意**：位置 + 力混合控制通过专用 `mix_control_by_pt` 接口实现。混合控制中 `tgt_torque` 字段单位为 **0.01N**，与触觉传感器法向力关联。`mix_control_by_pv` 和 `mix_control_by_pvt` 在 O12 上不可用。
 
 ```python
 def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
@@ -415,7 +454,7 @@ def mix_control_by_pt(self, positions: List[int], torques: List[int]) -> List[Mi
         mix_ctrls: 混合控制参数列表。
     
     Note:
-        纯力控模式 (TORQUE) 通过 `set_control_mode` 使用。位置+力矩混合控制使用 POSITION_TORQUE 模式。
+        纯力控模式 (TORQUE) 通过 `set_control_mode` 使用。位置 + 力混合控制通过该专用混合控制指令实现。
     """
 ```
 

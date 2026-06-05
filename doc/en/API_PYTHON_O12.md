@@ -10,6 +10,7 @@
 - Motor position range: 0-2000
 - Supports CAN (ZLG USB CANFD) communication only
 - Supports SocketCAN (Linux only)
+- Supports voltage command control
 - Supports temperature and current report period settings
 
 ## Import
@@ -49,20 +50,19 @@ class Finger(IntEnum):
 
 ```python
 class ControlMode(IntEnum):
-    POSITIONTION = 0
-    SERVO = 1            # Servo mode
-    VELOCITYCITY = 2
-    TORQUE = 3           # Torque mode
-    POSITIONTION_TORQUE = 4  # Mixed control
-    VELOCITYCITY_TORQUE = 5  # Not yet supported
-POSITIONTION_VELOCITYCITY_TORQUE = 6  # Not yet supported
+    POSITION = 0          # Position mode
+    SERVO = 1             # Servo mode
+    VELOCITY = 2          # Velocity mode
+    TORQUE = 3            # Torque mode
+    VOLTAGE = 4           # Voltage mode
+    PROFILE_POSITION = 7  # Profile-position mode
     UNKNOWN = 10
 ```
 
 **Note**: 
 - **SERVO mode**: Servo control mode. This mode requires position command frequency ≥ 50Hz. The motor adjusts its speed based on the difference between target and actual position.
-- **Position, Velocity, Torque modes**: All basic modes are supported.
-- **Mixed control**: Position+torque is achieved via `mix_control_by_pt`.
+- **Position, Velocity, Torque, Voltage modes**: All basic command modes are supported.
+- **Mixed control**: Position+force is a dedicated command via `mix_control_by_pt`, not `ControlMode.VOLTAGE`.
 
 ## Data Structures
 
@@ -476,6 +476,44 @@ def get_all_joint_velocities(self) -> List[int]:
     """
 ```
 
+## Voltage Control
+
+Set the corresponding joint motors to `ControlMode.VOLTAGE` before sending voltage commands.
+
+```python
+def set_joint_voltage(self, joint_motor_index: int, voltage: int) -> None:
+    """Sets the voltage command of a single joint motor.
+
+    Args:
+        joint_motor_index: Joint motor index (1-12).
+        voltage: Voltage command. The implementation clamps single-joint commands to the supported range.
+    """
+
+def get_joint_voltage(self, joint_motor_index: int) -> int:
+    """Gets the voltage command of a single joint motor.
+
+    Args:
+        joint_motor_index: Joint motor index (1-12).
+
+    Returns:
+        int: Current voltage command.
+    """
+
+def set_all_joint_voltages(self, voltages: List[int]) -> None:
+    """Sets voltage commands of all joint motors in batch.
+
+    Args:
+        voltages: Voltage command list. Must contain 12 values.
+    """
+
+def get_all_joint_voltages(self) -> List[int]:
+    """Gets voltage commands of all joint motors in batch.
+
+    Returns:
+        List[int]: Voltage command list. Returns 12 values when the request succeeds.
+    """
+```
+
 ## Tactile Sensor Data
 
 OmniHand Pro 2025 (O12) uses **3D tactile sensors** with the following characteristics:
@@ -506,7 +544,7 @@ def get_tactile_sensor_3d_data(self, eFinger: Finger) -> TactileSensor3DData:
 
 ## Control Mode
 
-O12 supports switching control modes via `set_control_mode`. The following 5 control modes are supported:
+O12 supports switching motor control modes via `set_control_mode`. The commonly used command modes are:
 
 | Mode Enum | Value | Description |
 |---|---|---|
@@ -514,9 +552,9 @@ O12 supports switching control modes via `set_control_mode`. The following 5 con
 | `ControlMode.SERVO` | 1 | Servo control mode (requires position command frequency ≥ 50Hz) |
 | `ControlMode.VELOCITY` | 2 | Velocity control mode |
 | `ControlMode.TORQUE` | 3 | Torque control mode |
-| `ControlMode.POSITION_TORQUE` | 4 | Position + force mixed control (via `mix_control_by_pt`, force unit: 0.01 N) |
+| `ControlMode.VOLTAGE` | 4 | Voltage command control |
 
-**Note**: In mixed control, `tgt_torque` is in **0.01 N**, correlated with tactile sensor normal force. Pure torque control (TORQUE) is available via `set_control_mode`, while POSITION_TORQUE is used through `mix_ctrl_joint_motor`. VELOCITY_TORQUE and POSITION_VELOCITY_TORQUE are not yet supported.
+**Note**: Position + force mixed control uses the dedicated `mix_control_by_pt` API. In mixed control, `tgt_torque` is in **0.01 N**, correlated with tactile sensor normal force. `mix_control_by_pv` and `mix_control_by_pvt` are not supported on O12.
 
 ```python
 def set_control_mode(self, joint_motor_index: int, mode: int) -> None:
@@ -601,7 +639,7 @@ def mix_control_by_pt(self, positions: List[int], torques: List[int]) -> List[Mi
         mix_ctrls: List of mixed control parameters.
     
     Note:
-        Pure torque control (TORQUE) is available via `set_control_mode`. Use POSITION_TORQUE mode for position+torque mixed control.
+        Pure torque control (TORQUE) is available via `set_control_mode`. Position + force mixed control uses this dedicated mixed-control command.
     """
 ```
 
