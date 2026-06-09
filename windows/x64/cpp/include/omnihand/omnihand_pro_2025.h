@@ -264,6 +264,33 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode, publ
    */
   virtual std::vector<int16_t> GetAllJointMotorVoltage() const = 0;
 
+  // ============ Torque Control ============
+  /**
+   * @brief Sets the torque of a single joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @param torque Torque value
+   */
+  virtual void SetJointMotorTorque(unsigned char joint_motor_index, int16_t torque) = 0;
+
+  /**
+   * @brief Gets the torque of a single joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @return Current torque value
+   */
+  virtual int16_t GetJointMotorTorque(unsigned char joint_motor_index) const = 0;
+
+  /**
+   * @brief Sets torques of all joint motors in batch.
+   * @param vec_torque Torque vector, length 12
+   */
+  virtual void SetAllJointMotorTorque(const std::vector<int16_t>& vec_torque) = 0;
+
+  /**
+   * @brief Gets torques of all joint motors in batch.
+   * @return Torque vector, length 12
+   */
+  virtual std::vector<int16_t> GetAllJointMotorTorque() const = 0;
+
   // ============ Position Mode Fine-Tune ============
   /**
    * @brief Enables or disables position mode fine-tune for all joint motors.
