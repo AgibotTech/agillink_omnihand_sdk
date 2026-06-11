@@ -17,7 +17,6 @@
 #include "omnihand/omnihand.h"
 #include "omnihand/private_omnihand.h"
 #include "omnihand/i_o10_tactile_sensor_1d.h"
-#include "omnihand/i_omnihand_motor_range.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/kinematics/omnihand_2025/omnihand_2025_solver.h"
@@ -33,7 +32,7 @@ namespace omnihand {
  * 
  * @note Inherits from IO10TactileSensor1D for 1D tactile sensor interface.
  */
-class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, public IO10TactileSensor1D, public IOmniHandMotorRange {
+class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, public IO10TactileSensor1D{
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 10;  // DoA
@@ -269,36 +268,48 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
     };
   }
 
-  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinMotorPos() const override {
-    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinMotorPos = {
-      {0, 4095},  // 1:thumb_roll_joint
-      {0, 4095},  // 2:thumb_abad_joint
-      {0, 4095},  // 3:thumb_mcp_joint
-      {0, 4095},  // 4:index_abad_joint
-      {0, 4095},  // 5:index_pip_joint
-      {0, 4095},  // 6:middle_pip_joint
-      {0, 4095},  // 7:ring_abad_joint
-      {0, 4095},  // 8:ring_pip_joint
-      {0, 4095},  // 9:pinky_abad_joint
-      {0, 4095},  // 10:pinky_pip_joint
-    };
-    return kAllMaxMinMotorPos;
+  static uint8_t GetNumOfJointMotors() {
+    return kDegreesOfActiveFreedom;
   }
 
-  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinActualMotorPos() const override {
-    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinActualMotorPos = {
-      {0, 4095},  // 1:thumb_roll_joint
-      {0, 4095},  // 2:thumb_abad_joint
-      {0, 4095},  // 3:thumb_mcp_joint
-      {0, 1024},  // 4:index_abad_joint
-      {0, 4095},  // 5:index_pip_joint
-      {0, 4095},  // 6:middle_pip_joint
-      {0, 1024},  // 7:ring_abad_joint
-      {0, 4095},  // 8:ring_pip_joint
-      {0, 1024},  // 9:pinky_abad_joint
-      {0, 4095},  // 10:pinky_pip_joint
-    };
-    return kAllMaxMinActualMotorPos;
+  static uint8_t GetDoA() {
+    return kDegreesOfActiveFreedom;
+  }
+
+  static uint8_t GetDoP() {
+    return kDegreesOfPassiveFreedom;
+  }
+
+  static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
+    auto [mn, mx] = o10::OmniHand2025Solver::GetMotorPositionRange(joint_motor_index - 1);
+    return {static_cast<int16_t>(mn), static_cast<int16_t>(mx)};
+  }
+
+  static FloatBound GetMinMaxJointAngle(uint8_t joint_motor_index, HandType hand_type) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0.0f, 0.0f};
+    auto [mn, mx] = o10::OmniHand2025Solver::GetJointAngleRange(joint_motor_index - 1, hand_type == HandType::LEFT);
+    return {static_cast<float>(mn), static_cast<float>(mx)};
+  }
+
+  static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
+    if (joint_motor_index == o10::ActiveJointIndexAbAd + 1 ||
+        joint_motor_index == o10::ActiveJointRingAbAd + 1 ||
+        joint_motor_index == o10::ActiveJointPinkyAbAd + 1) {
+      return kActualSideMotorPositionBound;
+    }
+    return kActualMotorPositionBound;
+  }
+
+  static Int16Range GetMinMaxDefaultMixCtrlVelocity(uint8_t joint_motor_index) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
+    return kMixCtrlVelocityRange;
+  }
+
+  static Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
+    return kMixCtrlTorqueRange;
   }
 
   // ============ Gesture Control ============
@@ -338,6 +349,10 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
    * @brief Kinematics solver for OmniHand 2025 (O10)
    */
   std::unique_ptr<o10::OmniHand2025Solver> kinematics_solver_;
+  static constexpr Int16Bound kActualMotorPositionBound = {0, 4096};
+  static constexpr Int16Bound kActualSideMotorPositionBound = {0, 1024}; // 4, 7 ,9
+  static constexpr Int16Range kMixCtrlVelocityRange = {0, 23767, 8000}; // unit: rpm
+  static constexpr Int16Range kMixCtrlTorqueRange = {0, 1000, 300}; // unit: mA
 };
 
 }  // namespace omnihand

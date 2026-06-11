@@ -16,11 +16,11 @@
 #include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/i_control_mode.h"
-#include "omnihand/i_omnihand_motor_range.h"
 #include "omnihand/kinematics/omnihand_pro_2025/omnihand_pro_2025_solver.h"
 #include "omnihand/omnihand.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/proto.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -31,7 +31,7 @@ namespace omnihand {
  * This class provides the public interface for OmniHand Pro 2025 product.
  * It includes all methods supported by O12, including 3D tactile sensors and report period settings.
  */
-class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode, public IOmniHandMotorRange {
+class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 12;  // DoA
@@ -330,26 +330,101 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode, publ
     };
   }
 
-  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinMotorPos() const override {
-    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinMotorPos = {
-        {0, 2000},  // 1: index ActuatorIndex1
-        {0, 2000},  // 2: index ActuatorIndex2
-        {0, 2000},  // 3: middle ActuatorMiddle1
-        {0, 2000},  // 4: middle ActuatorMiddle2
-        {0, 2000},  // 5: thumb_abad ActuatorThumbABAD
-        {0, 2000},  // 6: thumb_roll ActuatorThumbRoll
-        {0, 2000},  // 7: index_pip ActuatorIndex3
-        {0, 2000},  // 8: middle_pip ActuatorMiddle3
-        {0, 2000},  // 9: ring_mcp ActuatorRing
-        {0, 2000},  // 10: pinky_mcp ActuatorPinky
-        {0, 2000},  // 11: thumb_pip ActuatorThumbPIP
-        {0, 2000},  // 12: thumb_mcp ActuatorThumbMCP
-    };
-    return kAllMaxMinMotorPos;
+  // ============ Motor Range ============
+  /**
+   * @brief Returns the number of joint motors.
+   * @return Number of joint motors (12)
+   */
+  static uint8_t GetNumOfJointMotors() {
+    return kDegreesOfActiveFreedom;
   }
 
-  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinActualMotorPos() const override {
-    return GetAllMaxMinMotorPos();
+  /**
+   * @brief Returns the degrees of active freedom (DoA).
+   * @return Degrees of active freedom (12)
+   */
+  static uint8_t GetDoA() {
+    return kDegreesOfActiveFreedom;
+  }
+
+  /**
+   * @brief Returns the degrees of passive freedom (DoP).
+   * @return Degrees of passive freedom (7)
+   */
+  static uint8_t GetDoP() {
+    return kDegreesOfPassiveFreedom;
+  }
+
+  /**
+   * @brief Returns the min/max motor position range (unit: motor ticks) for a joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @return Min/max motor position range
+   */
+  static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
+    auto [mn, mx] = o12::OmniHandPro2025Solver::GetMotorPositionRange(joint_motor_index - 1);
+    return {static_cast<int16_t>(mn), static_cast<int16_t>(mx)};
+  }
+
+  /**
+   * @brief Returns the min/max motor angle range (unit: radians) for a joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @param hand_type Hand type (left/right)
+   * @return Min/max motor angle range
+   */
+  static FloatBound GetMinMaxJointAngle(uint8_t joint_motor_index, HandType hand_type) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0.0f, 0.0f};
+    auto [mn, mx] = o12::OmniHandPro2025Solver::GetJointAngleRange(joint_motor_index - 1, hand_type == HandType::LEFT);
+    return {static_cast<float>(mn), static_cast<float>(mx)};
+  }
+
+  /**
+   * @brief Returns the min/max actual motor position range (unit: motor ticks) for a joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @return Min/max actual motor position range
+   */
+  static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
+    return GetMinMaxMotorPosition(joint_motor_index);
+  }
+
+  /**
+   * @brief Returns the min/max default motor velocity range (unit: tick/s) for a joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @return Min/max default motor velocity range
+   */
+  static Int16Range GetMinMaxDefaultMotorVelocity(uint8_t joint_motor_index) {
+    (void)joint_motor_index;
+    return kMotorVelocityRange;
+  }
+
+  /**
+   * @brief Returns the min/max default motor torque range (unit: mA) for a joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @return Min/max default motor torque range
+   */
+  static Int16Range GetMinMaxDefaultMotorTorque(uint8_t joint_motor_index) {
+    return (joint_motor_index <= kServoMotorCount) ? kServoMotorTorqueCurrentRange
+                                                   : kNormalMotorTorqueCurrentRange;
+  }
+
+  /**
+   * @brief Returns the min/max default mixed control torque range (unit: 0.01N) for a joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @return Min/max default mixed control torque range
+   */
+  static Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
+    (void)joint_motor_index;
+    return kMixCtrlTorqueRange;
+  }
+
+  /**
+   * @brief Returns the min/max default motor voltage range (unit: ‰) for a joint motor.
+   * @param joint_motor_index Joint motor index (1-12)
+   * @return Min/max default motor voltage range
+   */
+  static Int16Range GetMinMaxDefaultMotorVoltage(uint8_t joint_motor_index) {
+    (void)joint_motor_index;
+    return kMotorVoltageRange;
   }
 
   // ============ Gesture Control ============
@@ -379,6 +454,12 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode, publ
    * @brief Kinematics solver for OmniHand Pro 2025 (O12)
    */
   std::unique_ptr<o12::OmniHandPro2025Solver> kinematics_solver_;
+  static constexpr uint8_t kServoMotorCount = 10; // 1 - 10
+  static constexpr Int16Range kMotorVelocityRange = {200, 2500, 2000}; // unit: tick/s (2000 tick is full)
+  static constexpr Int16Range kServoMotorTorqueCurrentRange = {1, 350, 350}; // 1 - 10, unit: mA
+  static constexpr Int16Range kNormalMotorTorqueCurrentRange = {1, 350, 320}; // 11 - 12, unit: mA
+  static constexpr Int16Range kMixCtrlTorqueRange = {100, 2000, 100}; // unit: 0.01N
+  static constexpr Int16Range kMotorVoltageRange = {-1000, 1000, 0}; // unit: ‰
 };
 
 }  // namespace omnihand

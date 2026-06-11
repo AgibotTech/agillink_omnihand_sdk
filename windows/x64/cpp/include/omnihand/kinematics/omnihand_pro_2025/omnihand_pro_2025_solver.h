@@ -320,6 +320,49 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
   double PredictPoly(const double &x, const std::vector<double> &coeffs);
 
   std::vector<double> GetAllJointPos(const std::vector<double> &active_joint_pos);
+
+  /**
+   * @brief Get min/max motor input for a given actuator (0-based index, 0=ActuatorIndex1 … 11=ActuatorThumbMCP)
+   */
+  static std::pair<int, int> GetMotorPositionRange(uint8_t actuator_index) {
+    static constexpr int kMin[ActuatorCount] = {0, 0, 0, 0, 2000, 0, 0, 0, 0, 0, 2000, 2000};
+    static constexpr int kMax[ActuatorCount] = {2000, 2000, 2000, 2000, 0, 2000, 2000, 2000, 2000, 2000, 0, 0};
+    if (actuator_index >= ActuatorCount) return {0, 0};
+    int mn = kMin[actuator_index];
+    int mx = kMax[actuator_index];
+    if (mn > mx) std::swap(mn, mx);
+    return {mn, mx};
+  }
+
+  /**
+   * @brief Get min/max active joint angle (rad) for a given actuator, adjusted for handedness
+   * @param actuator_index 0-based, per O12handProActuator (0=ActuatorIndex1 … 11=ActuatorThumbMCP)
+   */
+  static std::pair<double, double> GetJointAngleRange(uint8_t actuator_index, bool is_left_hand) {
+    static constexpr uint8_t kActuatorToActiveJoint[ActuatorCount] = {
+        4, 5, 7, 8, 1, 0, 6, 9, 10, 11, 3, 2};
+    static constexpr double kActiveJointMin[MaxActiveJoint] = {
+        0.0, -1.39, -0.83, -1.29, -0.26, 0.0, 0.0, -0.26, 0.0, 0.0, 0.0, 0.0};
+    static constexpr double kActiveJointMax[MaxActiveJoint] = {
+        0.94, 0, 0, 0, 0.26, 1.35, 1.53, 0.26, 1.36, 1.82, 1.55, 1.54};
+    if (actuator_index >= ActuatorCount) return {0.0, 0.0};
+    uint8_t aj = kActuatorToActiveJoint[actuator_index];
+    double mn = kActiveJointMin[aj];
+    double mx = kActiveJointMax[aj];
+    if (is_left_hand) {
+      if (aj == ActiveJointIndexAbAd ||
+          aj == ActiveJointMiddleABAD ||
+          aj == ActiveJointThumbMCP)
+        return {-mx, -mn};
+    } else {
+      if (aj == ActiveJointThumbAbAd ||
+          aj == ActiveJointThumbMCP ||
+          aj == ActiveJointThumbPIP)
+        return {-mx, -mn};
+    }
+    return {mn, mx};
+  }
+
   template <typename T>
   void Clamp(const std::vector<T> &max, const std::vector<T> &min,
              std::vector<T> &value);

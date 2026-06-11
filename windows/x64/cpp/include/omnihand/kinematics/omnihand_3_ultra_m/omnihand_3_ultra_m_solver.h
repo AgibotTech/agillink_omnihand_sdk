@@ -114,6 +114,11 @@ class AGIBOT_EXPORT OmniHand3UltraMSolver {
   explicit OmniHand3UltraMSolver(bool is_left_hand);
   ~OmniHand3UltraMSolver() = default;
 
+  static std::pair<int16_t, int16_t> GetMotorPositionRange(uint8_t actuator_index) {
+    (void)actuator_index;
+    return {kActuatorInputMin, kActuatorInputMax};
+  }
+
   /**
    * @brief Active-joint position (rad) -> actuator input (0..4095).
    *        Input length must be 20.
