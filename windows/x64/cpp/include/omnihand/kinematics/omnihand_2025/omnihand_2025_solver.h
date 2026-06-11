@@ -95,15 +95,15 @@ class AGIBOT_EXPORT OmniHand2025Solver {
   std::vector<int> actuator_min_;
   static constexpr int kMaxInput = 4096;
   static constexpr int kMinInput = 0;
-  static constexpr double kActiveJointMin[ActiveJointCount] = {
+  static inline const std::vector<double> kActiveJointMin = {
       -0.03, -1.64, 0.0, -0.16, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  static constexpr double kActiveJointMax[ActiveJointCount] = {
+  static inline const std::vector<double> kActiveJointMax = {
       1.12, 0.05, 0.8416, 0, 1.48, 1.48, 0.17, 1.48, 0.19, 1.48};
-  static constexpr int kLeftDirection[ActiveJointCount] = {
+  static inline const std::vector<int> kLeftDirection = {
       -1, -1, -1, -1, 1, 1, -1, 1, -1, 1};
   // Right-hand coefficients
-  std::vector<double> active_joint_max_;
-  std::vector<double> active_joint_min_;
+  std::vector<double> active_joint_max_ = kActiveJointMax;
+  std::vector<double> active_joint_min_ = kActiveJointMin;
   std::vector<double> motor_max_ = {1.12, 0.05, 1.33, 0, 1.43,
                                     1.43, 0.17, 1.43, 0.19, 1.43};
   std::vector<double> motor_min_ = {-0.03, -1.64, 0.0, -0.16, 0.0,
