@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "omnihand/export_symbols.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -186,9 +187,9 @@ class AGIBOT_EXPORT OmniHand2025Solver {
   std::vector<double>
   GetAllJointPos(const std::vector<double> &active_joint_pos);
 
-  static std::pair<int16_t, int16_t> GetMotorPositionRange();
+  static Int16Bound GetMotorPositionRange();
 
-  static std::pair<double, double> GetJointAngleRange(uint8_t actuator_index, bool is_left_hand);
+  static FloatBound GetJointAngleRange(uint8_t actuator_index, bool is_left_hand);
 };
 
 }  // namespace o10

@@ -221,9 +221,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
   }
 
   static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
-    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
-    auto [mn, mx] = OmniHand3LiteSolver::GetMotorPositionRange(joint_motor_index - 1);
-    return {mn, mx};
+    (void)joint_motor_index;
+    return OmniHand3LiteSolver::GetMotorPositionRange();
   }
 
   static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {

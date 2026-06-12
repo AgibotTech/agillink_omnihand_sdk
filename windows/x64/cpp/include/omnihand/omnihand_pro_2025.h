@@ -361,9 +361,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @return Min/max motor position range
    */
   static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
-    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
-    auto [mn, mx] = o12::OmniHandPro2025Solver::GetMotorPositionRange(joint_motor_index - 1);
-    return {static_cast<int16_t>(mn), static_cast<int16_t>(mx)};
+    return o12::OmniHandPro2025Solver::GetMotorPositionRange(joint_motor_index - 1);
   }
 
   /**
@@ -373,9 +371,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @return Min/max motor angle range
    */
   static FloatBound GetMinMaxJointAngle(uint8_t joint_motor_index, HandType hand_type) {
-    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0.0f, 0.0f};
-    auto [mn, mx] = o12::OmniHandPro2025Solver::GetJointAngleRange(joint_motor_index - 1, hand_type == HandType::LEFT);
-    return {static_cast<float>(mn), static_cast<float>(mx)};
+    return o12::OmniHandPro2025Solver::GetJointAngleRange(joint_motor_index - 1, hand_type == HandType::LEFT);
   }
 
   /**

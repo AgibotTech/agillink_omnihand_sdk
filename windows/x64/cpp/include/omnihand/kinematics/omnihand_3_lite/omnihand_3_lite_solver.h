@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "omnihand/export_symbols.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -37,8 +38,7 @@ class AGIBOT_EXPORT OmniHand3LiteSolver {
 
   std::vector<int> SetHandGesture(OmniHand3LiteGesture gesture) const;
 
-  static std::pair<int16_t, int16_t> GetMotorPositionRange(uint8_t actuator_index) {
-    (void)actuator_index;
+  static Int16Bound GetMotorPositionRange() {
     return {kActuatorInputMin, kActuatorInputMax};
   }
 

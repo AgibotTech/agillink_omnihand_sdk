@@ -114,19 +114,6 @@ void PrintVector(const std::string& name, const std::vector<T>& values) {
   std::cout << "]" << std::endl;
 }
 
-void PrintMotorRanges(
-    const std::string& name,
-    const std::vector<std::pair<int16_t, int16_t>>& ranges) {
-  std::cout << name << ": [";
-  for (size_t i = 0; i < ranges.size(); ++i) {
-    if (i > 0) {
-      std::cout << ", ";
-    }
-    std::cout << "joint" << (i + 1) << "=" << ranges[i].first << "~" << ranges[i].second;
-  }
-  std::cout << "]" << std::endl;
-}
-
 void PrintTactilePreview(const oh::TactileSensorData& sensor) {
   constexpr size_t kPreviewSize = 16;
   const size_t preview_size = std::min(kPreviewSize, sensor.data_.size());
@@ -192,8 +179,8 @@ void DemoDeviceInfo(oh::OmniPicker3& hand) {
   std::cout << "Vendor info:\n"
             << hand.GetVendorInfo().ToString();
   PrintVector("Joint names", hand.GetJointNames());
-  PrintMotorRanges("Nominal motor range", hand.GetAllMaxMinMotorPos());
-  PrintMotorRanges("Actual motor range", hand.GetAllMaxMinActualMotorPos());
+  auto range = oh::OmniPicker3::GetMinMaxMotorPosition();
+  std::cout << "minal motor range: [" << range.min_value << ", " << range.max_value << "]" << std::endl;
 }
 
 void DemoCommunicationSettings(oh::OmniPicker3& hand) {
