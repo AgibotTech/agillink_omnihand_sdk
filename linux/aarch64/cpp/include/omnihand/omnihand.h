@@ -443,6 +443,11 @@ class AGIBOT_EXPORT OmniHand {
    */
   virtual ~OmniHand() = default;
 
+  HandType GetHandType() const {
+    return is_left_hand_ ? HandType::LEFT : HandType::RIGHT;
+  }
+
+ protected:
   /**
    * @brief Initialize base class members
    * @param product_type Product type: ProductType::OMNIHAND_2025 (O10) or ProductType::OMNIHAND_PRO_2025 (O12)

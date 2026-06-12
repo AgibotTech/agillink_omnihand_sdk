@@ -55,6 +55,7 @@ enum class AGIBOT_EXPORT ProductType : unsigned char {
   OMNIHAND_3_LITE = 3,      // OmniHand 3 Lite S (O4, 4 DOF)
   OMNIHAND_3_ULTRA_M = 4,     // OmniHand 3 Ultra M(O20, 20 DOF)
   OMNI_PICKER_3 = 5,        // OmniPicker 3 (1 DOF)
+  OMNI_PICKER_2025 = 6,     // OmniPicker 2025
   UNKNOWN = 255             // Unknown product type
 };
 
@@ -117,7 +118,7 @@ enum class AGIBOT_EXPORT ControlMode : unsigned char {
   SERVO = 1,                       // Servo control mode
   VELOCITY = 2,                    // Velocity control mode
   TORQUE = 3,                      // Torque control mode
-  VOLTAGE = 4,                     // Voltage control mode
+  VOLTAGE = 4,                     // Voltage control mode： only supported by O12
   PROFILE_POSITION = 7,            // Profile-Position control mode
   UNKNOWN = 10                     // Unknown control mode
 };

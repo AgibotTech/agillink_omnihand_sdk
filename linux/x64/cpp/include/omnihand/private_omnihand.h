@@ -90,13 +90,13 @@ struct AGIBOT_EXPORT FirmwareVersionInfo {
   Version hardware_version;         // hardware version (major, minor, patch)
   uint8_t dof;                      // degrees of freedom
   
-  FirmwareVersionInfo() : device_type(0), dof(0) {
-    product_status[0] = '\0';
-    product_status[1] = '\0';
-    product_status[2] = '\0';
-    memset(&software_version, 0, sizeof(Version));
-    memset(&hardware_version, 0, sizeof(Version));
-  }
+  FirmwareVersionInfo()
+    : device_type(0)
+    , product_status{'\0', '\0', '\0'}
+    , software_version{}
+    , hardware_version{}
+    , dof(0) 
+  {}
   
   /**
    * @brief Convert to string representation
