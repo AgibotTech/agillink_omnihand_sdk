@@ -77,8 +77,8 @@ enum class H3UMGesture : int {
  *
  * Calibration data (rad_min, rad_max, actuator_min, actuator_max) lives in the
  * kRight / kLeft tables in the .cc file. rad bounds come from the URDF;
- * actuator bounds default to (0, 4095) and must be back-filled after physical
- * calibration.
+ * actuator bounds default to (kActuatorInputMin, kActuatorInputMax) and must be
+ * back-filled after physical calibration.
  *
  * Per-joint linear mapping:
  *     actuator = (rad      - rad_min)      / (rad_max      - rad_min)
@@ -97,7 +97,7 @@ class AGIBOT_EXPORT OmniHand3UltraMSolver {
   /// Actuator-input value range (matches int16_t domain of
   /// SetAllJointMotorPosi / GetAllJointMotorPosi).
   static constexpr int16_t kActuatorInputMin = 0;
-  static constexpr int16_t kActuatorInputMax = 4095;
+  static constexpr int16_t kActuatorInputMax = 4096;
 
   /// Per-joint linear calibration entry.
   struct JointMotorCalib {
@@ -113,6 +113,10 @@ class AGIBOT_EXPORT OmniHand3UltraMSolver {
    */
   explicit OmniHand3UltraMSolver(bool is_left_hand);
   ~OmniHand3UltraMSolver() = default;
+
+  static std::pair<int16_t, int16_t> GetMotorPositionRange() {
+    return {kActuatorInputMin, kActuatorInputMax};
+  }
 
   /**
    * @brief Active-joint position (rad) -> actuator input (0..4095).

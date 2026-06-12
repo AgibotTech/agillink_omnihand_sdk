@@ -29,12 +29,18 @@ enum class OmniHand3LiteGesture : int {
 
 class AGIBOT_EXPORT OmniHand3LiteSolver {
  public:
-  static constexpr int kActuatorInputMax = 4095;
-  static constexpr int kDegreesOfActiveFreedom = 4;
+  static constexpr int16_t kActuatorInputMax = 4096;
+  static constexpr int16_t kActuatorInputMin = 0;
+  static constexpr uint8_t kDegreesOfActiveFreedom = 4;
 
   explicit OmniHand3LiteSolver(bool is_left_hand);
 
   std::vector<int> SetHandGesture(OmniHand3LiteGesture gesture) const;
+
+  static std::pair<int16_t, int16_t> GetMotorPositionRange(uint8_t actuator_index) {
+    (void)actuator_index;
+    return {kActuatorInputMin, kActuatorInputMax};
+  }
 
  private:
   bool is_left_hand_;
