@@ -93,8 +93,8 @@ class AGIBOT_EXPORT OmniHand2025Solver {
   bool hand_type_;  ///< true=left hand, false=right hand
   std::vector<int> actuator_max_;
   std::vector<int> actuator_min_;
-  static constexpr int kMaxInput = 4096;
-  static constexpr int kMinInput = 0;
+  static constexpr int16_t kMaxInput = 4096;
+  static constexpr int16_t kMinInput = 0;
   static inline const std::vector<double> kActiveJointMin = {
       -0.03, -1.64, 0.0, -0.16, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   static inline const std::vector<double> kActiveJointMax = {
@@ -186,7 +186,7 @@ class AGIBOT_EXPORT OmniHand2025Solver {
   std::vector<double>
   GetAllJointPos(const std::vector<double> &active_joint_pos);
 
-  static std::pair<int, int> GetMotorPositionRange(uint8_t actuator_index);
+  static std::pair<int16_t, int16_t> GetMotorPositionRange();
 
   static std::pair<double, double> GetJointAngleRange(uint8_t actuator_index, bool is_left_hand);
 };

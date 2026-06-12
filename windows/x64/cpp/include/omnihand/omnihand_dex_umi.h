@@ -146,12 +146,11 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D
 
   static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
-    auto [mn, mx] = o10::OmniHand2025Solver::GetMotorPositionRange(joint_motor_index - 1);
-    return {static_cast<int16_t>(mn), static_cast<int16_t>(mx)};
+    auto [mn, mx] = o10::OmniHand2025Solver::GetMotorPositionRange();
+    return {mn, mx};
   }
 
   static FloatBound GetMinMaxJointAngle(uint8_t joint_motor_index, HandType hand_type) {
-    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0.0f, 0.0f};
     auto [mn, mx] = o10::OmniHand2025Solver::GetJointAngleRange(joint_motor_index - 1, hand_type == HandType::LEFT);
     return {static_cast<float>(mn), static_cast<float>(mx)};
   }

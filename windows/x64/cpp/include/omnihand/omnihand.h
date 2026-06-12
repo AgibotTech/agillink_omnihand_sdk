@@ -18,7 +18,6 @@
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
 #include "omnihand/utils.h"
-#include "proto.h"
 
 namespace agilink {
 namespace omnihand {

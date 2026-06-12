@@ -31,7 +31,7 @@ class AGIBOT_EXPORT OmniHand3LiteSolver {
  public:
   static constexpr int16_t kActuatorInputMax = 4096;
   static constexpr int16_t kActuatorInputMin = 0;
-  static constexpr int8_t kDegreesOfActiveFreedom = 4;
+  static constexpr uint8_t kDegreesOfActiveFreedom = 4;
 
   explicit OmniHand3LiteSolver(bool is_left_hand);
 

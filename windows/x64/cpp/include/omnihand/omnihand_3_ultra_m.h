@@ -233,7 +233,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
 
   static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
-    auto [mn, mx] = h3um::OmniHand3UltraMSolver::GetMotorPositionRange(joint_motor_index - 1);
+    auto [mn, mx] = h3um::OmniHand3UltraMSolver::GetMotorPositionRange();
     return {mn, mx};
   }
 
