@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "i_o10_tactile_sensor_1d.h"
 #include "omnihand/export_symbols.h"
 #include "omnihand/kinematics/omnihand_3_lite/omnihand_3_lite_solver.h"
 #include "omnihand/omnihand.h"
@@ -34,7 +35,7 @@ namespace omnihand {
  *       Use motor position control (SetJointMotorPosi, SetAllJointMotorPosi) instead.
  *       Gesture control is available via SetHandGesture() with OmniHand3LiteGesture enum.
  */
-class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
+class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, public IO10TactileSensor1D {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // DoA
@@ -252,6 +253,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
+  virtual bool InitTactileSensors() = 0;
+
  protected:
   /**
    * @brief Initialize base class members and kinematics solver
@@ -265,7 +268,7 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
   }
 
   std::unique_ptr<OmniHand3LiteSolver> solver_;
-  static constexpr Int16Bound kActualMotorPositionBound = {0, 4096};
+  static constexpr Int16Bound kActualMotorPositionBound = {0, 4095};
   static constexpr Int16Range kMixCtrlVelocityRange = {0, 23767, 8000}; // unit: rpm
   static constexpr Int16Range kMixCtrlTorqueRange = {0, 1000, 300}; // unit: mA
 };
