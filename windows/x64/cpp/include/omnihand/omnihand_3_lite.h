@@ -254,6 +254,12 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
   virtual bool InitTactileSensors() = 0;
+    /**
+   * @brief Gets tactile sensor data for the specified process, such as downsampled data.
+   * @param finger Finger/palm enum value
+   * @return Tactile sensor data vector
+   */
+  virtual TactileSensorData GetTactileSensorData(Finger finger) const = 0;
 
  protected:
   /**
