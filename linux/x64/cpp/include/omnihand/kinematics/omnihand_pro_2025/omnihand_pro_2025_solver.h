@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "omnihand/export_symbols.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -331,10 +332,10 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
   /**
    * @brief Get min/max motor input for a given actuator (0-based index, 0=ActuatorIndex1 … 11=ActuatorThumbMCP)
    */
-  static std::pair<int, int> GetMotorPositionRange(uint8_t actuator_index) {
+  static Int16Bound GetMotorPositionRange(uint8_t actuator_index) {
     if (actuator_index >= ActuatorCount) return {0, 0};
-    int mn = kMotorInputMin[actuator_index];
-    int mx = kMotorInputMax[actuator_index];
+    int16_t mn = static_cast<int16_t>(kMotorInputMin[actuator_index]);
+    int16_t mx = static_cast<int16_t>(kMotorInputMax[actuator_index]);
     if (mn > mx) {
         return {mx, mn};
     }
@@ -345,11 +346,11 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
    * @brief Get min/max active joint angle (rad) for a given actuator, adjusted for handedness
    * @param actuator_index 0-based, per O12handProActuator (0=ActuatorIndex1 … 11=ActuatorThumbMCP)
    */
-  static std::pair<double, double> GetJointAngleRange(uint8_t actuator_index, bool is_left_hand) {
+  static FloatBound GetJointAngleRange(uint8_t actuator_index, bool is_left_hand) {
     if (actuator_index >= ActuatorCount) return {0.0, 0.0};
     uint8_t aj = kActuatorToActiveJoint[actuator_index];
-    double mn = kActiveJointMin[aj];
-    double mx = kActiveJointMax[aj];
+    float mn = static_cast<float>(kActiveJointMin[aj]);
+    float mx = static_cast<float>(kActiveJointMax[aj]);
     if (is_left_hand) {
       if (aj == ActiveJointIndexAbAd ||
           aj == ActiveJointMiddleABAD ||

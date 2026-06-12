@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "omnihand/export_symbols.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -114,7 +115,7 @@ class AGIBOT_EXPORT OmniHand3UltraMSolver {
   explicit OmniHand3UltraMSolver(bool is_left_hand);
   ~OmniHand3UltraMSolver() = default;
 
-  static std::pair<int16_t, int16_t> GetMotorPositionRange() {
+  static Int16Bound GetMotorPositionRange() {
     return {kActuatorInputMin, kActuatorInputMax};
   }
 
