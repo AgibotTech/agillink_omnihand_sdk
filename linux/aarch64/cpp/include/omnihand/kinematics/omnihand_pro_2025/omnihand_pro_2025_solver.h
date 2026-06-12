@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "omnihand/export_symbols.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -98,14 +99,21 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
   std::vector<double> motor_min_ = {-14.56e-3, -14.56e-3, -14.56e-3, -14.56e-3,
                                     0, -5.9e-3, -8.76e-3, -9.08e-3,
                                     -15.49e-3, -15.49e-3, 0.0, 0.0};
-  std::vector<double> active_joint_max_ = {
-      0.94, 0, 0, 0, 0.26, 1.35, 1.53, 0.26, 1.36, 1.82, 1.55, 1.54};
-  std::vector<double> active_joint_min_ = {
-      0.0, -1.39, -0.83, -1.29, -0.26, 0.0, 0.0, -0.26, 0.0, 0.0, 0.0, 0.0};
 
-  std::vector<int> motor_input_max_ = {2000, 2000, 2000, 2000, 0, 2000,
-                                       2000, 2000, 2000, 2000, 0, 0};
-  std::vector<int> motor_input_min_ = {0, 0, 0, 0, 2000, 0, 0, 0, 0, 0, 2000, 2000};
+  static constexpr uint8_t kActuatorToActiveJoint[ActuatorCount] = {
+      4, 5, 7, 8, 1, 0, 6, 9, 10, 11, 3, 2};
+  static inline const std::vector<double> kActiveJointMin = {
+      0.0, -1.39, -0.83, -1.29, -0.26, 0.0, 0.0, -0.26, 0.0, 0.0, 0.0, 0.0};
+  static inline const std::vector<double> kActiveJointMax = {
+      0.94, 0, 0, 0, 0.26, 1.35, 1.53, 0.26, 1.36, 1.82, 1.55, 1.54};
+
+  std::vector<double> active_joint_max_ = kActiveJointMax;
+  std::vector<double> active_joint_min_ = kActiveJointMin;
+
+  static inline const std::vector<int> kMotorInputMax = {
+    2000, 2000, 2000, 2000, 0, 2000, 2000, 2000, 2000, 2000, 0, 0};
+  static inline const std::vector<int> kMotorInputMin = {
+    0, 0, 0, 0, 2000, 0, 0, 0, 0, 0, 2000, 2000};
   static const int max_intput_ = 2000;
   static const int min_intput_ = 0;
 
@@ -320,6 +328,43 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
   double PredictPoly(const double &x, const std::vector<double> &coeffs);
 
   std::vector<double> GetAllJointPos(const std::vector<double> &active_joint_pos);
+
+  /**
+   * @brief Get min/max motor input for a given actuator (0-based index, 0=ActuatorIndex1 … 11=ActuatorThumbMCP)
+   */
+  static Int16Bound GetMotorPositionRange(uint8_t actuator_index) {
+    if (actuator_index >= ActuatorCount) return {0, 0};
+    int16_t mn = static_cast<int16_t>(kMotorInputMin[actuator_index]);
+    int16_t mx = static_cast<int16_t>(kMotorInputMax[actuator_index]);
+    if (mn > mx) {
+        return {mx, mn};
+    }
+    return {mn, mx};
+  }
+
+  /**
+   * @brief Get min/max active joint angle (rad) for a given actuator, adjusted for handedness
+   * @param actuator_index 0-based, per O12handProActuator (0=ActuatorIndex1 … 11=ActuatorThumbMCP)
+   */
+  static FloatBound GetJointAngleRange(uint8_t actuator_index, bool is_left_hand) {
+    if (actuator_index >= ActuatorCount) return {0.0, 0.0};
+    uint8_t aj = kActuatorToActiveJoint[actuator_index];
+    float mn = static_cast<float>(kActiveJointMin[aj]);
+    float mx = static_cast<float>(kActiveJointMax[aj]);
+    if (is_left_hand) {
+      if (aj == ActiveJointIndexAbAd ||
+          aj == ActiveJointMiddleABAD ||
+          aj == ActiveJointThumbMCP)
+        return {-mx, -mn};
+    } else {
+      if (aj == ActiveJointThumbAbAd ||
+          aj == ActiveJointThumbMCP ||
+          aj == ActiveJointThumbPIP)
+        return {-mx, -mn};
+    }
+    return {mn, mx};
+  }
+
   template <typename T>
   void Clamp(const std::vector<T> &max, const std::vector<T> &min,
              std::vector<T> &value);

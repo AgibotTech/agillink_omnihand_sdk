@@ -494,6 +494,48 @@ TEST_F(OmniHandPro2025Test, VoltageControl) {
     hand_->SetFrameRecvTimeout(50);
   }
 }
+TEST_F(OmniHandPro2025Test, TorqueControl) {
+  if (!hand_->Init()) {
+    return;
+  }
+  
+  const size_t kDof = agilink::omnihand::OmniHandPro2025::kDegreesOfActiveFreedom;
+  std::cout << "Set control mode to Torque Control" << std::endl;
+  for (unsigned char joint = 1; joint <= kDof; ++joint) {
+    hand_->SetControlMode(joint, agilink::omnihand::ControlMode::TORQUE);
+  }
+  for (unsigned char joint = 1; joint <= kDof; ++joint) {
+    EXPECT_EQ(hand_->GetControlMode(joint), agilink::omnihand::ControlMode::TORQUE)
+      << "[GetControlMode] Expected Set Api usage";
+  }
+  // for (unsigned char joint = 0)
+  std::vector<int16_t> torqueFromGetJointMotorTorque(kDof, 0);
+  for (int i = 1; i <= kDof; ++ i) {
+    torqueFromGetJointMotorTorque[i-1] = hand_->GetJointMotorTorque(i);
+  }
+  std::vector<int16_t> torqueFromGetAllJointMotorTorque = hand_->GetAllJointMotorTorque();
+  EXPECT_EQ(kDof, torqueFromGetAllJointMotorTorque.size()) 
+    << "Expected size of getAllJointMotorTorque return val eq kdof";
+  if (torqueFromGetAllJointMotorTorque.size() != kDof) {
+    return;
+  }
+  for (int i = 0; i < kDof; ++ i) {
+    EXPECT_EQ(torqueFromGetAllJointMotorTorque[i], torqueFromGetJointMotorTorque[i]) 
+      << "Expected equals";
+    EXPECT_LE(torqueFromGetAllJointMotorTorque[i], 350);
+    EXPECT_GE(torqueFromGetAllJointMotorTorque[i], 1);
+  }
+
+  
+  hand_->SetJointMotorTorque(1, 0);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  //recovery
+  hand_->SetAllJointMotorTorque(torqueFromGetJointMotorTorque);
+  for (unsigned char joint = 1; joint <= kDof; ++joint) {
+    hand_->SetControlMode(joint, agilink::omnihand::ControlMode::POSITION);
+  }
+}
+
 
 // Custom main function to parse command line arguments
 int main(int argc, char** argv) {

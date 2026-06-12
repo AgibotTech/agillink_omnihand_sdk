@@ -16,7 +16,6 @@
 #include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/kinematics/omnihand_3_lite/omnihand_3_lite_solver.h"
-#include "omnihand/i_omnihand_motor_range.h"
 #include "omnihand/omnihand.h"
 #include "omnihand/private_omnihand.h"
 #include "omnihand/proto.h"
@@ -35,10 +34,11 @@ namespace omnihand {
  *       Use motor position control (SetJointMotorPosi, SetAllJointMotorPosi) instead.
  *       Gesture control is available via SetHandGesture() with OmniHand3LiteGesture enum.
  */
-class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, public IOmniHandMotorRange {
+class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // DoA
+  static constexpr uint8_t kDegreesOfPassiveFreedom = 5; // DoP
   static constexpr uint8_t kDefaultHandDeviceId = 1u;
 
   virtual ~OmniHand3Lite() = default;
@@ -208,24 +208,36 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
     };
   }
 
-  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinMotorPos() const override {
-    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinMotorPos = {
-      {0, 4095},  // 1
-      {0, 4095},  // 2
-      {0, 4095},  // 3
-      {0, 4095},  // 4
-    };
-    return kAllMaxMinMotorPos;
+  static uint8_t GetNumOfJointMotors() {
+    return kDegreesOfActiveFreedom;
   }
 
-  std::vector<std::pair<int16_t, int16_t>> GetAllMaxMinActualMotorPos() const override {
-    static const std::vector<std::pair<int16_t, int16_t>> kAllMaxMinActualMotorPos = {
-      {0, 4095},  // 1
-      {0, 4095},  // 2
-      {0, 4095},  // 3
-      {0, 4095},  // 4
-    };
-    return kAllMaxMinActualMotorPos;
+  static uint8_t GetDoA() {
+    return kDegreesOfActiveFreedom;
+  }
+
+  static uint8_t GetDoP() {
+    return kDegreesOfPassiveFreedom;
+  }
+
+  static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
+    (void)joint_motor_index;
+    return OmniHand3LiteSolver::GetMotorPositionRange();
+  }
+
+  static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
+    (void)joint_motor_index;
+    return kActualMotorPositionBound;
+  }
+
+  static Int16Range GetMinMaxDefaultMixCtrlVelocity(uint8_t joint_motor_index) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
+    return kMixCtrlVelocityRange;
+  }
+
+  static Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
+    return kMixCtrlTorqueRange;
   }
 
   // ============ Gesture Control ============
@@ -253,6 +265,9 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
   }
 
   std::unique_ptr<OmniHand3LiteSolver> solver_;
+  static constexpr Int16Bound kActualMotorPositionBound = {0, 4096};
+  static constexpr Int16Range kMixCtrlVelocityRange = {0, 23767, 8000}; // unit: rpm
+  static constexpr Int16Range kMixCtrlTorqueRange = {0, 1000, 300}; // unit: mA
 };
 
 }  // namespace omnihand
