@@ -14,7 +14,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "i_o10_tactile_sensor_1d.h"
+#include "i_tactile_sensor_1d_u16.h"
 #include "omnihand/export_symbols.h"
 #include "omnihand/kinematics/omnihand_3_lite/omnihand_3_lite_solver.h"
 #include "omnihand/omnihand.h"
@@ -35,7 +35,7 @@ namespace omnihand {
  *       Use motor position control (SetJointMotorPosi, SetAllJointMotorPosi) instead.
  *       Gesture control is available via SetHandGesture() with OmniHand3LiteGesture enum.
  */
-class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, public IO10TactileSensor1D {
+class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, public ITactileSensor1DU16 {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // DoA
@@ -252,14 +252,6 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
   void SetHandGesture(int gesture_num) override;
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
-
-  virtual bool InitTactileSensors() = 0;
-    /**
-   * @brief Gets tactile sensor data for the specified process, such as downsampled data.
-   * @param finger Finger/palm enum value
-   * @return Tactile sensor data vector
-   */
-  virtual TactileSensorData GetTactileSensorData(Finger finger) const = 0;
 
  protected:
   /**
