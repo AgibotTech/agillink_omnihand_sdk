@@ -352,8 +352,15 @@ struct AGIBOT_EXPORT MixCtrl {
   std::optional<short> tgt_velo_;
   std::optional<short> tgt_torque_;
 
-  // Default constructor: ensures bit-fields are initialized to 0 (C++17 compatible)
   MixCtrl() : joint_index_(0), ctrl_mode_(0) {}
+
+  MixCtrl(uint8_t joint_index, MixControlMode mode, int16_t pos, int16_t torque)
+      : joint_index_(joint_index), ctrl_mode_(static_cast<uint8_t>(mode)),
+        tgt_posi_(pos), tgt_torque_(torque) {}
+
+  MixCtrl(uint8_t joint_index, MixControlMode mode, int16_t pos, int16_t vel, int16_t torque)
+      : joint_index_(joint_index), ctrl_mode_(static_cast<uint8_t>(mode)),
+        tgt_posi_(pos), tgt_velo_(vel), tgt_torque_(torque) {}
 };
 
 #pragma pack(pop)

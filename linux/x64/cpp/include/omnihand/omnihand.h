@@ -219,6 +219,10 @@ class AGIBOT_EXPORT OmniHand {
   // are not defined in base class. They are conditionally defined via interface IControlMode.
   
   // ============ Mixed Control ============
+  virtual MixCtrl MixControlByPT(uint8_t joint_motor_index, int16_t position, int16_t torque) {
+    (void)joint_motor_index; (void)position; (void)torque; return {};
+  }
+
   /**
    * @brief 0x14: Position + torque mixed control (MixControlMode::POSITION_TORQUE).
    * @param positions Target position per joint; array[i] maps to mix-control joint id i (0-based).
@@ -232,6 +236,10 @@ class AGIBOT_EXPORT OmniHand {
     return {};
   }
 
+  virtual MixCtrl MixControlByPV(uint8_t joint_motor_index, int16_t velocity, int16_t torque) {
+    (void)joint_motor_index; (void)velocity; (void)torque; return {};
+  }
+
   /**
    * @brief 0x14: Velocity + torque mixed control (MixControlMode::VELOCITY_TORQUE).
    * @param velocities Target velocity per joint; array[i] maps to mix-control joint id i (0-based).
@@ -242,6 +250,10 @@ class AGIBOT_EXPORT OmniHand {
     (void)velocities;
     (void)torques;
     return {};
+  }
+
+  virtual MixCtrl MixControlByPVT(uint8_t joint_motor_index, int16_t position, int16_t velocity, int16_t torque) {
+    (void)joint_motor_index; (void)position; (void)velocity; (void)torque; return {};
   }
 
   /**

@@ -346,8 +346,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
    * @brief Kinematics solver for OmniHand 2025 (O10)
    */
   std::unique_ptr<o10::OmniHand2025Solver> kinematics_solver_;
-  static constexpr Int16Bound kActualMotorPositionBound = {0, 4096};
-  static constexpr Int16Bound kActualSideMotorPositionBound = {0, 1024}; // 4, 7 ,9
+  static constexpr Int16Bound kActualMotorPositionBound = {0, 4095};
+  static constexpr Int16Bound kActualSideMotorPositionBound = {0, 1023}; // 4, 7 ,9
   static constexpr Int16Range kMixCtrlVelocityRange = {0, 23767, 8000}; // unit: rpm
   static constexpr Int16Range kMixCtrlTorqueRange = {0, 1000, 300}; // unit: mA
 };
