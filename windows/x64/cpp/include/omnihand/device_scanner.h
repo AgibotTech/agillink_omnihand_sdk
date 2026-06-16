@@ -20,7 +20,8 @@
 namespace agilink {
 namespace omnihand {
 
-AGIBOT_EXPORT std::vector<ScannedCanfdDeviceInfo> ScanCanfdDevices();
+AGIBOT_EXPORT std::vector<ScannedCanfdDeviceInfo> ScanZlgCanfdDevices();
+AGIBOT_EXPORT std::vector<ScannedCanfdDeviceInfo> ScanHcanDevices();
 AGIBOT_EXPORT std::vector<ScannedSerialDeviceInfo> ScanSerialDevices();
 
 }  // namespace omnihand
