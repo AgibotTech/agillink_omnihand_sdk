@@ -14,13 +14,14 @@
 #include <string>
 #include <vector>
 
+#include "omnihand/export_symbols.h"
 #include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
 
-std::vector<ScannedCanfdDeviceInfo> ScanCanfdDevices();
-std::vector<ScannedSerialDeviceInfo> ScanSerialDevices();
+AGIBOT_EXPORT std::vector<ScannedCanfdDeviceInfo> ScanCanfdDevices();
+AGIBOT_EXPORT std::vector<ScannedSerialDeviceInfo> ScanSerialDevices();
 
 }  // namespace omnihand
 }  // namespace agilink
