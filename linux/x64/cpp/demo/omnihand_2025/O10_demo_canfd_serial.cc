@@ -10,9 +10,10 @@
  * 
  * Build: cmake .. && make
  * Run: 
- *   ./example_canfd_serial left    # Control left hand
- *   ./example_canfd_serial right   # Control right hand
- *   ./example_canfd_serial both    # Control both left and right hands simultaneously
+ *   ./example_canfd_serial left              # Control left hand (default zlgcan)
+ *   ./example_canfd_serial right -d hcan     # Control right hand via HCAN
+ *   ./example_canfd_serial both -d socketcan # Control both via SocketCAN
+ *   ./example_canfd_serial left -d zlgcan    # Control left hand via ZLG CAN
  * 
  * Note: serial numbers in code should be updated for your setup
  */
@@ -27,10 +28,11 @@
 #include "omnihand/omnihand_2025.h"
 
 void printUsage(const char* program_name) {
-  std::cout << "Usage: " << program_name << " [left|right|both]" << std::endl;
+  std::cout << "Usage: " << program_name << " [left|right|both] [-d DEVICE]" << std::endl;
   std::cout << "  left   - Control left hand only" << std::endl;
   std::cout << "  right  - Control right hand only" << std::endl;
   std::cout << "  both   - Control both hands simultaneously" << std::endl;
+  std::cout << "  -d DEVICE  Set CAN device type (zlgcan, hcan, or socketcan, default: zlgcan)" << std::endl;
   std::cout << std::endl;
   std::cout << "Note: Serial numbers in code need to be modified according to actual devices" << std::endl;
 }
@@ -142,11 +144,19 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
 
 int main(int argc, char** argv) {
   std::string mode = "left";
-  if (argc > 1) {
-    std::string arg = argv[1];
+  std::string device_type = "zlgcan";
+
+  for (int i = 1; i < argc; ++i) {
+    std::string arg = argv[i];
     if (arg == "--help" || arg == "-h") {
       printUsage(argv[0]);
       return 0;
+    } else if ((arg == "-d" || arg == "--device") && i + 1 < argc) {
+      device_type = argv[++i];
+      if (device_type != "zlgcan" && device_type != "hcan" && device_type != "socketcan") {
+        std::cerr << "[Error]: -d value must be 'zlgcan', 'hcan', or 'socketcan', got: " << device_type << std::endl;
+        return 1;
+      }
     } else if (arg == "left" || arg == "right" || arg == "both") {
       mode = arg;
     } else {
@@ -159,20 +169,33 @@ int main(int argc, char** argv) {
   std::cout << "============================================" << std::endl;
   std::cout << "OmniHand 2025 - CANFD Control (by serial_number)" << std::endl;
   std::cout << "Mode: " << mode << std::endl;
+  std::cout << "Device: " << device_type << std::endl;
   std::cout << "============================================" << std::endl;
 
   unsigned char device_id = 1;
-  // Note: serial numbers should be updated for your setup
-  std::string left_serial = "201BFF2A";   // left-hand adapter serial number (partial match)
-  std::string right_serial = "201BFF2B";  // right-hand adapter serial number (partial match, update for your setup)
+  std::string left_serial = "201BFF2A";
+  std::string right_serial = "201BFF2B";
+
+  auto createHand = [&](agilink::omnihand::HandType hand_type, const std::string& serial, uint8_t channel_id) {
+    if (device_type == "hcan") {
+      return agilink::omnihand::OmniHand2025::createHandByHcan(
+          hand_type, device_id, serial, channel_id);
+    } else if (device_type == "socketcan") {
+#ifdef __linux__
+      return agilink::omnihand::OmniHand2025::createHandSocketCan(
+          hand_type, device_id, serial);
+#else
+      std::cerr << "[Error]: SocketCAN is only supported on Linux" << std::endl;
+      return std::unique_ptr<agilink::omnihand::OmniHand2025>(nullptr);
+#endif
+    } else {
+      return agilink::omnihand::OmniHand2025::createHandByZlgcan(
+          hand_type, device_id, serial, channel_id);
+    }
+  };
 
   if (mode == "left" || mode == "both") {
-    auto left_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
-        agilink::omnihand::HandType::LEFT,
-        device_id,
-        left_serial,
-        0
-    );
+    auto left_hand = createHand(agilink::omnihand::HandType::LEFT, left_serial, 0);
 
     if (!left_hand) {
       std::cerr << "[Error]: Failed to create left hand instance" << std::endl;
@@ -186,16 +209,13 @@ int main(int argc, char** argv) {
     }
 
     std::cout << "[OK]: Left hand initialized successfully" << std::endl;
-    controlSingleHand(left_hand, "Left");
+    if (mode == "left") {
+      controlSingleHand(left_hand, "Left");
+    }
   }
 
   if (mode == "right" || mode == "both") {
-    auto right_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
-        agilink::omnihand::HandType::RIGHT,
-        device_id,
-        right_serial,
-        0
-    );
+    auto right_hand = createHand(agilink::omnihand::HandType::RIGHT, right_serial, 0);
 
     if (!right_hand) {
       std::cerr << "[Error]: Failed to create right hand instance" << std::endl;
@@ -213,20 +233,50 @@ int main(int argc, char** argv) {
     if (mode == "right") {
       controlSingleHand(right_hand, "Right");
     } else {
-      // both mode: control simultaneously
       std::cout << "\n=== Dual Hand Control ===" << std::endl;
-      
-      auto left_hand = agilink::omnihand::OmniHand2025::createHandByZlgcan(
-          agilink::omnihand::HandType::LEFT,
-          device_id,
-          left_serial,
-          0
-      );
+
+      auto left_hand = createHand(agilink::omnihand::HandType::LEFT, left_serial, 0);
       if (!left_hand || !left_hand->Init()) {
         std::cerr << "[Error]: Failed to initialize left hand for dual mode" << std::endl;
         return 1;
       }
 
+      auto left_vendor = left_hand->GetVendorInfo();
+      auto right_vendor = right_hand->GetVendorInfo();
+
+      std::cout << "\nLeft Hand Info:" << std::endl;
+      std::cout << "  Model: " << left_vendor.productModel << std::endl;
+      std::cout << "  Serial: " << left_vendor.productSeqNum << std::endl;
+
+      std::cout << "\nRight Hand Info:" << std::endl;
+      std::cout << "  Model: " << right_vendor.productModel << std::endl;
+      std::cout << "  Serial: " << right_vendor.productSeqNum << std::endl;
+
+      std::cout << "\nSetting joint angles..." << std::endl;
+      std::vector<double> left_angles(10, 0.0);
+      std::vector<double> right_angles(10, 0.5);
+
+      left_hand->SetAllActiveJointAngles(left_angles);
+      right_hand->SetAllActiveJointAngles(right_angles);
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+      auto left_angles_read = left_hand->GetAllActiveJointAngles();
+      auto right_angles_read = right_hand->GetAllActiveJointAngles();
+
+      std::cout << "Left Hand Angles (rad): [";
+      for (size_t i = 0; i < left_angles_read.size(); ++i) {
+        std::cout << std::fixed << std::setprecision(4) << left_angles_read[i];
+        if (i < left_angles_read.size() - 1) std::cout << ", ";
+      }
+      std::cout << "]" << std::endl;
+
+      std::cout << "Right Hand Angles (rad): [";
+      for (size_t i = 0; i < right_angles_read.size(); ++i) {
+        std::cout << std::fixed << std::setprecision(4) << right_angles_read[i];
+        if (i < right_angles_read.size() - 1) std::cout << ", ";
+      }
+      std::cout << "]" << std::endl;
     }
   }
 
