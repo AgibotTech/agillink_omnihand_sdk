@@ -456,10 +456,17 @@ class AGIBOT_EXPORT OmniHand {
   virtual ~OmniHand() = default;
 
   HandType GetHandType() const {
-    return is_left_hand_ ? HandType::LEFT : HandType::RIGHT;
+    return hand_type_;
+  }
+
+  void SetHandType(HandType hand_type) {
+    hand_type_ = hand_type;
+    OnHandTypeChanged();
   }
 
  protected:
+  virtual void OnHandTypeChanged() {}
+
   /**
    * @brief Initialize base class members
    * @param product_type Product type: ProductType::OMNIHAND_2025 (O10) or ProductType::OMNIHAND_PRO_2025 (O12)
@@ -469,12 +476,12 @@ class AGIBOT_EXPORT OmniHand {
   void Reset(ProductType product_type, unsigned char device_id, HandType hand_type) {
     product_type_ = product_type;
     device_id_ = device_id;
-    is_left_hand_ = (hand_type == HandType::LEFT);
+    hand_type_ = hand_type;
   }
 
   ProductType product_type_{ProductType::UNKNOWN};
   unsigned char device_id_{DEFAULT_DEVICE_ID};
-  bool is_left_hand_{true};
+  HandType hand_type_{HandType::LEFT};
   bool is_init_{false};
 };
 

@@ -253,7 +253,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
    *       `omnihand_sdk/assets/omnihand_description`.
    */
   std::vector<std::string> GetJointNames() const override {
-    const std::string p = is_left_hand_ ? "L_" : "R_";
+    const std::string p = hand_type_ == HandType::LEFT ? "L_" : "R_";
     return {
       p + "thumb_roll_joint",
       p + "thumb_abad_joint",
@@ -339,7 +339,11 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_2025, device_id, hand_type);
     // Automatically initialize kinematics solver
-    kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(is_left_hand_);
+    kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(hand_type_ == HandType::LEFT);
+  }
+
+  void OnHandTypeChanged() override {
+    kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(hand_type_ == HandType::LEFT);
   }
 
   /**

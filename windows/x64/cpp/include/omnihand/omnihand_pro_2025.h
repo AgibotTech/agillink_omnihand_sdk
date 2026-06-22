@@ -313,7 +313,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    *       index coupled tendons (not thumb); thumb roll/abad are motors 5–6.
    */
   std::vector<std::string> GetJointNames() const override {
-    const std::string p = is_left_hand_ ? "L_" : "R_";
+    const std::string p = hand_type_ == HandType::LEFT ? "L_" : "R_";
     return {
         p + "index_abad_joint",   // 1 ActuatorIndex1 (near thumb)
         p + "index_mcp_joint",    // 2 ActuatorIndex2
@@ -445,6 +445,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @note Product type is fixed to ProductType::OMNIHAND_PRO_2025 for this class
    */
   void Reset(unsigned char device_id, HandType hand_type);
+  void OnHandTypeChanged() override;
 
   /**
    * @brief Kinematics solver for OmniHand Pro 2025 (O12)

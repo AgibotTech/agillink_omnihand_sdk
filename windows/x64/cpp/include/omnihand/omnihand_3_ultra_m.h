@@ -307,10 +307,11 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    *       joint_motor_solver_ directly without re-implementing init logic.
    */
   void Reset(uint8_t device_id, HandType hand_type);
+  void OnHandTypeChanged() override;
 
   /**
    * @brief Per-joint linear rad <-> motor-tick solver for OmniHand 3 Ultra.
-   *        Bound to kLeft / kRight inside Reset() based on is_left_hand_.
+   *        Bound to kLeft / kRight inside Reset() based on hand_type_.
    *        Shared by every transport implementation.
    */
   std::unique_ptr<h3um::OmniHand3UltraMSolver> joint_motor_solver_;
