@@ -451,7 +451,10 @@ class AGIBOT_EXPORT OmniHand {
    *       RS485 implementation does nothing (device ID is fixed at construction time).
    * @warning Changing device ID without proper documentation may result in device inaccessibility.
    */
-  virtual void SetDeviceId(unsigned char device_id) = 0;
+  virtual void SetDeviceId(unsigned char device_id) {
+    (void)device_id;  // Suppress unused parameter warning
+  };
+
   /**
    * @brief Destructor - public for pybind11 compatibility
    * @note Users should NOT instantiate this class directly - use product-specific classes instead.
