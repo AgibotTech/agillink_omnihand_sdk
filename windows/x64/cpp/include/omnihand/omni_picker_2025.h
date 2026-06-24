@@ -296,6 +296,10 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
     ThrowUnsupported("UpdateFirmware");
   }
 
+  virtual void UpdateFirmwareViaFlash(const std::string&, OtaProgressCallback = nullptr) {
+    ThrowUnsupported("UpdateFirmwareViaFlash");
+  }
+
   bool ExitOtaUpgrade(uint32_t = 0) override {
     ThrowUnsupported("ExitOtaUpgrade");
   }
