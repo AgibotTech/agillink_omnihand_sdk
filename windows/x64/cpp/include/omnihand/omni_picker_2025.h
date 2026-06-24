@@ -27,7 +27,7 @@ namespace omnihand {
  * OP1 uses a compact 5-byte command payload. Each field is encoded as one
  * unsigned command byte and passed through to the gripper firmware.
  */
-struct Op1ControlFrame {
+struct AGIBOT_EXPORT Op1ControlFrame {
   uint8_t pos_cmd;    ///< Position command. 0x00 means closed/minimum position.
   uint8_t vel_cmd;    ///< Motor velocity command. 0x00 means zero velocity.
   uint8_t force_cmd;  ///< Grip force command, mapped to motor torque by firmware.
@@ -41,7 +41,7 @@ struct Op1ControlFrame {
  * The response mirrors the firmware report format: fault and motion state are
  * followed by current position, velocity, and force feedback bytes.
  */
-struct Op1StateFrame {
+struct AGIBOT_EXPORT Op1StateFrame {
   uint8_t fault_code;  ///< Fault code, see @ref Op1FaultCode.
   uint8_t state;       ///< Motion state, see @ref Op1State.
   uint8_t pos;         ///< Current position feedback.
@@ -56,7 +56,7 @@ static_assert(sizeof(Op1StateFrame) == 5);
 /**
  * @brief OP1 fault codes reported in Op1StateFrame::fault_code.
  */
-enum class Op1FaultCode : uint8_t {
+enum class AGIBOT_EXPORT Op1FaultCode : uint8_t {
   NO_FAULT = 0x00,       ///< No fault.
   OVER_TEMPTURE = 0x01,  ///< Over-temperature fault.
   OVER_SPEED = 0x02,     ///< Over-speed fault.
@@ -67,12 +67,34 @@ enum class Op1FaultCode : uint8_t {
 /**
  * @brief OP1 motion states reported in Op1StateFrame::state.
  */
-enum class Op1State : uint8_t {
+enum class AGIBOT_EXPORT Op1State : uint8_t {
   ARRIVERED = 0x00,  ///< Target has been reached.
   MOVING = 0x01,     ///< Motor is moving toward the target.
   BLOCKED = 0x02,    ///< Motion is blocked by contact or obstruction.
   FALLED = 0x03      ///< Motion failed or dropped out of normal tracking.
 };
+
+enum class AGIBOT_EXPORT Op1MotorRequestState : uint8_t {
+  MOTOR_STATE_IDLE = 0,        ///< Motor disabled (失能)
+  MOTOR_STATE_RUN = 1,         ///< Motor enabled (使能)
+  MOTOR_STATE_CALIBRATION = 2, ///< Motor calibration in progress (校准中)
+  MOTOR_STATE_BRAKE = 3,       ///< Motor brake (刹车)
+  MOTOR_STATE_PLAY_TONE = 5,   ///< Play tone (蜂鸣)
+};
+
+/**
+ * @brief Converts an OP1 motor state to a text label.
+ */
+AGIBOT_EXPORT inline std::string ToString(Op1MotorRequestState state) {
+  switch (state) {
+    case Op1MotorRequestState::MOTOR_STATE_IDLE:        return "IDLE";
+    case Op1MotorRequestState::MOTOR_STATE_RUN:         return "RUN";
+    case Op1MotorRequestState::MOTOR_STATE_CALIBRATION: return "CALIBRATION";
+    case Op1MotorRequestState::MOTOR_STATE_BRAKE:       return "BRAKE";
+    case Op1MotorRequestState::MOTOR_STATE_PLAY_TONE:   return "PLAY_TONE";
+    default:                                            return "UNKNOWN";
+  }
+}
 
 /**
  * @brief Converts an OP1 fault code to a stable text label.
@@ -109,6 +131,38 @@ AGIBOT_EXPORT std::ostream& operator<<(std::ostream& os, Op1State state);
  * @brief Streams an OP1 state frame using ToString(const Op1StateFrame&).
  */
 AGIBOT_EXPORT std::ostream& operator<<(std::ostream& os, const Op1StateFrame& frame);
+
+struct AGIBOT_EXPORT Op1MotorInfo {
+  uint32_t error_code{0};       ///< Motor error code (0 = no error)
+  uint32_t ctrl_mode{0};        ///< Control mode
+  float current_limit{0};       ///< Current limit (A)
+  float velocity_limit{0};      ///< Velocity limit (rad/s)
+  float pos_gain{0};            ///< Position gain
+  float vel_gain{0};            ///< Velocity gain
+  uint8_t calib_valid{0};       ///< Motor calibration valid (0 = invalid, 1 = valid)
+  Op1MotorRequestState request_state{Op1MotorRequestState::MOTOR_STATE_IDLE}; ///< Motor request state
+  uint8_t enable_on_boot{0};    ///< Enable motor on boot (0 = disabled, 1 = enabled)
+};
+
+struct AGIBOT_EXPORT Op1DeviceInfo {
+  uint8_t device_type{0};    ///< Device type
+  uint8_t can_node_id{0};    ///< CAN bus node ID
+  uint8_t debug_flag{0};     ///< Debug flag
+  uint32_t serial_number{0}; ///< Serial number
+  Version fw_version;        ///< Firmware version
+  uint32_t fw_hash{0};       ///< Firmware hash
+  Op1MotorInfo motor;        ///< Motor information
+};
+
+/**
+ * @brief Formats OP1 motor info into a readable string.
+ */
+AGIBOT_EXPORT std::string ToString(const Op1MotorInfo& motor);
+
+/**
+ * @brief Formats OP1 device info into a readable string.
+ */
+AGIBOT_EXPORT std::string ToString(const Op1DeviceInfo& info);
 
 /**
  * @brief OmniPicker 2025 (OP1) public interface.
@@ -152,22 +206,6 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
 
   std::vector<int16_t> GetAllCurrentThreshold() const override {
     ThrowUnsupported("GetAllCurrentThreshold");
-  }
-
-  int16_t SetJointMotorPosi(unsigned char, int16_t) override {
-    ThrowUnsupported("SetJointMotorPosi");
-  }
-
-  int16_t GetJointMotorPosi(unsigned char) const override {
-    ThrowUnsupported("GetJointMotorPosi");
-  }
-
-  std::vector<int16_t> SetAllJointMotorPosi(const std::vector<int16_t>&) override {
-    ThrowUnsupported("SetAllJointMotorPosi");
-  }
-
-  std::vector<int16_t> GetAllJointMotorPosi() const override {
-    ThrowUnsupported("GetAllJointMotorPosi");
   }
 
   std::vector<double> SetAllActiveJointAngles(const std::vector<double>&) override {
@@ -261,6 +299,51 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
   bool ExitOtaUpgrade(uint32_t = 0) override {
     ThrowUnsupported("ExitOtaUpgrade");
   }
+
+  // ============ Calibration (Fibre protocol over USB) ============
+
+  /**
+   * @brief Trigger motor calibration (phase resistance, inductance, encoder offset).
+   * @note Enters STATE_CALIBRATION on the firmware. The motor runs the calibration
+   *       procedure automatically and saves config to flash on success.
+   * @return true if the calibration request was sent successfully.
+   */
+  virtual bool StartMotorCalibration() = 0;
+
+  /**
+   * @brief Save current configuration to flash.
+   * @note Required after any parameter change (e.g. CAN-ID, velocity, current limit).
+   *       The motor must be in disabled (non-RUN) state.
+   * @return true if the save request was sent successfully.
+   */
+  virtual bool SaveConfig() = 0;
+
+  /**
+   * @brief Set CAN bus node ID (disables motor, writes new ID, saves config).
+   * @note The motor must be re-powered for the new CAN ID to take effect.
+   * @param node_id New CAN bus node ID
+   * @return true if the operation was sent successfully.
+   */
+  virtual bool SetCanNodeId(uint8_t node_id) = 0;
+
+  /**
+   * @brief Get CAN bus node ID via USB Fibre protocol.
+   * @return CAN bus node ID, or 0 if failed.
+   */
+  virtual uint8_t GetCanNodeId() = 0;
+
+  /**
+   * @brief Show device information via USB Fibre protocol (device type, serial number, firmware version, CAN node ID).
+   * @note This is equivalent to typing "ref0" in the REF-CLI tool.
+   */
+  virtual Op1DeviceInfo ShowDeviceInfo() = 0;
+
+  /**
+   * @brief Set position ratio (0.0 to 1.0) for joint motor position command.
+   * @param ratio Position ratio, clamped to [0.0, 1.0]
+   * @return Actual position (0-255) from device, or -1 on failure.
+   */
+  virtual int16_t SetPositionRatio(float ratio) = 0;
 
   // ============ Factory Methods ============
 

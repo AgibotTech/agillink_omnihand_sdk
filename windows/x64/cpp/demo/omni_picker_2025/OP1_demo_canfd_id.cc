@@ -47,6 +47,10 @@ int main(int argc, char** argv) {
   }
   // std::cout << picker->GetDeviceInfo().ToString() << std::endl;
   picker->ShowDataDetails(true);
+
+  auto info = picker->ShowDeviceInfo();
+  std::cout << ToString(info) << std::endl;
+
   agilink::omnihand::Op1ControlFrame frame{};
   frame.pos_cmd = 0x00;
   frame.vel_cmd = 0xFF;
@@ -57,6 +61,14 @@ int main(int argc, char** argv) {
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   frame.pos_cmd = 0xFF;
   picker->SendFrameSync(frame);
+
+  picker->SetPositionRatio(0.0f);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  picker->SetPositionRatio(0.5f);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  picker->SetPositionRatio(1.0f);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
   if (input_path == "")
     return 0;
   std::filesystem::path otaFilePath(input_path);
