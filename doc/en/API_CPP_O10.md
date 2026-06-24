@@ -526,8 +526,15 @@ Only the following mode is currently available:
  * @note Pure torque control (TORQUE) is not supported.
  * @note This interface is not supported for serial port communication (RS485).
  */
+MixCtrl MixControlByPT(uint8_t joint_motor_index,
+                       int16_t position,
+                       int16_t torque);
 std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
                                     const std::vector<int16_t>& torques);
+MixCtrl MixControlByPVT(uint8_t joint_motor_index,
+                        int16_t position,
+                        int16_t velocity,
+                        int16_t torque);
 std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
                                      const std::vector<int16_t>& velocities,
                                      const std::vector<int16_t>& torques);

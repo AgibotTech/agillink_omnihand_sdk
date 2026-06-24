@@ -481,6 +481,10 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPVT) {
   std::cout << std::endl;
   
   EXPECT_EQ(feedback_pos.size(), 10);
+
+  (void)hand_->MixControlByPVT(1, safe_pos[0], 50, 0);
+  std::cout << "[MixControlByPVT] single joint 1 pos=" << safe_pos[0] << " vel=50" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 TEST_F(OmniHand2025CanfdTest, GetJointMotorVelo) {
@@ -505,6 +509,10 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPT) {
   (void)hand_->MixControlByPT(positions, torques);
   std::cout << "[MixControlByPT] all 10 joints" << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  
+  (void)hand_->MixControlByPT(1, safe_pos[0], 0);
+  std::cout << "[MixControlByPT] single joint 1 pos=" << safe_pos[0] << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   
   SUCCEED();
 }

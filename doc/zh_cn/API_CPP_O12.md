@@ -317,8 +317,11 @@ std::vector<int16_t> GetAllCurrentThreshold() const;                            
 **注意**：O12 仅支持 **`MixControlByPT`（位置 + 力）**。`MixControlByPV`、`MixControlByPVT` 在接口中存在，但调用返回空向量且不下发指令。`tgt_torque_` 单位为 **0.01N**（与触觉法向力关联）。数组下标 `i` 对应混合控制关节 id `i`（0-based）；回读 echo 中 `joint_index_` 为 1-based。
 
 ```cpp
+MixCtrl MixControlByPT(uint8_t joint_motor_index,
+                       int16_t position,
+                       int16_t torque);                                    // 单轴
 std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
-                                    const std::vector<int16_t>& torques);  // 支持
+                                    const std::vector<int16_t>& torques);  // 批量
 std::vector<MixCtrl> MixControlByPV(const std::vector<int16_t>& velocities,
                                     const std::vector<int16_t>& torques);   // 不支持
 std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,

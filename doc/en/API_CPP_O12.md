@@ -537,8 +537,11 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 `tgt_torque_` is in **0.01 N** (correlated with tactile sensor normal force). Array index `i` maps to mix-control joint id `i` (0-based). Echo `joint_index_` is 1-based.
 
 ```cpp
+MixCtrl MixControlByPT(uint8_t joint_motor_index,
+                       int16_t position,
+                       int16_t torque);                                    // single joint
 std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
-                                    const std::vector<int16_t>& torques);  // supported
+                                    const std::vector<int16_t>& torques);  // batch
 std::vector<MixCtrl> MixControlByPV(const std::vector<int16_t>& velocities,
                                     const std::vector<int16_t>& torques);   // not supported
 std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
