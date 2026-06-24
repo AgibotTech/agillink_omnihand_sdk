@@ -39,8 +39,8 @@ add_subdirectory(omnihand_dex_umi)
 add_subdirectory(omni_picker_3)
 # Add OmniPicker 2025 demo conditionally
 if(BUILD_OMNI_PICKER_2025)
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/omni_picker_2025")
-    add_subdirectory(omni_picker_2025)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/omnipicker_2025")
+    add_subdirectory(omnipicker_2025)
   endif()
 endif()
 # Add OmniHand 3 Lite demo conditionally

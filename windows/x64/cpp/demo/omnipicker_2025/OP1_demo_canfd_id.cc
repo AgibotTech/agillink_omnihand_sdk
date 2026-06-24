@@ -9,7 +9,7 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "omnihand/omni_picker_2025.h"
+#include "omnihand/omnipicker_2025.h"
 #include "omnihand/proto.h"
 static std::unique_ptr<agilink::omnihand::OmniPicker2025> picker;
 enum class Commands : uint8_t {

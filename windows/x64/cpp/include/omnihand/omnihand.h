@@ -58,7 +58,9 @@ class AGIBOT_EXPORT OmniHand {
    * @brief 0x01: Gets vendor information.
    * @return Vendor information structure containing product model, serial number, hardware version, software version, supply voltage, DOF, etc.
    */
-  virtual VendorInfo GetVendorInfo() const = 0;
+  virtual VendorInfo GetVendorInfo() const {
+    return {};
+  };
   
   /**
    * @brief 0x02: Gets device information.
@@ -66,7 +68,9 @@ class AGIBOT_EXPORT OmniHand {
    * @note Serial port communication (RS485) does not support this interface. 
    *       RS485 implementation returns an empty DeviceInfo structure.
    */
-  virtual DeviceInfo GetDeviceInfo() const = 0;
+  virtual DeviceInfo GetDeviceInfo() const {
+    return {};
+  };
 
   // ============ Current Threshold ============
   /**
