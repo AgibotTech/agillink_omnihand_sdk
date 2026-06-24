@@ -75,8 +75,31 @@ int main(int argc, char** argv) {
   if (!std::filesystem::exists(otaFilePath)) {
     throw std::runtime_error("input file is not existed");
   }
+  std::cout << "[INFO][UPDATE_FIRMWARE] update firmware:" << otaFilePath.string() << std::endl;
   picker->UpdateFirmware(otaFilePath.string());
   std::cout << "[INFO][UPDATE_FIRMWARE] update firmware success" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  frame.pos_cmd = 0x00;
+  picker->SendFrameSync(frame);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  frame.pos_cmd = 0xFF;
+  picker->SendFrameSync(frame);
+ 
+  // std::cout << "[INFO][UPDATE_FIRMWARE_VIA_FLASH] update firmware:" << otaFilePath.string() << std::endl;
+  // picker->UpdateFirmwareViaFlash(otaFilePath.string());
+  // std::cout << "[INFO][UPDATE_FIRMWARE_VIA_FLASH] update firmware success" << std::endl;
+  // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  // frame.pos_cmd = 0x00;
+  // picker->SendFrameSync(frame);
+  // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  // frame.pos_cmd = 0xFF;
+  // picker->SendFrameSync(frame);
+  
+  std::cout << "[INFO][START_MOTOR_CALIBRATION] start ..." << std::endl;
+  if (!picker->StartMotorCalibration()) {
+    std::cout << "[ERROR][START_MOTOR_CALIBRATION] error start motor calibration" << std::endl;
+    return -1;
+  }
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   frame.pos_cmd = 0x00;
   picker->SendFrameSync(frame);

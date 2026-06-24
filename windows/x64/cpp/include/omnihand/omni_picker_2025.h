@@ -140,7 +140,6 @@ struct AGIBOT_EXPORT Op1MotorInfo {
   float pos_gain{0};            ///< Position gain
   float vel_gain{0};            ///< Velocity gain
   uint8_t calib_valid{0};       ///< Motor calibration valid (0 = invalid, 1 = valid)
-  Op1MotorRequestState request_state{Op1MotorRequestState::MOTOR_STATE_IDLE}; ///< Motor request state
   uint8_t enable_on_boot{0};    ///< Enable motor on boot (0 = disabled, 1 = enabled)
 };
 
@@ -309,18 +308,19 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
   /**
    * @brief Trigger motor calibration (phase resistance, inductance, encoder offset).
    * @note Enters STATE_CALIBRATION on the firmware. The motor runs the calibration
-   *       procedure automatically and saves config to flash on success.
+   *       procedure automatically, saves config to flash, and reboots the device on success.
+   *       After reboot, the USB and CAN connections will be lost.
    * @return true if the calibration request was sent successfully.
    */
   virtual bool StartMotorCalibration() = 0;
 
   /**
-   * @brief Save current configuration to flash.
-   * @note Required after any parameter change (e.g. CAN-ID, velocity, current limit).
-   *       The motor must be in disabled (non-RUN) state.
-   * @return true if the save request was sent successfully.
+   * @brief Reboot the device via Fibre USB protocol.
+   * @note After reboot, the USB and CAN connections will be lost. The caller must
+   *       re-establish connections after the device re-enumerates.
+   * @return true if the reboot request was sent successfully.
    */
-  virtual bool SaveConfig() = 0;
+  virtual bool Reboot() = 0;
 
   /**
    * @brief Set CAN bus node ID (disables motor, writes new ID, saves config).
