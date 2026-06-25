@@ -227,7 +227,7 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    * @brief Show device information via USB Fibre protocol (device type, serial number, firmware version, CAN node ID).
    * @note This is equivalent to typing "ref0" in the REF-CLI tool.
    */
-  virtual Op1DeviceInfo ShowDeviceInfo() = 0;
+  virtual Op1DeviceInfo ShowDeviceInfo() const = 0;
 
   /**
    * @brief Set position ratio (0.0 to 1.0) for joint motor position command.
