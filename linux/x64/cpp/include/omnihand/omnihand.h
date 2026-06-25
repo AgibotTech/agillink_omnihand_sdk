@@ -58,7 +58,9 @@ class AGIBOT_EXPORT OmniHand {
    * @brief 0x01: Gets vendor information.
    * @return Vendor information structure containing product model, serial number, hardware version, software version, supply voltage, DOF, etc.
    */
-  virtual VendorInfo GetVendorInfo() const = 0;
+  virtual VendorInfo GetVendorInfo() const {
+    return {};
+  };
   
   /**
    * @brief 0x02: Gets device information.
@@ -66,7 +68,9 @@ class AGIBOT_EXPORT OmniHand {
    * @note Serial port communication (RS485) does not support this interface. 
    *       RS485 implementation returns an empty DeviceInfo structure.
    */
-  virtual DeviceInfo GetDeviceInfo() const = 0;
+  virtual DeviceInfo GetDeviceInfo() const {
+    return {};
+  };
 
   // ============ Current Threshold ============
   /**
@@ -447,7 +451,10 @@ class AGIBOT_EXPORT OmniHand {
    *       RS485 implementation does nothing (device ID is fixed at construction time).
    * @warning Changing device ID without proper documentation may result in device inaccessibility.
    */
-  virtual void SetDeviceId(unsigned char device_id) = 0;
+  virtual void SetDeviceId(unsigned char device_id) {
+    (void)device_id;  // Suppress unused parameter warning
+  };
+
   /**
    * @brief Destructor - public for pybind11 compatibility
    * @note Users should NOT instantiate this class directly - use product-specific classes instead.
@@ -456,10 +463,17 @@ class AGIBOT_EXPORT OmniHand {
   virtual ~OmniHand() = default;
 
   HandType GetHandType() const {
-    return is_left_hand_ ? HandType::LEFT : HandType::RIGHT;
+    return hand_type_;
+  }
+
+  void SetHandType(HandType hand_type) {
+    hand_type_ = hand_type;
+    OnHandTypeChanged();
   }
 
  protected:
+  virtual void OnHandTypeChanged() {}
+
   /**
    * @brief Initialize base class members
    * @param product_type Product type: ProductType::OMNIHAND_2025 (O10) or ProductType::OMNIHAND_PRO_2025 (O12)
@@ -469,12 +483,12 @@ class AGIBOT_EXPORT OmniHand {
   void Reset(ProductType product_type, unsigned char device_id, HandType hand_type) {
     product_type_ = product_type;
     device_id_ = device_id;
-    is_left_hand_ = (hand_type == HandType::LEFT);
+    hand_type_ = hand_type;
   }
 
   ProductType product_type_{ProductType::UNKNOWN};
   unsigned char device_id_{DEFAULT_DEVICE_ID};
-  bool is_left_hand_{true};
+  HandType hand_type_{HandType::LEFT};
   bool is_init_{false};
 };
 

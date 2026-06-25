@@ -199,7 +199,7 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
    * @return Vector of joint names
    */
   std::vector<std::string> GetJointNames() const override {
-    const std::string p = is_left_hand_ ? "L_" : "R_";
+    const std::string p = hand_type_ == HandType::LEFT ? "L_" : "R_";
     // because of doesn't have URDF, so we hardcode the joint names
     return {
       p + "joint1",  // 1
@@ -262,7 +262,11 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
    */
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_3_LITE, device_id, hand_type);
-    solver_ = std::make_unique<OmniHand3LiteSolver>(is_left_hand_);
+    solver_ = std::make_unique<OmniHand3LiteSolver>(hand_type_ == HandType::LEFT);
+  }
+
+  void OnHandTypeChanged() override {
+    solver_ = std::make_unique<OmniHand3LiteSolver>(hand_type_ == HandType::LEFT);
   }
 
   std::unique_ptr<OmniHand3LiteSolver> solver_;
