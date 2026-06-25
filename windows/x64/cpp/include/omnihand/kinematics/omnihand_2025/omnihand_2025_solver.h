@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file omnihand_2025_solver.h
  * @brief O10 dexterous hand kinematics solver (10 DOF)
  * @author AgiBot-lishuang
@@ -187,7 +187,9 @@ class AGIBOT_EXPORT OmniHand2025Solver {
   std::vector<double>
   GetAllJointPos(const std::vector<double> &active_joint_pos);
 
-  static Int16Bound GetMotorPositionRange();
+  static constexpr Int16Bound GetMotorPositionRange() {
+    return {kMinInput, kMaxInput};
+  }
 
   static FloatBound GetJointAngleRange(uint8_t actuator_index, bool is_left_hand);
 };

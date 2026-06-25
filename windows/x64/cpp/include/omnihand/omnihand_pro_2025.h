@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
@@ -335,7 +335,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @brief Returns the number of joint motors.
    * @return Number of joint motors (12)
    */
-  static uint8_t GetNumOfJointMotors() {
+  static constexpr uint8_t GetNumOfJointMotors() {
     return kDegreesOfActiveFreedom;
   }
 
@@ -343,7 +343,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @brief Returns the degrees of active freedom (DoA).
    * @return Degrees of active freedom (12)
    */
-  static uint8_t GetDoA() {
+  static constexpr uint8_t GetDoA() {
     return kDegreesOfActiveFreedom;
   }
 
@@ -351,7 +351,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @brief Returns the degrees of passive freedom (DoP).
    * @return Degrees of passive freedom (7)
    */
-  static uint8_t GetDoP() {
+  static constexpr uint8_t GetDoP() {
     return kDegreesOfPassiveFreedom;
   }
 
@@ -360,7 +360,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @param joint_motor_index Joint motor index (1-12)
    * @return Min/max motor position range
    */
-  static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     return o12::OmniHandPro2025Solver::GetMotorPositionRange(joint_motor_index - 1);
   }
 
@@ -379,7 +379,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @param joint_motor_index Joint motor index (1-12)
    * @return Min/max actual motor position range
    */
-  static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
     return GetMinMaxMotorPosition(joint_motor_index);
   }
 
@@ -388,7 +388,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @param joint_motor_index Joint motor index (1-12)
    * @return Min/max default motor velocity range
    */
-  static Int16Range GetMinMaxDefaultMotorVelocity(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMotorVelocity(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return kMotorVelocityRange;
   }
@@ -398,7 +398,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @param joint_motor_index Joint motor index (1-12)
    * @return Min/max default motor torque range
    */
-  static Int16Range GetMinMaxDefaultMotorTorque(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMotorTorque(uint8_t joint_motor_index) {
     return (joint_motor_index <= kServoMotorCount) ? kServoMotorTorqueCurrentRange
                                                    : kNormalMotorTorqueCurrentRange;
   }
@@ -408,7 +408,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @param joint_motor_index Joint motor index (1-12)
    * @return Min/max default mixed control torque range
    */
-  static Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return kMixCtrlTorqueRange;
   }
@@ -418,7 +418,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @param joint_motor_index Joint motor index (1-12)
    * @return Min/max default motor voltage range
    */
-  static Int16Range GetMinMaxDefaultMotorVoltage(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMotorVoltage(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return kMotorVoltageRange;
   }

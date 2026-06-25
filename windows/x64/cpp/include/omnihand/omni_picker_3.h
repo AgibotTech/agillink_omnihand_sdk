@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 #ifndef AGILINK_OMNI_PICKER_3_H
@@ -192,11 +192,27 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
     };
   }
 
-  static Int16Bound GetMinMaxMotorPosition() {
+    /**
+   * @brief Returns the number of joint motors.
+   * @return Number of joint motors (12)
+   */
+  static constexpr uint8_t GetNumOfJointMotors() {
+    return kDegreesOfActiveFreedom;
+  }
+
+  /**
+   * @brief Returns the degrees of active freedom (DoA).
+   * @return Degrees of active freedom (12)
+   */
+  static constexpr uint8_t GetDoA() {
+    return kDegreesOfActiveFreedom;
+  }
+
+  static constexpr Int16Bound GetMinMaxMotorPosition() {
     return kMotorPositionBound;
   }
 
-  static Int16Range GetMinMaxMixCtrlTorque() {
+  static constexpr Int16Range GetMinMaxMixCtrlTorque() {
     return kMixCtrlTorqueRange;
   }
 

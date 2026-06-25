@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
@@ -268,19 +268,19 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
     };
   }
 
-  static uint8_t GetNumOfJointMotors() {
+  static constexpr uint8_t GetNumOfJointMotors() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoA() {
+  static constexpr uint8_t GetDoA() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoP() {
+  static constexpr uint8_t GetDoP() {
     return kDegreesOfPassiveFreedom;
   }
 
-  static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return o10::OmniHand2025Solver::GetMotorPositionRange();
   }
@@ -289,7 +289,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
     return o10::OmniHand2025Solver::GetJointAngleRange(joint_motor_index - 1, hand_type == HandType::LEFT);
   }
 
-  static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
     if (joint_motor_index == o10::ActiveJointIndexAbAd + 1 ||
         joint_motor_index == o10::ActiveJointRingAbAd + 1 ||
@@ -299,12 +299,12 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
     return kActualMotorPositionBound;
   }
 
-  static Int16Range GetMinMaxDefaultMixCtrlVelocity(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMixCtrlVelocity(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
     return kMixCtrlVelocityRange;
   }
 
-  static Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
     return kMixCtrlTorqueRange;
   }

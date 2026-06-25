@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 #ifndef AGILINK_OMNI_PICKER_2025_H
@@ -176,6 +176,10 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
   }
 
  public:
+
+  static constexpr uint8_t kDegreesOfActiveFreedom = 1;
+  static constexpr uint8_t kDefaultHandDeviceId = 1u;
+
   virtual ~OmniPicker2025() = default;
 
   /**
@@ -348,7 +352,35 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
       uint8_t hand_device_id,
       const std::string& marvin_controller_ip);
 #endif
-  //   static std::unique_ptr<OmniPicker2025> createHandByTtl
+  
+  /**
+   * @brief Returns the number of joint motors.
+   * @return Number of joint motors (12)
+   */
+  static constexpr uint8_t GetNumOfJointMotors() {
+    return kDegreesOfActiveFreedom;
+  }
+
+  /**
+   * @brief Returns the degrees of active freedom (DoA).
+   * @return Degrees of active freedom (12)
+   */
+  static constexpr uint8_t GetDoA() {
+    return kDegreesOfActiveFreedom;
+  }
+
+  static constexpr UInt8Bound GetMinMaxMotorPosition() {
+    return kMotorPositionBound;
+  }
+
+  static constexpr UInt8Range GetMinMaxDefaultVelocity() {
+    return kMotorVelocityRange;
+  }
+
+  static constexpr UInt8Range GetMinMaxDefaultTorque() {
+    return kMotorTorqueRange;
+  }
+
   protected:
   /**
    * @brief Initialize common base-class metadata for OP1.
@@ -358,6 +390,10 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNI_PICKER_2025, device_id, hand_type);
   }
+
+  static constexpr UInt8Bound kMotorPositionBound = {0, 255};
+  static constexpr UInt8Range kMotorVelocityRange = {0, 255, 255};
+  static constexpr UInt8Range kMotorTorqueRange = {0, 255, 255};
 };
 }  // namespace omnihand
 }  // namespace agilink

@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
@@ -219,24 +219,24 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
     };
   }
 
-  static uint8_t GetNumOfJointMotors() {
+  static constexpr uint8_t GetNumOfJointMotors() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoA() {
+  static constexpr uint8_t GetDoA() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoP() {
+  static constexpr uint8_t GetDoP() {
     return kDegreesOfPassiveFreedom;
   }
 
-  static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return h3um::OmniHand3UltraMSolver::GetMotorPositionRange();
   }
 
-  static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return kActualMotorPositionBound;
   }

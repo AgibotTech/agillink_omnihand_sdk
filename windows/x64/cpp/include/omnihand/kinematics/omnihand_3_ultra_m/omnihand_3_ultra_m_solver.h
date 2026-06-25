@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
@@ -115,7 +115,7 @@ class AGIBOT_EXPORT OmniHand3UltraMSolver {
   explicit OmniHand3UltraMSolver(bool is_left_hand);
   ~OmniHand3UltraMSolver() = default;
 
-  static Int16Bound GetMotorPositionRange() {
+  static constexpr Int16Bound GetMotorPositionRange() {
     return {kActuatorInputMin, kActuatorInputMax};
   }
 
