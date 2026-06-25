@@ -72,6 +72,7 @@ inline std::string ToString(ProductType product_type) {
     case ProductType::OMNIHAND_3_LITE: return "OmniHand 3 Lite";
     case ProductType::OMNIHAND_3_ULTRA_M: return "OmniHand 3 Ultra M";
     case ProductType::OMNI_PICKER_3: return "OmniPicker 3";
+    case ProductType::OMNI_PICKER_2025: return "OmniPicker 2025";
     default: return "Unknown";
   }
 }
