@@ -319,9 +319,9 @@ TEST_F(OmniHand2025UsbTest, GetTactileSensorData) {
 TEST_F(OmniHand2025UsbTest, SetAllCurrentThreshold) {
   RequireDevice();
   
-  std::vector<int16_t> thresholds(10, 1500);  // 1500mA
-  hand_->SetAllCurrentThreshold(thresholds);
-  std::cout << "[SetAllCurrentThreshold] All joints -> 1000mA" << std::endl;
+  // std::vector<int16_t> thresholds(10, 1500);  // 1500mA
+  // hand_->SetAllCurrentThreshold(thresholds);
+  // std::cout << "[SetAllCurrentThreshold] All joints -> 1000mA" << std::endl;
   
   // Note: GetAllCurrentThreshold returns cached values for USB (no GET command)
   auto current_thresholds = hand_->GetAllCurrentThreshold();

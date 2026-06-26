@@ -75,9 +75,11 @@ class AGIBOT_EXPORT OmniHand {
   // ============ Current Threshold ============
   /**
    * @brief 0x03: Sets the current threshold of a single joint motor.
-   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @param joint_motor_index Joint motor index
    * @param current_threshold Current threshold value
-   * @note Serial port communication (RS485) does not support this interface.
+   * @note Serial port communication (USB/RS485) does not support this interface.
+   * @note O10/H3L: not allowed to both SetCurrentThreshold and MixControl at the same time.
+   *        If you want to use MixControl, please do not call SetCurrentThreshold.
    */
   virtual void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold) { (void)joint_motor_index; (void)current_threshold; }
   
@@ -91,10 +93,10 @@ class AGIBOT_EXPORT OmniHand {
   
   /**
    * @brief 0x03: Sets current thresholds of all joint motors in batch.
-   * @param current_thresholds Current threshold vector. Length depends on product type:
-   *                           - OmniHand 2025 (O10): 10 values
-   *                           - OmniHand Pro 2025 (O12): 12 values
-   * @note Serial port communication (RS485) does not support this interface.
+   * @param current_thresholds Current threshold vector.
+   * @note Serial port communication (USB/RS485) does not support this interface.
+   * @note O10/H3L: not allowed to both SetAllCurrentThreshold and MixControl at the same time.
+   *        If you want to use MixControl, please do not call SetAllCurrentThreshold.
    */
   virtual void SetAllCurrentThreshold(const std::vector<int16_t>& current_thresholds) { (void)current_thresholds; }
   
