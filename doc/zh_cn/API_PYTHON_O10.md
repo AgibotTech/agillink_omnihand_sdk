@@ -342,6 +342,8 @@ O10 不支持通过 `set_control_mode` 指令切换控制模式，默认工作�
 
 ## 电流阈值控制
 
+> **注意**：O10/H3L 不允许同时使用电流阈值控制和混合控制。如需使用混合控制，请勿调用电流阈值接口。
+
 ```python
 def set_current_threshold(self, joint_motor_index: int, current_threshold: int) -> None:
     """设置单个关节电机的电流阈值。

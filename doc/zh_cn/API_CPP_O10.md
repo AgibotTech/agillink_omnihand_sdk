@@ -479,6 +479,8 @@ O10 不支持通过 `SetControlMode` 指令切换控制模式，默认工作在*
 
 ## 电流阈值控制
 
+> **注意**：O10/H3L 不允许同时使用电流阈值控制和混合控制。如需使用混合控制，请勿调用电流阈值接口。
+
 ```cpp
 void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold);
 int16_t GetCurrentThreshold(unsigned char joint_motor_index) const;

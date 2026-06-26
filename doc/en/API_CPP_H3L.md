@@ -217,6 +217,9 @@ std::vector<int16_t> GetAllJointMotorVelo() const;
 
 ### Current Threshold Control
 
+> **Note**: O10/H3L: not allowed to both SetCurrentThreshold/SetAllCurrentThreshold and MixControl at the same time.
+> If you want to use MixControl, please do not call the current threshold interfaces.
+
 ```cpp
 void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold);
 int16_t GetCurrentThreshold(unsigned char joint_motor_index) const;
