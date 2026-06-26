@@ -97,6 +97,10 @@ def main():
         hand.mix_control_by_pt(positions, torques)
         time.sleep(1.5)
 
+        print(f"[Cycle {cycle}] mix_control_by_pt single-joint: joint=1 pos={positions[0]} force={torques[0]} (0.01N)")
+        hand.mix_control_by_pt(1, positions[0], torques[0])
+        time.sleep(0.5)
+
     print("\n[Done]: Mix control demo completed!")
 
 if __name__ == "__main__":

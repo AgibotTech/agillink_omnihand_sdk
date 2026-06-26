@@ -58,7 +58,9 @@ class AGIBOT_EXPORT OmniHand {
    * @brief 0x01: Gets vendor information.
    * @return Vendor information structure containing product model, serial number, hardware version, software version, supply voltage, DOF, etc.
    */
-  virtual VendorInfo GetVendorInfo() const = 0;
+  virtual VendorInfo GetVendorInfo() const {
+    return {};
+  };
   
   /**
    * @brief 0x02: Gets device information.
@@ -66,14 +68,18 @@ class AGIBOT_EXPORT OmniHand {
    * @note Serial port communication (RS485) does not support this interface. 
    *       RS485 implementation returns an empty DeviceInfo structure.
    */
-  virtual DeviceInfo GetDeviceInfo() const = 0;
+  virtual DeviceInfo GetDeviceInfo() const {
+    return {};
+  };
 
   // ============ Current Threshold ============
   /**
    * @brief 0x03: Sets the current threshold of a single joint motor.
-   * @param joint_motor_index Joint motor index (O10: 1-10, O12: 1-12)
+   * @param joint_motor_index Joint motor index
    * @param current_threshold Current threshold value
-   * @note Serial port communication (RS485) does not support this interface.
+   * @note Serial port communication (USB/RS485) does not support this interface.
+   * @note O10/H3L: not allowed to both SetCurrentThreshold and MixControl at the same time.
+   *        If you want to use MixControl, please do not call SetCurrentThreshold.
    */
   virtual void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold) { (void)joint_motor_index; (void)current_threshold; }
   
@@ -87,10 +93,10 @@ class AGIBOT_EXPORT OmniHand {
   
   /**
    * @brief 0x03: Sets current thresholds of all joint motors in batch.
-   * @param current_thresholds Current threshold vector. Length depends on product type:
-   *                           - OmniHand 2025 (O10): 10 values
-   *                           - OmniHand Pro 2025 (O12): 12 values
-   * @note Serial port communication (RS485) does not support this interface.
+   * @param current_thresholds Current threshold vector.
+   * @note Serial port communication (USB/RS485) does not support this interface.
+   * @note O10/H3L: not allowed to both SetAllCurrentThreshold and MixControl at the same time.
+   *        If you want to use MixControl, please do not call SetAllCurrentThreshold.
    */
   virtual void SetAllCurrentThreshold(const std::vector<int16_t>& current_thresholds) { (void)current_thresholds; }
   
@@ -219,6 +225,10 @@ class AGIBOT_EXPORT OmniHand {
   // are not defined in base class. They are conditionally defined via interface IControlMode.
   
   // ============ Mixed Control ============
+  virtual MixCtrl MixControlByPT(uint8_t joint_motor_index, int16_t position, int16_t torque) {
+    (void)joint_motor_index; (void)position; (void)torque; return {};
+  }
+
   /**
    * @brief 0x14: Position + torque mixed control (MixControlMode::POSITION_TORQUE).
    * @param positions Target position per joint; array[i] maps to mix-control joint id i (0-based).
@@ -232,6 +242,10 @@ class AGIBOT_EXPORT OmniHand {
     return {};
   }
 
+  virtual MixCtrl MixControlByPV(uint8_t joint_motor_index, int16_t velocity, int16_t torque) {
+    (void)joint_motor_index; (void)velocity; (void)torque; return {};
+  }
+
   /**
    * @brief 0x14: Velocity + torque mixed control (MixControlMode::VELOCITY_TORQUE).
    * @param velocities Target velocity per joint; array[i] maps to mix-control joint id i (0-based).
@@ -242,6 +256,10 @@ class AGIBOT_EXPORT OmniHand {
     (void)velocities;
     (void)torques;
     return {};
+  }
+
+  virtual MixCtrl MixControlByPVT(uint8_t joint_motor_index, int16_t position, int16_t velocity, int16_t torque) {
+    (void)joint_motor_index; (void)position; (void)velocity; (void)torque; return {};
   }
 
   /**
@@ -435,7 +453,10 @@ class AGIBOT_EXPORT OmniHand {
    *       RS485 implementation does nothing (device ID is fixed at construction time).
    * @warning Changing device ID without proper documentation may result in device inaccessibility.
    */
-  virtual void SetDeviceId(unsigned char device_id) = 0;
+  virtual void SetDeviceId(unsigned char device_id) {
+    (void)device_id;  // Suppress unused parameter warning
+  };
+
   /**
    * @brief Destructor - public for pybind11 compatibility
    * @note Users should NOT instantiate this class directly - use product-specific classes instead.
@@ -444,10 +465,17 @@ class AGIBOT_EXPORT OmniHand {
   virtual ~OmniHand() = default;
 
   HandType GetHandType() const {
-    return is_left_hand_ ? HandType::LEFT : HandType::RIGHT;
+    return hand_type_;
+  }
+
+  void SetHandType(HandType hand_type) {
+    hand_type_ = hand_type;
+    OnHandTypeChanged();
   }
 
  protected:
+  virtual void OnHandTypeChanged() {}
+
   /**
    * @brief Initialize base class members
    * @param product_type Product type: ProductType::OMNIHAND_2025 (O10) or ProductType::OMNIHAND_PRO_2025 (O12)
@@ -457,12 +485,12 @@ class AGIBOT_EXPORT OmniHand {
   void Reset(ProductType product_type, unsigned char device_id, HandType hand_type) {
     product_type_ = product_type;
     device_id_ = device_id;
-    is_left_hand_ = (hand_type == HandType::LEFT);
+    hand_type_ = hand_type;
   }
 
   ProductType product_type_{ProductType::UNKNOWN};
   unsigned char device_id_{DEFAULT_DEVICE_ID};
-  bool is_left_hand_{true};
+  HandType hand_type_{HandType::LEFT};
   bool is_init_{false};
 };
 
