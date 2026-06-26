@@ -72,30 +72,6 @@ def control_single_hand(hand, hand_name):
     except Exception as e:
         print(f"  Warning: {e}")
 
-    # Read temperature report
-    print("\n--- Temperature Reports ---")
-    try:
-        periods = [500] * 10
-        hand.set_all_temperature_report_periods(periods)
-        time.sleep(0.5)
-
-        temperatures = hand.get_all_temperature_reports()
-        print(f"  All Joint Temperatures (°C): {temperatures}")
-    except Exception as e:
-        print(f"  Warning: {e}")
-
-    # Read current report
-    print("\n--- Current Reports ---")
-    try:
-        periods = [500] * 10
-        hand.set_all_current_report_periods(periods)
-        time.sleep(0.5)
-
-        currents = hand.get_all_current_reports()
-        print(f"  All Joint Currents: {currents}")
-    except Exception as e:
-        print(f"  Warning: {e}")
-
     # Read error report
     print("\n--- Error Reports ---")
     try:

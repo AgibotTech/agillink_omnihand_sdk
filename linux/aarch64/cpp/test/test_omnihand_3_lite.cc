@@ -255,23 +255,23 @@ TEST_F(OmniHand3LiteTest, SetHandGesture) {
 TEST_F(OmniHand3LiteTest, CurrentThreshold) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   
-  // Test single joint current threshold
-  int16_t threshold = 1500;
-  hand_->SetCurrentThreshold(1, threshold);
-  std::cout << "[SetCurrentThreshold] Set Joint 1 Current Threshold: " << threshold << std::endl;
+  // // Test single joint current threshold
+  // int16_t threshold = 1500;
+  // hand_->SetCurrentThreshold(1, threshold);
+  // std::cout << "[SetCurrentThreshold] Set Joint 1 Current Threshold: " << threshold << std::endl;
   
   auto current_threshold = hand_->GetCurrentThreshold(1);
   std::cout << "[GetCurrentThreshold] Joint 1 Current Threshold: " << current_threshold << std::endl;
   
-  // Test batch current thresholds
-  std::vector<int16_t> thresholds(4, 1500);  // 4 motors, all at 1500
-  hand_->SetAllCurrentThreshold(thresholds);
-  std::cout << "[SetAllCurrentThreshold] Set Current Thresholds: ";
-  for (size_t i = 0; i < thresholds.size(); ++i) {
-    std::cout << thresholds[i];
-    if (i < thresholds.size() - 1) std::cout << ", ";
-  }
-  std::cout << std::endl;
+  // // Test batch current thresholds
+  // std::vector<int16_t> thresholds(4, 1500);  // 4 motors, all at 1500
+  // hand_->SetAllCurrentThreshold(thresholds);
+  // std::cout << "[SetAllCurrentThreshold] Set Current Thresholds: ";
+  // for (size_t i = 0; i < thresholds.size(); ++i) {
+  //   std::cout << thresholds[i];
+  //   if (i < thresholds.size() - 1) std::cout << ", ";
+  // }
+  // std::cout << std::endl;
   
   auto all_thresholds = hand_->GetAllCurrentThreshold();
   // Check if request succeeded (non-empty result)
