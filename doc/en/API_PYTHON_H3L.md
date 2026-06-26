@@ -242,6 +242,9 @@ def get_all_joint_motor_velo(self) -> List[int]: ...
 
 ### Current Threshold Control
 
+> **Note**: O10/H3L: not allowed to use current threshold control and MixControl at the same time.
+> If you want to use MixControl, please do not call the current threshold interfaces.
+
 ```python
 def set_current_threshold(self, joint_motor_index: int, current_threshold: int) -> None: ...
 def get_current_threshold(self, joint_motor_index: int) -> int: ...

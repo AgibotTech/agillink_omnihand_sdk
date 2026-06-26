@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // OmniHand Pro 2025 SDK is licensed under Mulan PSL v2.
 
 /**
@@ -332,7 +332,7 @@ class AGIBOT_EXPORT OmniHandPro2025Solver {
   /**
    * @brief Get min/max motor input for a given actuator (0-based index, 0=ActuatorIndex1 … 11=ActuatorThumbMCP)
    */
-  static Int16Bound GetMotorPositionRange(uint8_t actuator_index) {
+  static constexpr Int16Bound GetMotorPositionRange(uint8_t actuator_index) {
     if (actuator_index >= ActuatorCount) return {0, 0};
     int16_t mn = static_cast<int16_t>(kMotorInputMin[actuator_index]);
     int16_t mx = static_cast<int16_t>(kMotorInputMax[actuator_index]);

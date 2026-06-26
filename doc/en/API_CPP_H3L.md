@@ -217,6 +217,9 @@ std::vector<int16_t> GetAllJointMotorVelo() const;
 
 ### Current Threshold Control
 
+> **Note**: O10/H3L: not allowed to both SetCurrentThreshold/SetAllCurrentThreshold and MixControl at the same time.
+> If you want to use MixControl, please do not call the current threshold interfaces.
+
 ```cpp
 void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold);
 int16_t GetCurrentThreshold(unsigned char joint_motor_index) const;
@@ -227,8 +230,15 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 ### Mixed Control
 
 ```cpp
+MixCtrl MixControlByPT(uint8_t joint_motor_index,
+                       int16_t position,
+                       int16_t torque);
 std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
                                     const std::vector<int16_t>& torques);
+MixCtrl MixControlByPVT(uint8_t joint_motor_index,
+                        int16_t position,
+                        int16_t velocity,
+                        int16_t torque);
 std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
                                      const std::vector<int16_t>& velocities,
                                      const std::vector<int16_t>& torques);

@@ -217,6 +217,8 @@ std::vector<int16_t> GetAllJointMotorVelo() const;
 
 ### 电流阈值控制
 
+> **注意**：O10/H3L 不允许同时使用电流阈值控制和混合控制。如需使用混合控制，请勿调用电流阈值接口。
+
 ```cpp
 void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold);
 int16_t GetCurrentThreshold(unsigned char joint_motor_index) const;
@@ -227,8 +229,15 @@ std::vector<int16_t> GetAllCurrentThreshold() const;
 ### 混合控制
 
 ```cpp
+MixCtrl MixControlByPT(uint8_t joint_motor_index,
+                       int16_t position,
+                       int16_t torque);
 std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
                                     const std::vector<int16_t>& torques);
+MixCtrl MixControlByPVT(uint8_t joint_motor_index,
+                        int16_t position,
+                        int16_t velocity,
+                        int16_t torque);
 std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
                                      const std::vector<int16_t>& velocities,
                                      const std::vector<int16_t>& torques);

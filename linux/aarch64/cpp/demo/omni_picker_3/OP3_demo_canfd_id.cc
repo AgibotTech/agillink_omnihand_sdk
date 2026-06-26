@@ -114,22 +114,18 @@ void PrintVector(const std::string& name, const std::vector<T>& values) {
   std::cout << "]" << std::endl;
 }
 
-void PrintTactilePreview(const oh::TactileSensorData& sensor) {
+void PrintTactilePreview(const oh::TactileSensorDataU16& sensor) {
   constexpr size_t kPreviewSize = 16;
   const size_t preview_size = std::min(kPreviewSize, sensor.data_.size());
 
-  std::cout << oh::ToString(sensor.sensor_id_) << " tactile raw bytes: "
-            << sensor.data_.size();
-  if (sensor.data_.size() >= 2) {
-    std::cout << " (" << (sensor.data_.size() / 2) << " uint16 points)";
-  }
-  std::cout << ", preview: [";
+  std::cout << oh::ToString(sensor.sensor_id_) << " tactile: "
+            << sensor.data_.size() << " points, preview: [";
 
   for (size_t i = 0; i < preview_size; ++i) {
     if (i > 0) {
       std::cout << ", ";
     }
-    std::cout << static_cast<unsigned int>(sensor.data_[i]);
+    std::cout << sensor.data_[i];
   }
   if (preview_size < sensor.data_.size()) {
     std::cout << ", ...";
@@ -255,6 +251,11 @@ void DemoMixControl(oh::OmniPicker3& hand) {
 
 void DemoTactileSensor(oh::OmniPicker3& hand) {
   std::cout << "\n========== Tactile Sensor ==========" << std::endl;
+
+  if (!hand.InitTactilePointsMap()) {
+    std::cerr << "InitTactilePointsMap failed" << std::endl;
+    return;
+  }
 
   const auto& sensor_order = hand.GetSensorOrder();
   std::cout << "GetSensorOrder(): [";

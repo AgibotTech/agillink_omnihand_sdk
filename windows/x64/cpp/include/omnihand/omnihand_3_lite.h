@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "i_tactile_sensor_1d_u16.h"
 #include "omnihand/export_symbols.h"
 #include "omnihand/kinematics/omnihand_3_lite/omnihand_3_lite_solver.h"
 #include "omnihand/omnihand.h"
@@ -34,7 +35,7 @@ namespace omnihand {
  *       Use motor position control (SetJointMotorPosi, SetAllJointMotorPosi) instead.
  *       Gesture control is available via SetHandGesture() with OmniHand3LiteGesture enum.
  */
-class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
+class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, public ITactileSensor1DU16 {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 4;  // DoA
@@ -198,7 +199,7 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
    * @return Vector of joint names
    */
   std::vector<std::string> GetJointNames() const override {
-    const std::string p = is_left_hand_ ? "L_" : "R_";
+    const std::string p = hand_type_ == HandType::LEFT ? "L_" : "R_";
     // because of doesn't have URDF, so we hardcode the joint names
     return {
       p + "joint1",  // 1
@@ -208,34 +209,34 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
     };
   }
 
-  static uint8_t GetNumOfJointMotors() {
+  static constexpr uint8_t GetNumOfJointMotors() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoA() {
+  static constexpr uint8_t GetDoA() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoP() {
+  static constexpr uint8_t GetDoP() {
     return kDegreesOfPassiveFreedom;
   }
 
-  static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return OmniHand3LiteSolver::GetMotorPositionRange();
   }
 
-  static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return kActualMotorPositionBound;
   }
 
-  static Int16Range GetMinMaxDefaultMixCtrlVelocity(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMixCtrlVelocity(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
     return kMixCtrlVelocityRange;
   }
 
-  static Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
     return kMixCtrlTorqueRange;
   }
@@ -261,11 +262,15 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand {
    */
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_3_LITE, device_id, hand_type);
-    solver_ = std::make_unique<OmniHand3LiteSolver>(is_left_hand_);
+    solver_ = std::make_unique<OmniHand3LiteSolver>(hand_type_ == HandType::LEFT);
+  }
+
+  void OnHandTypeChanged() override {
+    solver_ = std::make_unique<OmniHand3LiteSolver>(hand_type_ == HandType::LEFT);
   }
 
   std::unique_ptr<OmniHand3LiteSolver> solver_;
-  static constexpr Int16Bound kActualMotorPositionBound = {0, 4096};
+  static constexpr Int16Bound kActualMotorPositionBound = {0, 4095};
   static constexpr Int16Range kMixCtrlVelocityRange = {0, 23767, 8000}; // unit: rpm
   static constexpr Int16Range kMixCtrlTorqueRange = {0, 1000, 300}; // unit: mA
 };

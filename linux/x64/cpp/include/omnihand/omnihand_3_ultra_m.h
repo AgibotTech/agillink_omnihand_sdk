@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
@@ -219,24 +219,24 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
     };
   }
 
-  static uint8_t GetNumOfJointMotors() {
+  static constexpr uint8_t GetNumOfJointMotors() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoA() {
+  static constexpr uint8_t GetDoA() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoP() {
+  static constexpr uint8_t GetDoP() {
     return kDegreesOfPassiveFreedom;
   }
 
-  static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return h3um::OmniHand3UltraMSolver::GetMotorPositionRange();
   }
 
-  static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return kActualMotorPositionBound;
   }
@@ -307,10 +307,11 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    *       joint_motor_solver_ directly without re-implementing init logic.
    */
   void Reset(uint8_t device_id, HandType hand_type);
+  void OnHandTypeChanged() override;
 
   /**
    * @brief Per-joint linear rad <-> motor-tick solver for OmniHand 3 Ultra.
-   *        Bound to kLeft / kRight inside Reset() based on is_left_hand_.
+   *        Bound to kLeft / kRight inside Reset() based on hand_type_.
    *        Shared by every transport implementation.
    */
   std::unique_ptr<h3um::OmniHand3UltraMSolver> joint_motor_solver_;

@@ -8,6 +8,7 @@ Demonstrates position+torque mixed control via mix_control_by_pt(),
 alternating between two sets of position/torque parameters.
 
 Supports multiple connection types: ZLG CANFD, HCAN, RS485, ZLG TCP, USB CDC serial, SocketCAN, TJ.
+Note: single-axis mix_control_by_pt is not available over USB/RS485.
 Run with -h or --help to see all available options and usage examples.
 """
 
@@ -123,6 +124,7 @@ def main():
     print("[OK]: OmniHand 2025 hand initialized successfully!\n")
 
     NUM_JOINTS = 10
+    is_serial = args.device in ('rs485', 'usb')
 
     for cycle in range(6):
         if cycle % 2 == 0:
@@ -135,6 +137,11 @@ def main():
         print(f"[Cycle {cycle}] mix_control_by_pt pos[0]={positions[0]} torque[0]={torques[0]}")
         hand.mix_control_by_pt(positions, torques)
         time.sleep(1.5)
+
+        if not is_serial:
+            print(f"[Cycle {cycle}] mix_control_by_pt single-joint: joint=1 pos={positions[0]} torque={torques[0]}")
+            hand.mix_control_by_pt(1, positions[0], torques[0])
+            time.sleep(0.5)
 
     print("\n[Done]: Mix control demo completed!")
 

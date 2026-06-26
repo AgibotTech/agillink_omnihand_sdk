@@ -532,6 +532,9 @@ O10 does not support switching control modes via `set_control_mode`. It operates
 
 ## Current Threshold Control
 
+> **Note**: O10/H3L: not allowed to use current threshold control and MixControl at the same time.
+> If you want to use MixControl, please do not call the current threshold interfaces.
+
 ```python
 def set_current_threshold(self, joint_motor_index: int, current_threshold: int) -> None:
     """Sets the current threshold of a single joint motor.

@@ -435,11 +435,11 @@ TEST_F(OmniHand2025CanfdTest, GetAllJointMotorVelo) {
 
 TEST_F(OmniHand2025CanfdTest, SetGetAllCurrentThreshold) {
   RequireDevice();
-  
-  std::vector<int16_t> thresholds(10, 1500);
-  hand_->SetAllCurrentThreshold(thresholds);
-  std::cout << "[SetAllCurrentThreshold] All joints -> 1000mA" << std::endl;
-  
+
+  // std::vector<int16_t> thresholds(10, 1500);
+  // hand_->SetAllCurrentThreshold(thresholds);
+  // std::cout << "[SetAllCurrentThreshold] All joints -> 1000mA" << std::endl;
+
   auto current_thresholds = hand_->GetAllCurrentThreshold();
   std::cout << "[GetAllCurrentThreshold] ";
   for (size_t i = 0; i < current_thresholds.size(); ++i) {
@@ -465,8 +465,8 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPVT) {
   // Safe positions from Python demo (per joint)
   const int16_t safe_pos[10] = {2048, 2048, 4096, 2048, 4096, 4096, 2048, 4096, 2048, 4096};
   std::vector<int16_t> positions(safe_pos, safe_pos + 10);
-  std::vector<int16_t> velocities(10, 50);
-  std::vector<int16_t> torques(10, 0);
+  std::vector<int16_t> velocities(10, 8000);
+  std::vector<int16_t> torques(10, 300);
   
   (void)hand_->MixControlByPVT(positions, velocities, torques);
   std::cout << "[MixControlByPVT] all 10 joints" << std::endl;
@@ -481,6 +481,10 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPVT) {
   std::cout << std::endl;
   
   EXPECT_EQ(feedback_pos.size(), 10);
+
+  (void)hand_->MixControlByPVT(1, safe_pos[0], 50, 0);
+  std::cout << "[MixControlByPVT] single joint 1 pos=" << safe_pos[0] << " vel=50" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 TEST_F(OmniHand2025CanfdTest, GetJointMotorVelo) {
@@ -505,6 +509,10 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPT) {
   (void)hand_->MixControlByPT(positions, torques);
   std::cout << "[MixControlByPT] all 10 joints" << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  
+  (void)hand_->MixControlByPT(1, safe_pos[0], 0);
+  std::cout << "[MixControlByPT] single joint 1 pos=" << safe_pos[0] << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   
   SUCCEED();
 }

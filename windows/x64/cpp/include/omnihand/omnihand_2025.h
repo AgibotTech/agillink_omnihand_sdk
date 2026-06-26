@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
@@ -253,7 +253,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
    *       `omnihand_sdk/assets/omnihand_description`.
    */
   std::vector<std::string> GetJointNames() const override {
-    const std::string p = is_left_hand_ ? "L_" : "R_";
+    const std::string p = hand_type_ == HandType::LEFT ? "L_" : "R_";
     return {
       p + "thumb_roll_joint",
       p + "thumb_abad_joint",
@@ -268,19 +268,19 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
     };
   }
 
-  static uint8_t GetNumOfJointMotors() {
+  static constexpr uint8_t GetNumOfJointMotors() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoA() {
+  static constexpr uint8_t GetDoA() {
     return kDegreesOfActiveFreedom;
   }
 
-  static uint8_t GetDoP() {
+  static constexpr uint8_t GetDoP() {
     return kDegreesOfPassiveFreedom;
   }
 
-  static Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return o10::OmniHand2025Solver::GetMotorPositionRange();
   }
@@ -289,7 +289,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
     return o10::OmniHand2025Solver::GetJointAngleRange(joint_motor_index - 1, hand_type == HandType::LEFT);
   }
 
-  static Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
+  static constexpr Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
     if (joint_motor_index == o10::ActiveJointIndexAbAd + 1 ||
         joint_motor_index == o10::ActiveJointRingAbAd + 1 ||
@@ -299,12 +299,12 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
     return kActualMotorPositionBound;
   }
 
-  static Int16Range GetMinMaxDefaultMixCtrlVelocity(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMixCtrlVelocity(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
     return kMixCtrlVelocityRange;
   }
 
-  static Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
+  static constexpr Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
     return kMixCtrlTorqueRange;
   }
@@ -339,15 +339,19 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_2025, device_id, hand_type);
     // Automatically initialize kinematics solver
-    kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(is_left_hand_);
+    kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(hand_type_ == HandType::LEFT);
+  }
+
+  void OnHandTypeChanged() override {
+    kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(hand_type_ == HandType::LEFT);
   }
 
   /**
    * @brief Kinematics solver for OmniHand 2025 (O10)
    */
   std::unique_ptr<o10::OmniHand2025Solver> kinematics_solver_;
-  static constexpr Int16Bound kActualMotorPositionBound = {0, 4096};
-  static constexpr Int16Bound kActualSideMotorPositionBound = {0, 1024}; // 4, 7 ,9
+  static constexpr Int16Bound kActualMotorPositionBound = {0, 4095};
+  static constexpr Int16Bound kActualSideMotorPositionBound = {0, 1023}; // 4, 7 ,9
   static constexpr Int16Range kMixCtrlVelocityRange = {0, 23767, 8000}; // unit: rpm
   static constexpr Int16Range kMixCtrlTorqueRange = {0, 1000, 300}; // unit: mA
 };

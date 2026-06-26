@@ -112,6 +112,8 @@ SUBSYSTEM=="usb", ATTRS{idVendor}=="04da", ATTRS{idProduct}=="0f02", MODE="0666"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="a8fa", ATTRS{idProduct}=="8598", MODE="0666"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", MODE="0666"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="3325", ATTRS{idProduct}=="0049", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1001", ATTRS{idProduct}=="03ef", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1001", ATTRS{idProduct}=="df11", MODE="0666"
 
 EOF
 

@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <string>
+#include <cstdint>
 
 namespace agilink {
 namespace omnihand {
@@ -77,6 +78,19 @@ struct DoubleRange {
   double min_value;
   double max_value;
   double default_value;
+};
+
+struct ScannedCanfdDeviceInfo {
+  uint8_t canfd_device_id{0};
+  uint8_t num_channels{0};
+  std::string serial_number;
+  std::string dev_name;
+};
+
+struct ScannedSerialDeviceInfo {
+  std::string port;
+  std::string description;
+  std::string hardware_id;
 };
 
 }  // namespace omnihand

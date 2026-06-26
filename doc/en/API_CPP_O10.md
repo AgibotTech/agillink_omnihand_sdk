@@ -482,6 +482,8 @@ O10 does not support switching control modes via `SetControlMode`. It operates i
  * @param joint_motor_index The index of the joint motor (1-10).
  * @param current_threshold The current threshold value.
  * @note This interface is not supported for serial port communication (RS485).
+ * @note O10/H3L: not allowed to both SetCurrentThreshold and MixControl at the same time.
+ *       If you want to use MixControl, please do not call SetCurrentThreshold.
  */
 void SetCurrentThreshold(unsigned char joint_motor_index, int16_t current_threshold);
 
@@ -497,6 +499,8 @@ int16_t GetCurrentThreshold(unsigned char joint_motor_index) const;
  * @brief Sets the current thresholds of all joint motors in batch.
  * @param current_thresholds A vector of current thresholds. Must have 10 values.
  * @note This interface is not supported for serial port communication (RS485).
+ * @note O10/H3L: not allowed to both SetAllCurrentThreshold and MixControl at the same time.
+ *       If you want to use MixControl, please do not call SetAllCurrentThreshold.
  */
 void SetAllCurrentThreshold(const std::vector<int16_t>& current_thresholds);
 
@@ -526,8 +530,15 @@ Only the following mode is currently available:
  * @note Pure torque control (TORQUE) is not supported.
  * @note This interface is not supported for serial port communication (RS485).
  */
+MixCtrl MixControlByPT(uint8_t joint_motor_index,
+                       int16_t position,
+                       int16_t torque);
 std::vector<MixCtrl> MixControlByPT(const std::vector<int16_t>& positions,
                                     const std::vector<int16_t>& torques);
+MixCtrl MixControlByPVT(uint8_t joint_motor_index,
+                        int16_t position,
+                        int16_t velocity,
+                        int16_t torque);
 std::vector<MixCtrl> MixControlByPVT(const std::vector<int16_t>& positions,
                                      const std::vector<int16_t>& velocities,
                                      const std::vector<int16_t>& torques);
