@@ -247,12 +247,20 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
     ThrowUnsupported("SendBroadcastFrameByCanfd");
   };
 
+  virtual void SendMitFrameAsync(const Op1USBCtrlFrame& frame) {
+    ThrowUnsupported("SendFrameSyncByCanfd");
+  };
+
   /**
    * @brief Returns the CANFD frame byte encoding ranges for position, velocity, and torque.
    */
   virtual Op1CanfdFrameRange GetCanfdFrameRange() {
     ThrowUnsupported("GetCanfdFrameRange");
   }
+
+  virtual Op1USBRange GetMitFrameRange() {
+    ThrowUnsupported("GetMitFrameRange");
+  };
 
   /**
    * @brief Move the gripper to a position expressed as a normalized ratio [0.0, 1.0].
@@ -276,7 +284,9 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    *       After reboot, the USB and CAN connections will be lost.
    * @return true if the calibration request was sent successfully.
    */
-  virtual bool StartMotorCalibration() = 0;
+  virtual bool StartMotorCalibration() {
+    ThrowUnsupported("StartMotorCalibration");
+  };
 
   /**
    * @brief Reboot the device via Fibre USB protocol.
@@ -284,7 +294,9 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    *       re-establish connections after the device re-enumerates.
    * @return true if the reboot request was sent successfully.
    */
-  virtual bool Reboot() = 0;
+  virtual bool Reboot() {
+    ThrowUnsupported("Reboot");
+  };
 
   /**
    * @brief Set CAN bus node ID (disables motor, writes new ID, saves config).
@@ -292,23 +304,23 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    * @param node_id New CAN bus node ID
    * @return true if the operation was sent successfully.
    */
-  virtual bool SetCanNodeId(uint8_t node_id) = 0;
+  virtual bool SetCanNodeId(uint8_t node_id) {
+    ThrowUnsupported("SetCanNodeId");
+  };
 
   /**
    * @brief Get CAN bus node ID via USB Fibre protocol.
    * @return CAN bus node ID, or 0 if failed.
    */
-  virtual uint8_t GetCanNodeId() = 0;
+  virtual uint8_t GetCanNodeId() {
+    ThrowUnsupported("GetCanNodeId");
+  };
 
   /**
    * @brief Show device information via USB Fibre protocol (device type, serial number, firmware version, CAN node ID).
    * @note This is equivalent to typing "ref0" in the REF-CLI tool.
    */
   virtual Op1DeviceInfo ShowDeviceInfo() const = 0;
-  virtual Op1USBRange GetMitFrameRange() = 0;
-  virtual void SendMitFrameAsync(const Op1USBCtrlFrame& frame) {
-    ThrowUnsupported("SendFrameSyncByCanfd");
-  };
 
   // ============ Factory Methods ============
   static std::unique_ptr<OmniPicker2025> createHandByUSB();

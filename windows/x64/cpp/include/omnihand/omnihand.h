@@ -72,6 +72,10 @@ class AGIBOT_EXPORT OmniHand {
     return {};
   };
 
+  virtual uint8_t GetHandDeviceId() const {
+    return device_id_;
+  }
+
   // ============ Current Threshold ============
   /**
    * @brief 0x03: Sets the current threshold of a single joint motor.
