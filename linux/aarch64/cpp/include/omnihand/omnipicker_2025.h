@@ -9,6 +9,7 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 #include "omnihand/export_symbols.h"
 #include "omnihand/i_o10_tactile_sensor_1d.h"
@@ -27,7 +28,7 @@ namespace omnihand {
  * OP1 uses a compact 5-byte command payload. Each field is encoded as one
  * unsigned command byte and passed through to the gripper firmware.
  */
-struct AGIBOT_EXPORT Op1ControlFrame {
+struct AGIBOT_EXPORT Op1CanfdCtrlFrame {
   uint8_t pos_cmd;    ///< Position command. 0x00 means closed/minimum position.
   uint8_t vel_cmd;    ///< Motor velocity command. 0x00 means zero velocity.
   uint8_t force_cmd;  ///< Grip force command, mapped to motor torque by firmware.
@@ -41,20 +42,37 @@ struct AGIBOT_EXPORT Op1ControlFrame {
  * The response mirrors the firmware report format: fault and motion state are
  * followed by current position, velocity, and force feedback bytes.
  */
-struct AGIBOT_EXPORT Op1StateFrame {
+struct AGIBOT_EXPORT Op1CanfdStateFrame {
   uint8_t fault_code;  ///< Fault code, see @ref Op1FaultCode.
   uint8_t state;       ///< Motion state, see @ref Op1State.
   uint8_t pos;         ///< Current position feedback.
   uint8_t vel;         ///< Current velocity feedback.
   uint8_t force;       ///< Current force feedback.
 };
+
+struct AGIBOT_EXPORT Op1USBRange {
+  float pos_min, pos_max;
+  float vel_min, vel_max;
+  float tor_min, tor_max;
+  float kp_min, kp_max;
+  float kd_min, kd_max;
+};
+
+struct AGIBOT_EXPORT Op1USBCtrlFrame {
+  float pos;
+  float vel;
+  float tor;
+  float kp;
+  float kd;
+};
+
 #pragma pack(pop)
 
-static_assert(sizeof(Op1ControlFrame) == 5);
-static_assert(sizeof(Op1StateFrame) == 5);
+static_assert(sizeof(Op1CanfdCtrlFrame) == 5);
+static_assert(sizeof(Op1CanfdStateFrame) == 5);
 
 /**
- * @brief OP1 fault codes reported in Op1StateFrame::fault_code.
+ * @brief OP1 fault codes reported in Op1CanfdStateFrame::fault_code.
  */
 enum class AGIBOT_EXPORT Op1FaultCode : uint8_t {
   NO_FAULT = 0x00,       ///< No fault.
@@ -65,7 +83,7 @@ enum class AGIBOT_EXPORT Op1FaultCode : uint8_t {
 };
 
 /**
- * @brief OP1 motion states reported in Op1StateFrame::state.
+ * @brief OP1 motion states reported in Op1CanfdStateFrame::state.
  */
 enum class AGIBOT_EXPORT Op1State : uint8_t {
   ARRIVERED = 0x00,  ///< Target has been reached.
@@ -75,11 +93,11 @@ enum class AGIBOT_EXPORT Op1State : uint8_t {
 };
 
 enum class AGIBOT_EXPORT Op1MotorRequestState : uint8_t {
-  MOTOR_STATE_IDLE = 0,        ///< Motor disabled (失能)
-  MOTOR_STATE_RUN = 1,         ///< Motor enabled (使能)
-  MOTOR_STATE_CALIBRATION = 2, ///< Motor calibration in progress (校准中)
-  MOTOR_STATE_BRAKE = 3,       ///< Motor brake (刹车)
-  MOTOR_STATE_PLAY_TONE = 5,   ///< Play tone (蜂鸣)
+  MOTOR_STATE_IDLE = 0,         ///< Motor disabled
+  MOTOR_STATE_RUN = 1,          ///< Motor enabled
+  MOTOR_STATE_CALIBRATION = 2,  ///< Motor calibration in progress
+  MOTOR_STATE_BRAKE = 3,        ///< Motor brake
+  MOTOR_STATE_PLAY_TONE = 5,    ///< Play tone
 };
 
 /**
@@ -87,12 +105,18 @@ enum class AGIBOT_EXPORT Op1MotorRequestState : uint8_t {
  */
 AGIBOT_EXPORT inline std::string ToString(Op1MotorRequestState state) {
   switch (state) {
-    case Op1MotorRequestState::MOTOR_STATE_IDLE:        return "IDLE";
-    case Op1MotorRequestState::MOTOR_STATE_RUN:         return "RUN";
-    case Op1MotorRequestState::MOTOR_STATE_CALIBRATION: return "CALIBRATION";
-    case Op1MotorRequestState::MOTOR_STATE_BRAKE:       return "BRAKE";
-    case Op1MotorRequestState::MOTOR_STATE_PLAY_TONE:   return "PLAY_TONE";
-    default:                                            return "UNKNOWN";
+    case Op1MotorRequestState::MOTOR_STATE_IDLE:
+      return "IDLE";
+    case Op1MotorRequestState::MOTOR_STATE_RUN:
+      return "RUN";
+    case Op1MotorRequestState::MOTOR_STATE_CALIBRATION:
+      return "CALIBRATION";
+    case Op1MotorRequestState::MOTOR_STATE_BRAKE:
+      return "BRAKE";
+    case Op1MotorRequestState::MOTOR_STATE_PLAY_TONE:
+      return "PLAY_TONE";
+    default:
+      return "UNKNOWN";
   }
 }
 
@@ -115,7 +139,7 @@ AGIBOT_EXPORT std::string ToString(Op1State state);
  * @param frame Raw OP1 state frame.
  * @return Single-line string containing decoded fault/state labels and raw byte values.
  */
-AGIBOT_EXPORT std::string ToString(const Op1StateFrame& frame);
+AGIBOT_EXPORT std::string ToString(const Op1CanfdStateFrame& frame);
 
 /**
  * @brief Streams an OP1 fault code using ToString(Op1FaultCode).
@@ -128,29 +152,29 @@ AGIBOT_EXPORT std::ostream& operator<<(std::ostream& os, Op1FaultCode fault_code
 AGIBOT_EXPORT std::ostream& operator<<(std::ostream& os, Op1State state);
 
 /**
- * @brief Streams an OP1 state frame using ToString(const Op1StateFrame&).
+ * @brief Streams an OP1 state frame using ToString(const Op1CanfdStateFrame&).
  */
-AGIBOT_EXPORT std::ostream& operator<<(std::ostream& os, const Op1StateFrame& frame);
+AGIBOT_EXPORT std::ostream& operator<<(std::ostream& os, const Op1CanfdStateFrame& frame);
 
 struct AGIBOT_EXPORT Op1MotorInfo {
-  uint32_t error_code{0};       ///< Motor error code (0 = no error)
-  uint32_t ctrl_mode{0};        ///< Control mode
-  float current_limit{0};       ///< Current limit (A)
-  float velocity_limit{0};      ///< Velocity limit (rad/s)
-  float pos_gain{0};            ///< Position gain
-  float vel_gain{0};            ///< Velocity gain
-  uint8_t calib_valid{0};       ///< Motor calibration valid (0 = invalid, 1 = valid)
-  uint8_t enable_on_boot{0};    ///< Enable motor on boot (0 = disabled, 1 = enabled)
+  uint32_t error_code{0};     ///< Motor error code (0 = no error)
+  uint32_t ctrl_mode{0};      ///< Control mode
+  float current_limit{0};     ///< Current limit (A)
+  float velocity_limit{0};    ///< Velocity limit (rad/s)
+  float pos_gain{0};          ///< Position gain
+  float vel_gain{0};          ///< Velocity gain
+  uint8_t calib_valid{0};     ///< Motor calibration valid (0 = invalid, 1 = valid)
+  uint8_t enable_on_boot{0};  ///< Enable motor on boot (0 = disabled, 1 = enabled)
 };
 
 struct AGIBOT_EXPORT Op1DeviceInfo {
-  uint8_t device_type{0};    ///< Device type
-  uint8_t can_node_id{0};    ///< CAN bus node ID
-  uint8_t debug_flag{0};     ///< Debug flag
-  uint32_t serial_number{0}; ///< Serial number
-  Version fw_version;        ///< Firmware version
-  uint32_t fw_hash{0};       ///< Firmware hash
-  Op1MotorInfo motor;        ///< Motor information
+  uint8_t device_type{0};     ///< Device type
+  uint8_t can_node_id{0};     ///< CAN bus node ID
+  uint8_t debug_flag{0};      ///< Debug flag
+  uint32_t serial_number{0};  ///< Serial number
+  Version fw_version;         ///< Firmware version
+  uint32_t fw_hash{0};        ///< Firmware hash
+  Op1MotorInfo motor;         ///< Motor information
 };
 
 /**
@@ -176,7 +200,6 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
   }
 
  public:
-
   static constexpr uint8_t kDegreesOfActiveFreedom = 1;
   static constexpr uint8_t kDefaultHandDeviceId = 1u;
 
@@ -188,7 +211,39 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    * @return Device state frame when a valid response is received; std::nullopt on timeout,
    *         transport failure, or invalid response length.
    */
-  virtual std::optional<Op1StateFrame> SendFrameSync(const Op1ControlFrame& frame) = 0;
+  virtual std::optional<Op1CanfdStateFrame> SendFrameSyncByCanfd(const Op1CanfdCtrlFrame& frame) {
+    ThrowUnsupported("SendFrameSyncByCanfd");
+  };
+
+  /**
+   * @brief Sends one CANFD FD broadcast frame (CAN ID=0, 64 bytes) to up to 8 OP1 nodes simultaneously.
+   *
+   * The 64-byte frame is partitioned into 8 fixed slots of 8 bytes each:
+   *   slot offset = (node_id - 1) * 8
+   * Each node on the bus reads only its own slot; slots never overlap.
+   *
+   * @warning Node IDs not present in @p commands have their slot left as all-zeros,
+   *          which the firmware interprets as a valid command (pos=0, vel=0, force=0).
+   *          To avoid unintentional motion on other nodes, pass an entry for every
+   *          active node on the bus, or use SendFrameSyncByCanfd for single-node control.
+   *
+   * The frame is fire-and-forget — no per-node response is collected.
+   *
+   * @param commands Node-ID-to-frame pairs. Node IDs outside [1, 8] are silently ignored.
+   * @return true if the frame was dispatched to the CAN driver; false on device error.
+   */
+  virtual bool SendBroadcastFrameByCanfd(const std::vector<std::pair<uint8_t, Op1CanfdCtrlFrame>>& commands) {
+    ThrowUnsupported("SendBroadcastFrameByCanfd");
+  };
+
+  /**
+   * @brief Move the gripper to a position expressed as a normalized ratio [0.0, 1.0].
+   * @param ratio 0.0 = fully closed, 1.0 = fully open.
+   * @return Resulting raw position command sent to the motor, or -1 on error.
+   */
+  virtual int16_t SetPositionRatio(float ratio) {
+    ThrowUnsupported("SetPositionRatio");
+  }
 
   virtual void UpdateFirmwareViaFlash(const std::string&, OtaProgressCallback = nullptr) {
     ThrowUnsupported("UpdateFirmwareViaFlash");
@@ -232,16 +287,13 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    * @note This is equivalent to typing "ref0" in the REF-CLI tool.
    */
   virtual Op1DeviceInfo ShowDeviceInfo() const = 0;
-
-  /**
-   * @brief Set position ratio (0.0 to 1.0) for joint motor position command.
-   * @param ratio Position ratio, clamped to [0.0, 1.0]
-   * @return Actual position (0-255) from device, or -1 on failure.
-   */
-  virtual int16_t SetPositionRatio(float ratio) = 0;
+  virtual Op1USBRange GetMitFrameRange() = 0;
+  virtual void SendMitFrameAsync(const Op1USBCtrlFrame& frame) {
+    ThrowUnsupported("SendFrameSyncByCanfd");
+  };
 
   // ============ Factory Methods ============
-
+  static std::unique_ptr<OmniPicker2025> createHandByUSB();
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by canfd_device_id
    * @param hand_type Hand type (left/right)
@@ -352,7 +404,7 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
       uint8_t hand_device_id,
       const std::string& marvin_controller_ip);
 #endif
-  
+
   /**
    * @brief Returns the number of joint motors.
    * @return Number of joint motors (12)
@@ -381,7 +433,11 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
     return kMotorTorqueRange;
   }
 
-  protected:
+  // OP1 is a 1-DOF gripper; the multi-joint OmniHand position interface maps to the single motor.
+  int16_t GetJointMotorPosi(unsigned char) const override { return 0; }
+  std::vector<int16_t> GetAllJointMotorPosi() const override { return {0}; }
+
+ protected:
   /**
    * @brief Initialize common base-class metadata for OP1.
    * @param device_id Hand device ID.
