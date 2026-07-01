@@ -75,6 +75,8 @@ struct AGIBOT_EXPORT Op1CanfdFrameRange {
   UInt8Bound pos;  ///< Position byte range. pos=0 is fully closed; pos=max is fully open.
   UInt8Range vel;  ///< Velocity byte range.
   UInt8Range tor;  ///< Force/torque byte range.
+  UInt8Range acc;  ///< Acceleration byte range. 0 is rejected by firmware; use 255 for max.
+  UInt8Range dec;  ///< Deceleration byte range. 0 is rejected by firmware; use 255 for max.
 };
 
 /**
