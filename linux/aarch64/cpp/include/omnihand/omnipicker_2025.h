@@ -71,6 +71,14 @@ struct AGIBOT_EXPORT Op1USBCtrlFrame {
 static_assert(sizeof(Op1CanfdCtrlFrame) == 5);
 static_assert(sizeof(Op1CanfdStateFrame) == 5);
 
+struct AGIBOT_EXPORT Op1CanfdFrameRange {
+  UInt8Bound pos;  ///< Position byte range. pos=0 is fully closed; pos=max is fully open.
+  UInt8Range vel;  ///< Velocity byte range.
+  UInt8Range tor;  ///< Force/torque byte range.
+  UInt8Range acc;  ///< Acceleration byte range. 0 is rejected by firmware; use 255 for max.
+  UInt8Range dec;  ///< Deceleration byte range. 0 is rejected by firmware; use 255 for max.
+};
+
 /**
  * @brief OP1 fault codes reported in Op1CanfdStateFrame::fault_code.
  */
@@ -188,6 +196,11 @@ AGIBOT_EXPORT std::string ToString(const Op1MotorInfo& motor);
 AGIBOT_EXPORT std::string ToString(const Op1DeviceInfo& info);
 
 /**
+ * @brief Formats OP1 CANFD frame byte ranges into a readable string.
+ */
+AGIBOT_EXPORT std::string ToString(const Op1CanfdFrameRange& range);
+
+/**
  * @brief OmniPicker 2025 (OP1) public interface.
  *
  * OmniPicker 2025 is a 1-DOF gripper that exposes a compact raw command/feedback
@@ -236,6 +249,21 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
     ThrowUnsupported("SendBroadcastFrameByCanfd");
   };
 
+  virtual void SendMitFrameAsync(const Op1USBCtrlFrame& frame) {
+    ThrowUnsupported("SendFrameSyncByCanfd");
+  };
+
+  /**
+   * @brief Returns the CANFD frame byte encoding ranges for position, velocity, and torque.
+   */
+  virtual Op1CanfdFrameRange GetCanfdFrameRange() {
+    ThrowUnsupported("GetCanfdFrameRange");
+  }
+
+  virtual Op1USBRange GetMitFrameRange() {
+    ThrowUnsupported("GetMitFrameRange");
+  };
+
   /**
    * @brief Move the gripper to a position expressed as a normalized ratio [0.0, 1.0].
    * @param ratio 0.0 = fully closed, 1.0 = fully open.
@@ -258,7 +286,9 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    *       After reboot, the USB and CAN connections will be lost.
    * @return true if the calibration request was sent successfully.
    */
-  virtual bool StartMotorCalibration() = 0;
+  virtual bool StartMotorCalibration() {
+    ThrowUnsupported("StartMotorCalibration");
+  };
 
   /**
    * @brief Reboot the device via Fibre USB protocol.
@@ -266,7 +296,9 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    *       re-establish connections after the device re-enumerates.
    * @return true if the reboot request was sent successfully.
    */
-  virtual bool Reboot() = 0;
+  virtual bool Reboot() {
+    ThrowUnsupported("Reboot");
+  };
 
   /**
    * @brief Set CAN bus node ID (disables motor, writes new ID, saves config).
@@ -274,23 +306,23 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    * @param node_id New CAN bus node ID
    * @return true if the operation was sent successfully.
    */
-  virtual bool SetCanNodeId(uint8_t node_id) = 0;
+  virtual bool SetCanNodeId(uint8_t node_id) {
+    ThrowUnsupported("SetCanNodeId");
+  };
 
   /**
    * @brief Get CAN bus node ID via USB Fibre protocol.
    * @return CAN bus node ID, or 0 if failed.
    */
-  virtual uint8_t GetCanNodeId() = 0;
+  virtual uint8_t GetCanNodeId() {
+    ThrowUnsupported("GetCanNodeId");
+  };
 
   /**
    * @brief Show device information via USB Fibre protocol (device type, serial number, firmware version, CAN node ID).
    * @note This is equivalent to typing "ref0" in the REF-CLI tool.
    */
   virtual Op1DeviceInfo ShowDeviceInfo() const = 0;
-  virtual Op1USBRange GetMitFrameRange() = 0;
-  virtual void SendMitFrameAsync(const Op1USBCtrlFrame& frame) {
-    ThrowUnsupported("SendFrameSyncByCanfd");
-  };
 
   // ============ Factory Methods ============
   static std::unique_ptr<OmniPicker2025> createHandByUSB();
@@ -421,22 +453,6 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
     return kDegreesOfActiveFreedom;
   }
 
-  static constexpr UInt8Bound GetMinMaxMotorPosition() {
-    return kMotorPositionBound;
-  }
-
-  static constexpr UInt8Range GetMinMaxDefaultVelocity() {
-    return kMotorVelocityRange;
-  }
-
-  static constexpr UInt8Range GetMinMaxDefaultTorque() {
-    return kMotorTorqueRange;
-  }
-
-  // OP1 is a 1-DOF gripper; the multi-joint OmniHand position interface maps to the single motor.
-  int16_t GetJointMotorPosi(unsigned char) const override { return 0; }
-  std::vector<int16_t> GetAllJointMotorPosi() const override { return {0}; }
-
  protected:
   /**
    * @brief Initialize common base-class metadata for OP1.
@@ -447,9 +463,6 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
     OmniHand::Reset(ProductType::OMNI_PICKER_2025, device_id, hand_type);
   }
 
-  static constexpr UInt8Bound kMotorPositionBound = {0, 255};
-  static constexpr UInt8Range kMotorVelocityRange = {0, 255, 255};
-  static constexpr UInt8Range kMotorTorqueRange = {0, 255, 255};
 };
 }  // namespace omnihand
 }  // namespace agilink

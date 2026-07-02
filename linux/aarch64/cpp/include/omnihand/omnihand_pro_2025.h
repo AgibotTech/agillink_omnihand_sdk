@@ -249,6 +249,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    */
   virtual void SetAllJointMotorVoltage(const std::vector<int16_t>& vec_voltage) = 0;
 
+#if !DISABLE_FUNC
   /**
    * @brief Gets the voltage command of a single joint motor.
    * @param joint_motor_index Joint motor index (1-12)
@@ -263,6 +264,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @note O12 firmware versions up to and including 1.2.15 do not support voltage readback.
    */
   virtual std::vector<int16_t> GetAllJointMotorVoltage() const = 0;
+#endif // !DISABLE_FUNC
 
   // ============ Torque Control ============
   /**

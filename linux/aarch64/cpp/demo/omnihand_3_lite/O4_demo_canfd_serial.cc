@@ -56,7 +56,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
   std::cout << "\n=== Gesture Control ===" << std::endl;
 
   std::cout << "Setting gesture: FIST..." << std::endl;
-  hand->SetHandGesture(agilink::omnihand::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
+  hand->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   auto fist_positions = hand->GetAllJointMotorPosi();
@@ -68,7 +68,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
   std::cout << "]" << std::endl;
 
   std::cout << "Setting gesture: OPEN..." << std::endl;
-  hand->SetHandGesture(agilink::omnihand::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_OPEN);
+  hand->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_OPEN);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   auto open_positions = hand->GetAllJointMotorPosi();

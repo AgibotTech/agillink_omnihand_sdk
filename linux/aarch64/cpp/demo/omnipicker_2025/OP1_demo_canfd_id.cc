@@ -15,6 +15,7 @@ int main() {
     std::cerr << "[ERROR][INIT] failed to init OmniPicker2025" << std::endl;
     return 1;
   }
+
   picker->ShowDataDetails(true);
 
   const auto info = picker->ShowDeviceInfo();
