@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <vector>
 
 #include "omnihand/export_symbols.h"
@@ -22,12 +23,12 @@
 
 namespace agilink {
 namespace omnihand {
-
+namespace h3l {
 enum class H3LActivateJoint {
-  H3L_ACTIVATE_JOINT_THUMB_ROLL = 0,
-  H3L_ACTIVATE_JOINT_THUMB_,
-  H3L_ACTIVATE_JOINT_FORFINGER,
-  H3L_ACTIVATE_OTHER,
+  H3L_ACTIVATE_JOINT_MRP_PIP = 0,
+  H3L_ACTIVATE_JOINT_INDEX_PIP,
+  H3L_ACTIVATE_JOINT_THUMB_PIP,
+  H3L_ACTIVATE_OTHER_THUMB_ABAD,
   H3L_ACTIVATE_JOINT_COUNT
 };
 enum class OmniHand3LiteGesture : int {
@@ -54,6 +55,17 @@ class AGIBOT_EXPORT OmniHand3LiteSolver {
   static constexpr Int16Bound GetMotorPositionRange() {
     return {kActuatorInputMin, kActuatorInputMax};
   }
+
+  static constexpr FloatBound GetActivateJointAngleRange(H3LActivateJoint joint_index, bool is_left_hand) {
+    if (joint_index == H3LActivateJoint::H3L_ACTIVATE_JOINT_COUNT) {
+      return {};
+    }
+    const JointMotorCalib& calib = (is_left_hand ? kLeft : kRight)[static_cast<std::size_t>(joint_index)];
+    return FloatBound{
+      static_cast<float>(calib.rad_min),
+      static_cast<float>(calib.rad_max)
+    };
+  }
   double SingleActuatorInput2ActiveJointPos(std::size_t joint_index, int16_t actuator_input) const;
   int16_t SingleActiveJointPos2ActuatorInput(std::size_t joint_index, double rad) const;
   std::vector<double> ActuatorInput2ActiveJointPos(const std::vector<int16_t>& actuator_input) const;
@@ -62,9 +74,20 @@ class AGIBOT_EXPORT OmniHand3LiteSolver {
  private:
   bool is_left_hand_;
   const JointMotorCalib* table_;  // Points to either kLeft or kRight.
-  static const JointMotorCalib kRight[kActiveJointCount];
-  static const JointMotorCalib kLeft[kActiveJointCount];
+  static constexpr JointMotorCalib kRight[kActiveJointCount] = {
+      {0, 1.58, kActuatorInputMax, kActuatorInputMin},
+      {0, 1.58, kActuatorInputMax, kActuatorInputMin},
+      {0.01, 1.59, kActuatorInputMin, kActuatorInputMax},
+      {-0.01, 1.58, kActuatorInputMax, kActuatorInputMin},
+  };
+  static constexpr JointMotorCalib kLeft[kActiveJointCount] = {
+      {0, 1.58, kActuatorInputMin, kActuatorInputMax},
+      {0, 1.58, kActuatorInputMax, kActuatorInputMin},
+      {0.01, 1.59, kActuatorInputMin, kActuatorInputMax},
+      {-0.01, 1.58, kActuatorInputMin, kActuatorInputMax},
+  };
 };
+}  // namespace h3l
 }  // namespace omnihand
 }  // namespace agilink
 
