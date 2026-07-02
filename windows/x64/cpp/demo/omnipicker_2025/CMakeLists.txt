@@ -11,9 +11,9 @@ set_target_properties(demo_omnipicker_2025_canfd_id PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${DEMO_OUTPUT_DIR}"
 )
 
-# # CANFD (by serial_number)
-# add_executable(demo_omnihand_3_lite_canfd_serial O4_demo_canfd_serial.cc)
-# target_link_libraries(demo_omnihand_3_lite_canfd_serial PRIVATE ${OMNIHAND_TARGET})
-# set_target_properties(demo_omnihand_3_lite_canfd_serial PROPERTIES
-#   RUNTIME_OUTPUT_DIRECTORY "${DEMO_OUTPUT_DIR}"
-# )
+# USB
+add_executable(demo_omnipicker_2025_usb OP1_demo_usb.cc)
+target_link_libraries(demo_omnipicker_2025_usb PRIVATE ${OMNIHAND_TARGET})
+set_target_properties(demo_omnipicker_2025_usb PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${DEMO_OUTPUT_DIR}"
+)

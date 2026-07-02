@@ -80,7 +80,7 @@ if "-d" in sys.argv:
         sys.argv.pop(idx)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def hand():
     """Create and initialize OmniHand 2025 instance for testing"""
     if DEVICE_TYPE == "hcan":
@@ -378,6 +378,12 @@ def test_kinematics_solver(hand):
 
 
 if __name__ == "__main__":
+    # Propagate parsed CLI options as env vars so pytest's reimport of this
+    # module picks them up (module-level sys.argv parsing runs twice: once here
+    # and once when pytest collects the file, at which point -d/-f are already
+    # stripped from sys.argv).
+    os.environ["OMNIHAND_DEVICE_TYPE"] = DEVICE_TYPE
+    os.environ["OMNIHAND_REQUEST_INTERVAL"] = str(REQUEST_INTERVAL)
     # Default to verbose mode if -v is not already specified
     args = sys.argv[1:]
     if "-v" not in args and "--verbose" not in args:

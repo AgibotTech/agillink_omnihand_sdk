@@ -1,110 +1,51 @@
 #include <chrono>
 #include <cstdint>
-#include <cstdlib>
-#include <exception>
-#include <filesystem>
 #include <iostream>
 #include <memory>
-#include <stdexcept>
-#include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 #include "omnihand/omnipicker_2025.h"
-#include "omnihand/proto.h"
-static std::unique_ptr<agilink::omnihand::OmniPicker2025> picker;
-enum class Commands : uint8_t {
-  PATH = 1,
-  NONE = 0xff
-};
-int main(int argc, char** argv) {
-  std::vector<std::string> args;
-  for (int i = 1; i < argc; i++) {
-    args.push_back(argv[i]);
+
+int main() {
+  using namespace agilink::omnihand;
+
+  auto picker = OmniPicker2025::createHandByHcan(HandType::LEFT, 1, 0, 0);
+  if (!picker || !picker->Init()) {
+    std::cerr << "[ERROR][INIT] failed to init OmniPicker2025" << std::endl;
+    return 1;
   }
-  std::string input_path = "";
-  auto prev = Commands::NONE;
-  for (auto& arg : args) {
-    if (prev != Commands::NONE) {
-      if (prev == Commands::PATH) {
-        input_path = arg;
-      }
-      continue;
-    }
-    if (arg == "--path" || arg == "-p") {
-      prev = Commands::PATH;
-      continue;
-    }
-    throw std::runtime_error("error occupid when process " + arg);
-  }
-  picker = agilink::omnihand::OmniPicker2025::createHandByHcan(
-      agilink::omnihand::HandType::LEFT,
-      1,
-      0,
-      0);
-  if (!picker->Init()) {
-    std::cout << "[ERROR][INIT] error init omnipicker 2025" << std::endl;
-    return -1;
-  }
-  // std::cout << picker->GetDeviceInfo().ToString() << std::endl;
+
   picker->ShowDataDetails(true);
 
-  auto info = picker->ShowDeviceInfo();
+  const auto info = picker->ShowDeviceInfo();
   std::cout << ToString(info) << std::endl;
 
-  agilink::omnihand::Op1ControlFrame frame{};
-  frame.pos_cmd = 0x00;
-  frame.vel_cmd = 0xFF;
+  // ---- single-node sync control ----
+  Op1CanfdCtrlFrame frame{};
+  frame.vel_cmd   = 0xFF;
   frame.force_cmd = 0xFF;
-  frame.acc_cmd = 0xFF;
-  frame.dec_cmd = 0xFF;
-  picker->SendFrameSync(frame);
+  frame.acc_cmd   = 0xFF;
+  frame.dec_cmd   = 0xFF;
+
+  frame.pos_cmd = 0x00;
+  picker->SendFrameSyncByCanfd(frame);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   frame.pos_cmd = 0xFF;
-  picker->SendFrameSync(frame);
-
-  picker->SetPositionRatio(0.0f);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  picker->SetPositionRatio(0.5f);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  picker->SetPositionRatio(1.0f);
+  picker->SendFrameSyncByCanfd(frame);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-  if (input_path == "")
-    return 0;
-  std::filesystem::path otaFilePath(input_path);
-  if (!std::filesystem::exists(otaFilePath)) {
-    throw std::runtime_error("input file is not existed");
-  }
-  std::cout << "[INFO][UPDATE_FIRMWARE] update firmware:" << otaFilePath.string() << std::endl;
-  picker->UpdateFirmware(otaFilePath.string());
-  std::cout << "[INFO][UPDATE_FIRMWARE] update firmware success" << std::endl;
+  // ---- broadcast (CANFD FD 64-byte, CAN ID=0, no reply) ----
+  Op1CanfdCtrlFrame f1{};
+  f1.vel_cmd = f1.force_cmd = f1.acc_cmd = f1.dec_cmd = 0xFF;
+
+  f1.pos_cmd = 0x00;
+  picker->SendBroadcastFrameByCanfd({{1, f1}});
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  frame.pos_cmd = 0x00;
-  picker->SendFrameSync(frame);
+
+  f1.pos_cmd = 0xFF;
+  picker->SendBroadcastFrameByCanfd({{1, f1}});
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  frame.pos_cmd = 0xFF;
-  picker->SendFrameSync(frame);
- 
-  // std::cout << "[INFO][UPDATE_FIRMWARE_VIA_FLASH] update firmware:" << otaFilePath.string() << std::endl;
-  // picker->UpdateFirmwareViaFlash(otaFilePath.string());
-  // std::cout << "[INFO][UPDATE_FIRMWARE_VIA_FLASH] update firmware success" << std::endl;
-  // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  // frame.pos_cmd = 0x00;
-  // picker->SendFrameSync(frame);
-  // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  // frame.pos_cmd = 0xFF;
-  // picker->SendFrameSync(frame);
-  
-  std::cout << "[INFO][START_MOTOR_CALIBRATION] start ..." << std::endl;
-  if (!picker->StartMotorCalibration()) {
-    std::cout << "[ERROR][START_MOTOR_CALIBRATION] error start motor calibration" << std::endl;
-    return -1;
-  }
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  frame.pos_cmd = 0x00;
-  picker->SendFrameSync(frame);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  frame.pos_cmd = 0xFF;
-  picker->SendFrameSync(frame);
+
   return 0;
 }

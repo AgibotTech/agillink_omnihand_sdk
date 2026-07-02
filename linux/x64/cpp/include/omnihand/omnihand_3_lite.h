@@ -21,6 +21,7 @@
 #include "omnihand/private_omnihand.h"
 #include "omnihand/proto.h"
 #include "omnihand/ota_types.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -223,7 +224,7 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
 
   static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
-    return OmniHand3LiteSolver::GetMotorPositionRange();
+    return h3l::OmniHand3LiteSolver::GetMotorPositionRange();
   }
 
   static constexpr Int16Bound GetMinMaxActualMotorPosition(uint8_t joint_motor_index) {
@@ -241,13 +242,19 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
     return kMixCtrlTorqueRange;
   }
 
+  static constexpr FloatBound GetMinMaxActivateJointAngle(uint8_t joint_motor_index, HandType hand_type) {
+    if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {};
+    return h3l::OmniHand3LiteSolver::GetActivateJointAngleRange(
+        static_cast<h3l::H3LActivateJoint>(joint_motor_index - 1), hand_type == HandType::LEFT);
+  }
+
   // ============ Gesture Control ============
   /**
    * @brief Sets the hand to a predefined gesture (typed API).
    */
-  void SetHandGesture(OmniHand3LiteGesture gesture);
+  void SetHandGesture(h3l::OmniHand3LiteGesture gesture);
 
-  std::vector<int16_t> GetHandGesture(OmniHand3LiteGesture gesture);
+  std::vector<int16_t> GetHandGesture(h3l::OmniHand3LiteGesture gesture);
 
   void SetHandGesture(int gesture_num) override;
 
@@ -262,14 +269,14 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
    */
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNIHAND_3_LITE, device_id, hand_type);
-    solver_ = std::make_unique<OmniHand3LiteSolver>(hand_type_ == HandType::LEFT);
+    solver_ = std::make_unique<h3l::OmniHand3LiteSolver>(hand_type_ == HandType::LEFT);
   }
 
   void OnHandTypeChanged() override {
-    solver_ = std::make_unique<OmniHand3LiteSolver>(hand_type_ == HandType::LEFT);
+    solver_ = std::make_unique<h3l::OmniHand3LiteSolver>(hand_type_ == HandType::LEFT);
   }
 
-  std::unique_ptr<OmniHand3LiteSolver> solver_;
+  std::unique_ptr<h3l::OmniHand3LiteSolver> solver_;
   static constexpr Int16Bound kActualMotorPositionBound = {0, 4095};
   static constexpr Int16Range kMixCtrlVelocityRange = {0, 23767, 8000}; // unit: rpm
   static constexpr Int16Range kMixCtrlTorqueRange = {0, 1000, 300}; // unit: mA
