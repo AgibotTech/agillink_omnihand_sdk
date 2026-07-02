@@ -72,6 +72,10 @@ class AGIBOT_EXPORT OmniHand {
     return {};
   };
 
+  virtual uint8_t GetHandDeviceId() const {
+    return device_id_;
+  }
+
   // ============ Current Threshold ============
   /**
    * @brief 0x03: Sets the current threshold of a single joint motor.
@@ -127,7 +131,10 @@ class AGIBOT_EXPORT OmniHand {
    *         - OmniHand 2025 (O10): 0-4096
    *         - OmniHand Pro 2025 (O12): 0-2000
    */
-  virtual int16_t GetJointMotorPosi(unsigned char joint_motor_index) const = 0;
+  virtual int16_t GetJointMotorPosi(unsigned char joint_motor_index) const {
+    (void)joint_motor_index;
+    return -1;
+  };
   
   /**
    * @brief 0x13: Sets positions of all joint motors in batch and returns the actual positions.
@@ -144,7 +151,9 @@ class AGIBOT_EXPORT OmniHand {
    *         - OmniHand 2025 (O10): 10 values, each in range 0-4096
    *         - OmniHand Pro 2025 (O12): 12 values, each in range 0-2000
    */
-  virtual std::vector<int16_t> GetAllJointMotorPosi() const = 0;
+  virtual std::vector<int16_t> GetAllJointMotorPosi() const {
+    return {};
+  };
 
   // ============ Joint Angle Control ============
   // Note: SetActiveJointAngle and GetActiveJointAngle are not defined in base class.

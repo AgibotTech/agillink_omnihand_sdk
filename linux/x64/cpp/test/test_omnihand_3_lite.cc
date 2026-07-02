@@ -211,7 +211,7 @@ TEST_F(OmniHand3LiteTest, JointAngleControl) {
 TEST_F(OmniHand3LiteTest, SetHandGesture) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
 
-  hand_->SetHandGesture(OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
+  hand_->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
   std::cout << "[SetHandGesture] FIST gesture set" << std::endl;
 }
 
