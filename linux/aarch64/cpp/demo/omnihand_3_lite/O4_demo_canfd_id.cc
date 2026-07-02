@@ -17,13 +17,16 @@
 
 #include <iostream>
 #include <iomanip>
+#include <ostream>
 #include <vector>
 #include <thread>
 #include <chrono>
 #include <string>
 #include <algorithm>
+#include "omnihand/kinematics/omnihand_3_lite/omnihand_3_lite_solver.h"
 #include "omnihand/omnihand_3_lite.h"
-
+#include "omnihand/proto.h"
+static agilink::omnihand::HandType handType;
 void printUsage(const char* program_name) {
   std::cout << "Usage: " << program_name << " [left|right|both]" << std::endl;
   std::cout << "  left   - Control left hand only" << std::endl;
@@ -35,6 +38,20 @@ void printUsage(const char* program_name) {
   std::cout << "  " << program_name << " both" << std::endl;
 }
 
+template<class Container>
+static void container_print(const Container& container) {
+  std::cout << &container << " is ";
+  for (const auto& elem : container) {
+    std::cout << elem << ' ';
+  }
+  std::cout << std::endl;
+}
+
+template<class T>
+static T val_silder(const T& min_val, const T& max_val, double controller) {
+  controller = std::clamp(controller, 0., 1.);
+  return (max_val - min_val) * controller + min_val;
+}
 void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
                        const std::string& hand_name) {
   std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
@@ -92,44 +109,54 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
   std::cout << "\n=== Gesture Control ===" << std::endl;
 
   std::cout << "Setting gesture: FIST..." << std::endl;
-  hand->SetHandGesture(agilink::omnihand::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
+  hand->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  auto fist_positions = hand->GetAllJointMotorPosi();
-  std::cout << "FIST positions: [";
-  for (size_t i = 0; i < fist_positions.size(); ++i) {
-    std::cout << fist_positions[i];
-    if (i < fist_positions.size() - 1) std::cout << ", ";
-  }
-  std::cout << "]" << std::endl;
-
-  std::cout << "Setting gesture: OPEN..." << std::endl;
-  hand->SetHandGesture(agilink::omnihand::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_OPEN);
+  std::cout << "Setting gesture: Zero..." << std::endl;
+  hand->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_ALL_ZERO);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  auto open_positions = hand->GetAllJointMotorPosi();
-  std::cout << "OPEN positions: [";
-  for (size_t i = 0; i < open_positions.size(); ++i) {
-    std::cout << open_positions[i];
-    if (i < open_positions.size() - 1) std::cout << ", ";
-  }
-  std::cout << "]" << std::endl;
-
-  // ============ Motor Position Control Demo (O4 uses motor positions 0~4096, no angle control)============
-  std::cout << "\nSetting joint motor positions (0~4096)..." << std::endl;
-  std::vector<int16_t> positions(
-      static_cast<size_t>(agilink::omnihand::OmniHand3Lite::kDegreesOfActiveFreedom), 2048);
-  hand->SetAllJointMotorPosi(positions);
-
+  std::cout << "Setting gesture: Open..." << std::endl;
+  hand->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_OPEN);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  auto read_positions = hand->GetAllJointMotorPosi();
-  std::cout << "Joint Motor Positions: [";
-  for (size_t i = 0; i < read_positions.size(); ++i) {
-    std::cout << read_positions[i];
-    if (i < read_positions.size() - 1) std::cout << ", ";
+  // ============ Motor Control Demo ==============
+  std::cout << "\n=== Motor Control Test ===" << std::endl;
+  for (int i = 0; i < agilink::omnihand::OmniHand3Lite::kDegreesOfActiveFreedom; i ++) {
+    hand->SetJointMotorPosi(i + 1, 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    hand->SetJointMotorPosi(i + 1, 2000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    hand->SetJointMotorPosi(i + 1, 4095);
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    hand->SetJointMotorPosi(i + 1, 2000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    hand->SetJointMotorPosi(i + 1, 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
   }
-  std::cout << "]" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  std::cout << "All Joint Set To Zeros" << std::endl;
+  hand->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_ALL_ZERO);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  std::cout << "All Joint Set To Open" << std::endl;
+  hand->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_OPEN);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  auto joints = hand->GetAllActiveJointAngles();
+  container_print(joints);
+
+  hand->SetAllActiveJointAngles(joints);
+  std::this_thread::sleep_for(std::chrono::milliseconds(400));
+  for (int i = 0; i < agilink::omnihand::OmniHand3Lite::kDegreesOfActiveFreedom; i ++) {
+    auto range = agilink::omnihand::OmniHand3Lite::GetMinMaxActivateJointAngle(i + 1, handType);
+    for (int j = 0; j <= 5; j ++) {
+      joints[i] = val_silder(range.min_value, range.max_value, j * 0.2);
+      hand->SetAllActiveJointAngles(joints);
+      std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    }
+    for (int j = 0; j <= 5; j ++) {
+      joints[i] = val_silder(range.min_value, range.max_value, 1 -  j * 0.2);
+      hand->SetAllActiveJointAngles(joints);
+      std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    }
+  }
+  hand->SetAllJointMotorPosi({0, 0, 0, 0});
 }
 
 int main(int argc, char** argv) {
@@ -180,6 +207,7 @@ int main(int argc, char** argv) {
 
   if (mode == "left") {
     auto left_hand = createHand(agilink::omnihand::HandType::LEFT, 0);
+    handType = agilink::omnihand::HandType::LEFT;
     if (!left_hand) {
       std::cerr << "[Error]: Failed to create left hand instance" << std::endl;
       return 1;
@@ -192,6 +220,7 @@ int main(int argc, char** argv) {
     controlSingleHand(left_hand, "Left");
   } else if (mode == "right") {
     auto right_hand = createHand(agilink::omnihand::HandType::RIGHT, 0);
+    handType = agilink::omnihand::HandType::RIGHT;
     if (!right_hand) {
       std::cerr << "[Error]: Failed to create right hand instance" << std::endl;
       return 1;
