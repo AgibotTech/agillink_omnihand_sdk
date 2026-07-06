@@ -39,6 +39,8 @@ Usage:
   sudo ./setup_socketcan.sh              Apply to every canN under /sys/class/net
   sudo ./setup_socketcan.sh can0 can3    Apply only to the listed interfaces
        ./setup_socketcan.sh --dry-run    Print commands without executing
+  sudo ./setup_socketcan.sh --install    Install as a systemd service (runs at every boot)
+  sudo ./setup_socketcan.sh --uninstall  Remove the systemd service
        ./setup_socketcan.sh -h|--help    This message
 
 OmniHand CAN FD timings applied:
@@ -72,6 +74,47 @@ while (( $# > 0 )); do
   case "$1" in
     -h|--help)  usage; exit 0 ;;
     --dry-run)  DRY_RUN=1; shift ;;
+    --install)
+      if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
+        err "root required for --install. Rerun as: sudo $0 --install"
+        exit 1
+      fi
+      INSTALL_PATH=/usr/local/bin/omnihand-setup-socketcan
+      SERVICE=/etc/systemd/system/omnihand-socketcan.service
+      install -m 755 "$(cd "$(dirname "$0")" && pwd)/$(basename "$0")" "${INSTALL_PATH}"
+      cat > "${SERVICE}" <<'UNIT'
+[Unit]
+Description=OmniHand SocketCAN interface setup (1M@80% / 5M@75%)
+After=systemd-modules-load.service
+Before=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/omnihand-setup-socketcan
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+      systemctl daemon-reload
+      systemctl enable omnihand-socketcan.service
+      log "script installed: ${INSTALL_PATH}"
+      log "service installed: ${SERVICE}"
+      log "enabled:   sudo systemctl start omnihand-socketcan   (or reboot)"
+      exit 0
+      ;;
+    --uninstall)
+      if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
+        err "root required for --uninstall. Rerun as: sudo $0 --uninstall"
+        exit 1
+      fi
+      systemctl disable --now omnihand-socketcan.service 2>/dev/null || true
+      rm -f /etc/systemd/system/omnihand-socketcan.service
+      rm -f /usr/local/bin/omnihand-setup-socketcan
+      systemctl daemon-reload
+      log "omnihand-socketcan service removed"
+      exit 0
+      ;;
     --)         shift; while (( $# > 0 )); do CLI_IFACES+=("$1"); shift; done ;;
     -*)         err "unknown flag: $1"; usage >&2; exit 1 ;;
     *)          CLI_IFACES+=("$1"); shift ;;
