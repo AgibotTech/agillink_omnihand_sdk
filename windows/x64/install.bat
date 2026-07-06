@@ -59,7 +59,7 @@ if not defined PYTHON_CMD (
     for /f "delims=" %%p in ('where python 2^>nul') do (
         if not defined PYTHON_CMD (
             set "_PY_PATH=%%p"
-            echo !_PY_PATH! | findstr /I /C:"conda" >nul 2>&1
+            echo !_PY_PATH! | findstr /I /C:"\envs\" >nul 2>&1
             if !errorlevel! neq 0 (
                 set "PYTHON_CMD=%%p"
             ) else (
