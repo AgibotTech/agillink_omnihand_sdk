@@ -121,6 +121,7 @@ class AGIBOT_EXPORT HandService {
       const std::string& method_name,
       const nlohmann::json& params = nlohmann::json::object());
   nlohmann::json ReadStream(int hand_id, const std::string& stream) const;
+  nlohmann::json GetSupportedTypes(const std::string& query_type) const;
   nlohmann::json ProcessMessage(const nlohmann::json& request);
 
  private:
