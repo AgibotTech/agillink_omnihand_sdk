@@ -38,103 +38,103 @@ function parseTOML(text) {
     }
     return config;
 }
-let configHost = null;
-let connConfigData = {};
-const urlBuilder = (path) => `http://${configHost.server.name}:${configHost.server.port}${path}`;
+
+// Static metadata — no server needed to populate dropdowns
+const PRODUCT_TYPES = [
+    'omnihand_2025',
+    'omnihand_pro_2025',
+    'omnihand_dex_umi',
+    'omnihand_3_lite',
+    'omnihand_3_ultra_m',
+];
+
+const CONN_TYPES = [
+    'zlgcan', 'hcan', 'socketcan', 'zlgcan_tcp', 'tj', 'rs485', 'usb',
+];
+
+const CONN_CONFIG_SCHEMA = {
+    zlgcan: [
+        { canfd_device_id: 'int', canfd_channel_id: 'int' },
+        { usbcanfd_serial_number: 'string', canfd_channel_id: 'int' },
+    ],
+    hcan: [
+        { canfd_device_id: 'int', canfd_channel_id: 'int' },
+        { hcan_serial_number: 'string', canfd_channel_id: 'int' },
+    ],
+    socketcan: [{ can_interface: 'string' }],
+    zlgcan_tcp: [{ host: 'string', port: 'int', canfd_channel_id: 'int' }],
+    tj: [{ marvin_controller_ip: 'string' }],
+    rs485: [{ uart_port: 'string', baudrate: 'int' }],
+    usb: [{ uart_port: 'string' }],
+};
+
+let configHost = { server: { name: '127.0.0.1', port: 8000 } };
+
+function getServerBase() {
+    const input = document.getElementById('server-host-input');
+    if (input) {
+        const val = input.value.trim();
+        const m = val.match(/^(.+):(\d+)$/);
+        if (m) return { name: m[1], port: parseInt(m[2], 10) };
+    }
+    return configHost.server;
+}
+
+const urlBuilder = (path) => {
+    const s = getServerBase();
+    return `http://${s.name}:${s.port}${path}`;
+};
 
 
-const configHostPath = 'configs/host.toml';
+function populateProductTypeSelects() {
+    const ptPlaceholder = document.createElement('option');
+    ptPlaceholder.value = '';
+    ptPlaceholder.textContent = '-- Select product type --';
+    ptPlaceholder.disabled = true;
+    ptPlaceholder.selected = true;
 
-fetch(configHostPath)
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`Failed to load config: ${response.status}`);
-        }
-        return response.text();
-    })
-    .then((data) => {
-        configHost = parseTOML(data);
-        const serverHost = document.getElementById('server-host');
-        serverHost.innerHTML = `${configHost.server.name}:${configHost.server.port}`;
-        console.log('Config loaded:', configHost);
-
-        return Promise.all([
-            fetch(urlBuilder('/v1/hands/type?query=product_type'))
-                .then((response) => {
-                    if (!response.ok) throw new Error(`Product type query failed: ${response.status}`);
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log('Product type query:', data);
-                    const productTypeSelect = document.getElementById('product-type-select');
-                    const ptPlaceholder = document.createElement('option');
-                    ptPlaceholder.value = '';
-                    ptPlaceholder.textContent = '-- Select product type --';
-                    ptPlaceholder.disabled = true;
-                    ptPlaceholder.selected = true;
-                    productTypeSelect.appendChild(ptPlaceholder);
-                    data.type.forEach((type) => {
-                        const option = document.createElement('option');
-                        option.value = type;
-                        option.textContent = type;
-                        productTypeSelect.appendChild(option);
-                    });
-                    const productTypeForMethodSelect = document.getElementById('product-type-for-method-select');
-                    productTypeForMethodSelect.innerHTML = '';
-                    productTypeForMethodSelect.appendChild(ptPlaceholder.cloneNode(true));
-                    data.type.forEach((type) => {
-                        const option = document.createElement('option');
-                        option.value = type;
-                        option.textContent = type;
-                        productTypeForMethodSelect.appendChild(option);
-                    });
-                }),
-            fetch(urlBuilder('/v1/hands/type?query=conn_type'))
-                .then((response) => {
-                    if (!response.ok) throw new Error(`Connection type query failed: ${response.status}`);
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log('Connection type query:', data);
-                    const connectTypeSelect = document.getElementById('connection-type-select');
-                    const ctPlaceholder = document.createElement('option');
-                    ctPlaceholder.value = '';
-                    ctPlaceholder.textContent = '-- Select connection type --';
-                    ctPlaceholder.disabled = true;
-                    ctPlaceholder.selected = true;
-                    connectTypeSelect.appendChild(ctPlaceholder);
-                    data.type.forEach((type) => {
-                        const option = document.createElement('option');
-                        option.value = type;
-                        option.textContent = type;
-                        connectTypeSelect.appendChild(option);
-                    });
-                    connectTypeSelect.addEventListener('change', (e) => {
-                        renderConnConfig(e.target.value);
-                    });
-                }),
-            fetch(urlBuilder('/v1/hands/type?query=conn_config'))
-                .then((response) => {
-                    if (!response.ok) throw new Error(`Connection config query failed: ${response.status}`);
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log('Connection config query:', data);
-                    connConfigData = data.type || {};
-                    const connectTypeSelect = document.getElementById('connection-type-select');
-                    if (connectTypeSelect.value) {
-                        renderConnConfig(connectTypeSelect.value);
-                    }
-                }),
-        ]);
-    })
-    .catch((error) => {
-        console.error('API initialization failed:', error);
-        const serverHost = document.getElementById('server-host');
-        if (!configHost) {
-            serverHost.innerHTML = 'Failed to load config';
-        }
+    const productTypeSelect = document.getElementById('product-type-select');
+    productTypeSelect.appendChild(ptPlaceholder.cloneNode(true));
+    PRODUCT_TYPES.forEach((type) => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type;
+        productTypeSelect.appendChild(option);
     });
+
+    const productTypeForMethodSelect = document.getElementById('product-type-for-method-select');
+    productTypeForMethodSelect.innerHTML = '';
+    productTypeForMethodSelect.appendChild(ptPlaceholder.cloneNode(true));
+    PRODUCT_TYPES.forEach((type) => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type;
+        productTypeForMethodSelect.appendChild(option);
+    });
+}
+
+function populateConnTypeSelect() {
+    const connectTypeSelect = document.getElementById('connection-type-select');
+    const ctPlaceholder = document.createElement('option');
+    ctPlaceholder.value = '';
+    ctPlaceholder.textContent = '-- Select connection type --';
+    ctPlaceholder.disabled = true;
+    ctPlaceholder.selected = true;
+    connectTypeSelect.appendChild(ctPlaceholder);
+    CONN_TYPES.forEach((type) => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type;
+        connectTypeSelect.appendChild(option);
+    });
+    connectTypeSelect.addEventListener('change', (e) => {
+        renderConnConfig(e.target.value);
+    });
+}
+
+// Populate dropdowns immediately from static data (no server needed)
+populateProductTypeSelects();
+populateConnTypeSelect();
 
 
 function renderConfigFields(variant, container) {
@@ -151,7 +151,7 @@ function renderConnConfig(connType) {
     const container = document.getElementById('conn_config');
     container.innerHTML = '';
 
-    const variants = connConfigData[connType];
+    const variants = CONN_CONFIG_SCHEMA[connType];
     if (!variants || variants.length === 0) return;
 
     const fieldsDiv = document.createElement('div');

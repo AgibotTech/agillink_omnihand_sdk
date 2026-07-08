@@ -124,7 +124,10 @@
 </head>
 <body>
     <div class="header">
-        Server: <span id="server-host"></span>
+        Server:
+        <input id="server-host-input" type="text" value="127.0.0.1:8000"
+               style="width:180px;padding:2px 6px;font-size:13px;border:1px solid #ccc;border-radius:4px;margin-left:4px;">
+        <span id="server-host" style="display:none;"></span>
     </div>
 
     <div class="container">
