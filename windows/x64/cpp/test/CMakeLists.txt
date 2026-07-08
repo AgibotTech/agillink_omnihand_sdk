@@ -160,3 +160,21 @@ if(BUILD_OMNIHAND_3_ULTRA_M)
   )
   add_test(NAME OmniHand3UltraMTest COMMAND test_omnihand_3_ultra_m)
 endif()
+
+# OmniHand Server Tests (HandService, HandWsServer, HandRestServer)
+# HandWsServerTest / HandRestServerTest: no device needed.
+# HandServiceTest: requires a real hand; select device with -d zlgcan|hcan|socketcan.
+add_executable(test_omnihand_server test_omnihand_server.cc)
+target_link_libraries(
+  test_omnihand_server
+  PRIVATE
+  ${OMNIHAND_TARGET}
+  GTest::gtest
+)
+if(WIN32)
+  target_link_libraries(test_omnihand_server PRIVATE ws2_32)
+endif()
+set_target_properties(test_omnihand_server PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${TEST_OUTPUT_DIR}"
+)
+add_test(NAME OmniHandServerTest COMMAND test_omnihand_server)

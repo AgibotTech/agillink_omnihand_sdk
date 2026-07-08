@@ -156,3 +156,4 @@ hand->SetPositionReportCallback([](const std::vector<int16_t>& positions) {
 - [SocketCAN Setup Guide](SOCKETCAN_SETUP.md) - For Linux SocketCAN configuration
 - [OmniHand 2025 (O10) Kinematics Solver C++ API](API_KINEMATICS_CPP_O10.md) - For kinematics calculations
 - [OmniHand Pro 2025 (O12) Kinematics Solver C++ API](API_KINEMATICS_CPP_O12.md) - For kinematics calculations
+- [Server Interface API](API_SERVER.md) - WebSocket and RESTful server/client API (C++, Python, Web)
