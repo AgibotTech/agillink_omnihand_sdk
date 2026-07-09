@@ -10,7 +10,7 @@ namespace omnihand {
 namespace server {
 namespace transport {
 
-void RegisterWsRoute(crow::App<crow::CORSHandler>& app, WsHandler& handler);
+void RegisterWsRoutes(crow::App<crow::CORSHandler>& app, WsHandler& handler);
 
 }  // namespace transport
 }  // namespace server

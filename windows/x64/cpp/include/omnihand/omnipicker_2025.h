@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025, Agibot Co., Ltd.
+// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 #ifndef AGILINK_OMNI_PICKER_2025_H
@@ -201,6 +201,15 @@ AGIBOT_EXPORT std::string ToString(const Op1DeviceInfo& info);
 AGIBOT_EXPORT std::string ToString(const Op1CanfdFrameRange& range);
 
 /**
+ * @brief OmniPicker 2025 predefined gestures for SetHandGesture.
+ */
+enum class OmniPicker2025Gesture : int {
+  OMNIPICKER_2025_GESTURE_ZERO = 0,
+  OMNIPICKER_2025_GESTURE_HALF_OPEN,
+  OMNIPICKER_2025_GESTURE_FULL_OPEN,
+};
+
+/**
  * @brief OmniPicker 2025 (OP1) public interface.
  *
  * OmniPicker 2025 is a 1-DOF gripper that exposes a compact raw command/feedback
@@ -263,15 +272,6 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
   virtual Op1USBRange GetMitFrameRange() {
     ThrowUnsupported("GetMitFrameRange");
   };
-
-  /**
-   * @brief Move the gripper to a position expressed as a normalized ratio [0.0, 1.0].
-   * @param ratio 0.0 = fully closed, 1.0 = fully open.
-   * @return Resulting raw position command sent to the motor, or -1 on error.
-   */
-  virtual int16_t SetPositionRatio(float ratio) {
-    ThrowUnsupported("SetPositionRatio");
-  }
 
   virtual void UpdateFirmwareViaFlash(const std::string&, OtaProgressCallback = nullptr) {
     ThrowUnsupported("UpdateFirmwareViaFlash");
@@ -438,6 +438,16 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
 #endif
 
   /**
+   * @brief Sets the gripper to a predefined gesture (typed API).
+   */
+  virtual float SetHandGesture(OmniPicker2025Gesture gesture) = 0;
+
+  /**
+   * @brief Returns gesture target motor position by typed gesture.
+   */
+  virtual float GetHandGesture(OmniPicker2025Gesture gesture) = 0;
+
+  /**
    * @brief Returns the number of joint motors.
    * @return Number of joint motors (12)
    */
@@ -461,6 +471,15 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    */
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNI_PICKER_2025, device_id, hand_type);
+  }
+
+  /**
+   * @brief Move the gripper to a position expressed as a normalized ratio [0.0, 1.0].
+   * @param ratio 0.0 = fully closed, 1.0 = fully open.
+   * @return ratio of position in feaaback.
+   */
+  virtual float SetPositionRatio(float ratio) {
+    ThrowUnsupported("SetPositionRatio");
   }
 
 };

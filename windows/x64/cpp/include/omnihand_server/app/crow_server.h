@@ -2,6 +2,7 @@
 #define AGILINK_OMNIHAND_SERVER_APP_CROW_SERVER_H
 
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -21,6 +22,7 @@ struct CrowServerOptions {
   uint16_t port = 8000;
   int publish_interval_ms = 100;
   std::string log_level = "info";
+  std::filesystem::path file_path = "";
 };
 
 class CrowServer {

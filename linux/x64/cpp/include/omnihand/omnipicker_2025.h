@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025, Agibot Co., Ltd.
+// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 #ifndef AGILINK_OMNI_PICKER_2025_H
@@ -199,6 +199,15 @@ AGIBOT_EXPORT std::string ToString(const Op1DeviceInfo& info);
  * @brief Formats OP1 CANFD frame byte ranges into a readable string.
  */
 AGIBOT_EXPORT std::string ToString(const Op1CanfdFrameRange& range);
+
+/**
+ * @brief OmniPicker 2025 predefined gestures for SetHandGesture.
+ */
+enum class OmniPicker2025Gesture : int {
+  OMNIPICKER_2025_GESTURE_ZERO = 0,
+  OMNIPICKER_2025_GESTURE_HALF_OPEN,
+  OMNIPICKER_2025_GESTURE_FULL_OPEN,
+};
 
 /**
  * @brief OmniPicker 2025 (OP1) public interface.
@@ -436,6 +445,24 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
       uint8_t hand_device_id,
       const std::string& marvin_controller_ip);
 #endif
+
+  /**
+   * @brief Sets the gripper to a predefined gesture (typed API).
+   */
+  void SetHandGesture(OmniPicker2025Gesture gesture);
+
+  /**
+   * @brief Returns gesture target motor position by typed gesture.
+   */
+  std::vector<int16_t> GetHandGesture(OmniPicker2025Gesture gesture);
+
+  /**
+   * @brief Sets the gripper to a predefined gesture by numeric ID.
+   * @param gesture_num Gesture number (default: 1 = HALF_OPEN)
+   */
+  void SetHandGesture(int gesture_num = 1) override;
+
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
   /**
    * @brief Returns the number of joint motors.
