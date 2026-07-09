@@ -1,12 +1,12 @@
 """REST client demo for OmniHand Server.
 
-Connects to a running OmniHand REST server (C++ binary or Python FastAPI),
+Connects to a running OmniHand REST server (C++ Crow binary or Python FastAPI),
 creates a hand, calls several methods, then removes the hand.
 
 Usage::
 
     # Start the C++ server:
-    #   omnihand_rest_server 127.0.0.1 8000
+    #   omnihand_server --host 127.0.0.1 --port 8000
     # Or start the Python FastAPI server:
     #   uvicorn omnihand_server.app.main:app --port 8000
 
@@ -48,58 +48,71 @@ def run(host: str, port: int, device: str, uart_port: str = "") -> None:
     print(f"[GET /health] -> {r.json()}")
 
     # Query methods by product type (no device required)
-    r = requests.get(f"{base}/v1/hands/methods", params={"product_type": "omnihand_2025"}, timeout=5)
+    r = requests.get(
+        f"{base}/v1/hands/methods",
+        params={"product_type": "omnihand_2025"},
+        timeout=5,
+    )
     r.raise_for_status()
     pt_methods = r.json()
     pt_names = [m["name"] for m in pt_methods.get("methods", [])]
-    print(f"[GET /v1/hands/methods?product_type=omnihand_2025] ({len(pt_names)} methods): {pt_names}\n")
+    print(f"[GET /v1/hands/methods] ({len(pt_names)} methods): {pt_names}\n")
 
     # List hands (should be empty)
-    r = requests.get(f"{base}/v1/hands", timeout=5)
+    r = requests.get(f"{base}/v1/hands/", timeout=5)
     r.raise_for_status()
-    print(f"[GET /v1/hands] -> {r.json()}")
+    print(f"[GET /v1/hands/] -> {r.json()}")
 
     # Create hand
     spec = {
-        "product_type": "omnihand_2025",
+        "hand_type": "omnihand_2025",
         "conn_method": device,
-        "hand_side": "left",
         "conn_config": build_conn_config(device, uart_port),
     }
-    print(f"\n[POST /v1/hands] request: {json.dumps(spec)}")
-    r = requests.post(f"{base}/v1/hands", json=spec, timeout=10)
+    print(f"\n[POST /v1/hands/] request: {json.dumps(spec)}")
+    r = requests.post(f"{base}/v1/hands/", json=spec, timeout=10)
     if r.status_code >= 400:
-        print(f"[POST /v1/hands] FAILED {r.status_code}: {r.text}")
+        print(f"[POST /v1/hands/] FAILED {r.status_code}: {r.text}")
         return
     hand_id = r.json()["hand_id"]
-    print(f"[POST /v1/hands] hand_id={hand_id}")
+    print(f"[POST /v1/hands/] hand_id={hand_id}")
 
     # Describe hand
     r = requests.get(f"{base}/v1/hands/{hand_id}", timeout=5)
     r.raise_for_status()
     print(f"\n[GET /v1/hands/{hand_id}] -> {json.dumps(r.json(), indent=2)}")
 
-    # List methods
+    # Read available methods for this hand
     r = requests.get(f"{base}/v1/hands/{hand_id}/methods", timeout=5)
     r.raise_for_status()
-    methods_resp = r.json()
-    method_names = [m["name"] for m in methods_resp.get("methods", [])]
-    print(f"[GET /v1/hands/{hand_id}/methods] available: {method_names}")
+    print(f"[GET /v1/hands/{hand_id}/methods] -> {json.dumps(r.json(), indent=2)}")
 
     # Call get_vendor_info
-    r = requests.post(f"{base}/v1/hands/{hand_id}/methods",
-                      params={"method": "get_vendor_info"}, json={}, timeout=10)
-    print(f"\n[POST .../methods?method=get_vendor_info] -> {json.dumps(r.json(), indent=2)}")
+    r = requests.post(
+        f"{base}/v1/hands/{hand_id}/methods",
+        params={"method": "get_vendor_info"},
+        json={},
+        timeout=10,
+    )
+    print(f"\n[POST .../methods get_vendor_info] -> {json.dumps(r.json(), indent=2)}")
 
     # Call get_joint_names
-    r = requests.post(f"{base}/v1/hands/{hand_id}/methods",
-                      params={"method": "get_joint_names"}, json={}, timeout=10)
-    print(f"[POST .../methods?method=get_joint_names] -> {r.json()}")
+    r = requests.post(
+        f"{base}/v1/hands/{hand_id}/methods",
+        params={"method": "get_joint_names"},
+        json={},
+        timeout=10,
+    )
+    print(f"[POST .../methods get_joint_names] -> {r.json()}")
 
     # Call get_all_joint_positions
-    r = requests.post(f"{base}/v1/hands/{hand_id}/methods",
-                      params={"method": "get_all_joint_positions"}, json={}, timeout=10)
-    print(f"[POST .../methods?method=get_all_joint_positions] -> {r.json()}")
+    r = requests.post(
+        f"{base}/v1/hands/{hand_id}/methods",
+        params={"method": "get_all_joint_positions"},
+        json={},
+        timeout=10,
+    )
+    print(f"[POST .../methods get_all_joint_positions] -> {r.json()}")
 
     # Remove hand
     r = requests.delete(f"{base}/v1/hands/{hand_id}", timeout=5)

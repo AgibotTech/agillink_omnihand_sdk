@@ -53,6 +53,3 @@ endif()
 if(BUILD_OMNIHAND_3_ULTRA_M)
   add_subdirectory(omnihand_3_ultra_m)
 endif()
-
-# OmniHand Server demos (WebSocket, REST, combined)
-add_subdirectory(omnihand_server)

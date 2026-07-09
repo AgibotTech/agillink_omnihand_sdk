@@ -1,16 +1,16 @@
 """WebSocket client demo for OmniHand Server.
 
-Connects to a running OmniHand WebSocket server (C++ binary or Python FastAPI),
+Connects to a running OmniHand WebSocket server (C++ Crow binary or Python FastAPI),
 creates a hand, calls several methods, then removes the hand.
 
 Usage::
 
     # Start the C++ server:
-    #   omnihand_ws_server 127.0.0.1 8765
+    #   omnihand_server --host 127.0.0.1 --port 8000
     # Or start the Python FastAPI server:
-    #   uvicorn omnihand_server.app.main:app --port 8765
+    #   uvicorn omnihand_server.app.main:app --port 8000
 
-    python demo_ws_client.py --host 127.0.0.1 --port 8765 -d zlgcan
+    python demo_ws_client.py --host 127.0.0.1 --port 8000 -d zlgcan
 
 Requires::
 
@@ -40,7 +40,7 @@ def build_conn_config(device: str, uart_port: str = "") -> dict:
 
 
 async def run(host: str, port: int, device: str, uart_port: str = "") -> None:
-    uri = f"ws://{host}:{port}"
+    uri = f"ws://{host}:{port}/ws"
     print(f"Connecting to {uri} ...")
 
     async with websockets.connect(uri) as ws:
@@ -59,14 +59,6 @@ async def run(host: str, port: int, device: str, uart_port: str = "") -> None:
                 if resp.get("request_id") == req_id:
                     return resp
 
-        # Query methods by product type (no device required)
-        resp = await request({"type": "methods", "product_type": "omnihand_2025"})
-        if resp.get("ok"):
-            names = [m["name"] for m in resp["result"].get("methods", [])]
-            print(f"[methods product_type=omnihand_2025] ({len(names)} methods): {names}\n")
-        else:
-            print(f"[methods product_type] FAILED: {resp.get('error')}")
-
         # List hands (should be empty)
         resp = await request({"type": "list"})
         print(f"[list] -> {json.dumps(resp['result'], indent=2)}")
@@ -74,9 +66,8 @@ async def run(host: str, port: int, device: str, uart_port: str = "") -> None:
         # Create hand
         spec = {
             "type": "create",
-            "product_type": "omnihand_2025",
+            "hand_type": "omnihand_2025",
             "conn_method": device,
-            "hand_side": "left",
             "conn_config": build_conn_config(device, uart_port),
         }
         print(f"\n[create] request: {json.dumps(spec)}")
@@ -86,6 +77,10 @@ async def run(host: str, port: int, device: str, uart_port: str = "") -> None:
             return
         hand_id = resp["result"]["hand_id"]
         print(f"[create] hand_id={hand_id}")
+
+        # Read available methods for this hand
+        resp = await request({"type": "methods", "hand_id": hand_id})
+        print(f"\n[methods] -> {json.dumps(resp.get('result'), indent=2)}")
 
         # Get vendor info
         resp = await request({"type": "call", "hand_id": hand_id,
@@ -112,7 +107,7 @@ async def run(host: str, port: int, device: str, uart_port: str = "") -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="OmniHand WebSocket client demo")
     parser.add_argument("--host", default="127.0.0.1", help="Server host (default: 127.0.0.1)")
-    parser.add_argument("--port", type=int, default=8765, help="Server port (default: 8765)")
+    parser.add_argument("--port", type=int, default=8000, help="Server port (default: 8000)")
     parser.add_argument("-d", "--device", default="zlgcan",
                         choices=["zlgcan", "hcan", "socketcan", "rs485", "usb"],
                         help="Device type (default: zlgcan)")

@@ -253,30 +253,13 @@ document.getElementById('hand-query-btn').addEventListener('click', () => {
         })
         .then((data) => {
             queryResult.innerHTML = `Hand query result: ${JSON.stringify(data)}`;
-            if (Array.isArray(data.hands)) {
-                handsCache = data.hands;
-                populateMethodCallHandSelect(data.hands);
+            const hands = Array.isArray(data) ? data : (data.hands || []);
+            if (hands.length >= 0) {
+                handsCache = hands;
+                populateMethodCallHandSelect(hands);
             }
         }).catch((error) => {
             queryResult.innerHTML = `Hand query failed: ${error.message}`;
-        });
-});
-
-document.getElementById('hand-vendor-info-btn').addEventListener('click', () => {
-    const vendorInfoResult = document.getElementById('hand-vendor-info-result');
-    vendorInfoResult.innerHTML = 'Querying vendor info...';
-    fetch(urlBuilder(`/v1/hands/vendor-info`))
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`Vendor info query failed: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then((data) => {
-            vendorInfoResult.innerHTML = `Vendor info query result: ${JSON.stringify(data)}`;
-        })
-        .catch((error) => {
-            vendorInfoResult.innerHTML = `Vendor info query failed: ${error.message}`;
         });
 });
 
@@ -333,7 +316,7 @@ document.getElementById('method-call-hand-select').addEventListener('change', (e
         return;
     }
 
-    fetch(urlBuilder(`/v1/hands/methods?query=hand_id&q=${encodeURIComponent(handId)}`))
+    fetch(urlBuilder(`/v1/hands/${encodeURIComponent(handId)}/methods`))
         .then((r) => {
             if (!r.ok) throw new Error(`Methods fetch failed: ${r.status}`);
             return r.json();
@@ -370,18 +353,24 @@ document.getElementById('method-for-method-call-select').addEventListener('chang
     paramContainer.innerHTML = '';
     descEl.textContent = method ? method.description : '';
 
-    if (!method || Object.keys(method.params).length === 0) return;
+    if (!method) return;
+    const paramNames = Array.isArray(method.params) ? method.params : Object.keys(method.params || {});
+    if (paramNames.length === 0) return;
 
-    for (const [paramName, paramType] of Object.entries(method.params)) {
-        const isArray = paramType.endsWith('[]');
-        const baseType = isArray ? paramType.slice(0, -2) : paramType;
-        const inputType = baseType === 'integer' ? 'number' : 'text';
-        const placeholder = isArray ? `comma-separated ${baseType} values` : paramType;
-        const label = document.createElement('label');
-        label.innerHTML = `${paramName} <span style="color:#aaa;font-size:11px">(${paramType})</span>
-            <input type="${inputType}" id="param_${paramName}" placeholder="${placeholder}" data-type="${paramType}">`;
-        paramContainer.appendChild(label);
-    }
+    // Build a template JSON object so user knows what keys to fill
+    const template = {};
+    paramNames.forEach(p => { template[p] = null; });
+    const textarea = document.createElement('textarea');
+    textarea.id = 'param-json-input';
+    textarea.rows = 4;
+    textarea.style.cssText = 'width:100%;font-family:monospace;font-size:13px;border:1px solid #d0d0d0;border-radius:6px;padding:8px;resize:vertical;';
+    textarea.placeholder = 'Enter params as JSON';
+    textarea.value = JSON.stringify(template, null, 2);
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:12px;color:#888;margin-top:4px;';
+    hint.textContent = `Params: ${paramNames.join(', ')}`;
+    paramContainer.appendChild(textarea);
+    paramContainer.appendChild(hint);
 });
 
 document.getElementById('method-call-btn').addEventListener('click', () => {
@@ -392,37 +381,19 @@ document.getElementById('method-call-btn').addEventListener('click', () => {
     if (!handId) { result.innerHTML = 'Please select a hand.'; return; }
     if (!methodName) { result.innerHTML = 'Please select a method.'; return; }
 
-    const methods = methodsCache[handId] || [];
-    const method = methods.find((m) => m.name === methodName);
-    const body = {};
-
-    if (method) {
-        for (const [paramName, paramType] of Object.entries(method.params)) {
-            const input = document.getElementById(`param_${paramName}`);
-            if (!input) continue;
-            const raw = input.value.trim();
-            if (raw === '') continue;
-            const isArray = paramType.endsWith('[]');
-            const baseType = isArray ? paramType.slice(0, -2) : paramType;
-            if (isArray) {
-                body[paramName] = raw.split(',').map((v) => {
-                    const t = v.trim();
-                    return baseType === 'integer' ? parseInt(t, 10) : baseType === 'number' ? parseFloat(t) : t;
-                });
-            } else if (baseType === 'integer') {
-                body[paramName] = parseInt(raw, 10);
-            } else if (baseType === 'number') {
-                body[paramName] = parseFloat(raw);
-            } else if (baseType === 'boolean') {
-                body[paramName] = raw === 'true';
-            } else {
-                body[paramName] = raw;
-            }
+    let body = {};
+    const textarea = document.getElementById('param-json-input');
+    if (textarea && textarea.value.trim()) {
+        try {
+            body = JSON.parse(textarea.value);
+        } catch (e) {
+            result.innerHTML = `Invalid JSON params: ${e.message}`;
+            return;
         }
     }
 
     result.innerHTML = 'Calling...';
-    fetch(urlBuilder(`/v1/hands/methods?query=hand_id&q=${encodeURIComponent(handId)}&method=${encodeURIComponent(methodName)}`), {
+    fetch(urlBuilder(`/v1/hands/${encodeURIComponent(handId)}/methods?method=${encodeURIComponent(methodName)}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -472,7 +443,7 @@ document.getElementById('method-query-type-select').addEventListener('change', (
                 return response.json();
             })
             .then((data) => {
-                handsCache = data.hands || [];
+                handsCache = Array.isArray(data) ? data : (data.hands || []);
                 handIdSelect.innerHTML = '';
                 const placeholder = document.createElement('option');
                 placeholder.value = '';
@@ -515,7 +486,13 @@ document.getElementById('hand-method-query-btn').addEventListener('click', () =>
     }
 
     queryResult.innerHTML = 'Querying hand methods...';
-    fetch(urlBuilder(`/v1/hands/methods?query=${queryType}&q=${encodeURIComponent(queryValue)}`))
+    let url;
+    if (queryType === 'product_type') {
+        url = urlBuilder(`/v1/hands/methods?product_type=${encodeURIComponent(queryValue)}`);
+    } else {
+        url = urlBuilder(`/v1/hands/${encodeURIComponent(queryValue)}/methods`);
+    }
+    fetch(url)
         .then((response) => {
             if (!response.ok) {
                 throw new Error(`Hand method query failed: ${response.status}`);
