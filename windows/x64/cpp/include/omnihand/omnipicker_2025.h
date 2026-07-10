@@ -447,6 +447,10 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    */
   virtual float GetHandGesture(OmniPicker2025Gesture gesture) = 0;
 
+  void SetHandGesture(int gesture_num = 1) override;
+
+  std::vector<int16_t> GetHandGesture(int gesture_num) override;
+
   /**
    * @brief Returns the number of joint motors.
    * @return Number of joint motors (12)
