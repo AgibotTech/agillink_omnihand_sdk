@@ -56,7 +56,7 @@
         }
         .form-row > * { flex: 1; }
 
-        select, input {
+        select, input, textarea {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid #d0d0d0;
@@ -67,7 +67,13 @@
             outline: none;
             transition: border-color 0.15s;
         }
-        select:focus, input:focus { border-color: #1a73e8; }
+        select:focus, input:focus, textarea:focus { border-color: #1a73e8; }
+        textarea {
+            min-height: 96px;
+            resize: vertical;
+            font-family: "SF Mono", "Fira Code", monospace;
+            line-height: 1.4;
+        }
 
         #conn_config { margin-bottom: 12px; }
         #conn_config label {
@@ -91,6 +97,10 @@
         }
         button:hover { background: #1557b0; }
         button:active { background: #12479a; }
+        button:disabled {
+            background: #a8b6c8;
+            cursor: not-allowed;
+        }
 
         .result {
             margin-top: 12px;
@@ -109,6 +119,11 @@
             margin-bottom: 10px;
             min-height: 0;
         }
+        .hint {
+            font-size: 12px;
+            color: #777;
+            margin-top: 8px;
+        }
         #param-container { margin-bottom: 12px; }
         #param-container label {
             display: block;
@@ -119,6 +134,57 @@
         #param-container input { margin-top: 2px; }
         .result:empty { display: none; }
         input:invalid { border-color: #e81123; }
+        .button-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .status-line {
+            display: inline-flex;
+            align-items: center;
+            min-height: 32px;
+            font-size: 13px;
+            color: #555;
+        }
+        .ws-live h3 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        .ws-live .result {
+            margin-top: 0;
+            min-height: 96px;
+            max-height: 180px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .ws-chart-panel h3 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        .ws-chart {
+            width: 100%;
+            height: 240px;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            background: #fff;
+        }
+        #ws-log {
+            max-height: 220px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        @media (max-width: 720px) {
+            .form-row {
+                flex-direction: column;
+            }
+        }
 
     </style>
 </head>
@@ -151,11 +217,14 @@
         <div class="card" id="hand-query">
             <h2>Query Hands</h2>
             <button id="hand-query-btn">Query Hand</button>
+            <div class="hint">After creating a hand session, click List before calling other methods to load hand information.</div>
             <div class="result" id="hand-query-result"></div>
         </div>
         <div class="card" id="hand-delete">
             <h2>Delete Hand</h2>
-            <input type="text" id="hand-id-input" placeholder="Enter hand ID to delete" required>
+            <select id="hand-id-input">
+                <option value="" disabled selected>-- Select hand ID --</option>
+            </select>
             <button id="hand-delete-btn">Delete Hand</button>
             <div class="result" id="hand-delete-result"></div>
         </div>
@@ -192,9 +261,124 @@
             <button id="hand-method-query-btn">Call Method</button>
             <div class="result" id="hand-method-query-result"></div>
         </div>
+
+        <div class="card" id="websocket-connection">
+            <h2>WebSocket Connection</h2>
+            <div class="button-row">
+                <button id="ws-connect-btn">Connect</button>
+                <button id="ws-disconnect-btn" disabled>Disconnect</button>
+                <span class="status-line" id="ws-status">Disconnected</span>
+            </div>
+        </div>
+
+        <div class="card" id="websocket-hands">
+            <h2>WebSocket Hands</h2>
+            <div class="button-row">
+                <button class="ws-action" id="ws-list-btn" disabled>List</button>
+                <button class="ws-action" id="ws-create-btn" disabled>Create From Form</button>
+            </div>
+            <div class="hint">After creating a hand session, click List before calling other methods to load hand information.</div>
+            <div class="form-row">
+                <select class="ws-hand-select" id="ws-hand-select" disabled>
+                    <option value="" disabled selected>-- Select hand ID --</option>
+                </select>
+                <button class="ws-action" id="ws-remove-btn" disabled>Remove Selected</button>
+            </div>
+            <div class="result" id="ws-hands-result"></div>
+        </div>
+
+        <div class="card" id="websocket-method-call">
+            <h2>WebSocket Method Call</h2>
+            <div class="form-row">
+                <select class="ws-hand-select" id="ws-method-hand-select" disabled>
+                    <option value="" disabled selected>-- Select hand ID --</option>
+                </select>
+                <select id="ws-method-select" disabled>
+                    <option value="" disabled selected>-- Select method --</option>
+                </select>
+            </div>
+            <div class="button-row">
+                <button class="ws-action" id="ws-load-methods-btn" disabled>Load Methods</button>
+                <button class="ws-action" id="ws-call-method-btn" disabled>Call Method</button>
+            </div>
+            <textarea id="ws-param-json-input" placeholder="{}" disabled>{}</textarea>
+            <div class="result" id="ws-method-call-result"></div>
+        </div>
+
+        <div class="card" id="websocket-state-stream">
+            <h2>WebSocket State Stream</h2>
+            <div class="form-row">
+                <select class="ws-hand-select" id="ws-state-hand-select" disabled>
+                    <option value="" disabled selected>-- Select hand ID --</option>
+                </select>
+            </div>
+            <div class="button-row">
+                <button class="ws-action" id="ws-state-subscribe-btn" disabled>Subscribe</button>
+                <button class="ws-action" id="ws-state-unsubscribe-btn" disabled>Unsubscribe</button>
+            </div>
+            <div class="result" id="ws-state-stream-result"></div>
+            <div class="ws-chart-panel">
+                <h3>State Chart</h3>
+                <div class="ws-chart" id="ws-state-chart"></div>
+            </div>
+            <div class="ws-live">
+                <h3>State Data</h3>
+                <div class="result" id="ws-state-result"></div>
+            </div>
+        </div>
+
+        <div class="card" id="websocket-diagnostics-stream">
+            <h2>WebSocket Diagnostics Stream</h2>
+            <div class="form-row">
+                <select class="ws-hand-select" id="ws-diagnostics-hand-select" disabled>
+                    <option value="" disabled selected>-- Select hand ID --</option>
+                </select>
+            </div>
+            <div class="button-row">
+                <button class="ws-action" id="ws-diagnostics-subscribe-btn" disabled>Subscribe</button>
+                <button class="ws-action" id="ws-diagnostics-unsubscribe-btn" disabled>Unsubscribe</button>
+            </div>
+            <div class="result" id="ws-diagnostics-stream-result"></div>
+            <div class="ws-chart-panel">
+                <h3>Diagnostics Chart</h3>
+                <div class="ws-chart" id="ws-diagnostics-chart"></div>
+            </div>
+            <div class="ws-live">
+                <h3>Diagnostics Data</h3>
+                <div class="result" id="ws-diagnostics-result"></div>
+            </div>
+        </div>
+
+        <div class="card" id="websocket-tactile-stream">
+            <h2>WebSocket Tactile Stream</h2>
+            <div class="form-row">
+                <select class="ws-hand-select" id="ws-tactile-hand-select" disabled>
+                    <option value="" disabled selected>-- Select hand ID --</option>
+                </select>
+            </div>
+            <div class="button-row">
+                <button class="ws-action" id="ws-tactile-subscribe-btn" disabled>Subscribe</button>
+                <button class="ws-action" id="ws-tactile-unsubscribe-btn" disabled>Unsubscribe</button>
+            </div>
+            <div class="result" id="ws-tactile-stream-result"></div>
+            <div class="ws-chart-panel">
+                <h3>Tactile Chart</h3>
+                <div class="ws-chart" id="ws-tactile-chart"></div>
+            </div>
+            <div class="ws-live">
+                <h3>Tactile Data</h3>
+                <div class="result" id="ws-tactile-result"></div>
+            </div>
+        </div>
+
+        <div class="card" id="websocket-log">
+            <h2>WebSocket Log</h2>
+            <div class="result" id="ws-log"></div>
+        </div>
     </div>
     
     
+    <script src="https://cdn.jsdelivr.net/npm/echarts@6.1.0/dist/echarts.min.js"></script>
     <script src="scripts/client.js"></script>
 
 </body>
