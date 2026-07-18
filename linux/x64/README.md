@@ -1,4 +1,4 @@
-# AGILINK OmniHand SDK - Linux (x64) - Version 1.1.7
+# AGILINK OmniHand SDK - Linux (x64) - Version 1.1.8
 
 [中文文档](README_zh_cn.md) | [Overview & API Docs](../../README.md)
 
@@ -9,6 +9,20 @@
 ```bash
 ./install.sh                  # Install SDK
 sudo ./setup_udev.sh          # Configure USB permissions (first time only, then log out/in)
+```
+
+The ROS2 deliverable is a thin package and does not bundle `libomnihand` or
+device-vendor shared libraries. Install the matching C++ SDK with `./install.sh`
+before using the ROS2 nodes, then run:
+
+```bash
+source ros2/setup.bash
+```
+
+When using a non-default installation prefix, also run:
+
+```bash
+export LD_LIBRARY_PATH="<prefix>/lib:${LD_LIBRARY_PATH:-}"
 ```
 
 ## Uninstall
@@ -34,7 +48,7 @@ x64/
 │   ├── *.whl                    # Python wheel
 │   ├── demo/                    # Python demos (not installed)
 │   └── test/                    # Python tests (not installed)
-├── ros2/                        # ROS2 packages
+├── ros2/                        # Thin ROS2 packages (no bundled C++ SDK)
 │   ├── humble/          # ROS2 distribution
 │   └── setup.bash               # Auto-detect ROS distribution
 ├── install.sh                   # Install script

@@ -1,4 +1,4 @@
-# AGILINK OmniHand SDK - Linux (x64) - 版本 1.1.7
+# AGILINK OmniHand SDK - Linux (x64) - 版本 1.1.8
 
 [English Documentation](README.md) | [产品概述 & API 文档](../../README_zh_cn.md)
 
@@ -9,6 +9,19 @@
 ```bash
 ./install.sh                  # 安装 SDK
 sudo ./setup_udev.sh          # 配置 USB 权限（首次需要，然后注销重新登录）
+```
+
+ROS2 是薄发布包，不包含 `libomnihand` 或设备厂商动态库。使用 ROS2 node
+前必须先运行 `./install.sh` 安装同版本 C++ SDK，然后执行：
+
+```bash
+source ros2/setup.bash
+```
+
+如果将 SDK 安装到非默认前缀，还需要：
+
+```bash
+export LD_LIBRARY_PATH="<prefix>/lib:${LD_LIBRARY_PATH:-}"
 ```
 
 ## 卸载
@@ -34,7 +47,7 @@ x64/
 │   ├── *.whl                    # Python wheel
 │   ├── demo/                    # Python 示例（不安装）
 │   └── test/                    # Python 测试（不安装）
-├── ros2/                        # ROS2 包
+├── ros2/                        # 薄 ROS2 包（不重复携带 C++ SDK）
 │   ├── humble/          # ROS2 发行版
 │   └── setup.bash               # 自动检测 ROS 发行版
 ├── install.sh                   # 安装脚本

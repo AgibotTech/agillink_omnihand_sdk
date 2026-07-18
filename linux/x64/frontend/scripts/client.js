@@ -303,6 +303,15 @@ document.getElementById('hand-create-btn').addEventListener('click', () => {
     const handType = document.getElementById('product-type-select').value;
     const connectType = document.getElementById('connection-type-select').value;
     const connectConfig = readConnConfig();
+    const handSide = document.getElementById('hand-side-select').value;
+    const requestBody = {
+        hand_type: handType,
+        conn_method: connectType,
+        conn_config: connectConfig,
+    };
+    if (handSide) {
+        requestBody.hand_side = handSide;
+    }
     const createResult = document.getElementById('hand-create-result');
     createResult.innerHTML = 'Creating hand...';
     fetch(urlBuilder('/v1/hands'), {
@@ -310,11 +319,7 @@ document.getElementById('hand-create-btn').addEventListener('click', () => {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            hand_type: handType,
-            conn_method: connectType,
-            conn_config: connectConfig,
-        }),
+        body: JSON.stringify(requestBody),
     })
         .then((response) => {
             if (!response.ok) {
@@ -951,19 +956,23 @@ document.getElementById('ws-create-btn')?.addEventListener('click', () => {
     runWsAction(async () => {
         const productType = document.getElementById('product-type-select')?.value ?? '';
         const connMethod = document.getElementById('connection-type-select')?.value ?? '';
+        const handSide = document.getElementById('hand-side-select')?.value ?? '';
         if (!productType) {
             throw new Error('Please select a product type.');
         }
         if (!connMethod) {
             throw new Error('Please select a connection type.');
         }
-        const result = await sendWsRequest({
+        const request = {
             type: 'create',
             product_type: productType,
             conn_method: connMethod,
             conn_config: readConnConfig(),
-            hand_side: 'left',
-        });
+        };
+        if (handSide) {
+            request.hand_side = handSide;
+        }
+        const result = await sendWsRequest(request);
         updateHandsCache([result, ...handsCache.filter((hand) => hand.hand_id !== result.hand_id)]);
         setText('ws-hands-result', prettyJson(result));
     });

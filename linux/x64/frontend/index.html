@@ -26,6 +26,12 @@
             color: #1a73e8;
             font-weight: 600;
         }
+        .header a {
+            margin-left: 12px;
+            color: #1a73e8;
+            text-decoration: none;
+        }
+        .header a:hover { text-decoration: underline; }
 
         .container {
             max-width: 680px;
@@ -193,6 +199,7 @@
         Server:
         <input id="server-host-input" type="text" value="127.0.0.1:8000"
                style="width:180px;padding:2px 6px;font-size:13px;border:1px solid #ccc;border-radius:4px;margin-left:4px;">
+        <a href="docs/" target="_blank" rel="noopener noreferrer">OpenAPI Docs</a>
         <span id="server-host" style="display:none;"></span>
     </div>
 
@@ -208,6 +215,11 @@
             <div class="form-row">
                 <select id="product-type-select"></select>
                 <select id="connection-type-select"></select>
+                <select id="hand-side-select" aria-label="Hand side (optional)">
+                    <option value="" selected>-- Hand side (optional) --</option>
+                    <option value="left">left</option>
+                    <option value="right">right</option>
+                </select>
             </div>
             <div id="conn_config"></div>
             <button id="hand-create-btn">Create Hand</button>

@@ -3,6 +3,9 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -12,12 +15,16 @@
 #include "nlohmann/json.hpp"
 #include "omnihand_server/service/hand_service.h"
 #include "omnihand_server/adapter/hand_device.h"
+#include "omnihand_server/handler/rest_handler.h"
 #include "omnihand_server/protocol/json_codec.h"
+#include "omnihand_server/router/rest_router.h"
+#include "omnihand_server/router/static_file_router.h"
 
 using agilink::omnihand::server::ApplicationError;
 using agilink::omnihand::server::Capabilities;
 using agilink::omnihand::server::HandService;
 using agilink::omnihand::server::HandCreateSpec;
+using agilink::omnihand::server::HandSide;
 using agilink::omnihand::server::IHandDevice;
 using agilink::omnihand::server::IHandDeviceFactory;
 using agilink::omnihand::server::MakeProblem;
@@ -25,6 +32,7 @@ using agilink::omnihand::server::ProductInfo;
 using agilink::omnihand::server::protocol::DataValue;
 using agilink::omnihand::server::protocol::DataValueFromJson;
 using agilink::omnihand::server::protocol::DataValueToJson;
+using agilink::omnihand::server::transport::RestHandler;
 using Json = nlohmann::json;
 
 namespace {
@@ -105,6 +113,7 @@ class FakeHandDeviceFactory final : public IHandDeviceFactory {
 
   std::unique_ptr<IHandDevice> Create(const HandCreateSpec& spec) override {
     ++create_count;
+    last_create_spec = spec;
     if (spec.product_type != "fake_hand") {
       throw ApplicationError(MakeProblem(
           400, "unsupported_product", "Bad Request", "Unsupported product_type: " + spec.product_type));
@@ -118,12 +127,12 @@ class FakeHandDeviceFactory final : public IHandDeviceFactory {
   }
 
   int create_count = 0;
+  HandCreateSpec last_create_spec;
 };
 
 DataValue CreateRequest(const std::string& serial = "A") {
   return DataValueFromJson(
       Json{{"product_type", "fake_hand"},
-           {"hand_side", "left"},
            {"connection", Json{{"type", "fake"},
                                {"config", Json{{"serial", serial}, {"hand_device_id", 1}}}}}});
 }
@@ -134,6 +143,13 @@ std::shared_ptr<FakeHandDeviceFactory> MakeFactory() {
 
 Json ToJson(const DataValue& value) {
   return DataValueToJson(value);
+}
+
+crow::request RestCreateRequest(const Json& body) {
+  crow::request request;
+  request.method = crow::HTTPMethod::POST;
+  request.body = body.dump();
+  return request;
 }
 
 }  // namespace
@@ -148,6 +164,7 @@ TEST(HandServiceTest, CreateListDescribeDeleteHand) {
   EXPECT_EQ(created.value("hand_type", ""), "fake_hand");
   EXPECT_EQ(created.value("hand_side", ""), "left");
   EXPECT_EQ(created.value("conn_method", ""), "fake");
+  EXPECT_EQ(factory->last_create_spec.hand_side, HandSide::kLeft);
 
   Json hands = ToJson(service.ListHands());
   ASSERT_TRUE(hands.is_array());
@@ -159,6 +176,114 @@ TEST(HandServiceTest, CreateListDescribeDeleteHand) {
   Json removed = ToJson(service.DeleteHand(1));
   EXPECT_TRUE(removed.value("removed", false));
   EXPECT_TRUE(ToJson(service.ListHands()).empty());
+}
+
+TEST(HandServiceTest, RequestedHandSideIsPassedToFactory) {
+  auto factory = MakeFactory();
+  HandService service(factory);
+
+  Json request = ToJson(CreateRequest());
+  request["hand_side"] = "right";
+  Json created = ToJson(service.CreateHand(DataValueFromJson(request)));
+
+  EXPECT_EQ(created.value("hand_side", ""), "right");
+  EXPECT_EQ(factory->last_create_spec.hand_side, HandSide::kRight);
+}
+
+TEST(RestHandlerTest, CreateHandForwardsHandSideAndDefaultsToLeft) {
+  auto factory = MakeFactory();
+  auto service = std::make_shared<HandService>(factory);
+  RestHandler handler(service);
+
+  const Json base_request{{"hand_type", "fake_hand"},
+                          {"conn_method", "fake"},
+                          {"conn_config", Json{{"serial", "right"}}}};
+  Json right_request = base_request;
+  right_request["hand_side"] = "right";
+  crow::response right_response = handler.HandsCollection(RestCreateRequest(right_request));
+
+  ASSERT_EQ(right_response.code, 201);
+  EXPECT_EQ(Json::parse(right_response.body).value("hand_side", ""), "right");
+  EXPECT_EQ(factory->last_create_spec.hand_side, HandSide::kRight);
+
+  Json left_request = base_request;
+  left_request["conn_config"]["serial"] = "left";
+  crow::response left_response = handler.HandsCollection(RestCreateRequest(left_request));
+
+  ASSERT_EQ(left_response.code, 201);
+  EXPECT_EQ(Json::parse(left_response.body).value("hand_side", ""), "left");
+  EXPECT_EQ(factory->last_create_spec.hand_side, HandSide::kLeft);
+}
+
+TEST(RestRouterTest, HandsCollectionAcceptsBothSlashVariantsAndCorsPreflight) {
+  auto factory = MakeFactory();
+  auto service = std::make_shared<HandService>(factory);
+  RestHandler handler(service);
+  crow::App<crow::CORSHandler> app;
+  agilink::omnihand::server::transport::RegisterRestRoutes(app, handler);
+  app.validate();
+
+  const Json create_request{{"hand_type", "fake_hand"},
+                            {"conn_method", "fake"},
+                            {"conn_config", Json{{"serial", "router"}}}};
+  crow::request post_request = RestCreateRequest(create_request);
+  post_request.url = "/v1/hands";
+  crow::response post_response;
+  app.handle_full(post_request, post_response);
+  EXPECT_EQ(post_response.code, 201);
+
+  crow::request get_request;
+  get_request.method = crow::HTTPMethod::GET;
+  get_request.url = "/v1/hands/";
+  crow::response get_response;
+  app.handle_full(get_request, get_response);
+  EXPECT_EQ(get_response.code, 200);
+
+  crow::request preflight_request;
+  preflight_request.method = crow::HTTPMethod::Options;
+  preflight_request.url = "/v1/hands";
+  crow::response preflight_response;
+  app.handle_full(preflight_request, preflight_response);
+  EXPECT_EQ(preflight_response.code, 204);
+
+  preflight_request.url = "/v1/hands/";
+  crow::response slash_preflight_response;
+  app.handle_full(preflight_request, slash_preflight_response);
+  EXPECT_EQ(slash_preflight_response.code, 204);
+}
+
+TEST(StaticFileRouterTest, ServesOpenApiDocumentation) {
+  const auto temp_dir = std::filesystem::temp_directory_path() /
+                        ("omnihand_server_static_" +
+                         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+  const auto frontend_dir = temp_dir / "frontend";
+  const auto docs_dir = frontend_dir / "docs";
+  std::filesystem::create_directories(docs_dir);
+  {
+    std::ofstream(docs_dir / "index.html") << "<title>OpenAPI</title>";
+    std::ofstream(docs_dir / "openapi.yml") << "openapi: 3.0.3\n";
+  }
+
+  crow::App<crow::CORSHandler> app;
+  agilink::omnihand::server::transport::RegisterStaticFiles(app, temp_dir / "bin");
+  app.validate();
+
+  crow::request html_request;
+  html_request.url = "/docs/";
+  crow::response html_response;
+  app.handle_full(html_request, html_response);
+  EXPECT_EQ(html_response.code, 200);
+  EXPECT_TRUE(html_response.is_static_type());
+
+  crow::request yaml_request;
+  yaml_request.url = "/docs/openapi.yml";
+  crow::response yaml_response;
+  app.handle_full(yaml_request, yaml_response);
+  EXPECT_EQ(yaml_response.code, 200);
+  EXPECT_TRUE(yaml_response.is_static_type());
+  EXPECT_EQ(yaml_response.get_header_value("Content-Type"), "application/yaml");
+
+  std::filesystem::remove_all(temp_dir);
 }
 
 TEST(HandServiceTest, DuplicateConnectionReturnsExistingSession) {
