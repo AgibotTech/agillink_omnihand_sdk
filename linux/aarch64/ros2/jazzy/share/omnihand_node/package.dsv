@@ -1,0 +1,14 @@
+source;share/omnihand_node/hook/cmake_prefix_path.ps1
+source;share/omnihand_node/hook/cmake_prefix_path.dsv
+source;share/omnihand_node/hook/cmake_prefix_path.sh
+source;share/omnihand_node/hook/ld_library_path_lib.ps1
+source;share/omnihand_node/hook/ld_library_path_lib.dsv
+source;share/omnihand_node/hook/ld_library_path_lib.sh
+source;share/omnihand_node/hook/pythonpath.ps1
+source;share/omnihand_node/hook/pythonpath.dsv
+source;share/omnihand_node/hook/pythonpath.sh
+source;share/omnihand_node/local_setup.bash
+source;share/omnihand_node/local_setup.dsv
+source;share/omnihand_node/local_setup.ps1
+source;share/omnihand_node/local_setup.sh
+source;share/omnihand_node/local_setup.zsh

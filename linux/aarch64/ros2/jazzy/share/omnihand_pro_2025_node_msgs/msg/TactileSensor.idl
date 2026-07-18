@@ -1,0 +1,28 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from omnihand_pro_2025_node_msgs/msg/TactileSensor.msg
+// generated code does not contain a copyright notice
+
+#include "omnihand_pro_2025_node_msgs/msg/TactileSensorData.idl"
+#include "std_msgs/msg/Header.idl"
+
+module omnihand_pro_2025_node_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "OmniHand Pro 2025 (O12) 3D tactile: one TactileSensorData per finger (thumb … palm).")
+    struct TactileSensor {
+      std_msgs::msg::Header header;
+
+      omnihand_pro_2025_node_msgs::msg::TactileSensorData thumb;
+
+      omnihand_pro_2025_node_msgs::msg::TactileSensorData index;
+
+      omnihand_pro_2025_node_msgs::msg::TactileSensorData middle;
+
+      omnihand_pro_2025_node_msgs::msg::TactileSensorData ring;
+
+      omnihand_pro_2025_node_msgs::msg::TactileSensorData little;
+
+      omnihand_pro_2025_node_msgs::msg::TactileSensorData palm;
+    };
+  };
+};
