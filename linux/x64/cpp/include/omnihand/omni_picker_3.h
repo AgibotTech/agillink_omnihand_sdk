@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025, Agibot Co., Ltd.
+// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 #ifndef AGILINK_OMNI_PICKER_3_H
@@ -138,19 +138,6 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0);
 
-#ifdef OMNIHAND_TJ_MARVIN_SDK
-  /**
-   * @brief Factory method - TJ MARVIN controller TJ SDK end-effector CAN/CANFD passthrough
-   * @param hand_type Hand type (left/right)
-   * @param hand_device_id Hand device ID
-   * @param marvin_controller_ip Robotic arm controller IP
-   * @return A unique pointer to OmniPicker3 instance
-   */
-  static std::unique_ptr<OmniPicker3> createHandByTJ(
-      HandType hand_type,
-      uint8_t hand_device_id,
-      const std::string& marvin_controller_ip);
-#endif
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)

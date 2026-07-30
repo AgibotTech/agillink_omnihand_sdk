@@ -83,7 +83,7 @@ class TestHandCreateRequest:
 
     def test_all_valid_conn_methods_accepted(self) -> None:
         valid_methods = [
-            "zlgcan", "hcan", "socketcan", "rs485", "usb", "tj", "zlgcan_tcp",
+            "zlgcan", "hcan", "socketcan", "rs485", "usb", "zlgcan_tcp",
         ]
         for cm in valid_methods:
             req = HandCreateRequest(hand_type="omnihand_2025", conn_method=cm)

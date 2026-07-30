@@ -1,5 +1,5 @@
 ﻿// Copyright (c) 2025, Agibot Co., Ltd.
-// AGILINK OmniHand SDK is licensed under Mulan PSL v2.
+// AGILINK OmniHand SDK is licensed under Mulan PSL v2
 
 /**
  * @file omnihand_3_ultra_m.h
@@ -24,6 +24,52 @@
 
 namespace agilink {
 namespace omnihand {
+
+// ============================================
+// Xense Visual-Tactile Sensor Interface
+// ============================================
+// Xense frame data structure
+struct AGIBOT_EXPORT XenseFrame {
+  // RGB image (HWC format, uint8)
+  std::vector<uint8_t> rgb_image;
+  uint32_t rgb_width;
+  uint32_t rgb_height;
+
+  // Depth image (HWC format, float32, meters)
+  std::vector<float> depth_image;
+  uint32_t depth_width;
+  uint32_t depth_height;
+
+  // Timestamp (nanoseconds)
+  uint64_t timestamp;
+};
+
+// Xense sensor interface
+class AGIBOT_EXPORT IXenseSensor {
+ public:
+  virtual ~IXenseSensor() = default;
+
+  // Initialize Xense sensor
+  virtual bool XenseInit(const std::string& serial_number = "") { return false; }
+
+  // Start streaming
+  virtual bool XenseStart() { return false; }
+
+  // Stop streaming
+  virtual bool XenseStop() { return false; }
+
+  // Get current frame
+  virtual bool XenseGetFrame(XenseFrame& frame) { return false; }
+
+  // Calibrate Xense
+  virtual bool XenseCalibrate() { return false; }
+
+  // Export runtime config
+  virtual bool XenseExportRuntimeConfig(const std::string& path) { return false; }
+
+  // Check if sensor is initialized
+  virtual bool XenseIsInitialized() const { return false; }
+};
 
 enum class H3UMErrorBit : uint16_t {
   H3U_M_ERR_ENCODER_COMM_TIMEOUT = 1 << 0,
@@ -78,7 +124,7 @@ inline std::string H3UMErrorReportToString(const JointMotorErrorReport& report) 
  * @brief OmniHand 3 Ultra (O20) interface class - 20 DOF
  *
  * This class provides the public interface for OmniHand 3 Ultra product.
- * It supports 20 active degrees of freedom.
+ * It supports 20 active degrees of freedom and optional Xense visual-tactile sensor.
  *
  * Angle <-> motor position convention:
  *   - SetAllJointMotorPosi / GetAllJointMotorPosi int16_t values range [0, 4095]
@@ -95,7 +141,7 @@ inline std::string H3UMErrorReportToString(const JointMotorErrorReport& report) 
  *   SetHandGesture, and interfaces for accessing passive joints by single joint
  *   name/index are still placeholder implementations.
  */
-class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, public IOmniHandCalibrator {
+class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, public IOmniHandCalibrator, public IXenseSensor {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // DoA
@@ -107,21 +153,34 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
   // ============ Factory Methods ============
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by canfd_device_id
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param canfd_device_id CANFD device ID
+   * @param canfd_channel_id CANFD channel ID
+   * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      const std::string& xense_serial_number = "");
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param usbcanfd_serial_number USB CANFD serial number
+   * @param canfd_channel_id CANFD channel ID
+   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
+   * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      const std::string& xense_serial_number = "");
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -132,6 +191,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param tcp_host TCP server IP or hostname (e.g. "192.168.0.178")
    * @param tcp_port TCP server port (e.g. 8000)
    * @param canfd_channel_id CAN channel index (0 or 1, default 0)
+   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgCanTcp(
@@ -139,46 +199,57 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t hand_device_id,
       const std::string& tcp_host,
       uint16_t tcp_port,
-      uint8_t canfd_channel_id = 0);
-#endif  // OMNIHAND_ZLG_TCP_SUPPORTED
+      uint8_t canfd_channel_id = 0,
+      const std::string& xense_serial_number = "");
+#endif
 
 #ifdef __linux__
   /**
    * @brief Factory method - SocketCAN communication (Linux native CAN interface)
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param can_interface CAN interface name (e.g. "can0")
+   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
+   * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandSocketCan(
       HandType hand_type,
       uint8_t hand_device_id,
-      const std::string& can_interface = "can0");
+      const std::string& can_interface = "can0",
+      const std::string& xense_serial_number = "");
 #endif
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by canfd_device_id)
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param canfd_device_id CANFD device ID
+   * @param canfd_channel_id CANFD channel ID
+   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
+   * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      const std::string& xense_serial_number = "");
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param hcan_serial_number HCAN serial number
+   * @param canfd_channel_id CANFD channel ID
+   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
+   * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      uint8_t canfd_channel_id = 0);
-
-#ifdef OMNIHAND_TJ_MARVIN_SDK
-  /**
-   * @brief Factory method - TJ MARVIN controller TJ SDK end-effector CAN/CANFD passthrough (O20)
-   */
-  static std::unique_ptr<OmniHand3UltraM> createHandByTJ(
-      HandType hand_type,
-      uint8_t hand_device_id,
-      const std::string& marvin_controller_ip);
-#endif
+      uint8_t canfd_channel_id = 0,
+      const std::string& xense_serial_number = "");
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)

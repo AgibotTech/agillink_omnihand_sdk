@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025, Agibot Co., Ltd.
+// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
@@ -165,19 +165,6 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0);
 
-#ifdef OMNIHAND_TJ_MARVIN_SDK
-  /**
-   * @brief Factory method - TJ MARVIN controller TJ SDK end-effector CAN/CANFD passthrough (O10, parallel to USB-CAN/SocketCAN)
-   * @param hand_type Hand type: LEFT -> TJ left arm end-effector channel (OnSetChDataA), RIGHT -> right arm (OnSetChDataB). Consistent with the convention that left/right hand is mounted on the same-side robotic arm
-   * @param hand_device_id Hand device ID on the OmniHand bus
-   * @param marvin_controller_ip Robotic arm controller IP (UDP, consistent with TJ SDK OnLinkTo)
-   * @note TJ end-effector uses CAN/CANFD passthrough (set_ch=1); COM passthrough does not use this interface
-   */
-  static std::unique_ptr<OmniHand2025> createHandByTJ(
-      HandType hand_type,
-      uint8_t hand_device_id,
-      const std::string& marvin_controller_ip);
-#endif
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
