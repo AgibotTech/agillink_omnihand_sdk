@@ -1,4 +1,4 @@
-# AGILINK OmniHand SDK - Windows (x64) - Version 1.1.7
+# AGILINK OmniHand SDK - Windows (x64) - Version 1.1.8
 
 [中文文档](README_zh_cn.md) | [Overview & API Docs](../../README.md)
 

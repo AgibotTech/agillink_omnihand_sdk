@@ -1,0 +1,4 @@
+msg/TactileSensor.idl
+msg/TactileSensor.msg
+msg/TactileSensorData.idl
+msg/TactileSensorData.msg

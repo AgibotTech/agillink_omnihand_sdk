@@ -1,0 +1,43 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from omnihand_2025_node_msgs/msg/TactileSensor.msg
+// generated code does not contain a copyright notice
+
+#include "std_msgs/msg/Header.idl"
+
+module omnihand_2025_node_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "OmniHand 2025 (O10) 1D tactile: one uint8[] per region; 1g per point, max 255g. ")
+    struct TactileSensor {
+      std_msgs::msg::Header header;
+
+      @verbatim (language="comment", text=
+        "16 points")
+      sequence<uint8> thumb;
+
+      @verbatim (language="comment", text=
+        "18 points")
+      sequence<uint8> index;
+
+      @verbatim (language="comment", text=
+        "18 points")
+      sequence<uint8> middle;
+
+      @verbatim (language="comment", text=
+        "18 points")
+      sequence<uint8> ring;
+
+      @verbatim (language="comment", text=
+        "18 points")
+      sequence<uint8> little;
+
+      @verbatim (language="comment", text=
+        "78 points")
+      sequence<uint8> palm;
+
+      @verbatim (language="comment", text=
+        "102 points")
+      sequence<uint8> dorsum;
+    };
+  };
+};

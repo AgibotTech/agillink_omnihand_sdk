@@ -7,7 +7,7 @@ OmniHand 3 Lite S (O4) - Mix Control Demo (Position + Torque)
 Demonstrates position+torque mixed control via mix_control_by_pt(),
 alternating between two sets of position/torque parameters.
 
-Supports connection types: ZLG CANFD, HCAN, ZLG TCP, SocketCAN, TJ.
+Supports connection types: ZLG CANFD, HCAN, ZLG TCP, SocketCAN.
 Run with -h or --help to see all available options and usage examples.
 """
 
@@ -25,9 +25,6 @@ examples:
 
   # SocketCAN (Linux only)
   python demo_mix_ctrl_pos_torque.py -d socketcan --can-interface can0
-
-  # TJ Marvin controller
-  python demo_mix_ctrl_pos_torque.py -d tj --tj-ip 192.168.10.190
 """
 
 def main():
@@ -36,8 +33,8 @@ def main():
         epilog=EXAMPLES,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'socketcan', 'zlgcan_tcp', 'tj'], default='zlgcan',
-                        help='Device type: zlgcan, hcan, zlgcan_tcp, socketcan (Linux only), tj, default: zlgcan')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'socketcan', 'zlgcan_tcp'], default='zlgcan',
+                        help='Device type: zlgcan, hcan, zlgcan_tcp, socketcan (Linux only), default: zlgcan')
     parser.add_argument('--canfd-device-id', type=int, default=0,
                         help='CANFD device index, default: 0')
     parser.add_argument('--canfd-channel-id', type=int, default=0,
@@ -48,8 +45,6 @@ def main():
                         help='ZLG CAN TCP host address, default: 192.168.0.178')
     parser.add_argument('--port', type=int, default=8000,
                         help='ZLG CAN TCP port, default: 8000')
-    parser.add_argument('--tj-ip', type=str, default='192.168.10.190',
-                        help='TJ Marvin controller IP, default: 192.168.10.190')
     args = parser.parse_args()
 
     print("=" * 60)
@@ -75,12 +70,6 @@ def main():
             hand_type=HandType.LEFT,
             hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
             can_interface=args.can_interface
-        )
-    elif args.device == 'tj':
-        hand = OmniHand3Lite.create_hand_by_tj(
-            hand_type=HandType.LEFT,
-            hand_device_id=OmniHand3Lite.kDefaultHandDeviceId,
-            marvin_controller_ip=args.tj_ip
         )
     else:  # default: zlgcan
         hand = OmniHand3Lite.create_hand_by_zlgcan(

@@ -77,7 +77,7 @@ class AGIBOT_EXPORT OmniHand3LiteSolver {
   static constexpr JointMotorCalib kRight[kActiveJointCount] = {
       {0, 1.58, kActuatorInputMax, kActuatorInputMin},
       {0, 1.58, kActuatorInputMax, kActuatorInputMin},
-      {0.01, 1.59, kActuatorInputMin, kActuatorInputMax},
+      {0.01, 1.59, kActuatorInputMax, kActuatorInputMin},
       {-0.01, 1.58, kActuatorInputMax, kActuatorInputMin},
   };
   static constexpr JointMotorCalib kLeft[kActiveJointCount] = {

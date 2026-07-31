@@ -169,3 +169,4 @@ hand->SetPositionReportCallback([](const std::vector<int16_t>& positions) {
 - [SocketCAN 设置指南](SOCKETCAN_SETUP.md) - Linux SocketCAN 配置说明
 - [OmniHand 2025 (O10) 运动学求解器 C++ API](API_KINEMATICS_CPP_O10.md) - 运动学计算
 - [OmniHand Pro 2025 (O12) 运动学求解器 C++ API](API_KINEMATICS_CPP_O12.md) - 运动学计算
+- [服务器接口 API](API_SERVER.md) - WebSocket 与 RESTful 服务器/客户端接口（C++、Python、Web 浏览器）

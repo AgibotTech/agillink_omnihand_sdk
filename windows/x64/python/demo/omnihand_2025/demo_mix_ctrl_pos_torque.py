@@ -7,7 +7,7 @@ OmniHand 2025 mix control demo (position + torque).
 Demonstrates position+torque mixed control via mix_control_by_pt(),
 alternating between two sets of position/torque parameters.
 
-Supports multiple connection types: ZLG CANFD, HCAN, RS485, ZLG TCP, USB CDC serial, SocketCAN, TJ.
+Supports multiple connection types: ZLG CANFD, HCAN, RS485, ZLG TCP, USB CDC serial, SocketCAN.
 Note: single-axis mix_control_by_pt is not available over USB/RS485.
 Run with -h or --help to see all available options and usage examples.
 """
@@ -32,9 +32,6 @@ examples:
 
   # USB CDC serial (e.g. COM3 or /dev/ttyACM0)
   python demo_mix_ctrl_pos_torque.py -d usb --uart-port COM3
-
-  # TJ Marvin controller
-  python demo_mix_ctrl_pos_torque.py -d tj --tj-ip 192.168.10.190
 """
 
 def main():
@@ -43,8 +40,8 @@ def main():
         epilog=EXAMPLES,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'socketcan', 'zlgcan_tcp', 'rs485', 'usb', 'tj'], default='zlgcan',
-                        help='Device type: zlgcan, hcan, zlgcan_tcp, rs485, usb (CDC serial), socketcan (Linux only), tj, default: zlgcan')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'socketcan', 'zlgcan_tcp', 'rs485', 'usb'], default='zlgcan',
+                        help='Device type: zlgcan, hcan, zlgcan_tcp, rs485, usb (CDC serial), socketcan (Linux only), default: zlgcan')
     parser.add_argument('-t', '--hand-type', choices=['left', 'right'], default='right',
                         help='Hand type: left or right, default: right')
     parser.add_argument('--hand-id', type=int, default=None,
@@ -61,8 +58,6 @@ def main():
                         help='ZLG CAN TCP host address, default: 192.168.0.178')
     parser.add_argument('--port', type=int, default=8000,
                         help='ZLG CAN TCP port, default: 8000')
-    parser.add_argument('--tj-ip', type=str, default='192.168.10.190',
-                        help='TJ Marvin controller IP, default: 192.168.10.190')
     args = parser.parse_args()
 
     hand_type = HandType.LEFT if args.hand_type == 'left' else HandType.RIGHT
@@ -101,12 +96,6 @@ def main():
             hand_type=hand_type,
             hand_device_id=hand_device_id,
             can_interface=args.can_interface
-        )
-    elif args.device == 'tj':
-        hand = OmniHand2025.create_hand_by_tj(
-            hand_type=hand_type,
-            hand_device_id=hand_device_id,
-            marvin_controller_ip=args.tj_ip
         )
     else:  # default: zlgcan
         hand = OmniHand2025.create_hand_by_zlgcan(

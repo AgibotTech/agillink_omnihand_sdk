@@ -8,3 +8,5 @@ _deps/
 build/
 cmake-build*/
 compile_commands.json
+**/__pycache__/
+*.pyc
