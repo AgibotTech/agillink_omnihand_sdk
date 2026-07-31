@@ -24,8 +24,8 @@ omnihand_pro_2025_node_msgs__msg__TactileSensor__get_type_hash(
 
 // Include directives for referenced types
 #include "std_msgs/msg/detail/header__functions.h"
-#include "omnihand_pro_2025_node_msgs/msg/detail/tactile_sensor_data__functions.h"
 #include "builtin_interfaces/msg/detail/time__functions.h"
+#include "omnihand_pro_2025_node_msgs/msg/detail/tactile_sensor_data__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG
