@@ -30,9 +30,6 @@ examples:
 
   # USB CDC serial (e.g. COM3 or /dev/ttyACM0)
   python demo_get_hardware_info.py -d usb --uart-port COM3
-
-  # TJ Marvin controller
-  python demo_get_hardware_info.py -d tj --tj-ip 192.168.10.190
 """
 
 def main():
@@ -41,8 +38,8 @@ def main():
         epilog=EXAMPLES,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'socketcan', 'zlgcan_tcp', 'rs485', 'usb', 'tj'], default='zlgcan',
-                        help='Device type: zlgcan, hcan, zlgcan_tcp, rs485, usb (CDC serial), socketcan (Linux only), tj, default: zlgcan')
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'socketcan', 'zlgcan_tcp', 'rs485', 'usb'], default='zlgcan',
+                        help='Device type: zlgcan, hcan, zlgcan_tcp, rs485, usb (CDC serial), socketcan (Linux only), default: zlgcan')
     parser.add_argument('-t', '--hand-type', choices=['left', 'right'], default='left',
                         help='Hand type: left or right, default: left')
     parser.add_argument('--hand-id', type=int, default=None,
@@ -59,8 +56,6 @@ def main():
                         help='ZLG CAN TCP host address, default: 192.168.0.178')
     parser.add_argument('--port', type=int, default=8000,
                         help='ZLG CAN TCP port, default: 8000')
-    parser.add_argument('--tj-ip', type=str, default='192.168.10.190',
-                        help='TJ Marvin controller IP, default: 192.168.10.190')
     args = parser.parse_args()
 
     hand_type = HandType.LEFT if args.hand_type == 'left' else HandType.RIGHT
@@ -95,12 +90,6 @@ def main():
             hand_type=hand_type,
             hand_device_id=hand_device_id,
             can_interface=args.can_interface
-        )
-    elif args.device == 'tj':
-        hand = OmniHand2025.create_hand_by_tj(
-            hand_type=hand_type,
-            hand_device_id=hand_device_id,
-            marvin_controller_ip=args.tj_ip
         )
     else:  # default: zlgcan
         hand = OmniHand2025.create_hand_by_zlgcan(

@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser(
         description='OmniHand 2025 Set+Get reliability test (set position + get position), log results to CSV'
     )
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485', 'zlgcan_tcp', 'tj'], default='zlgcan',
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'rs485', 'zlgcan_tcp'], default='zlgcan',
                         help='CAN device type (default: zlgcan)')
     parser.add_argument('-i', '--interval_ms', type=int, default=0,
                         help='Request interval in ms (default: 10)')
@@ -39,9 +39,6 @@ def main():
     interval_ms = max(0, args.interval_ms)
     total_iterations = max(1, args.iterations)
     frame_recv_timeout_ms = max(10, min(1000, args.timeout_ms))
-    # TJ path (UDP + controller + bus) is slower than direct CAN; raise default timeout to reduce false timeouts
-    if args.device == 'tj' and frame_recv_timeout_ms < 200:
-        frame_recv_timeout_ms = 200
 
     raw_positions = [int(x.strip()) for x in args.positions.split(',') if x.strip() != ""]
     # O10 fixed 10 joints: pad short lists, truncate long
@@ -66,8 +63,6 @@ def main():
                 host='192.168.0.178', 
                 port=8000
             )
-        elif args.device == 'tj':
-            hand = OmniHand2025.create_hand_by_tj(hand_type=HandType.LEFT, marvin_controller_ip="192.168.10.190")
         else:
             hand = OmniHand2025.create_hand_by_zlgcan(
                 hand_type=HandType.LEFT,

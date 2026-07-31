@@ -16,7 +16,6 @@ crow::response JsonResponse(const DataValue& payload, int status = 200);
 crow::response DetailResponse(const std::string& detail, int status);
 crow::response ProblemResponse(const Problem& problem);
 crow::response HandleException(const std::exception& exc);
-crow::response RedirectToHandsSlash();
 
 }  // namespace transport
 }  // namespace server
