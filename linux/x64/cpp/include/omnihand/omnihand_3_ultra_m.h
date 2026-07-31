@@ -30,45 +30,61 @@ namespace omnihand {
 // ============================================
 // Xense frame data structure
 struct AGIBOT_EXPORT XenseFrame {
-  // RGB image (HWC format, uint8)
-  std::vector<uint8_t> rgb_image;
-  uint32_t rgb_width;
-  uint32_t rgb_height;
+  // Rectified image (BGR, HWC format, uint8)
+  std::vector<uint8_t> rectify_image;
+  uint32_t rectify_width = 0;
+  uint32_t rectify_height = 0;
 
-  // Depth image (HWC format, float32, meters)
-  std::vector<float> depth_image;
-  uint32_t depth_width;
-  uint32_t depth_height;
+  // Difference image (rectify - reference, uint8, HWC)
+  std::vector<uint8_t> difference_image;
+  uint32_t difference_width = 0;
+  uint32_t difference_height = 0;
+
+  // Force distribution (float32, row-major, shape [H, W, C])
+  // C=3 for 3D force vector at each pixel
+  std::vector<float> force;
+  uint32_t force_width = 0;
+  uint32_t force_height = 0;
+
+  // 6-DOF resultant force/torque [Fx, Fy, Fz, Tx, Ty, Tz]
+  float force_resultant[6] = {0, 0, 0, 0, 0, 0};
+
+  // Depth map (float32, meters, shape [H, W])
+  std::vector<float> depth;
+  uint32_t depth_width = 0;
+  uint32_t depth_height = 0;
+
+  // Initial mesh 3D coordinates (float32, shape [H, W, 3], mm)
+  std::vector<float> mesh3d_init;
+  uint32_t mesh_width = 0;
+  uint32_t mesh_height = 0;
+
+  // Mesh displacement field (float32, shape [H, W, 3], mm)
+  std::vector<float> mesh3d_flow;
 
   // Timestamp (nanoseconds)
-  uint64_t timestamp;
+  uint64_t timestamp = 0;
 };
 
-// Xense sensor interface
-class AGIBOT_EXPORT IXenseSensor {
- public:
-  virtual ~IXenseSensor() = default;
+/// Convert raw depth map (float32, meters) to RGB uint8 image (HWC).
+/// Auto-normalizes to [0,1] per-frame, then applies color mapping.
+/// Colors: gray → blue → cyan → green → orange.
+AGIBOT_EXPORT void DepthToRGB(const std::vector<float>& depth,
+                               uint32_t width, uint32_t height,
+                               std::vector<uint8_t>& rgb);
 
-  // Initialize Xense sensor
-  virtual bool XenseInit(const std::string& serial_number = "") { return false; }
+// Note: Palm is NOT Xense-based — it uses a separate data source (TCP from SoC)
+struct AGIBOT_EXPORT PalmFrame {
+  // Force distribution (float32, interleaved fx,fy,fz per pixel)
+  std::vector<float> force;
+  uint32_t width = 0;
+  uint32_t height = 0;
+};
 
-  // Start streaming
-  virtual bool XenseStart() { return false; }
-
-  // Stop streaming
-  virtual bool XenseStop() { return false; }
-
-  // Get current frame
-  virtual bool XenseGetFrame(XenseFrame& frame) { return false; }
-
-  // Calibrate Xense
-  virtual bool XenseCalibrate() { return false; }
-
-  // Export runtime config
-  virtual bool XenseExportRuntimeConfig(const std::string& path) { return false; }
-
-  // Check if sensor is initialized
-  virtual bool XenseIsInitialized() const { return false; }
+// All tactile data: 5 fingers + palm
+struct AGIBOT_EXPORT AllTactileFrame {
+  XenseFrame fingers[5];
+  PalmFrame palm;
 };
 
 enum class H3UMErrorBit : uint16_t {
@@ -141,7 +157,7 @@ inline std::string H3UMErrorReportToString(const JointMotorErrorReport& report) 
  *   SetHandGesture, and interfaces for accessing passive joints by single joint
  *   name/index are still placeholder implementations.
  */
-class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, public IOmniHandCalibrator, public IXenseSensor {
+class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, public IOmniHandCalibrator {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // DoA
@@ -157,6 +173,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_device_id Hand device ID
    * @param canfd_device_id CANFD device ID
    * @param canfd_channel_id CANFD channel ID
+   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_port SoC data port (default 19009)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
@@ -164,7 +182,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
       uint8_t canfd_channel_id = 0,
-      const std::string& xense_serial_number = "");
+      const std::string& soc_host = "192.168.99.2",
+      uint16_t soc_port = 19009);
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -172,7 +191,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_device_id Hand device ID
    * @param usbcanfd_serial_number USB CANFD serial number
    * @param canfd_channel_id CANFD channel ID
-   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
+   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_port SoC data port (default 19009)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
@@ -180,7 +200,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
       uint8_t canfd_channel_id = 0,
-      const std::string& xense_serial_number = "");
+      const std::string& soc_host = "192.168.99.2",
+      uint16_t soc_port = 19009);
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -191,7 +212,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param tcp_host TCP server IP or hostname (e.g. "192.168.0.178")
    * @param tcp_port TCP server port (e.g. 8000)
    * @param canfd_channel_id CAN channel index (0 or 1, default 0)
-   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
+   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_port SoC data port (default 19009)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgCanTcp(
@@ -200,7 +222,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       const std::string& tcp_host,
       uint16_t tcp_port,
       uint8_t canfd_channel_id = 0,
-      const std::string& xense_serial_number = "");
+      const std::string& soc_host = "192.168.99.2",
+      uint16_t soc_port = 19009);
 #endif
 
 #ifdef __linux__
@@ -209,14 +232,16 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param can_interface CAN interface name (e.g. "can0")
-   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
+   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_port SoC data port (default 19009)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandSocketCan(
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& can_interface = "can0",
-      const std::string& xense_serial_number = "");
+      const std::string& soc_host = "192.168.99.2",
+      uint16_t soc_port = 19009);
 #endif
 
   /**
@@ -225,7 +250,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_device_id Hand device ID
    * @param canfd_device_id CANFD device ID
    * @param canfd_channel_id CANFD channel ID
-   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
+   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_port SoC data port (default 19009)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
@@ -233,7 +259,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
       uint8_t canfd_channel_id = 0,
-      const std::string& xense_serial_number = "");
+      const std::string& soc_host = "192.168.99.2",
+      uint16_t soc_port = 19009);
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -241,7 +268,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_device_id Hand device ID
    * @param hcan_serial_number HCAN serial number
    * @param canfd_channel_id CANFD channel ID
-   * @param xense_serial_number Xense sensor serial number (empty = no Xense)
+   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_port SoC data port (default 19009)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
@@ -249,7 +277,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t hand_device_id,
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0,
-      const std::string& xense_serial_number = "");
+      const std::string& soc_host = "192.168.99.2",
+      uint16_t soc_port = 19009);
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
@@ -320,6 +349,29 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
   void SetHandGesture(int gesture_num = 1) override;
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
+
+  // ============ Xense Tactile Sensing ============
+  /**
+   * @brief Get tactile data for a specific finger
+   * @param finger_index 0=thumb, 1=index, 2=middle, 3=ring, 4=pinky
+   * @param frame Output frame data
+   * @return true if frame was successfully retrieved
+   */
+  virtual bool GetFingerTactile(uint8_t finger_index, XenseFrame& frame) { (void)finger_index; (void)frame; return false; }
+
+  /**
+   * @brief Get palm tactile data (TCP from SoC, not Xense)
+   * @param frame Output frame (force field filled)
+   * @return true if frame was successfully retrieved
+   */
+  virtual bool GetPalmTactile(PalmFrame& frame) { (void)frame; return false; }
+
+  /**
+   * @brief Get all 5 finger tactile data at once
+   * @param fingers Output array of 5 finger frames (thumb..pinky)
+   * @return true if all frames were successfully retrieved
+   */
+  virtual bool GetAllTactile(AllTactileFrame& frame) { (void)frame; return false; }
 
   // ============ O20 Extended API ============
 
