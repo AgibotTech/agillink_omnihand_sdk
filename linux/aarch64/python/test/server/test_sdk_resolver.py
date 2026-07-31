@@ -35,7 +35,7 @@ class TestGetSupportedConnTypes:
         methods = get_supported_conn_types()
         assert isinstance(methods, list)
         for m in methods:
-            assert m in ("zlgcan", "hcan", "socketcan", "rs485", "usb", "tj", "zlgcan_tcp")
+            assert m in ("zlgcan", "hcan", "socketcan", "rs485", "usb", "zlgcan_tcp")
 
     def test_contains_core_methods(self) -> None:
         methods = get_supported_conn_types()

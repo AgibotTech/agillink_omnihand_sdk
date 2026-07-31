@@ -8,7 +8,7 @@ const PRODUCT_TYPES = [
 ];
 
 const CONN_TYPES = [
-    'zlgcan', 'hcan', 'socketcan', 'zlgcan_tcp', 'tj', 'rs485', 'usb',
+    'zlgcan', 'hcan', 'socketcan', 'zlgcan_tcp', 'rs485', 'usb',
 ];
 
 const CONN_CONFIG_SCHEMA = {
@@ -22,8 +22,7 @@ const CONN_CONFIG_SCHEMA = {
     ],
     socketcan: [{ can_interface: 'string' }],
     zlgcan_tcp: [{ host: 'string', port: 'int', canfd_channel_id: 'int' }],
-    tj: [{ marvin_controller_ip: 'string' }],
-    rs485: [{ uart_port: 'string', baudrate: 'int' }],
+   rs485: [{ uart_port: 'string', baudrate: 'int' }],
     usb: [{ uart_port: 'string' }],
 };
 

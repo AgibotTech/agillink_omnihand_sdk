@@ -521,7 +521,6 @@ components:
             - socketcan
             - rs485
             - usb
-            - tj
             - zlgcan_tcp
         conn_config:
           type: object
@@ -532,7 +531,6 @@ components:
             - **socketcan**: `{hand_type, hand_device_id, can_interface}`
             - **rs485**: `{hand_type, hand_device_id, uart_port, baudrate}`
             - **usb**: `{hand_type, hand_device_id, uart_port, baudrate}`
-            - **tj**: `{hand_type, hand_device_id, marvin_controller_ip}`
             - **zlgcan_tcp**: `{hand_type, hand_device_id, host, port, canfd_channel_id}`
 
     # ========== 响应 ==========

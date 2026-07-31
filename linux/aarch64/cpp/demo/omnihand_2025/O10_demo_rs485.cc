@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
   // Note: serial port path should be updated for your setup
   std::string left_port = "/dev/ttyUSB0";   // Linux: /dev/ttyUSB0, Windows: COM3
   std::string right_port = "/dev/ttyUSB1";  // Linux: /dev/ttyUSB1, Windows: COM4
-  int32_t baudrate = 115200;
+  int32_t baudrate = 460800;
 
   if (mode == "left" || mode == "both") {
     auto left_hand = agilink::omnihand::OmniHand2025::createHandByRs485(

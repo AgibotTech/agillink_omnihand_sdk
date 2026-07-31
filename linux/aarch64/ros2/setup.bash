@@ -1,7 +1,6 @@
 #!/bin/bash
 # OmniHand ROS2 Setup - Auto-detect ROS distribution
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RELEASE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Supported ROS distributions (in order of preference)
 for distro in humble iron jazzy rolling; do
@@ -20,7 +19,7 @@ for distro in humble iron jazzy rolling; do
         echo "[3/4] Sourcing $SCRIPT_DIR/$distro/setup.bash..."
         source "$SCRIPT_DIR/$distro/setup.bash"
         if [[ $? -eq 0 ]]; then
-            echo "[4/4] Checking external OmniHand C++ SDK runtime..."
+            echo "[4/4] Checking bundled OmniHand runtime..."
             node_executable="$SCRIPT_DIR/$distro/lib/omnihand_node/omnihand_2025_node"
             if [[ ! -x "$node_executable" ]]; then
                 echo "Error: ROS2 node executable is missing: $node_executable" >&2
@@ -35,11 +34,10 @@ for distro in humble iron jazzy rolling; do
             if [[ -n "$missing_dependencies" ]]; then
                 echo "Error: ROS2 node has unresolved runtime dependencies:" >&2
                 echo "$missing_dependencies" | sed 's/^/  /' >&2
-                echo "Install the matching C++ SDK first: $RELEASE_ROOT/install.sh" >&2
-                echo "For a custom prefix, add <prefix>/lib to LD_LIBRARY_PATH." >&2
+                echo "The bundled ROS2 runtime is incomplete." >&2
                 return 1
             fi
-            echo "Success: ROS2 $distro and external OmniHand SDK are ready"
+            echo "Success: ROS2 $distro and bundled OmniHand runtime are ready"
             return 0
         else
             echo "Warning: Failed to source $SCRIPT_DIR/$distro/setup.bash" >&2

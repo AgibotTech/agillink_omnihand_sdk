@@ -11,9 +11,9 @@
 sudo ./setup_udev.sh          # Configure USB permissions (first time only, then log out/in)
 ```
 
-The ROS2 deliverable is a thin package and does not bundle `libomnihand` or
-device-vendor shared libraries. Install the matching C++ SDK with `./install.sh`
-before using the ROS2 nodes, then run:
+The ROS2 deliverable bundles the C++ SDK and device-vendor shared libraries
+required by the ROS2 nodes. It does not include C++ headers, CMake development
+files, or server executables. Before using the ROS2 nodes, run:
 
 ```bash
 source ros2/setup.bash
@@ -48,7 +48,7 @@ aarch64/
 │   ├── *.whl                    # Python wheel
 │   ├── demo/                    # Python demos (not installed)
 │   └── test/                    # Python tests (not installed)
-├── ros2/                        # Thin ROS2 packages (no bundled C++ SDK)
+├── ros2/                        # ROS2 packages with bundled runtime libraries
 │   ├── humble/          # ROS2 distribution
 │   └── setup.bash               # Auto-detect ROS distribution
 ├── install.sh                   # Install script
