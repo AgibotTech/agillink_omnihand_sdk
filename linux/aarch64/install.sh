@@ -24,7 +24,6 @@ sudo rm -f "$PREFIX/lib/libomnihand.so"* 2>/dev/null || true
 sudo rm -f "$PREFIX/lib/libusbcanfd.so"* 2>/dev/null || true
 sudo rm -f "$PREFIX/lib/libusb-1.0.so"* 2>/dev/null || true
 sudo rm -f "$PREFIX/lib/libcanbus.so"* 2>/dev/null || true
-sudo rm -f "$PREFIX/lib/libMarvinSDK.so"* 2>/dev/null || true
 
 sudo mkdir -p "$PREFIX/include" "$PREFIX/lib" "$PREFIX/share/cmake/omnihand"
 sudo cp -r "$SCRIPT_DIR/cpp/include/"* "$PREFIX/include/"

@@ -1,0 +1,56 @@
+[omnihand]
+product_type = [
+    "omnihand_3_lite",
+    "omnihand_3_ultra_m",
+    "omnihand_2025",
+    "omnihand_pro_2025",
+]
+
+conn_type = [
+    "hcan",
+    "zlgcan",
+    "usb",
+    "rs485",
+    "socketcan",
+]
+
+[[omnihand.conn_config.zlgcan]]
+product_type= "string"
+hand_type= "string"
+hand_device_id= "int"
+canfd_device_id= "int"
+canfd_channel_id= "int"
+
+[[omnihand.conn_config.zlgcan]]
+product_type= "string"
+hand_type= "string"
+hand_device_id= "int"
+usbcanfd_serial_number= "string"
+canfd_channel_id= "int"
+
+[[omnihand.conn_config.rs485]]
+product_type= "string"
+hand_type= "string"
+hand_device_id= "int"
+uart_port= "string"
+baudrate= "int"
+
+[[omnihand.conn_config.hcan]]
+product_type= "string"
+hand_type= "string"
+hand_device_id= "int"
+canfd_device_id= "int"
+canfd_channel_id= "int"
+
+[[omnihand.conn_config.hcan]]
+product_type= "string"
+hand_type= "string"
+hand_device_id= "int"
+hcan_serial_number= "string"
+canfd_channel_id= "int"
+
+[[omnihand.conn_config.socketcan]]
+product_type= "string"
+hand_type= "string"
+hand_device_id= "int"
+can_interface= "string"

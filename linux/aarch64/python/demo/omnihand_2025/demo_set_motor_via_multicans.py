@@ -7,20 +7,14 @@ from omnihand import OmniHand2025, Finger, ControlMode, HandType
 
 def main():
     parser = argparse.ArgumentParser(description='Control multiple hands via multiple CAN devices')
-    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan', 'tj'], default='zlgcan',
+    parser.add_argument('-d', '--device', choices=['zlgcan', 'hcan'], default='zlgcan',
                         help='CAN device type: zlgcan (ZLG USB CANFD) or hcan (HCAN USB CANFD), default: zlgcan')
     args = parser.parse_args()
     
     # Two ways to create hand (pick by device type):
     # - canfd_device_id: by adapter index, no scan, single open; index may change after replug/reboot.
     # - usbcanfd_serial_number: by serial, scan then open, extra open/close; serial is stable.
-    if args.device == 'tj':
-        left_hand = OmniHand2025.create_hand_by_tj(hand_type=HandType.LEFT, marvin_controller_ip="192.168.10.190")
-        right_hand = OmniHand2025.create_hand_by_tj(hand_type=HandType.RIGHT, marvin_controller_ip="192.168.10.190")
-        # TjMarvinCanBusDevice defaults to 200ms; increase if timeouts persist (UDP + arm scheduling + CAN)
-        for _h in (left_hand, right_hand):
-            _h.set_frame_recv_timeout(200)
-    elif args.device == 'hcan':
+    if args.device == 'hcan':
         left_hand = OmniHand2025.create_hand_by_hcan(HandType.LEFT, OmniHand2025.kDefaultHandDeviceId, "201BFF2AF01202D44690")
         right_hand = OmniHand2025.create_hand_by_hcan(HandType.RIGHT, OmniHand2025.kDefaultHandDeviceId, "A029A58630B30D14DBB")
     else:  # default: zlgcan

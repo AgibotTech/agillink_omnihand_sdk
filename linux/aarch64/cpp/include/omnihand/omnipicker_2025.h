@@ -273,15 +273,6 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
     ThrowUnsupported("GetMitFrameRange");
   };
 
-  /**
-   * @brief Move the gripper to a position expressed as a normalized ratio [0.0, 1.0].
-   * @param ratio 0.0 = fully closed, 1.0 = fully open.
-   * @return Resulting raw position command sent to the motor, or -1 on error.
-   */
-  virtual int16_t SetPositionRatio(float ratio) {
-    ThrowUnsupported("SetPositionRatio");
-  }
-
   virtual void UpdateFirmwareViaFlash(const std::string&, OtaProgressCallback = nullptr) {
     ThrowUnsupported("UpdateFirmwareViaFlash");
   }
@@ -432,34 +423,17 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0);
 
-#ifdef OMNIHAND_TJ_MARVIN_SDK
-  /**
-   * @brief Factory method - TJ MARVIN controller TJ SDK end-effector CAN/CANFD passthrough
-   * @param hand_type Hand type (left/right)
-   * @param hand_device_id Hand device ID
-   * @param marvin_controller_ip Robotic arm controller IP
-   * @return A unique pointer to OmniPicker2025 instance
-   */
-  static std::unique_ptr<OmniPicker2025> createHandByTJ(
-      HandType hand_type,
-      uint8_t hand_device_id,
-      const std::string& marvin_controller_ip);
-#endif
 
   /**
    * @brief Sets the gripper to a predefined gesture (typed API).
    */
-  void SetHandGesture(OmniPicker2025Gesture gesture);
+  virtual float SetHandGesture(OmniPicker2025Gesture gesture) = 0;
 
   /**
    * @brief Returns gesture target motor position by typed gesture.
    */
-  std::vector<int16_t> GetHandGesture(OmniPicker2025Gesture gesture);
+  virtual float GetHandGesture(OmniPicker2025Gesture gesture) = 0;
 
-  /**
-   * @brief Sets the gripper to a predefined gesture by numeric ID.
-   * @param gesture_num Gesture number (default: 1 = HALF_OPEN)
-   */
   void SetHandGesture(int gesture_num = 1) override;
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
@@ -488,6 +462,15 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
    */
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNI_PICKER_2025, device_id, hand_type);
+  }
+
+  /**
+   * @brief Move the gripper to a position expressed as a normalized ratio [0.0, 1.0].
+   * @param ratio 0.0 = fully closed, 1.0 = fully open.
+   * @return ratio of position in feaaback.
+   */
+  virtual float SetPositionRatio(float ratio) {
+    ThrowUnsupported("SetPositionRatio");
   }
 
 };

@@ -1,0 +1,6 @@
+
+vendor = "OmniHand"
+manufacturer = "Agibot Co., Ltd."
+contact = "wujunxiao@agibot.com"
+license = "Mulan PSL v2"
+sdk_version = "0.x.x"

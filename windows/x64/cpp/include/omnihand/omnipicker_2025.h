@@ -423,19 +423,6 @@ class AGIBOT_EXPORT OmniPicker2025 : public OmniHand {
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0);
 
-#ifdef OMNIHAND_TJ_MARVIN_SDK
-  /**
-   * @brief Factory method - TJ MARVIN controller TJ SDK end-effector CAN/CANFD passthrough
-   * @param hand_type Hand type (left/right)
-   * @param hand_device_id Hand device ID
-   * @param marvin_controller_ip Robotic arm controller IP
-   * @return A unique pointer to OmniPicker2025 instance
-   */
-  static std::unique_ptr<OmniPicker2025> createHandByTJ(
-      HandType hand_type,
-      uint8_t hand_device_id,
-      const std::string& marvin_controller_ip);
-#endif
 
   /**
    * @brief Sets the gripper to a predefined gesture (typed API).

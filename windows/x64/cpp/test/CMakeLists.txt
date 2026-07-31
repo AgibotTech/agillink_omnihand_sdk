@@ -161,12 +161,13 @@ if(BUILD_OMNIHAND_3_ULTRA_M)
   add_test(NAME OmniHand3UltraMTest COMMAND test_omnihand_3_ultra_m)
 endif()
 
-# OmniHand Server core tests use a fake IHandDeviceFactory and need no hardware.
+# OmniHand Server tests use a fake IHandDeviceFactory and need no hardware.
 add_executable(test_omnihand_server test_omnihand_server.cc)
 target_link_libraries(
   test_omnihand_server
   PRIVATE
   omnihand_server_core
+  omnihand_server_crow
   omnihand_server_json_codec
   GTest::gtest
   GTest::gtest_main

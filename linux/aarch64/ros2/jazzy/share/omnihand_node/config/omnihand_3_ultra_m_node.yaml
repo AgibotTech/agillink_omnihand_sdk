@@ -1,0 +1,47 @@
+# OmniHand 3 Ultra M(O20) Configuration
+# use "/**" to match any namespace below this node, avoid launch changing namespace (e.g. 'h3u_m')
+# top level key mismatch with node FQN (/h3u_m/omnihand_3_ultra_m_param_reader) will cause all parameters to default to the default value.
+# connection_type: "zlgcan" | "hcan" | "socketcan" (socketcan only supported on Linux)
+# request_interval_ms: min gap between requests, SDK default 0 = no throttling, range 0..100
+# frame_recv_timeout_ms: single-frame reply wait, SDK default 50, range 10..1000
+#
+# /joint_states is driven entirely by /joint_cmd (one echoed frame per cmd);
+# there is no self-driven publish rate to configure. For periodic state
+# without active control, have the publisher repeat the last position.
+
+/**:
+  ros__parameters:
+    # zlgcan example
+    # left_hand:
+    #   hand_device_id: 9
+    #   connection_type: "zlgcan"
+    #   canfd_device_id: 0
+    #   canfd_channel_id: 0
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: false
+    #
+    # right_hand:
+    #   hand_device_id: 9
+    #   connection_type: "zlgcan"
+    #   canfd_device_id: 0
+    #   canfd_channel_id: 1
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: false
+    # socketcan example
+    left_hand:
+      hand_device_id: 9
+      connection_type: "socketcan"
+      can_interface: "can0"
+      request_interval_ms: 0
+      frame_recv_timeout_ms: 50
+      show_data_details: true
+
+    right_hand:
+      hand_device_id: 9
+      connection_type: "socketcan"
+      can_interface: "can1"
+      request_interval_ms: 0
+      frame_recv_timeout_ms: 50
+      show_data_details: true

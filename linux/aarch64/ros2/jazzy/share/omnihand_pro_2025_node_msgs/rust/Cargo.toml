@@ -1,0 +1,19 @@
+[package]
+name = "omnihand_pro_2025_node_msgs"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+rosidl_runtime_rs = "0.6"
+serde = { version = "1", optional = true, features = ["derive"] }
+serde-big-array = { version = "0.5.1", optional = true }
+
+# ROS Dependencies
+builtin_interfaces = "*"
+std_msgs = "*"
+
+[features]
+serde = ['dep:serde', 'dep:serde-big-array', 'rosidl_runtime_rs/serde', 'builtin_interfaces/serde', 'std_msgs/serde']
+
+[package.metadata.ros-env]
+include = true

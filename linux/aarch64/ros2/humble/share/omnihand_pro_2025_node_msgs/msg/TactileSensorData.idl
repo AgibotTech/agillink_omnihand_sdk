@@ -1,0 +1,34 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from omnihand_pro_2025_node_msgs/msg/TactileSensorData.msg
+// generated code does not contain a copyright notice
+
+
+module omnihand_pro_2025_node_msgs {
+  module msg {
+    struct TactileSensorData {
+      @verbatim (language="comment", text=
+        "1=sensor online; 0=sensor offline")
+      uint8 online_state;
+
+      @verbatim (language="comment", text=
+        "6-channel 24-bit value")
+      sequence<uint32> channel_value;
+
+      @verbatim (language="comment", text=
+        "normal force (0.1 N, 0 ~ 3000)")
+      uint16 normal_force;
+
+      @verbatim (language="comment", text=
+        "tangent force (0.1 N, 0 ~ 3000)")
+      uint16 tangent_force;
+
+      @verbatim (language="comment", text=
+        "tangent force angle, fingertip-up = 0°, clockwise (0~359)")
+      uint16 tangent_force_angle;
+
+      @verbatim (language="comment", text=
+        "4 self-capacitance proximity values")
+      sequence<uint8> capa_approach;
+    };
+  };
+};

@@ -1,0 +1,819 @@
+openapi: "3.0.3"
+info:
+  title: OmniHand API
+  version: "1.1.0"
+  license:
+    name: Mulan PSL v2
+    url: https://license.coscl.org.cn/MulanPSL2
+  description: |
+    OmniHand SDK REST API — 手部实例管理与远程方法调用。
+
+    支持产品型号:
+    - `omnihand_2025` (O10, 10 DOF)
+    - `omnihand_pro_2025` (O12, 12 DOF)
+    - `omnihand_dex_umi` (10 DOF, UMI 协议)
+    - `omnihand_3_lite` (O4, 4 DOF)
+    - `omnihand_3_ultra_m` (O20, 20 DOF)
+  contact:
+    name: OmniHand SDK Team
+    email: junxiaowu@agibot.com
+
+servers:
+  - url: http://localhost:8000/v1
+    description: 本地开发服务器
+
+security: []
+
+paths:
+  /hands:
+    post:
+      tags: [Hands]
+      summary: 创建 OmniHand 手部实例
+      operationId: create_hand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HandCreateRequest"
+      responses:
+        "200":
+          description: 手部实例已存在（幂等创建）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HandCreateResponse"
+        "201":
+          description: 成功创建
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HandCreateResponse"
+        "400":
+          description: 无效请求参数
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    get:
+      tags: [Hands]
+      summary: 获取所有已创建的手部实例
+      operationId: get_hands
+      responses:
+        "200":
+          description: 手部实例列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hands:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/HandSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /hands/vendor-info:
+    get:
+      tags: [Hands]
+      summary: 查询厂商信息
+      operationId: get_vendor_info
+      responses:
+        "200":
+          description: 厂商信息
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorInfo"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /hands/type:
+    get:
+      tags: [Hands]
+      summary: 查询可选的手部类型或连接方式
+      operationId: get_hand_type
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [vendor, connection]
+      responses:
+        "200":
+          description: 类型列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: array
+                    items:
+                      type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /hands/{hand_id}:
+    get:
+      tags: [Hands]
+      summary: 查询手部实例详情
+      operationId: get_hand
+      parameters:
+        - name: hand_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: info
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: 是否返回完整设备信息
+      responses:
+        "200":
+          description: 手部实例状态
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HandDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+    delete:
+      tags: [Hands]
+      summary: 释放手部实例资源
+      operationId: release_hand
+      parameters:
+        - name: hand_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 释放结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  already_released:
+                    type: boolean
+                    description: 该 hand_id 是否已释放
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /hands/{hand_id}/methods:
+    get:
+      tags: [Hands]
+      summary: 查询该手部实例支持的所有可调用方法
+      operationId: get_hand_methods
+      parameters:
+        - name: hand_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 方法列表（按类别分组）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MethodListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+    post:
+      tags: [Hands]
+      summary: 调用手部实例方法
+      description: |
+        根据 `method` 参数调用指定方法，请求体和响应体结构取决于具体方法。
+
+        ## 通用信息类方法
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `init` | — | `bool` | 全部 |
+        | `get_product_type` | — | `int` (ProductType 枚举) | 全部 |
+        | `get_vendor_info` | — | VendorInfo | 全部 |
+        | `get_device_info` | — | DeviceInfo | 全部 |
+        | `get_sensor_order` | — | `int[]` | O10, UMI |
+
+        ## 关节位置
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `set_joint_position` | `joint_motor_index: int`, `posi: int` | `null` | O10, O12, O4, H3UM |
+        | `get_joint_position` | `joint_motor_index: int` | `int` | 全部 |
+        | `set_all_joint_positions` | `vec_posi: int[]` | `int[]` (设备返回的实际位置) | O10, O12, O4, H3UM |
+        | `get_all_joint_positions` | — | `int[]` | 全部 |
+        | `set_all_active_joint_angles` | `angles: float[]` | `null` | O10, O12, O4, H3UM |
+        | `get_all_active_joint_angles` | — | `float[]` | 全部 |
+        | `get_all_joint_angles` | `active_joint_angles?: float[]` | `float[]` | 全部 |
+
+        ## 手势
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `set_hand_gesture` | `gesture: int` (手势编号，见下方手势表) | `null` | 全部 |
+
+        ## 关节速度
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `set_joint_velocity` | `joint_motor_index: int`, `velo: int` | `null` | O10, O12, O4, H3UM |
+        | `get_joint_velocity` | `joint_motor_index: int` | `int` | O10, O12, O4, H3UM |
+        | `set_all_joint_velocities` | `vec_velo: int[]` | `null` | O10, O12, O4, H3UM |
+        | `get_all_joint_velocities` | — | `int[]` | O10, O12, O4, H3UM |
+
+        ## 控制模式（仅 O12, H3UM）
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `set_control_mode` | `joint_motor_index: int`, `mode: int` (0=POSITION, 1=SERVO, 2=VELOCITY, 3=TORQUE, 4=POSITION_TORQUE, 5=VELOCITY_TORQUE, 6=POSITION_VELOCITY_TORQUE) | `null` | O12, H3UM |
+        | `get_control_mode` | `joint_motor_index: int` | `int` | O12, H3UM |
+        | `set_all_control_modes` | `ctrl_modes: int[]` | `null` | O12, H3UM |
+        | `get_all_control_modes` | — | `int[]` | O12, H3UM |
+
+        ## 触觉传感器
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `get_tactile_sensor_data` | `finger_index: int` (1=LITTLE..5=THUMB) | `int[]` (1D 原始数据) | O10 |
+        | `get_tactile_sensor_data_raw` | `finger_index: int` | TactileSensorData | O10, UMI |
+        | `get_all_tactile_sensor_data_raw` | — | TactileSensorData[] | O10, UMI |
+        | `get_tactile_sensor_3d_data` | `finger_index: int` | TactileSensor3DData | O12 |
+        | `get_sensor_data_length` | `finger_index: int` | `int` | O10, UMI |
+
+        ## 电流阈值
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `set_current_threshold` | `joint_motor_index: int`, `current_threshold: int` | `null` | O10, O12, O4, H3UM |
+        | `get_current_threshold` | `joint_motor_index: int` | `int` | O10, O12, O4, H3UM |
+        | `set_all_current_thresholds` | `current_thresholds: int[]` | `null` | O10, O12, O4, H3UM |
+        | `get_all_current_thresholds` | — | `int[]` | O10, O12, O4, H3UM |
+
+        ## 混合控制
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `mix_ctrl_joint_motor` | `mix_ctrls: {joint_index, ctrl_mode, tgt_posi, tgt_velo, tgt_torque}[]` | `null` | O10, O12, O4, H3UM |
+
+        ## 错误报告
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `get_error_report` | `joint_motor_index: int` | JointMotorErrorReport | 全部 |
+        | `get_all_error_reports` | — | JointMotorErrorReport[] | 全部 |
+        | `set_error_report_period` | `joint_motor_index: int`, `period: int` | `null` | O12 |
+        | `set_all_error_report_periods` | `vec_period: int[]` | `null` | O12 |
+        | `clear_error_report` | `joint_motor_index: int` | `null` | H3UM |
+        | `clear_all_error_report` | — | `null` | H3UM |
+
+        ## 温度报告
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `get_temperature_report` | `joint_motor_index: int` | `int` | 全部 |
+        | `get_all_temperature_reports` | — | `int[]` | 全部 |
+        | `set_temperature_report_period` | `joint_motor_index: int`, `period: int` | `null` | O12 |
+        | `set_all_temperature_report_periods` | `vec_period: int[]` | `null` | O12 |
+
+        ## 电流报告
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `get_current_report` | `joint_motor_index: int` | `int` | 全部 |
+        | `get_all_current_reports` | — | `int[]` | 全部 |
+        | `set_current_report_period` | `joint_motor_index: int`, `period: int` | `null` | O12 |
+        | `set_all_current_report_periods` | `vec_period: int[]` | `null` | O12 |
+
+        ## 通信参数
+        | method | 参数 | 返回值 | 适用产品 |
+        |--------|------|--------|----------|
+        | `set_request_interval` | `milliseconds: int` (0-100, 0=无限制, 默认30) | `null` | 全部 |
+        | `get_request_interval` | — | `int` | 全部 |
+        | `set_frame_recv_timeout` | `milliseconds: int` (10-1000, 默认50, 仅CAN) | `null` | 全部 |
+        | `get_frame_recv_timeout` | — | `int` (RS485 返回0) | 全部 |
+        | `show_data_details` | `show: bool` | `null` | 全部 |
+        | `set_device_id` | `device_id: int` | `null` | 全部 |
+
+        ## UMI 标定（仅 OmniHand Dex UMI）
+        | method | 参数 | 返回值 |
+        |--------|------|--------|
+        | `set_min_position_calibration` | `joint_index?: int` (省略则标定全部10关节) | `null` |
+        | `set_max_position_calibration` | `joint_index?: int` (省略则标定全部10关节) | `null` |
+
+        ## O10 手势枚举 (OmniHand2025Gesture)
+        | 值 | 常量名 | 说明 |
+        |----|--------|------|
+        | 0 | OMNIHAND_2025_GESTURE_PAPER | 手掌张开 |
+        | 1 | OMNIHAND_2025_GESTURE_FIST1 | 握拳1 |
+        | 2 | OMNIHAND_2025_GESTURE_FIST2 | 握拳2 |
+        | 3 | OMNIHAND_2025_GESTURE_OK | OK |
+        | 4 | OMNIHAND_2025_GESTURE_ONE_HANDED_FINGER_HEART | 单手比心 |
+        | 5 | OMNIHAND_2025_GESTURE_LIKE | 点赞 |
+        | 6 | OMNIHAND_2025_GESTURE_ILY | ILY 手势 |
+        | 7 | OMNIHAND_2025_GESTURE_NUM1 | 数字1 |
+        | 8 | OMNIHAND_2025_GESTURE_NUM2 | 数字2 |
+        | 9 | OMNIHAND_2025_GESTURE_NUM3 | 数字3 |
+        | 10 | OMNIHAND_2025_GESTURE_NUM4 | 数字4 |
+        | 11 | OMNIHAND_2025_GESTURE_NUM6 | 数字6 |
+        | 12 | OMNIHAND_2025_GESTURE_NUM8 | 数字8 |
+        | 13 | OMNIHAND_2025_GESTURE_HAND_HEART1 | 双手比心1 |
+        | 14 | OMNIHAND_2025_GESTURE_HAND_HEART2 | 双手比心2 |
+        | 15 | OMNIHAND_2025_GESTURE_HAND_HEART3 | 双手比心3 |
+        | 16 | OMNIHAND_2025_GESTURE_CLASPING | 握紧 |
+
+        ## O12 手势枚举 (OmniHandPro2025Gesture)
+        | 值 | 常量名 | 说明 |
+        |----|--------|------|
+        | 0 | OMNIHAND_PRO_2025_GESTURE_ALL_ZERO | 全零位 |
+        | 1 | OMNIHAND_PRO_2025_GESTURE_PAPER | 手掌张开 |
+        | 2 | OMNIHAND_PRO_2025_GESTURE_FIST | 握拳 |
+        | 3 | OMNIHAND_PRO_2025_GESTURE_OK | OK |
+        | 4 | OMNIHAND_PRO_2025_GESTURE_PACK | 收拢 |
+
+        ## O4 手势枚举 (OmniHand3LiteGesture)
+        | 值 | 常量名 | 说明 |
+        |----|--------|------|
+        | 0 | OMNI_HAND_3_LITE_GESTURE_ALL_ZERO | 全零位 |
+        | 1 | OMNI_HAND_3_LITE_GESTURE_FIST | 握拳 |
+        | 2 | OMNI_HAND_3_LITE_GESTURE_OPEN | 张开 |
+
+        ## Finger (手指) 枚举
+        | 值 | 常量名 |
+        |----|--------|
+        | 1 | THUMB (拇指) |
+        | 2 | INDEX (食指) |
+        | 3 | MIDDLE (中指) |
+        | 4 | RING (无名指) |
+        | 5 | LITTLE (小指) |
+        | 6 | PALM (手掌) |
+        | 7 | DORSUM (手背) |
+
+        ## ControlMode 枚举
+        | 值 | 常量名 |
+        |----|--------|
+        | 0 | POSITION |
+        | 1 | SERVO |
+        | 2 | VELOCITY |
+        | 3 | TORQUE |
+        | 4 | POSITION_TORQUE |
+        | 5 | VELOCITY_TORQUE |
+        | 6 | POSITION_VELOCITY_TORQUE |
+      operationId: call_hand_method
+      parameters:
+        - name: hand_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: method
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 要调用的方法名（见上方方法表）
+      requestBody:
+        required: false
+        description: 方法参数，JSON 对象，键为参数名，值为参数值
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              set_joint_position:
+                summary: 设置单个关节位置
+                value:
+                  joint_motor_index: 0
+                  posi: 2048
+              set_all_joint_positions:
+                summary: 设置全部关节位置
+                value:
+                  vec_posi: [2048, 2048, 2048, 2048, 2048, 2048, 2048, 2048, 2048, 2048]
+              set_all_active_joint_angles:
+                summary: 设置全部主动关节角度
+                value:
+                  angles: [0.0, 0.5, 0.3, 0.0, 0.5, 0.3, 0.0, 0.5, 0.3, 0.0]
+              set_hand_gesture:
+                summary: 设置手势
+                value:
+                  gesture: 1
+              set_control_mode:
+                summary: 设置控制模式
+                value:
+                  joint_motor_index: 0
+                  mode: 0
+              mix_ctrl_joint_motor:
+                summary: 混合控制关节
+                value:
+                  mix_ctrls:
+                    - joint_index: 0
+                      ctrl_mode: 0
+                      tgt_posi: 2048
+                      tgt_velo: 0
+                      tgt_torque: 0
+              get_tactile_sensor_data:
+                summary: 获取触觉传感器数据
+                value:
+                  finger_index: 1
+              set_request_interval:
+                summary: 设置请求间隔
+                value:
+                  milliseconds: 30
+      responses:
+        "200":
+          description: 方法调用结果
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MethodCallResponse"
+              examples:
+                get_joint_position:
+                  summary: 获取单个关节位置结果
+                  value:
+                    result: 2048
+                get_all_joint_positions:
+                  summary: 获取全部关节位置结果
+                  value:
+                    result: [2048, 2048, 2048, 2048, 2048, 2048, 2048, 2048, 2048, 2048]
+                get_vendor_info:
+                  summary: 获取厂商信息结果
+                  value:
+                    result:
+                      product_model: "OmniHand 2025"
+                      product_seq_num: "SN123456"
+                      hardware_version: { major: 1, minor: 0, patch: 0, res: 0 }
+                      software_version: { major: 2, minor: 1, patch: 0, res: 0 }
+                      voltage: 24
+                      dof: 10
+                get_error_report:
+                  summary: 获取错误报告结果
+                  value:
+                    result:
+                      stalled: false
+                      overheat: false
+                      over_current: false
+                      motor_except: false
+                      commu_except: false
+                get_all_error_reports:
+                  summary: 获取全部错误报告结果
+                  value:
+                    result:
+                      - stalled: false
+                        overheat: false
+                        over_current: false
+                        motor_except: false
+                        commu_except: false
+                init:
+                  summary: 初始化检查结果
+                  value:
+                    result: true
+        "400":
+          description: 未知方法或参数无效
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /health:
+    get:
+      tags: [System]
+      summary: 健康检查
+      operationId: health_check
+      responses:
+        "200":
+          description: 服务正常
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+components:
+  schemas:
+    # ========== 请求 ==========
+    HandCreateRequest:
+      type: object
+      required: [hand_type, conn_method, conn_config]
+      properties:
+        hand_type:
+          type: string
+          description: 手部型号
+          enum:
+            - omnihand_2025
+            - omnihand_pro_2025
+            - omnihand_dex_umi
+            - omnihand_3_lite
+            - omnihand_3_ultra_m
+        hand_side:
+          type: string
+          description: 手部侧别，默认为左手
+          default: left
+          enum: [left, right]
+        conn_method:
+          type: string
+          description: 连接方式
+          enum:
+            - zlgcan
+            - hcan
+            - socketcan
+            - rs485
+            - usb
+            - zlgcan_tcp
+        conn_config:
+          type: object
+          description: |
+            连接参数，取决于 conn_method:
+            - **zlgcan**: `{hand_type, hand_device_id, canfd_device_id, canfd_channel_id}` 或 `{hand_type, hand_device_id, usbcanfd_serial_number, canfd_channel_id}`
+            - **hcan**: `{hand_type, hand_device_id, canfd_device_id, canfd_channel_id}` 或 `{hand_type, hand_device_id, hcan_serial_number, canfd_channel_id}`
+            - **socketcan**: `{hand_type, hand_device_id, can_interface}`
+            - **rs485**: `{hand_type, hand_device_id, uart_port, baudrate}`
+            - **usb**: `{hand_type, hand_device_id, uart_port, baudrate}`
+            - **zlgcan_tcp**: `{hand_type, hand_device_id, host, port, canfd_channel_id}`
+
+    # ========== 响应 ==========
+    HandCreateResponse:
+      type: object
+      required: [hand_id, already_created]
+      properties:
+        hand_id:
+          type: integer
+          description: 后端注册的唯一手部标识
+        already_created:
+          type: boolean
+          description: 该 hand_id 是否已存在（幂等创建）
+
+    HandSummary:
+      type: object
+      properties:
+        hand_id:
+          type: integer
+        hand_type:
+          type: string
+        conn_method:
+          type: string
+
+    HandDetail:
+      type: object
+      properties:
+        already_created:
+          type: boolean
+        hand_type:
+          type: string
+        conn_method:
+          type: string
+        device_info:
+          $ref: "#/components/schemas/DeviceInfo"
+        vendor_info:
+          $ref: "#/components/schemas/VendorInfo"
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    MethodCallResponse:
+      type: object
+      properties:
+        result:
+          description: |
+            方法返回结果，类型取决于具体方法。可能类型:
+            - `bool` — init 等
+            - `int` — get_joint_position, get_temperature_report 等
+            - `int[]` — get_all_joint_positions, get_all_temperature_reports 等
+            - `float[]` — get_all_active_joint_angles, get_all_joint_angles
+            - VendorInfo — get_vendor_info
+            - DeviceInfo — get_device_info
+            - JointMotorErrorReport — get_error_report
+            - JointMotorErrorReport[] — get_all_error_reports
+            - TactileSensorData — get_tactile_sensor_data_raw
+            - TactileSensorData[] — get_all_tactile_sensor_data_raw
+            - TactileSensor3DData — get_tactile_sensor_3d_data
+
+    # ========== 方法枚举 ==========
+    MethodListResponse:
+      type: object
+      properties:
+        methods:
+          type: object
+          properties:
+            info:
+              type: array
+              description: 通用信息类
+              items:
+                type: string
+              example: ["init", "get_product_type", "get_vendor_info", "get_device_info", "get_sensor_order"]
+            position:
+              type: array
+              description: 关节位置
+              items:
+                type: string
+              example: ["set_joint_position", "get_joint_position", "set_all_joint_positions", "get_all_joint_positions", "set_all_active_joint_angles", "get_all_active_joint_angles", "get_all_joint_angles"]
+            gesture:
+              type: array
+              description: 手势
+              items:
+                type: string
+              example: ["set_hand_gesture"]
+            velocity:
+              type: array
+              description: 关节速度
+              items:
+                type: string
+              example: ["set_joint_velocity", "get_joint_velocity", "set_all_joint_velocities", "get_all_joint_velocities"]
+            control_mode:
+              type: array
+              description: 控制模式 (O12/H3UM)
+              items:
+                type: string
+              example: ["set_control_mode", "get_control_mode", "set_all_control_modes", "get_all_control_modes"]
+            tactile:
+              type: array
+              description: 触觉传感器
+              items:
+                type: string
+              example: ["get_tactile_sensor_data", "get_tactile_sensor_data_raw", "get_all_tactile_sensor_data_raw", "get_tactile_sensor_3d_data", "get_sensor_data_length"]
+            current_threshold:
+              type: array
+              description: 电流阈值
+              items:
+                type: string
+              example: ["set_current_threshold", "get_current_threshold", "set_all_current_thresholds", "get_all_current_thresholds"]
+            mix_ctrl:
+              type: array
+              description: 混合控制
+              items:
+                type: string
+              example: ["mix_ctrl_joint_motor"]
+            error:
+              type: array
+              description: 错误报告
+              items:
+                type: string
+              example: ["get_error_report", "get_all_error_reports", "set_error_report_period", "set_all_error_report_periods", "clear_error_report", "clear_all_error_report"]
+            temperature:
+              type: array
+              description: 温度报告
+              items:
+                type: string
+              example: ["get_temperature_report", "get_all_temperature_reports", "set_temperature_report_period", "set_all_temperature_report_periods"]
+            current:
+              type: array
+              description: 电流报告
+              items:
+                type: string
+              example: ["get_current_report", "get_all_current_reports", "set_current_report_period", "set_all_current_report_periods"]
+            communication:
+              type: array
+              description: 通信参数
+              items:
+                type: string
+              example: ["set_request_interval", "get_request_interval", "set_frame_recv_timeout", "get_frame_recv_timeout", "show_data_details", "set_device_id"]
+            calibration:
+              type: array
+              description: 标定 (UMI)
+              items:
+                type: string
+              example: ["set_min_position_calibration", "set_max_position_calibration"]
+
+    # ========== 数据类型 ==========
+    Version:
+      type: object
+      properties:
+        major:
+          type: integer
+        minor:
+          type: integer
+        patch:
+          type: integer
+        res:
+          type: integer
+
+    VendorInfo:
+      type: object
+      properties:
+        product_model:
+          type: string
+          description: 产品型号
+        product_seq_num:
+          type: string
+          description: 产品序列号
+        hardware_version:
+          $ref: "#/components/schemas/Version"
+        software_version:
+          $ref: "#/components/schemas/Version"
+        voltage:
+          type: integer
+          description: 供电电压
+        dof:
+          type: integer
+          description: 自由度数量
+
+    CommuParams:
+      type: object
+      properties:
+        bitrate:
+          type: integer
+        sample_point:
+          type: integer
+        dbitrate:
+          type: integer
+        dsample_point:
+          type: integer
+
+    DeviceInfo:
+      type: object
+      properties:
+        hand_device_id:
+          type: integer
+        commu_params:
+          $ref: "#/components/schemas/CommuParams"
+
+    JointMotorErrorReport:
+      type: object
+      properties:
+        stalled:
+          type: boolean
+          description: 堵转
+        overheat:
+          type: boolean
+          description: 过温
+        over_current:
+          type: boolean
+          description: 过流
+        motor_except:
+          type: boolean
+          description: 电机异常
+        commu_except:
+          type: boolean
+          description: 通信异常
+
+    MixCtrl:
+      type: object
+      properties:
+        joint_index:
+          type: integer
+          description: 关节索引
+        ctrl_mode:
+          type: integer
+          description: 控制模式 (0=POSITION, 1=SERVO, 2=VELOCITY, 3=TORQUE, 4=POSITION_TORQUE, 5=VELOCITY_TORQUE, 6=POSITION_VELOCITY_TORQUE)
+        tgt_posi:
+          type: integer
+        tgt_velo:
+          type: integer
+        tgt_torque:
+          type: integer
+
+    TactileSensorData:
+      type: object
+      description: 1D 触觉传感器原始数据 (O10/UMI)
+      properties:
+        sensor_id:
+          type: integer
+          description: 传感器对应的手指枚举值
+        data:
+          type: array
+          items:
+            type: integer
+          description: 原始传感器数据
+
+    TactileSensor3DData:
+      type: object
+      description: 3D 触觉传感器数据 (O12)
+      properties:
+        online_state:
+          type: integer
+        channel_values:
+          type: array
+          items:
+            type: integer
+          description: 9 通道数据
+        normal_force:
+          type: integer
+        tangent_force:
+          type: integer
+        tangent_force_angle:
+          type: integer
+        capacitive_approach:
+          type: array
+          items:
+            type: integer
+          description: 4 通道电容接近数据
+
+  responses:
+    BadRequest:
+      description: 请求参数无效
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: 资源未找到
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
