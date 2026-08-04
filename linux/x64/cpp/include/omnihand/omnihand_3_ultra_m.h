@@ -175,7 +175,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param canfd_channel_id CANFD channel ID
    * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
-   * @param xense_mac_addr Xense master MAC address for remote scanning (empty = no Xense)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
@@ -185,7 +185,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
       uint16_t soc_port = 19009,
-      const std::string& xense_mac_addr = "192.168.99.2");
+      const std::string& xense_ip_addr = "192.168.99.2");
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -195,7 +195,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param canfd_channel_id CANFD channel ID
    * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
-   * @param xense_mac_addr Xense master MAC address for remote scanning (empty = no Xense)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
@@ -205,7 +205,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
       uint16_t soc_port = 19009,
-      const std::string& xense_mac_addr = "192.168.99.2");
+      const std::string& xense_ip_addr = "192.168.99.2");
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -218,7 +218,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param canfd_channel_id CAN channel index (0 or 1, default 0)
    * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
-   * @param xense_mac_addr Xense master MAC address for remote scanning (empty = no Xense)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgCanTcp(
@@ -229,7 +229,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
       uint16_t soc_port = 19009,
-      const std::string& xense_mac_addr = "192.168.99.2");
+      const std::string& xense_ip_addr = "192.168.99.2");
 #endif
 
 #ifdef __linux__
@@ -240,7 +240,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param can_interface CAN interface name (e.g. "can0")
    * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
-   * @param xense_mac_addr Xense master MAC address for remote scanning (empty = no Xense)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandSocketCan(
@@ -249,7 +249,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       const std::string& can_interface = "can0",
       const std::string& soc_host = "192.168.99.2",
       uint16_t soc_port = 19009,
-      const std::string& xense_mac_addr = "192.168.99.2");
+      const std::string& xense_ip_addr = "192.168.99.2");
 #endif
 
   /**
@@ -260,7 +260,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param canfd_channel_id CANFD channel ID
    * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
-   * @param xense_mac_addr Xense master MAC address for remote scanning (empty = no Xense)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
@@ -270,7 +270,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
       uint16_t soc_port = 19009,
-      const std::string& xense_mac_addr = "192.168.99.2");
+      const std::string& xense_ip_addr = "192.168.99.2");
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -280,7 +280,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param canfd_channel_id CANFD channel ID
    * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
-   * @param xense_mac_addr Xense master MAC address for remote scanning (empty = no Xense)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
@@ -290,7 +290,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
       uint16_t soc_port = 19009,
-      const std::string& xense_mac_addr = "192.168.99.2");
+      const std::string& xense_ip_addr = "192.168.99.2");
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
