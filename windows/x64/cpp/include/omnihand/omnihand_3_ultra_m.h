@@ -173,8 +173,9 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_device_id Hand device ID
    * @param canfd_device_id CANFD device ID
    * @param canfd_channel_id CANFD channel ID
-   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
@@ -183,7 +184,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t canfd_device_id,
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
-      uint16_t soc_port = 19009);
+      uint16_t soc_port = 19009,
+      const std::string& xense_ip_addr = "192.168.99.2");
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -191,8 +193,9 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_device_id Hand device ID
    * @param usbcanfd_serial_number USB CANFD serial number
    * @param canfd_channel_id CANFD channel ID
-   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgcan(
@@ -201,7 +204,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       const std::string& usbcanfd_serial_number,
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
-      uint16_t soc_port = 19009);
+      uint16_t soc_port = 19009,
+      const std::string& xense_ip_addr = "192.168.99.2");
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -212,8 +216,9 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param tcp_host TCP server IP or hostname (e.g. "192.168.0.178")
    * @param tcp_port TCP server port (e.g. 8000)
    * @param canfd_channel_id CAN channel index (0 or 1, default 0)
-   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByZlgCanTcp(
@@ -223,7 +228,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint16_t tcp_port,
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
-      uint16_t soc_port = 19009);
+      uint16_t soc_port = 19009,
+      const std::string& xense_ip_addr = "192.168.99.2");
 #endif
 
 #ifdef __linux__
@@ -232,8 +238,9 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param can_interface CAN interface name (e.g. "can0")
-   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandSocketCan(
@@ -241,7 +248,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t hand_device_id,
       const std::string& can_interface = "can0",
       const std::string& soc_host = "192.168.99.2",
-      uint16_t soc_port = 19009);
+      uint16_t soc_port = 19009,
+      const std::string& xense_ip_addr = "192.168.99.2");
 #endif
 
   /**
@@ -250,8 +258,9 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_device_id Hand device ID
    * @param canfd_device_id CANFD device ID
    * @param canfd_channel_id CANFD channel ID
-   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
@@ -260,7 +269,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t canfd_device_id,
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
-      uint16_t soc_port = 19009);
+      uint16_t soc_port = 19009,
+      const std::string& xense_ip_addr = "192.168.99.2");
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -268,8 +278,9 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    * @param hand_device_id Hand device ID
    * @param hcan_serial_number HCAN serial number
    * @param canfd_channel_id CANFD channel ID
-   * @param soc_host SoC board IP (palm TCP + Xense MAC, empty = no palm/Xense)
+   * @param soc_host SoC board IP for palm TCP (empty = no palm)
    * @param soc_port SoC data port (default 19009)
+   * @param xense_ip_addr Xense master IP address for remote scanning (empty = no Xense)
    * @return A unique pointer to OmniHand3UltraM instance
    */
   static std::unique_ptr<OmniHand3UltraM> createHandByHcan(
@@ -278,7 +289,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0,
       const std::string& soc_host = "192.168.99.2",
-      uint16_t soc_port = 19009);
+      uint16_t soc_port = 19009,
+      const std::string& xense_ip_addr = "192.168.99.2");
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)

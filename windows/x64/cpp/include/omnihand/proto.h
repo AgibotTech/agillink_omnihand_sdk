@@ -332,11 +332,13 @@ struct AGIBOT_EXPORT CommuParams {
 struct AGIBOT_EXPORT DeviceInfo {
   uint8_t hand_device_id;
   CommuParams commu_params;
+  HandType hand_type;
 
   std::string ToString() const {
     std::stringstream sstream;
     sstream << "\t[Hand Device ID: " << static_cast<unsigned int>(hand_device_id) << "]\n";
     sstream << commu_params.ToString();
+    sstream << "\t[Hand Type: " << agilink::omnihand::ToString(hand_type) << "]\n";
     return sstream.str();
   }
 };
