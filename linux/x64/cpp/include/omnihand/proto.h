@@ -269,10 +269,8 @@ struct AGIBOT_EXPORT Version {
     std::stringstream sstream;
     sstream << static_cast<unsigned int>(major) << "."
             << static_cast<unsigned int>(minor) << "."
-            << static_cast<unsigned int>(patch);
-    if (res != 0) {
-      sstream << "." << static_cast<unsigned int>(res);
-    }
+            << static_cast<unsigned int>(patch) << "."
+            << static_cast<unsigned int>(res);
     return sstream.str();
   }
 };
@@ -332,11 +330,13 @@ struct AGIBOT_EXPORT CommuParams {
 struct AGIBOT_EXPORT DeviceInfo {
   uint8_t hand_device_id;
   CommuParams commu_params;
+  HandType hand_type{HandType::UNKNOWN};
 
   std::string ToString() const {
     std::stringstream sstream;
     sstream << "\t[Hand Device ID: " << static_cast<unsigned int>(hand_device_id) << "]\n";
     sstream << commu_params.ToString();
+    sstream << "\t[Hand Type: " << agilink::omnihand::ToString(hand_type) << "]\n";
     return sstream.str();
   }
 };
