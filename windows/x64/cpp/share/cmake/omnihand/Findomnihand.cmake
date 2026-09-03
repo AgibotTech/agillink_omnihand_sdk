@@ -6,18 +6,18 @@
 #   target_link_libraries(your_target omnihand)
 
 get_filename_component(_cmake_dir "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
-REM For installed path: /usr/local/share/cmake/omnihand -> /usr/local
-REM For release package: cpp/share/cmake/omnihand -> root
+# For installed path: C:/omnihand/share/cmake/omnihand -> C:/omnihand
+# For release package: windows/x64/cpp/share/cmake/omnihand -> windows/x64
 get_filename_component(_possible_root "${_cmake_dir}/../../.." ABSOLUTE)
 if(EXISTS "${_possible_root}/cpp/include/omnihand")
-  REM Release package structure
+  # Release package structure
   get_filename_component(OMNIHAND_ROOT "${_cmake_dir}/../../../.." ABSOLUTE)
 else()
-  REM Installed structure
+  # Installed structure
   get_filename_component(OMNIHAND_ROOT "${_cmake_dir}/../../.." ABSOLUTE)
 endif()
 
-REM Try installed path first, then fallback to release package path
+# Try installed path first, then fallback to release package path
 if(EXISTS "${OMNIHAND_ROOT}/include/omnihand")
   set(omnihand_INCLUDE_DIRS "${OMNIHAND_ROOT}/include")
   set(_lib_dir "${OMNIHAND_ROOT}/lib")

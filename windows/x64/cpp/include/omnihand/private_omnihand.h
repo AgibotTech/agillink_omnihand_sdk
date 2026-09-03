@@ -218,7 +218,7 @@ class AGIBOT_EXPORT PrivateOmniHand : public IOmniHandCalibrator {
 
   /**
    * @brief 0x0A: Get all axes current information
-   * @return Current per axis (0.01A units, int16, signed)
+   * @return Current per axis (mA, int16, signed)
    */
   virtual std::vector<int16_t> GetAllAxisCurrent() const = 0;
 
