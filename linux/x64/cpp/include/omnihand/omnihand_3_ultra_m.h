@@ -75,10 +75,13 @@ AGIBOT_EXPORT void DepthToRGB(const std::vector<float>& depth,
 
 // Note: Palm is NOT Xense-based — it uses a separate data source (TCP from SoC)
 struct AGIBOT_EXPORT PalmFrame {
-  // Force distribution (float32, interleaved fx,fy,fz per pixel)
+  // Force distribution (float32, interleaved fx,fy,fz per taxel, raw int16 units)
   std::vector<float> force;
   uint32_t width = 0;
   uint32_t height = 0;
+  // Server-computed resultant [Fx, Fy, Fz] (same int16 units)
+  float resultant[3] = {0, 0, 0};
+  double timestamp = 0.0;
 };
 
 // All tactile data: 5 fingers + palm
