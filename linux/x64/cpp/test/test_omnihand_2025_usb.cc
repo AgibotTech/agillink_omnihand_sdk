@@ -212,6 +212,16 @@ TEST_F(OmniHand2025UsbTest, GetAllCurrentReport) {
   EXPECT_EQ(currents.size(), 10);
 }
 
+TEST_F(OmniHand2025UsbTest, GetCurrentReport) {
+  RequireDevice();
+
+  std::cout << "[GetCurrentReport] All joints:" << std::endl;
+  for (int i = 1; i <= 10; ++i) {
+    auto current = hand_->GetCurrentReport(static_cast<unsigned char>(i));
+    std::cout << "  J" << i << ": " << current << "mA" << std::endl;
+  }
+}
+
 // ============================================================================
 // Temperature Test (GET_ALL_AXIS_TEMP 0x0C)
 // ============================================================================
@@ -241,6 +251,18 @@ TEST_F(OmniHand2025UsbTest, GetAllTemperatureReport) {
   }
 }
 
+TEST_F(OmniHand2025UsbTest, GetTemperatureReport) {
+  RequireDevice();
+
+  std::cout << "[GetTemperatureReport] All joints:" << std::endl;
+  for (int i = 1; i <= 10; ++i) {
+    auto temp = hand_->GetTemperatureReport(static_cast<unsigned char>(i));
+    std::cout << "  J" << i << ": " << temp << " degC" << std::endl;
+    EXPECT_GE(temp, -40);
+    EXPECT_LE(temp, 127);
+  }
+}
+
 // ============================================================================
 // Error Report Test (GET_ERROR_CODE 0x0D)
 // ============================================================================
@@ -267,6 +289,21 @@ TEST_F(OmniHand2025UsbTest, GetAllErrorReport) {
   }
   
   EXPECT_EQ(errors.size(), 10);
+}
+
+TEST_F(OmniHand2025UsbTest, GetErrorReport) {
+  RequireDevice();
+
+  std::cout << "[GetErrorReport] All joints:" << std::endl;
+  for (int i = 1; i <= 10; ++i) {
+    auto err = hand_->GetErrorReport(static_cast<unsigned char>(i));
+    std::cout << "  J" << i << ": ["
+              << (err.bits.stalled_ ? "S" : "")
+              << (err.bits.overheat_ ? "H" : "")
+              << (err.bits.over_current_ ? "C" : "")
+              << (err.bits.motor_except_ ? "M" : "")
+              << (err.bits.commu_except_ ? "X" : "") << "]" << std::endl;
+  }
 }
 
 // ============================================================================
@@ -310,6 +347,69 @@ TEST_F(OmniHand2025UsbTest, GetTactileSensorData) {
     std::cout << std::endl;
     EXPECT_EQ(data.size(), 25);
   }
+}
+
+TEST_F(OmniHand2025UsbTest, GetAllTactileSensorData) {
+  RequireDevice();
+
+  auto all_data = hand_->GetAllTactileSensorData();
+  std::cout << "[GetAllTactileSensorData] " << all_data.size() << " sensors:" << std::endl;
+  for (const auto& d : all_data) {
+    std::cout << "  " << agilink::omnihand::ToString(d.sensor_id_)
+              << ": " << d.data_.size() << " bytes" << std::endl;
+  }
+  EXPECT_EQ(all_data.size(), 7u);
+  for (const auto& d : all_data) {
+    EXPECT_FALSE(d.data_.empty());
+  }
+}
+
+TEST_F(OmniHand2025UsbTest, GetTactileSensorDataRaw) {
+  RequireDevice();
+
+  std::vector<agilink::omnihand::Finger> sensors = {
+    agilink::omnihand::Finger::THUMB, agilink::omnihand::Finger::INDEX,
+    agilink::omnihand::Finger::MIDDLE, agilink::omnihand::Finger::RING,
+    agilink::omnihand::Finger::LITTLE, agilink::omnihand::Finger::PALM,
+    agilink::omnihand::Finger::DORSUM
+  };
+
+  bool any_supported = false;
+  for (auto finger : sensors) {
+    auto raw = hand_->GetTactileSensorDataRaw(finger);
+    std::cout << "[GetTactileSensorDataRaw] " << agilink::omnihand::ToString(finger)
+              << " (" << raw.data_.size() << " bytes): ";
+    if (raw.data_.empty()) {
+      std::cout << "(empty)" << std::endl;
+      continue;
+    }
+    any_supported = true;
+    for (size_t i = 0; i < raw.data_.size(); ++i) {
+      std::cout << static_cast<int>(raw.data_[i]);
+      if (i < raw.data_.size() - 1) std::cout << ", ";
+    }
+    std::cout << std::endl;
+  }
+  if (!any_supported) GTEST_SKIP() << "GetTactileSensorDataRaw not supported on this device";
+}
+
+TEST_F(OmniHand2025UsbTest, GetAllTactileSensorDataRaw) {
+  RequireDevice();
+
+  auto all_raw = hand_->GetAllTactileSensorDataRaw();
+  if (all_raw.empty()) GTEST_SKIP() << "GetAllTactileSensorDataRaw not supported on this device";
+
+  std::cout << "[GetAllTactileSensorDataRaw] " << all_raw.size() << " sensors:" << std::endl;
+  for (const auto& d : all_raw) {
+    std::cout << "  " << agilink::omnihand::ToString(d.sensor_id_)
+              << " (" << d.data_.size() << " bytes): ";
+    for (size_t i = 0; i < d.data_.size(); ++i) {
+      std::cout << static_cast<int>(d.data_[i]);
+      if (i < d.data_.size() - 1) std::cout << ", ";
+    }
+    std::cout << std::endl;
+  }
+  EXPECT_EQ(all_raw.size(), 7u);
 }
 
 // ============================================================================
@@ -377,6 +477,16 @@ TEST_F(OmniHand2025UsbTest, GetAllJointMotorVelo) {
   }
 
   EXPECT_EQ(current_velo.size(), 10);
+}
+
+TEST_F(OmniHand2025UsbTest, GetJointMotorVelo) {
+  RequireDevice();
+
+  std::cout << "[GetJointMotorVelo] All joints:" << std::endl;
+  for (int i = 1; i <= 10; ++i) {
+    auto velo = hand_->GetJointMotorVelo(static_cast<unsigned char>(i));
+    std::cout << "  J" << i << ": " << velo << std::endl;
+  }
 }
 
 TEST_F(OmniHand2025UsbTest, MixControlByPT) {

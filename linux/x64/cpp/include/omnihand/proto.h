@@ -247,6 +247,10 @@ struct AGIBOT_EXPORT Version {
     return res > other.res;
   }
 
+  bool operator<(const Version& other) const {
+    return other > *this;
+  }
+
   bool operator>=(const Version& other) const {
     if (major < other.major) return false;
     if (major > other.major) return true;
@@ -255,6 +259,10 @@ struct AGIBOT_EXPORT Version {
     if (patch < other.patch) return false;
     if (patch > other.patch) return true;
     return res >= other.res;
+  }
+
+  bool operator<=(const Version& other) const {
+    return other >= *this;
   }
 
   bool operator==(const Version& other) const {
