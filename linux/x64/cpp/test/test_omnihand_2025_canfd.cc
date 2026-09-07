@@ -106,6 +106,9 @@ class OmniHand2025CanfdTest : public ::testing::Test {
         std::cout << "[Warning]: CANFD device created but Init() failed." << std::endl;
       }
     }
+    if (!hand_ || !device_available_) {
+      GTEST_SKIP() << "CANFD device not available";
+    }
   }
 
   void TearDown() override {
@@ -113,9 +116,7 @@ class OmniHand2025CanfdTest : public ::testing::Test {
   }
 
   void RequireDevice() {
-    if (!hand_ || !device_available_) {
-      GTEST_SKIP() << "CANFD device not available";
-    }
+    ASSERT_TRUE(device_available_);
   }
 
   std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
@@ -127,7 +128,7 @@ class OmniHand2025CanfdTest : public ::testing::Test {
 // ============================================================================
 
 TEST_F(OmniHand2025CanfdTest, CreateHand) {
-  EXPECT_NE(hand_, nullptr);
+  ASSERT_TRUE(device_available_) << "CANFD hand object failed to initialize";
 }
 
 TEST_F(OmniHand2025CanfdTest, Init) {
@@ -145,10 +146,7 @@ TEST_F(OmniHand2025CanfdTest, GetVendorInfo) {
   auto vendor_info = hand_->GetVendorInfo();
   std::cout << vendor_info.ToString() << std::endl;
   
-  if (vendor_info.dof == 0) {
-    GTEST_SKIP() << "GetVendorInfo timeout";
-  }
-  
+  ASSERT_NE(vendor_info.dof, 0) << "GetVendorInfo timed out";
   EXPECT_EQ(vendor_info.dof, 10);
 }
 
@@ -162,10 +160,7 @@ TEST_F(OmniHand2025CanfdTest, GetDeviceInfo) {
   auto device_info = hand_->GetDeviceInfo();
   std::cout << device_info.ToString() << std::endl;
   
-  if (device_info.hand_device_id == 0) {
-    GTEST_SKIP() << "GetDeviceInfo timeout";
-  }
-  
+  ASSERT_NE(device_info.hand_device_id, 0) << "GetDeviceInfo timed out";
   EXPECT_EQ(device_info.hand_device_id, 1);
 }
 
@@ -173,9 +168,7 @@ TEST_F(OmniHand2025CanfdTest, SetDeviceId) {
   RequireDevice();
   
   auto current_info = hand_->GetDeviceInfo();
-  if (current_info.hand_device_id == 0) {
-    GTEST_SKIP() << "Cannot get current device ID";
-  }
+  ASSERT_NE(current_info.hand_device_id, 0) << "Cannot get current device ID";
   
   // Change to ID 2
   hand_->SetDeviceId(2);
@@ -257,11 +250,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllCurrentReport) {
   }
   std::cout << std::endl;
   
-  if (currents.empty()) {
-    GTEST_SKIP() << "GetAllCurrentReport timeout";
-  }
-  
-  EXPECT_EQ(currents.size(), 10);
+  ASSERT_EQ(currents.size(), 10u) << "GetAllCurrentReport timed out or returned an invalid size";
 }
 
 // ============================================================================
@@ -279,11 +268,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllTemperatureReport) {
   }
   std::cout << std::endl;
   
-  if (temps.empty()) {
-    GTEST_SKIP() << "GetAllTemperatureReport timeout";
-  }
-  
-  EXPECT_EQ(temps.size(), 10);
+  ASSERT_EQ(temps.size(), 10u) << "GetAllTemperatureReport timed out or returned an invalid size";
 
   // Temperature is int8_t (-128 to 127 degC), typical motor temp: 30-80 degC
   for (auto temp : temps) {
@@ -313,11 +298,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllErrorReport) {
   }
   std::cout << std::endl;
   
-  if (errors.empty()) {
-    GTEST_SKIP() << "GetAllErrorReport timeout";
-  }
-  
-  EXPECT_EQ(errors.size(), 10);
+  ASSERT_EQ(errors.size(), 10u) << "GetAllErrorReport timed out or returned an invalid size";
 }
 
 // ============================================================================
@@ -404,7 +385,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllTactileSensorDataRaw) {
     std::cout << std::endl;
   }
   
-  EXPECT_GE(all_data.size(), 0);
+  ASSERT_FALSE(all_data.empty());
 }
 
 // ============================================================================
@@ -422,11 +403,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllJointMotorVelo) {
   }
   std::cout << std::endl;
   
-  if (current_velo.empty()) {
-    GTEST_SKIP() << "GetAllJointMotorVelo timeout";
-  }
-  
-  EXPECT_EQ(current_velo.size(), 10);
+  ASSERT_EQ(current_velo.size(), 10u) << "GetAllJointMotorVelo timed out or returned an invalid size";
 }
 
 // ============================================================================
@@ -448,11 +425,8 @@ TEST_F(OmniHand2025CanfdTest, SetGetAllCurrentThreshold) {
   }
   std::cout << std::endl;
   
-  if (current_thresholds.empty()) {
-    GTEST_SKIP() << "GetAllCurrentThreshold timeout";
-  }
-  
-  EXPECT_EQ(current_thresholds.size(), 10);
+  ASSERT_EQ(current_thresholds.size(), 10u)
+      << "GetAllCurrentThreshold timed out or returned an invalid size";
 }
 
 // ============================================================================
@@ -468,7 +442,9 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPVT) {
   std::vector<int16_t> velocities(10, 8000);
   std::vector<int16_t> torques(10, 300);
   
-  (void)hand_->MixControlByPVT(positions, velocities, torques);
+  auto result = hand_->MixControlByPVT(positions, velocities, torques);
+  ASSERT_EQ(result.size(), positions.size())
+      << "MixControlByPVT returned an unexpected number of joint results";
   std::cout << "[MixControlByPVT] all 10 joints" << std::endl;
   
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -482,7 +458,12 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPVT) {
   
   EXPECT_EQ(feedback_pos.size(), 10);
 
-  (void)hand_->MixControlByPVT(1, safe_pos[0], 50, 0);
+  auto single_result = hand_->MixControlByPVT(1, safe_pos[0], 50, 0);
+  ASSERT_TRUE(single_result.tgt_posi_.has_value());
+  ASSERT_TRUE(single_result.tgt_velo_.has_value());
+  ASSERT_TRUE(single_result.tgt_torque_.has_value());
+  // O10 CAN replies expose the protocol joint number (1-based) after parsing.
+  EXPECT_EQ(single_result.joint_index_, 1);
   std::cout << "[MixControlByPVT] single joint 1 pos=" << safe_pos[0] << " vel=50" << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
@@ -496,7 +477,8 @@ TEST_F(OmniHand2025CanfdTest, GetJointMotorVelo) {
     std::cout << "  J" << joint << ": velo=" << velo << std::endl;
   }
 
-  SUCCEED();
+  EXPECT_EQ(hand_->GetJointMotorVelo(0), -1);
+  EXPECT_EQ(hand_->GetJointMotorVelo(11), -1);
 }
 
 TEST_F(OmniHand2025CanfdTest, MixControlByPT) {
@@ -506,15 +488,20 @@ TEST_F(OmniHand2025CanfdTest, MixControlByPT) {
   std::vector<int16_t> positions(safe_pos, safe_pos + 10);
   std::vector<int16_t> torques(10, 0);
   
-  (void)hand_->MixControlByPT(positions, torques);
+  auto result = hand_->MixControlByPT(positions, torques);
+  ASSERT_EQ(result.size(), positions.size())
+      << "MixControlByPT returned an unexpected number of joint results";
   std::cout << "[MixControlByPT] all 10 joints" << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   
-  (void)hand_->MixControlByPT(1, safe_pos[0], 0);
+  auto single_result = hand_->MixControlByPT(1, safe_pos[0], 0);
+  ASSERT_TRUE(single_result.tgt_posi_.has_value());
+  ASSERT_TRUE(single_result.tgt_torque_.has_value());
+  // O10 CAN replies expose the protocol joint number (1-based) after parsing.
+  EXPECT_EQ(single_result.joint_index_, 1);
   std::cout << "[MixControlByPT] single joint 1 pos=" << safe_pos[0] << std::endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
   
-  SUCCEED();
 }
 
 // ============================================================================
@@ -537,11 +524,8 @@ TEST_F(OmniHand2025CanfdTest, SetGetAllActiveJointAngles) {
   }
   std::cout << std::endl;
   
-  if (current_angles.empty()) {
-    GTEST_SKIP() << "GetAllActiveJointAngles timeout";
-  }
-  
-  EXPECT_EQ(current_angles.size(), 10);
+  ASSERT_EQ(current_angles.size(), 10u)
+      << "GetAllActiveJointAngles timed out or returned an invalid size";
 }
 
 TEST_F(OmniHand2025CanfdTest, GetAllJointAngles) {
@@ -555,11 +539,7 @@ TEST_F(OmniHand2025CanfdTest, GetAllJointAngles) {
   }
   std::cout << std::endl;
   
-  if (all_angles.empty()) {
-    GTEST_SKIP() << "GetAllJointAngles timeout";
-  }
-  
-  EXPECT_EQ(all_angles.size(), 16);
+  ASSERT_EQ(all_angles.size(), 16u) << "GetAllJointAngles timed out or returned an invalid size";
 }
 
 // ============================================================================
