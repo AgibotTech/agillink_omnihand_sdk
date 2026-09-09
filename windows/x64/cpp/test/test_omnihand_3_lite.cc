@@ -19,6 +19,8 @@ using namespace agilink::omnihand;
 static int g_request_interval = 5;  // Default: 5ms
 // Global variable to store device type from command line argument
 static std::string g_device_type = "zlgcan";  // Default: zlgcan
+// Global variables for RS-485 serial connection
+static std::string g_serial_port = "/dev/ttyUSB0";  // Default serial port
 
 // Helper function to get request interval
 static int GetRequestInterval() {
@@ -37,17 +39,23 @@ class OmniHand3LiteTest : public ::testing::Test {
     std::string device_type = GetDeviceType();
     if (device_type == "hcan") {
       hand_ = OmniHand3Lite::createHandByHcan(
-          HandType::LEFT,        // hand_type: left hand
-          1,                       // hand_device_id: hand device ID
-          0,                       // canfd_device_id: USB CANFD adapter device index
-          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
+          HandType::LEFT,
+          1,   // hand_device_id
+          0,   // canfd_device_id
+          0    // canfd_channel_id
+      );
+    } else if (device_type == "rs485") {
+      hand_ = OmniHand3Lite::createHandByRs485(
+          HandType::LEFT,
+          1,              // hand_device_id
+          g_serial_port   // serial port path
       );
     } else {  // default: zlgcan
       hand_ = OmniHand3Lite::createHandByZlgcan(
-          HandType::LEFT,        // hand_type: left hand
-          1,                       // hand_device_id: hand device ID
-          0,                       // canfd_device_id: USB CANFD adapter device index
-          0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
+          HandType::LEFT,
+          1,   // hand_device_id
+          0,   // canfd_device_id
+          0    // canfd_channel_id
       );
     }
     int request_interval = GetRequestInterval();
@@ -58,6 +66,9 @@ class OmniHand3LiteTest : public ::testing::Test {
       std::cout << "[Info]: Using request interval: " << request_interval << " ms" << std::endl;
     }
     std::cout << "[Info]: Using device type: " << device_type << std::endl;
+    if (device_type == "rs485") {
+      std::cout << "[Info]: Serial port: " << g_serial_port << std::endl;
+    }
   }
 
   void TearDown() override {
@@ -416,14 +427,164 @@ TEST_F(OmniHand3LiteTest, InvalidJointIndex) {
 // Test constants
 TEST_F(OmniHand3LiteTest, Constants) {
   EXPECT_EQ(OmniHand3Lite::kDegreesOfActiveFreedom, 4);
-  std::cout << "[Constants] kDegreesOfActiveFreedom: " 
+  std::cout << "[Constants] kDegreesOfActiveFreedom: "
             << static_cast<int>(OmniHand3Lite::kDegreesOfActiveFreedom) << std::endl;
+}
+
+// Test tactile sensor initialization
+TEST_F(OmniHand3LiteTest, InitTactilePointsMap) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  bool ok = hand_->InitTactilePointsMap();
+  if (!ok) {
+    GTEST_SKIP() << "InitTactilePointsMap failed - tactile sensors may not be present";
+  }
+  EXPECT_TRUE(ok);
+  std::cout << "[InitTactilePointsMap] OK" << std::endl;
+}
+
+// Test GetSensorOrder
+TEST_F(OmniHand3LiteTest, GetSensorOrder) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  const auto& order = hand_->GetSensorOrder();
+  EXPECT_FALSE(order.empty());
+  std::cout << "[GetSensorOrder] " << order.size() << " sensors: ";
+  for (size_t i = 0; i < order.size(); ++i) {
+    std::cout << ToString(order[i]);
+    if (i + 1 < order.size()) std::cout << ", ";
+  }
+  std::cout << std::endl;
+}
+
+// Test calibrated tactile sensor data per finger
+TEST_F(OmniHand3LiteTest, GetTactileSensorData) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  if (!hand_->InitTactilePointsMap()) {
+    GTEST_SKIP() << "Tactile sensors not available";
+  }
+  for (Finger finger : hand_->GetSensorOrder()) {
+    auto data = hand_->GetTactileSensorData(finger);
+    std::cout << "[GetTactileSensorData] " << ToString(finger)
+              << ": " << data.data_.size() << " points";
+    if (!data.data_.empty()) {
+      std::cout << " [";
+      for (size_t i = 0; i < std::min(data.data_.size(), size_t(6)); ++i) {
+        std::cout << data.data_[i];
+        if (i + 1 < std::min(data.data_.size(), size_t(6))) std::cout << ", ";
+      }
+      if (data.data_.size() > 6) std::cout << "...";
+      std::cout << "]";
+    }
+    std::cout << std::endl;
+    EXPECT_EQ(data.sensor_id_, finger);
+  }
+}
+
+// Test raw tactile sensor data per finger (multi-frame)
+TEST_F(OmniHand3LiteTest, GetTactileSensorDataRaw) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  if (!hand_->InitTactilePointsMap()) {
+    GTEST_SKIP() << "Tactile sensors not available";
+  }
+  for (Finger finger : hand_->GetSensorOrder()) {
+    auto data = hand_->GetTactileSensorDataRaw(finger);
+    std::cout << "[GetTactileSensorDataRaw] " << ToString(finger)
+              << ": " << data.data_.size() << " points";
+    if (!data.data_.empty()) {
+      std::cout << " [";
+      for (size_t i = 0; i < std::min(data.data_.size(), size_t(6)); ++i) {
+        std::cout << data.data_[i];
+        if (i + 1 < std::min(data.data_.size(), size_t(6))) std::cout << ", ";
+      }
+      if (data.data_.size() > 6) std::cout << "...";
+      std::cout << "]";
+    }
+    std::cout << std::endl;
+    EXPECT_EQ(data.sensor_id_, finger);
+  }
+}
+
+// Test all fingers raw tactile data in one call
+TEST_F(OmniHand3LiteTest, GetAllTactileSensorDataRaw) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  if (!hand_->InitTactilePointsMap()) {
+    GTEST_SKIP() << "Tactile sensors not available";
+  }
+  auto all_data = hand_->GetAllTactileSensorDataRaw();
+  EXPECT_FALSE(all_data.empty()) << "GetAllTactileSensorDataRaw returned empty";
+  std::cout << "[GetAllTactileSensorDataRaw] " << all_data.size() << " fingers:" << std::endl;
+  for (const auto& sd : all_data) {
+    std::cout << "  " << ToString(sd.sensor_id_) << ": " << sd.data_.size() << " points" << std::endl;
+  }
+  EXPECT_EQ(all_data.size(), hand_->GetSensorOrder().size());
+}
+
+// Test GetNumOfTactileSensors
+TEST_F(OmniHand3LiteTest, GetNumOfTactileSensors) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  size_t num = hand_->GetNumOfTactileSensors();
+  std::cout << "[GetNumOfTactileSensors] " << num << std::endl;
+  EXPECT_GT(num, 0u);
+  EXPECT_EQ(num, hand_->GetSensorOrder().size());
+}
+
+// Test GetNumOfTactilePoints per finger
+TEST_F(OmniHand3LiteTest, GetNumOfTactilePoints) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    size_t pts = hand_->GetNumOfTactilePoints(finger);
+    std::cout << "[GetNumOfTactilePoints] " << ToString(finger) << ": " << pts << " points" << std::endl;
+    EXPECT_GT(pts, 0u) << "Expected >0 points for " << ToString(finger);
+  }
+  // UNKNOWN / DORSUM should return 0
+  EXPECT_EQ(hand_->GetNumOfTactilePoints(Finger::UNKNOWN), 0u);
+  EXPECT_EQ(hand_->GetNumOfTactilePoints(Finger::DORSUM), 0u);
+}
+
+// Test GetLenOfTactileDatum per finger
+TEST_F(OmniHand3LiteTest, GetLenOfTactileDatum) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    size_t len = hand_->GetLenOfTactileDatum(finger);
+    std::cout << "[GetLenOfTactileDatum] " << ToString(finger) << ": " << len << " bytes/point" << std::endl;
+    EXPECT_GT(len, 0u) << "Expected >0 bytes per datum for " << ToString(finger);
+  }
+}
+
+// Test GetNumOfRepliedTactileFrames per finger
+TEST_F(OmniHand3LiteTest, GetNumOfRepliedTactileFrames) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    size_t frames = hand_->GetNumOfRepliedTactileFrames(finger);
+    std::cout << "[GetNumOfRepliedTactileFrames] " << ToString(finger) << ": " << frames << " frame(s)" << std::endl;
+    EXPECT_GT(frames, 0u) << "Expected >=1 frame for " << ToString(finger);
+  }
+}
+
+// Test GetSNOfTactileSensor per finger
+TEST_F(OmniHand3LiteTest, GetSNOfTactileSensor) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    std::string sn = hand_->GetSNOfTactileSensor(finger);
+    std::cout << "[GetSNOfTactileSensor] " << ToString(finger) << ": \"" << sn << "\"" << std::endl;
+  }
+}
+
+// Test deprecated GetSensorDataLength consistency with GetNumOfTactilePoints
+TEST_F(OmniHand3LiteTest, GetSensorDataLength) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    size_t len = hand_->GetSensorDataLength(finger);
+    size_t pts = hand_->GetNumOfTactilePoints(finger);
+    std::cout << "[GetSensorDataLength] " << ToString(finger)
+              << ": " << len << " (GetNumOfTactilePoints=" << pts << ")" << std::endl;
+    EXPECT_GT(len, 0u) << "Expected >0 for " << ToString(finger);
+  }
 }
 
 // Main function for gtest
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  
+
   // Parse command line arguments
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -431,15 +592,24 @@ int main(int argc, char** argv) {
       g_request_interval = std::stoi(argv[++i]);
     } else if ((arg == "-d" || arg == "--device") && i + 1 < argc) {
       std::string device_arg = argv[++i];
-      if (device_arg == "zlgcan" || device_arg == "hcan") {
+      if (device_arg == "zlgcan" || device_arg == "hcan" || device_arg == "rs485") {
         g_device_type = device_arg;
       } else {
-        std::cerr << "[Error]: -d value must be 'zlgcan' or 'hcan', got: " << device_arg << std::endl;
+        std::cerr << "[Error]: -d value must be 'zlgcan', 'hcan', or 'rs485', got: " << device_arg << std::endl;
         return 1;
       }
+    } else if ((arg == "-p" || arg == "--port") && i + 1 < argc) {
+      g_serial_port = argv[++i];
+    } else if (arg == "--help" || arg == "-h") {
+      std::cout << "Usage: " << argv[0]
+                << " [--request-interval MS] [-d DEVICE] [-p PORT]" << std::endl;
+      std::cout << "  --request-interval MS  Set request interval in ms (default: 5)" << std::endl;
+      std::cout << "  -d DEVICE              Device type: zlgcan | hcan | rs485 (default: zlgcan)" << std::endl;
+      std::cout << "  -p PORT                Serial port for rs485 (default: /dev/ttyUSB0)" << std::endl;
+      return 0;
     }
   }
-  
+
   return RUN_ALL_TESTS();
 }
 #endif  // BUILD_OMNIHAND_3_LITE

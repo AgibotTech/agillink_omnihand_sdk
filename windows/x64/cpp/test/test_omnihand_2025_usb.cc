@@ -77,6 +77,9 @@ class OmniHand2025UsbTest : public ::testing::Test {
       hand_.reset();
       device_available_ = false;
     }
+    if (!hand_ || !device_available_) {
+      GTEST_SKIP() << "USB device not available";
+    }
   }
 
   void TearDown() override {
@@ -84,9 +87,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
   }
 
   void RequireDevice() {
-    if (!hand_ || !device_available_) {
-      GTEST_SKIP() << "USB device not available";
-    }
+    ASSERT_TRUE(device_available_);
   }
 
   std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
@@ -99,7 +100,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
 
 TEST_F(OmniHand2025UsbTest, CreateHand) {
   RequireDevice();
-  EXPECT_NE(hand_, nullptr);
+  ASSERT_TRUE(device_available_) << "USB hand object failed to initialize";
 }
 
 TEST_F(OmniHand2025UsbTest, Init) {
@@ -117,10 +118,7 @@ TEST_F(OmniHand2025UsbTest, GetVendorInfo) {
   auto vendor_info = hand_->GetVendorInfo();
   std::cout << vendor_info.ToString() << std::endl;
   
-  if (vendor_info.dof == 0) {
-    GTEST_SKIP() << "GetVendorInfo timeout";
-  }
-  
+  ASSERT_NE(vendor_info.dof, 0) << "GetVendorInfo timed out";
   EXPECT_EQ(vendor_info.dof, 10);
   EXPECT_FALSE(vendor_info.productModel.empty());
 }
@@ -205,11 +203,7 @@ TEST_F(OmniHand2025UsbTest, GetAllCurrentReport) {
   }
   std::cout << std::endl;
   
-  if (currents.empty()) {
-    GTEST_SKIP() << "GetAllCurrentReport timeout";
-  }
-  
-  EXPECT_EQ(currents.size(), 10);
+  ASSERT_EQ(currents.size(), 10u) << "GetAllCurrentReport timed out or returned an invalid size";
 }
 
 TEST_F(OmniHand2025UsbTest, GetCurrentReport) {
@@ -238,11 +232,7 @@ TEST_F(OmniHand2025UsbTest, GetAllTemperatureReport) {
   }
   std::cout << std::endl;
   
-  if (temps.empty()) {
-    GTEST_SKIP() << "GetAllTemperatureReport timeout";
-  }
-  
-  EXPECT_EQ(temps.size(), 10);
+  ASSERT_EQ(temps.size(), 10u) << "GetAllTemperatureReport timed out or returned an invalid size";
   
   // Temperature is int8_t (-128 to 127 degC), typical motor temp: 30-80 degC
   for (auto temp : temps) {
@@ -284,11 +274,7 @@ TEST_F(OmniHand2025UsbTest, GetAllErrorReport) {
   }
   std::cout << std::endl;
   
-  if (errors.empty()) {
-    GTEST_SKIP() << "GetAllErrorReport timeout";
-  }
-  
-  EXPECT_EQ(errors.size(), 10);
+  ASSERT_EQ(errors.size(), 10u) << "GetAllErrorReport timed out or returned an invalid size";
 }
 
 TEST_F(OmniHand2025UsbTest, GetErrorReport) {
@@ -412,6 +398,65 @@ TEST_F(OmniHand2025UsbTest, GetAllTactileSensorDataRaw) {
   EXPECT_EQ(all_raw.size(), 7u);
 }
 
+TEST_F(OmniHand2025UsbTest, GetNumOfTactileSensors) {
+  RequireDevice();
+
+  size_t num = hand_->GetNumOfTactileSensors();
+  std::cout << "[GetNumOfTactileSensors] " << num << std::endl;
+  EXPECT_GT(num, 0u);
+}
+
+TEST_F(OmniHand2025UsbTest, GetNumOfTactilePoints) {
+  RequireDevice();
+
+  for (auto finger : hand_->GetSensorOrder()) {
+    size_t pts = hand_->GetNumOfTactilePoints(finger);
+    std::cout << "[GetNumOfTactilePoints] " << agilink::omnihand::ToString(finger)
+              << ": " << pts << " points" << std::endl;
+    EXPECT_GT(pts, 0u) << "Expected >0 points for " << agilink::omnihand::ToString(finger);
+  }
+  EXPECT_EQ(hand_->GetNumOfTactilePoints(agilink::omnihand::Finger::UNKNOWN), 0u);
+}
+
+TEST_F(OmniHand2025UsbTest, GetLenOfTactileDatum) {
+  RequireDevice();
+
+  for (auto finger : hand_->GetSensorOrder()) {
+    size_t len = hand_->GetLenOfTactileDatum(finger);
+    std::cout << "[GetLenOfTactileDatum] " << agilink::omnihand::ToString(finger)
+              << ": " << len << " bytes/point" << std::endl;
+    EXPECT_GT(len, 0u) << "Expected >0 bytes per datum for " << agilink::omnihand::ToString(finger);
+  }
+  EXPECT_EQ(hand_->GetLenOfTactileDatum(agilink::omnihand::Finger::UNKNOWN), 0u);
+}
+
+TEST_F(OmniHand2025UsbTest, GetNumOfRepliedTactileFrames) {
+  RequireDevice();
+
+  for (auto finger : hand_->GetSensorOrder()) {
+    if (finger == agilink::omnihand::Finger::DORSUM) continue;
+    size_t frames = hand_->GetNumOfRepliedTactileFrames(finger);
+    std::cout << "[GetNumOfRepliedTactileFrames] " << agilink::omnihand::ToString(finger)
+              << ": " << frames << " frame(s)" << std::endl;
+    EXPECT_GT(frames, 0u) << "Expected >=1 frame for " << agilink::omnihand::ToString(finger);
+  }
+  EXPECT_EQ(hand_->GetNumOfRepliedTactileFrames(agilink::omnihand::Finger::DORSUM), 0u);
+  EXPECT_EQ(hand_->GetNumOfRepliedTactileFrames(agilink::omnihand::Finger::UNKNOWN), 0u);
+}
+
+TEST_F(OmniHand2025UsbTest, GetSNOfTactileSensor) {
+  RequireDevice();
+
+  for (auto finger : hand_->GetSensorOrder()) {
+    if (finger == agilink::omnihand::Finger::DORSUM) continue;
+    std::string sn = hand_->GetSNOfTactileSensor(finger);
+    std::cout << "[GetSNOfTactileSensor] " << agilink::omnihand::ToString(finger)
+              << ": \"" << sn << "\"" << std::endl;
+  }
+  EXPECT_EQ(hand_->GetSNOfTactileSensor(agilink::omnihand::Finger::DORSUM), "");
+  EXPECT_EQ(hand_->GetSNOfTactileSensor(agilink::omnihand::Finger::UNKNOWN), "");
+}
+
 // ============================================================================
 // Current Threshold Test (SET_PROTECTIVE_CURRENT 0x25)
 // ============================================================================
@@ -472,11 +517,7 @@ TEST_F(OmniHand2025UsbTest, GetAllJointMotorVelo) {
   }
   std::cout << std::endl;
 
-  if (current_velo.empty()) {
-    GTEST_SKIP() << "GetAllJointMotorVelo timeout";
-  }
-
-  EXPECT_EQ(current_velo.size(), 10);
+  ASSERT_EQ(current_velo.size(), 10u) << "GetAllJointMotorVelo timed out or returned an invalid size";
 }
 
 TEST_F(OmniHand2025UsbTest, GetJointMotorVelo) {
@@ -496,9 +537,12 @@ TEST_F(OmniHand2025UsbTest, MixControlByPT) {
   std::vector<int16_t> positions(safe_pos, safe_pos + 10);
   std::vector<int16_t> torques(10, 0);
   
-  (void)hand_->MixControlByPT(positions, torques);
+  auto result = hand_->MixControlByPT(positions, torques);
+  ASSERT_EQ(result.size(), positions.size())
+      << "MixControlByPT returned an unexpected number of joint results";
+  ASSERT_TRUE(result.front().tgt_posi_.has_value());
+  ASSERT_TRUE(result.front().tgt_torque_.has_value());
   std::cout << "[MixControlByPT] all 10 joints" << std::endl;
-  SUCCEED();
 }
 
 // ============================================================================
@@ -520,11 +564,8 @@ TEST_F(OmniHand2025UsbTest, SetGetAllActiveJointAngles) {
   }
   std::cout << std::endl;
   
-  if (current_angles.empty()) {
-    GTEST_SKIP() << "GetAllActiveJointAngles timeout";
-  }
-  
-  EXPECT_EQ(current_angles.size(), 10);
+  ASSERT_EQ(current_angles.size(), 10u)
+      << "GetAllActiveJointAngles timed out or returned an invalid size";
 }
 
 TEST_F(OmniHand2025UsbTest, GetAllJointAngles) {
@@ -538,11 +579,7 @@ TEST_F(OmniHand2025UsbTest, GetAllJointAngles) {
   }
   std::cout << std::endl;
   
-  if (all_angles.empty()) {
-    GTEST_SKIP() << "GetAllJointAngles timeout";
-  }
-  
-  EXPECT_EQ(all_angles.size(), 16);  // 10 active + 6 passive
+  ASSERT_EQ(all_angles.size(), 16u) << "GetAllJointAngles timed out or returned an invalid size";  // 10 active + 6 passive
 }
 
 // ============================================================================
@@ -600,6 +637,8 @@ TEST_F(OmniHand2025UsbTest, StreamCmdSingleAxisPos) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // Wait for the position to take effect
     uint16_t read_pos = hand_->GetSingleAxisPos(i);
     std::cout << "  Joint " << i << ": origin=" << origin_pos << ", set=" << target_pos << ", reply=" << reply_pos << ", read=" << read_pos << std::endl;
+    EXPECT_LE(reply_pos, 4096u) << "invalid reply position for joint " << i;
+    EXPECT_LE(read_pos, 4096u) << "invalid read position for joint " << i;
   }
 }
 
@@ -614,7 +653,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAllAxisPos) {
   EXPECT_EQ(resp.positions.size(), 10u);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // Wait for the position to take effect
   const auto all_pos = hand_->GetAllAxisPos();
-  if (all_pos.empty()) GTEST_SKIP() << "GetAllAxisPos timeout";
+  ASSERT_FALSE(all_pos.empty()) << "GetAllAxisPos timed out";
   EXPECT_EQ(all_pos.size(), 10u);
   for (size_t i = 0; i < resp.positions.size(); ++i) {
     std::cout << "  J" << (i + 1) << ": set_pos=" << positions[i]
@@ -630,7 +669,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdCurrentVelTemp) {
 
   std::cout << "[StreamCmd] Testing all axis current commands(0x0A):" << std::endl;
   const auto all_current = hand_->GetAllAxisCurrent();
-  if (all_current.empty()) GTEST_SKIP() << "GetAllAxisCurrent timeout";
+  ASSERT_FALSE(all_current.empty()) << "GetAllAxisCurrent timed out";
   EXPECT_EQ(all_current.size(), 10u);
   std::cout << "  Currents: ";
   for (size_t i = 0; i < all_current.size(); ++i) {
@@ -640,7 +679,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdCurrentVelTemp) {
 
   std::cout << "[StreamCmd] Testing all axis velocity commands(0x0B):" << std::endl;
   const auto all_velocity = hand_->GetAllAxisVelocity();
-  if (all_velocity.empty()) GTEST_SKIP() << "GetAllAxisVelocity timeout";
+  ASSERT_FALSE(all_velocity.empty()) << "GetAllAxisVelocity timed out";
   EXPECT_EQ(all_velocity.size(), 10u);
   std::cout << "  Velocities: ";
   for (size_t i = 0; i < all_velocity.size(); ++i) {
@@ -650,7 +689,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdCurrentVelTemp) {
 
   std::cout << "[StreamCmd] Testing all axis temperature commands(0x0C):" << std::endl;
   const auto all_temp = hand_->GetAllAxisTemp();
-  if (all_temp.empty()) GTEST_SKIP() << "GetAllAxisTemp timeout";
+  ASSERT_FALSE(all_temp.empty()) << "GetAllAxisTemp timed out";
   EXPECT_EQ(all_temp.size(), 10u);
   std::cout << "  Temperatures: ";
   for (size_t i = 0; i < all_temp.size(); ++i) {
@@ -678,7 +717,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdPosRange) {
 
   std::cout << "[StreamCmd] Testing all axis pos range commands(0x10):" << std::endl;
   const auto pos_range = hand_->GetAllAxisPosRange();
-  if (pos_range.empty()) GTEST_SKIP() << "GetAllAxisPosRange timeout";
+  ASSERT_FALSE(pos_range.empty()) << "GetAllAxisPosRange timed out";
   EXPECT_EQ(pos_range.size(), 10u);
   std::cout << "  Position Ranges: ";
   for (size_t i = 0; i < pos_range.size(); ++i) {
@@ -705,17 +744,17 @@ TEST_F(OmniHand2025UsbTest, StreamCmdTactileSensors) {
 
   std::cout << "[StreamCmd] Testing all axis tactile sensors commands(0x12):" << std::endl;
   const auto fingertipA = hand_->GetAllFingertipSensorA();
-  if (fingertipA.empty()) GTEST_SKIP() << "GetAllFingertipSensorA timeout";
+  ASSERT_FALSE(fingertipA.empty()) << "GetAllFingertipSensorA timed out";
   EXPECT_EQ(fingertipA.size(), 48u);
 
   std::cout << "[StreamCmd] Testing all axis tactile sensors commands(0x13):" << std::endl;
   const auto fingertipB = hand_->GetAllFingertipSensorB();
-  if (fingertipB.empty()) GTEST_SKIP() << "GetAllFingertipSensorB timeout";
+  ASSERT_FALSE(fingertipB.empty()) << "GetAllFingertipSensorB timed out";
   EXPECT_EQ(fingertipB.size(), 32u);
 
   std::cout << "[StreamCmd] Testing all axis tactile sensors commands(0x14):" << std::endl;
   const auto fingertipC = hand_->GetAllFingertipSensorC();
-  if (fingertipC.empty()) GTEST_SKIP() << "GetAllFingertipSensorC timeout";
+  ASSERT_FALSE(fingertipC.empty()) << "GetAllFingertipSensorC timed out";
   EXPECT_EQ(fingertipC.size(), 50u);
 }
 
@@ -740,7 +779,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdLoadData) {
 
   std::cout << "[StreamCmd] Testing all axis load data commands(0x1A):" << std::endl;
   const auto load = hand_->GetAllLoadData();
-  if (load.empty()) GTEST_SKIP() << "GetAllLoadData timeout";
+  ASSERT_FALSE(load.empty()) << "GetAllLoadData timed out";
   EXPECT_EQ(load.size(), 10u);
 
   // 0x1B~0x1D limits: too dangerous
@@ -765,7 +804,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdMotorSensorIds) {
 
   std::cout << "[StreamCmd] Testing all axis ID commands(0x26):" << std::endl;
   const auto motor_ids = hand_->GetAllElectricMotorId();
-  if (motor_ids.empty()) GTEST_SKIP() << "GetAllElectricMotorId timeout";
+  ASSERT_FALSE(motor_ids.empty()) << "GetAllElectricMotorId timed out";
   EXPECT_EQ(motor_ids.size(), 10u);
   std::cout << "  Motor IDs: ";
   for (size_t i = 0; i < motor_ids.size(); ++i) {
@@ -776,7 +815,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdMotorSensorIds) {
 
   std::cout << "[StreamCmd] Testing all axis ID commands(0x27):" << std::endl;
   const auto sensor_ids = hand_->GetAllSensorId();
-  if (sensor_ids.empty()) GTEST_SKIP() << "GetAllSensorId timeout";
+  ASSERT_FALSE(sensor_ids.empty()) << "GetAllSensorId timed out";
   EXPECT_EQ(sensor_ids.size(), 7u);
   std::cout << "  Sensor IDs: ";
   for (size_t i = 0; i < sensor_ids.size(); ++i) {
@@ -796,7 +835,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdCVP) {
 
   std::cout << "[StreamCmd] Testing all axis CVP commands(0x29):" << std::endl;
   const auto cvp = hand_->GetAllAxisCvp();
-  if (cvp.empty()) GTEST_SKIP() << "GetAllAxisCvp timeout";
+  ASSERT_FALSE(cvp.empty()) << "GetAllAxisCvp timed out";
   EXPECT_EQ(cvp.size(), 60u);
 }
 
@@ -806,7 +845,7 @@ TEST_F(OmniHand2025UsbTest, StreamCmdAxisLimits) {
 
   std::cout << "[StreamCmd] Testing all axis limit position commands(0x30):" << std::endl;
   const auto axis_limits = hand_->GetAxisLimitPos();
-  if (axis_limits.min_limits.empty()) GTEST_SKIP() << "GetAxisLimitPos timeout";
+  ASSERT_FALSE(axis_limits.min_limits.empty()) << "GetAxisLimitPos timed out";
   EXPECT_EQ(axis_limits.min_limits.size(), 10u);
   EXPECT_EQ(axis_limits.max_limits.size(), 10u);
   std::cout << "  Axis Limits (min/max per joint, 0-4095): ";
@@ -830,11 +869,11 @@ TEST_F(OmniHand2025UsbTest, StreamCmdPosSpeedCur) {
   std::vector<int16_t> ps_speeds(10, 0);
   std::vector<uint16_t> ps_torques(10, 0);
   const agilink::omnihand::SetAllAxisPosResponse pos_speed_torque_resp = hand_->SetPosSpeedTorqueData(ps_positions, ps_speeds, ps_torques);
-  if (pos_speed_torque_resp.positions.empty()) GTEST_SKIP() << "SetPosSpeedTorqueData failed";
+  ASSERT_FALSE(pos_speed_torque_resp.positions.empty()) << "SetPosSpeedTorqueData failed";
   EXPECT_EQ(pos_speed_torque_resp.positions.size(), 10u);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   const auto all_pos_after_ps = hand_->GetAllAxisPos();
-  if (all_pos_after_ps.empty()) GTEST_SKIP() << "GetAllAxisPos after SetPosSpeedTorqueData timeout";
+  ASSERT_FALSE(all_pos_after_ps.empty()) << "GetAllAxisPos after SetPosSpeedTorqueData timed out";
   EXPECT_EQ(all_pos_after_ps.size(), 10u);
   for (size_t i = 0; i < pos_speed_torque_resp.positions.size(); ++i) {
     std::cout << "  J" << (i + 1) << ": set_pos=" << ps_positions[i]
