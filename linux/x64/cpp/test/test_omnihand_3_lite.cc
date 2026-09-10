@@ -518,6 +518,69 @@ TEST_F(OmniHand3LiteTest, GetAllTactileSensorDataRaw) {
   EXPECT_EQ(all_data.size(), hand_->GetSensorOrder().size());
 }
 
+// Test GetNumOfTactileSensors
+TEST_F(OmniHand3LiteTest, GetNumOfTactileSensors) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  size_t num = hand_->GetNumOfTactileSensors();
+  std::cout << "[GetNumOfTactileSensors] " << num << std::endl;
+  EXPECT_GT(num, 0u);
+  EXPECT_EQ(num, hand_->GetSensorOrder().size());
+}
+
+// Test GetNumOfTactilePoints per finger
+TEST_F(OmniHand3LiteTest, GetNumOfTactilePoints) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    size_t pts = hand_->GetNumOfTactilePoints(finger);
+    std::cout << "[GetNumOfTactilePoints] " << ToString(finger) << ": " << pts << " points" << std::endl;
+    EXPECT_GT(pts, 0u) << "Expected >0 points for " << ToString(finger);
+  }
+  // UNKNOWN / DORSUM should return 0
+  EXPECT_EQ(hand_->GetNumOfTactilePoints(Finger::UNKNOWN), 0u);
+  EXPECT_EQ(hand_->GetNumOfTactilePoints(Finger::DORSUM), 0u);
+}
+
+// Test GetLenOfTactileDatum per finger
+TEST_F(OmniHand3LiteTest, GetLenOfTactileDatum) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    size_t len = hand_->GetLenOfTactileDatum(finger);
+    std::cout << "[GetLenOfTactileDatum] " << ToString(finger) << ": " << len << " bytes/point" << std::endl;
+    EXPECT_GT(len, 0u) << "Expected >0 bytes per datum for " << ToString(finger);
+  }
+}
+
+// Test GetNumOfRepliedTactileFrames per finger
+TEST_F(OmniHand3LiteTest, GetNumOfRepliedTactileFrames) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    size_t frames = hand_->GetNumOfRepliedTactileFrames(finger);
+    std::cout << "[GetNumOfRepliedTactileFrames] " << ToString(finger) << ": " << frames << " frame(s)" << std::endl;
+    EXPECT_GT(frames, 0u) << "Expected >=1 frame for " << ToString(finger);
+  }
+}
+
+// Test GetSNOfTactileSensor per finger
+TEST_F(OmniHand3LiteTest, GetSNOfTactileSensor) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    std::string sn = hand_->GetSNOfTactileSensor(finger);
+    std::cout << "[GetSNOfTactileSensor] " << ToString(finger) << ": \"" << sn << "\"" << std::endl;
+  }
+}
+
+// Test deprecated GetSensorDataLength consistency with GetNumOfTactilePoints
+TEST_F(OmniHand3LiteTest, GetSensorDataLength) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+  for (Finger finger : hand_->GetSensorOrder()) {
+    size_t len = hand_->GetSensorDataLength(finger);
+    size_t pts = hand_->GetNumOfTactilePoints(finger);
+    std::cout << "[GetSensorDataLength] " << ToString(finger)
+              << ": " << len << " (GetNumOfTactilePoints=" << pts << ")" << std::endl;
+    EXPECT_GT(len, 0u) << "Expected >0 for " << ToString(finger);
+  }
+}
+
 // Main function for gtest
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);

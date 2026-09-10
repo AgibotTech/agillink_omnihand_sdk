@@ -32,7 +32,18 @@ struct AGIBOT_EXPORT TactileSensorData {
  */
 class AGIBOT_EXPORT IO10TactileSensor1D {
  public:
+  virtual size_t GetNumOfTactileSensors() const = 0;
+
+  virtual size_t GetNumOfTactilePoints(Finger finger) const = 0;
+
+  virtual size_t GetLenOfTactileDatum(Finger finger) const = 0;
+
+  virtual size_t GetNumOfRepliedTactileFrames(Finger finger) const = 0;
+
+  virtual std::string GetSNOfTactileSensor(Finger finger) const = 0;
+
   /**
+   * @deprecated Use GetNumOfTactilePoints() instead.
    * @brief Get sensor data length for a specific finger
    * @param finger Finger enum value
    * @return Sensor data length in bytes
