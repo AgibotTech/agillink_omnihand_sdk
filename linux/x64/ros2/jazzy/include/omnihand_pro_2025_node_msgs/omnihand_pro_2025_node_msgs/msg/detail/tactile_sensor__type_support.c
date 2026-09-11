@@ -4,10 +4,10 @@
 
 #include <string.h>
 
-#include "omnihand_pro_2025_node_msgs/msg/detail/tactile_sensor__type_support.h"
 #include "omnihand_pro_2025_node_msgs/msg/detail/tactile_sensor__struct.h"
-#include "rosidl_typesupport_interface/macros.h"
+#include "omnihand_pro_2025_node_msgs/msg/detail/tactile_sensor__type_support.h"
 #include "omnihand_pro_2025_node_msgs/msg/detail/tactile_sensor__functions.h"
+#include "rosidl_typesupport_interface/macros.h"
 
 #ifdef __cplusplus
 extern "C"

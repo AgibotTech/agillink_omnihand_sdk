@@ -14,24 +14,27 @@
  *   ./demo_omnihand_2025_zlgcan_tcp right 192.168.0.178 8000
  */
 
-#include <iostream>
-#include <iomanip>
+#include <cstdio>
 #include <vector>
 #include <chrono>
 #include <thread>
 #include <string>
+#include "agilink_logger.h"
 #include "omnihand/omnihand_2025.h"
 
+using agilink::AgilinkLogger;
+static constexpr const char* TAG = "OmniHand2025Demo";
+
 void printUsage(const char* program_name) {
-  std::cout << "Usage: " << program_name << " [left|right] [host] [port]" << std::endl;
-  std::cout << "  left   - Control left hand (default)" << std::endl;
-  std::cout << "  right  - Control right hand" << std::endl;
-  std::cout << "  host   - TCP server IP (default: 192.168.0.178)" << std::endl;
-  std::cout << "  port   - TCP server port (default: 8000)" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Example:" << std::endl;
-  std::cout << "  " << program_name << " left" << std::endl;
-  std::cout << "  " << program_name << " right 192.168.0.178 8000" << std::endl;
+  AgilinkLogger::get().infof(TAG, "Usage: %s [left|right] [host] [port]", program_name);
+  AgilinkLogger::get().infof(TAG, "  left   - Control left hand (default)");
+  AgilinkLogger::get().infof(TAG, "  right  - Control right hand");
+  AgilinkLogger::get().infof(TAG, "  host   - TCP server IP (default: 192.168.0.178)");
+  AgilinkLogger::get().infof(TAG, "  port   - TCP server port (default: 8000)");
+  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().infof(TAG, "Example:");
+  AgilinkLogger::get().infof(TAG, "  %s left", program_name);
+  AgilinkLogger::get().infof(TAG, "  %s right 192.168.0.178 8000", program_name);
 }
 
 int main(int argc, char** argv) {
@@ -55,17 +58,17 @@ int main(int argc, char** argv) {
       try {
         port = static_cast<uint16_t>(std::stoi(arg));
       } catch (...) {
-        std::cerr << "[Error]: Invalid port: " << arg << std::endl;
+        AgilinkLogger::get().errorf(TAG, "[Error]: Invalid port: %s", arg.c_str());
         return 1;
       }
     }
   }
 
-  std::cout << "============================================" << std::endl;
-  std::cout << "OmniHand 2025 - ZLG CAN over TCP" << std::endl;
-  std::cout << "Mode: " << mode << std::endl;
-  std::cout << "Server: " << host << ":" << port << std::endl;
-  std::cout << "============================================" << std::endl;
+  AgilinkLogger::get().infof(TAG, "============================================");
+  AgilinkLogger::get().infof(TAG, "OmniHand 2025 - ZLG CAN over TCP");
+  AgilinkLogger::get().infof(TAG, "Mode: %s", mode.c_str());
+  AgilinkLogger::get().infof(TAG, "Server: %s:%d", host.c_str(), static_cast<int>(port));
+  AgilinkLogger::get().infof(TAG, "============================================");
 
   auto hand_type = (mode == "right") ? agilink::omnihand::HandType::RIGHT
                                      : agilink::omnihand::HandType::LEFT;
@@ -74,46 +77,56 @@ int main(int argc, char** argv) {
       hand_type, hand_device_id, host, port, canfd_channel_id);
 
   if (!hand) {
-    std::cerr << "[Error]: Failed to create hand (check TCP connection to " << host << ":" << port << ")" << std::endl;
+    AgilinkLogger::get().errorf(TAG, "[Error]: Failed to create hand (check TCP connection to %s:%d)", host.c_str(), static_cast<int>(port));
     return 1;
   }
 
   if (!hand->Init()) {
-    std::cerr << "[Error]: Failed to initialize hand" << std::endl;
+    AgilinkLogger::get().errorf(TAG, "[Error]: Failed to initialize hand");
     return 1;
   }
 
-  std::cout << "[OK]: Hand initialized via ZLG CAN TCP" << std::endl;
+  AgilinkLogger::get().infof(TAG, "[OK]: Hand initialized via ZLG CAN TCP");
 
   // Vendor info
   auto vendor_info = hand->GetVendorInfo();
-  std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
+  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().infof(TAG, "Vendor Info:%s", vendor_info.ToString().c_str());
 
   // Device info
   auto device_info = hand->GetDeviceInfo();
-  std::cout << "\nDevice Info: hand_device_id=" << static_cast<int>(device_info.hand_device_id) << std::endl;
+  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().infof(TAG, "Device Info: hand_device_id=%d", static_cast<int>(device_info.hand_device_id));
 
   // Get positions
   auto positions = hand->GetAllJointMotorPosi();
-  std::cout << "\nJoint positions: [";
-  for (size_t i = 0; i < positions.size(); ++i) {
-    std::cout << positions[i];
-    if (i < positions.size() - 1) std::cout << ", ";
+  AgilinkLogger::get().infof(TAG, "");
+  {
+    std::string msg;
+    for (size_t i = 0; i < positions.size(); ++i) {
+      msg += std::to_string(positions[i]);
+      if (i < positions.size() - 1) msg += ", ";
+    }
+    AgilinkLogger::get().infof(TAG, "Joint positions: [%s]", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 
   // Set angles and read back
   std::vector<double> angles(10, 0.0);
   hand->SetAllActiveJointAngles(angles);
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
   auto angles_read = hand->GetAllActiveJointAngles();
-  std::cout << "Active joint angles (rad): [";
-  for (size_t i = 0; i < angles_read.size(); ++i) {
-    std::cout << std::fixed << std::setprecision(3) << angles_read[i];
-    if (i < angles_read.size() - 1) std::cout << ", ";
+  {
+    std::string msg;
+    char buf[32];
+    for (size_t i = 0; i < angles_read.size(); ++i) {
+      snprintf(buf, sizeof(buf), "%.4f", angles_read[i]);
+      msg += buf;
+      if (i < angles_read.size() - 1) msg += ", ";
+    }
+    AgilinkLogger::get().infof(TAG, "Active joint angles (rad): [%s]", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 
-  std::cout << "\n[Done]: ZLG CAN TCP demo completed." << std::endl;
+  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().infof(TAG, "[Done]: ZLG CAN TCP demo completed.");
   return 0;
 }
