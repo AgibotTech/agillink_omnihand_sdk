@@ -38,4 +38,15 @@ if(omnihand_FOUND)
       IMPORTED_IMPLIB "${OMNIHAND_LIBRARY}"
       INTERFACE_INCLUDE_DIRECTORIES "${omnihand_INCLUDE_DIRS}")
   endif()
+  find_library(AGILINK_LOGGER_LIBRARY NAMES agilink_logger HINTS "${_lib_dir}" NO_DEFAULT_PATH)
+  if(AGILINK_LOGGER_LIBRARY)
+    if(NOT TARGET agilink_logger)
+      add_library(agilink_logger SHARED IMPORTED)
+      set_target_properties(agilink_logger PROPERTIES
+        IMPORTED_IMPLIB "${AGILINK_LOGGER_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${omnihand_INCLUDE_DIRS}")
+    endif()
+    set_property(TARGET omnihand APPEND PROPERTY
+      INTERFACE_LINK_LIBRARIES agilink_logger)
+  endif()
 endif()

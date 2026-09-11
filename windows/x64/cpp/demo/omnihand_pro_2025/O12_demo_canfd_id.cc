@@ -17,121 +17,147 @@
 
 #include <algorithm>
 #include <chrono>
-#include <iomanip>
-#include <iostream>
+#include <cstdio>
 #include <string>
 #include <thread>
 #include <vector>
+#include "agilink_logger.h"
 #include "omnihand/omnihand_pro_2025.h"
 
+using agilink::AgilinkLogger;
+static constexpr const char* TAG = "OmniHandPro2025Demo";
+
 void printUsage(const char* program_name) {
-  std::cout << "Usage: " << program_name << " [left|right|both] [-d zlgcan|hcan]" << std::endl;
-  std::cout << "  left   - Control left hand only" << std::endl;
-  std::cout << "  right  - Control right hand only" << std::endl;
-  std::cout << "  both   - Control both hands simultaneously" << std::endl;
-  std::cout << "  -d, --device DEVICE" << std::endl;
-  std::cout << "         Set CAN device type (zlgcan or hcan, default: zlgcan)" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Example:" << std::endl;
-  std::cout << "  " << program_name << " left" << std::endl;
-  std::cout << "  " << program_name << " right -d hcan" << std::endl;
-  std::cout << "  " << program_name << " both -d zlgcan" << std::endl;
+  AgilinkLogger::get().infof(TAG, "Usage: %s [left|right|both] [-d zlgcan|hcan]", program_name);
+  AgilinkLogger::get().infof(TAG, "  left   - Control left hand only");
+  AgilinkLogger::get().infof(TAG, "  right  - Control right hand only");
+  AgilinkLogger::get().infof(TAG, "  both   - Control both hands simultaneously");
+  AgilinkLogger::get().infof(TAG, "  -d, --device DEVICE");
+  AgilinkLogger::get().infof(TAG, "         Set CAN device type (zlgcan or hcan, default: zlgcan)");
+  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().infof(TAG, "Example:");
+  AgilinkLogger::get().infof(TAG, "  %s left", program_name);
+  AgilinkLogger::get().infof(TAG, "  %s right -d hcan", program_name);
+  AgilinkLogger::get().infof(TAG, "  %s both -d zlgcan", program_name);
 }
 
 void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand, const std::string& hand_name) {
-  std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\n=== %s Hand Control ===", hand_name.c_str());
 
   // ============ Get Device Info ============
   auto vendor_info = hand->GetVendorInfo();
-  std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nVendor Info:%s", vendor_info.ToString().c_str());
 
   auto device_info = hand->GetDeviceInfo();
-  std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nDevice Info:%s", device_info.ToString().c_str());
 
   // ============ Read Sensor Data ============
-  std::cout << "\n=== Reading Sensor Data ===" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\n=== Reading Sensor Data ===");
 
   // Read 3D tactile sensor data (O12-specific)
-  std::cout << "\n3D Tactile Sensor Data (O12 only):" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\n3D Tactile Sensor Data (O12 only):");
   try {
     auto thumb_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::THUMB);
-    std::cout << "  Thumb:" << std::endl;
-    std::cout << "    Online State: " << (thumb_sensor.online_state ? "Online" : "Offline") << std::endl;
-    std::cout << "    Normal Force: " << thumb_sensor.normal_force << " (0.1N, max: 3000)" << std::endl;
-    std::cout << "    Tangent Force: " << thumb_sensor.tangent_force << std::endl;
-    std::cout << "    Tangent Force Angle: " << thumb_sensor.tangent_force_angle << "°" << std::endl;
-    std::cout << "    Channel Values: [";
-    for (size_t i = 0; i < agilink::omnihand::TactileSensor3DData::kChannelCount; ++i) {
-      std::cout << thumb_sensor.channel_value[i];
-      if (i + 1 < agilink::omnihand::TactileSensor3DData::kChannelCount) std::cout << ", ";
+    AgilinkLogger::get().infof(TAG, "  Thumb:");
+    AgilinkLogger::get().infof(TAG, "    Online State: %s", (thumb_sensor.online_state ? "Online" : "Offline"));
+    AgilinkLogger::get().infof(TAG, "    Normal Force: %d (0.1N, max: 3000)", thumb_sensor.normal_force);
+    AgilinkLogger::get().infof(TAG, "    Tangent Force: %.4f", thumb_sensor.tangent_force);
+    AgilinkLogger::get().infof(TAG, "    Tangent Force Angle: %.4f°", thumb_sensor.tangent_force_angle);
+    {
+      std::string msg = "    Channel Values: [";
+      for (size_t i = 0; i < agilink::omnihand::TactileSensor3DData::kChannelCount; ++i) {
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%d", thumb_sensor.channel_value[i]);
+        msg += buf;
+        if (i + 1 < agilink::omnihand::TactileSensor3DData::kChannelCount) msg += ", ";
+      }
+      msg += "]";
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << "]" << std::endl;
 
     auto index_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::INDEX);
-    std::cout << "  Index:" << std::endl;
-    std::cout << "    Online State: " << (index_sensor.online_state ? "Online" : "Offline") << std::endl;
-    std::cout << "    Normal Force: " << index_sensor.normal_force << " (0.1N, max: 3000)" << std::endl;
-    std::cout << "    Tangent Force: " << index_sensor.tangent_force << std::endl;
-    std::cout << "    Tangent Force Angle: " << index_sensor.tangent_force_angle << "°" << std::endl;
+    AgilinkLogger::get().infof(TAG, "  Index:");
+    AgilinkLogger::get().infof(TAG, "    Online State: %s", (index_sensor.online_state ? "Online" : "Offline"));
+    AgilinkLogger::get().infof(TAG, "    Normal Force: %d (0.1N, max: 3000)", index_sensor.normal_force);
+    AgilinkLogger::get().infof(TAG, "    Tangent Force: %.4f", index_sensor.tangent_force);
+    AgilinkLogger::get().infof(TAG, "    Tangent Force Angle: %.4f°", index_sensor.tangent_force_angle);
   } catch (const std::exception& e) {
-    std::cout << "  Warning: " << e.what() << std::endl;
+    AgilinkLogger::get().infof(TAG, "  Warning: %s", e.what());
   }
 
   // Read temperature report
-  std::cout << "\nTemperature Reports:" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nTemperature Reports:");
   auto temperatures = hand->GetAllTemperatureReport();
-  std::cout << "  All Joint Temperatures (°C): [";
-  for (size_t i = 0; i < temperatures.size(); ++i) {
-    std::cout << temperatures[i];
-    if (i < temperatures.size() - 1) std::cout << ", ";
+  {
+    std::string msg = "  All Joint Temperatures (°C): [";
+    for (size_t i = 0; i < temperatures.size(); ++i) {
+      char buf[32];
+      snprintf(buf, sizeof(buf), "%.4f", temperatures[i]);
+      msg += buf;
+      if (i < temperatures.size() - 1) msg += ", ";
+    }
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 
   // Read current report
-  std::cout << "\nCurrent Reports:" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nCurrent Reports:");
   auto currents = hand->GetAllCurrentReport();
-  std::cout << "  All Joint Currents: [";
-  for (size_t i = 0; i < currents.size(); ++i) {
-    std::cout << currents[i];
-    if (i < currents.size() - 1) std::cout << ", ";
+  {
+    std::string msg = "  All Joint Currents: [";
+    for (size_t i = 0; i < currents.size(); ++i) {
+      char buf[32];
+      snprintf(buf, sizeof(buf), "%.4f", currents[i]);
+      msg += buf;
+      if (i < currents.size() - 1) msg += ", ";
+    }
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 
   // Read error report
-  std::cout << "\nError Reports:" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nError Reports:");
   auto errors = hand->GetAllErrorReport();
   for (size_t i = 0; i < errors.size(); ++i) {
     if (errors[i].bits.stalled_ || errors[i].bits.overheat_ || errors[i].bits.over_current_ ||
         errors[i].bits.motor_except_ || errors[i].bits.commu_except_) {
-      std::cout << "  Joint " << (i + 1) << ": ";
-      if (errors[i].bits.stalled_) std::cout << "Stalled ";
-      if (errors[i].bits.overheat_) std::cout << "Overheat ";
-      if (errors[i].bits.over_current_) std::cout << "OverCurrent ";
-      if (errors[i].bits.motor_except_) std::cout << "MotorException ";
-      if (errors[i].bits.commu_except_) std::cout << "CommException ";
-      std::cout << std::endl;
+      std::string msg;
+      char buf[32];
+      snprintf(buf, sizeof(buf), "  Joint %zu: ", i + 1);
+      msg += buf;
+      if (errors[i].bits.stalled_) msg += "Stalled ";
+      if (errors[i].bits.overheat_) msg += "Overheat ";
+      if (errors[i].bits.over_current_) msg += "OverCurrent ";
+      if (errors[i].bits.motor_except_) msg += "MotorException ";
+      if (errors[i].bits.commu_except_) msg += "CommException ";
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
   }
   if (std::all_of(errors.begin(), errors.end(), [](const auto& e) {
         return !e.bits.stalled_ && !e.bits.overheat_ && !e.bits.over_current_ &&
                !e.bits.motor_except_ && !e.bits.commu_except_;
       })) {
-    std::cout << "  No errors detected" << std::endl;
+    AgilinkLogger::get().infof(TAG, "  No errors detected");
   }
 
   // Read velocity (read-only, not control)
-  std::cout << "\nJoint Velocities:" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nJoint Velocities:");
   auto velocities = hand->GetAllJointMotorVelo();
-  std::cout << "  All Joint Velocities: [";
-  for (size_t i = 0; i < velocities.size(); ++i) {
-    std::cout << velocities[i];
-    if (i < velocities.size() - 1) std::cout << ", ";
+  {
+    std::string msg = "  All Joint Velocities: [";
+    for (size_t i = 0; i < velocities.size(); ++i) {
+      char buf[32];
+      snprintf(buf, sizeof(buf), "%.4f", velocities[i]);
+      msg += buf;
+      if (i < velocities.size() - 1) msg += ", ";
+    }
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 
   // ============ Joint Angle Control Demo ============
   // Use joint-angle control (recommended; underlying layer auto-converts)
-  std::cout << "\nSetting joint angles..." << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nSetting joint angles...");
   for (int i = 1; i <= agilink::omnihand::OmniHandPro2025::kDegreesOfActiveFreedom; i++)
     hand->SetControlMode(i, agilink::omnihand::ControlMode::POSITION);
 
@@ -149,21 +175,34 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
 
   // Read joint angle
   auto active_angles = hand->GetAllActiveJointAngles();
-  std::cout << "Active Joint Angles (rad): [";
-  for (size_t i = 0; i < active_angles.size(); ++i) {
-    std::cout << std::fixed << std::setprecision(4) << active_angles[i];
-    if (i < active_angles.size() - 1) std::cout << ", ";
+  {
+    std::string msg = "Active Joint Angles (rad): [";
+    for (size_t i = 0; i < active_angles.size(); ++i) {
+      char buf[32];
+      snprintf(buf, sizeof(buf), "%.4f", active_angles[i]);
+      msg += buf;
+      if (i < active_angles.size() - 1) msg += ", ";
+    }
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 
   // Read all joint angles
   auto all_angles = hand->GetAllJointAngles();
-  std::cout << "All Joint Angles (rad, " << all_angles.size() << " joints): [";
-  for (size_t i = 0; i < all_angles.size(); ++i) {
-    std::cout << std::fixed << std::setprecision(4) << all_angles[i];
-    if (i < all_angles.size() - 1) std::cout << ", ";
+  {
+    std::string msg;
+    char hdr[64];
+    snprintf(hdr, sizeof(hdr), "All Joint Angles (rad, %zu joints): [", all_angles.size());
+    msg += hdr;
+    for (size_t i = 0; i < all_angles.size(); ++i) {
+      char buf[32];
+      snprintf(buf, sizeof(buf), "%.4f", all_angles[i]);
+      msg += buf;
+      if (i < all_angles.size() - 1) msg += ", ";
+    }
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -178,29 +217,29 @@ int main(int argc, char** argv) {
       return 0;
     } else if (arg == "-d" || arg == "--device") {
       if (i + 1 >= argc) {
-        std::cerr << "[Error]: " << arg << " requires a value (zlgcan or hcan)" << std::endl;
+        AgilinkLogger::get().errorf(TAG, "[Error]: %s requires a value (zlgcan or hcan)", arg.c_str());
         printUsage(argv[0]);
         return 1;
       }
       device_type = argv[++i];
       if (device_type != "zlgcan" && device_type != "hcan") {
-        std::cerr << "[Error]: -d value must be 'zlgcan' or 'hcan', got: " << device_type << std::endl;
+        AgilinkLogger::get().errorf(TAG, "[Error]: -d value must be 'zlgcan' or 'hcan', got: %s", device_type.c_str());
         return 1;
       }
     } else if (arg == "left" || arg == "right" || arg == "both") {
       mode = arg;
     } else {
-      std::cerr << "[Error]: Invalid argument: " << arg << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Invalid argument: %s", arg.c_str());
       printUsage(argv[0]);
       return 1;
     }
   }
 
-  std::cout << "============================================" << std::endl;
-  std::cout << "OmniHand Pro 2025 - CANFD Control (by canfd_id)" << std::endl;
-  std::cout << "Mode: " << mode << std::endl;
-  std::cout << "Device: " << device_type << std::endl;
-  std::cout << "============================================" << std::endl;
+  AgilinkLogger::get().infof(TAG, "============================================");
+  AgilinkLogger::get().infof(TAG, "OmniHand Pro 2025 - CANFD Control (by canfd_id)");
+  AgilinkLogger::get().infof(TAG, "Mode: %s", mode.c_str());
+  AgilinkLogger::get().infof(TAG, "Device: %s", device_type.c_str());
+  AgilinkLogger::get().infof(TAG, "============================================");
 
   unsigned char device_id = 1;
   unsigned char canfd_id = 0;
@@ -225,32 +264,32 @@ int main(int argc, char** argv) {
     auto left_hand = createHand(agilink::omnihand::HandType::LEFT, 0);
 
     if (!left_hand) {
-      std::cerr << "[Error]: Failed to create left hand instance" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to create left hand instance");
       return 1;
     }
 
     if (!left_hand->Init()) {
-      std::cerr << "[Error]: Failed to initialize left hand" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to initialize left hand");
       return 1;
     }
 
-    std::cout << "[OK]: Left hand initialized successfully" << std::endl;
+    AgilinkLogger::get().infof(TAG, "[OK]: Left hand initialized successfully");
     controlSingleHand(left_hand, "Left");
   } else if (mode == "right") {
     // Create right-hand instance
     auto right_hand = createHand(agilink::omnihand::HandType::RIGHT, 0);
 
     if (!right_hand) {
-      std::cerr << "[Error]: Failed to create right hand instance" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to create right hand instance");
       return 1;
     }
 
     if (!right_hand->Init()) {
-      std::cerr << "[Error]: Failed to initialize right hand" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to initialize right hand");
       return 1;
     }
 
-    std::cout << "[OK]: Right hand initialized successfully" << std::endl;
+    AgilinkLogger::get().infof(TAG, "[OK]: Right hand initialized successfully");
     controlSingleHand(right_hand, "Right");
   } else if (mode == "both") {
     // both mode: create both hands
@@ -258,39 +297,39 @@ int main(int argc, char** argv) {
     auto right_hand = createHand(agilink::omnihand::HandType::RIGHT, 1);
 
     if (!left_hand || !right_hand) {
-      std::cerr << "[Error]: Failed to create hand instances" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to create hand instances");
       return 1;
     }
 
     if (!left_hand->Init()) {
-      std::cerr << "[Error]: Failed to initialize left hand" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to initialize left hand");
       return 1;
     }
 
     if (!right_hand->Init()) {
-      std::cerr << "[Error]: Failed to initialize right hand" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to initialize right hand");
       return 1;
     }
 
-    std::cout << "[OK]: Both hands initialized successfully" << std::endl;
+    AgilinkLogger::get().infof(TAG, "[OK]: Both hands initialized successfully");
 
     // Control both hands simultaneously
-    std::cout << "\n=== Dual Hand Control ===" << std::endl;
+    AgilinkLogger::get().infof(TAG, "\n=== Dual Hand Control ===");
 
     // Get device info
     auto left_vendor = left_hand->GetVendorInfo();
     auto right_vendor = right_hand->GetVendorInfo();
 
-    std::cout << "\nLeft Hand Info:" << std::endl;
-    std::cout << "  Model: " << left_vendor.productModel << std::endl;
-    std::cout << "  Serial: " << left_vendor.productSeqNum << std::endl;
+    AgilinkLogger::get().infof(TAG, "\nLeft Hand Info:");
+    AgilinkLogger::get().infof(TAG, "  Model: %s", left_vendor.productModel.c_str());
+    AgilinkLogger::get().infof(TAG, "  Serial: %s", left_vendor.productSeqNum.c_str());
 
-    std::cout << "\nRight Hand Info:" << std::endl;
-    std::cout << "  Model: " << right_vendor.productModel << std::endl;
-    std::cout << "  Serial: " << right_vendor.productSeqNum << std::endl;
+    AgilinkLogger::get().infof(TAG, "\nRight Hand Info:");
+    AgilinkLogger::get().infof(TAG, "  Model: %s", right_vendor.productModel.c_str());
+    AgilinkLogger::get().infof(TAG, "  Serial: %s", right_vendor.productSeqNum.c_str());
 
     // Use joint-angle control
-    std::cout << "\nSetting joint angles..." << std::endl;
+    AgilinkLogger::get().infof(TAG, "\nSetting joint angles...");
     std::vector<double> left_angles(12, 0.0);
     std::vector<double> right_angles(12, 0.5);
 
@@ -303,21 +342,31 @@ int main(int argc, char** argv) {
     auto left_angles_read = left_hand->GetAllActiveJointAngles();
     auto right_angles_read = right_hand->GetAllActiveJointAngles();
 
-    std::cout << "Left Hand Angles (rad): [";
-    for (size_t i = 0; i < left_angles_read.size(); ++i) {
-      std::cout << std::fixed << std::setprecision(4) << left_angles_read[i];
-      if (i < left_angles_read.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "Left Hand Angles (rad): [";
+      for (size_t i = 0; i < left_angles_read.size(); ++i) {
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%.4f", left_angles_read[i]);
+        msg += buf;
+        if (i < left_angles_read.size() - 1) msg += ", ";
+      }
+      msg += "]";
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << "]" << std::endl;
 
-    std::cout << "Right Hand Angles (rad): [";
-    for (size_t i = 0; i < right_angles_read.size(); ++i) {
-      std::cout << std::fixed << std::setprecision(4) << right_angles_read[i];
-      if (i < right_angles_read.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "Right Hand Angles (rad): [";
+      for (size_t i = 0; i < right_angles_read.size(); ++i) {
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%.4f", right_angles_read[i]);
+        msg += buf;
+        if (i < right_angles_read.size() - 1) msg += ", ";
+      }
+      msg += "]";
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << "]" << std::endl;
   }
 
-  std::cout << "\n[Done]: Example completed successfully!" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\n[Done]: Example completed successfully!");
   return 0;
 }
