@@ -36,7 +36,10 @@ endif()
 add_subdirectory(omnihand_2025)
 add_subdirectory(omnihand_pro_2025)
 add_subdirectory(omnihand_dex_umi)
-add_subdirectory(omni_picker_3)
+# Add OmniPicker 3 demos conditionally
+if(BUILD_OMNI_PICKER_3)
+  add_subdirectory(omni_picker_3)
+endif()
 # Add OmniPicker 2025 demo conditionally
 if(BUILD_OMNI_PICKER_2025)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/omnipicker_2025")

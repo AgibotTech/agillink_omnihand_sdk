@@ -33,30 +33,40 @@
 #include <memory>
 #include <mutex>
 
+#if defined(_WIN32) || defined(_WIN64)
+  #ifdef AGILINK_BUILDING_DLL
+    #define AGILINK_EXPORT __declspec(dllexport)
+  #else
+    #define AGILINK_EXPORT __declspec(dllimport)
+  #endif
+#else
+  #define AGILINK_EXPORT __attribute__((visibility("default")))
+#endif
+
 namespace agilink {
 
-class AgilinkLogger {
+class AGILINK_EXPORT AgilinkLogger {
  public:
   // ── Initialization ──────────────────────────────────────────────────────────
 
   // FILE* sink: no external formatting, timestamps on by default.
   static void init(FILE* fp = stdout,
-                   OmniLogger<1024>::Level min_level = OmniLogger<1024>::Level::VERBOSE,
+                   OmniLogger<>::Level min_level = OmniLogger<>::Level::VERBOSE,
                    std::chrono::milliseconds flush_interval = std::chrono::milliseconds(50),
                    bool with_timestamp = true);
 
   // Custom sink: caller usually adds its own timestamps (e.g. RCLCPP, syslog), off by default.
-  static void init(OmniLogger<1024>::WriteFn write_fn,
-                   OmniLogger<1024>::FlushFn flush_fn = nullptr,
-                   OmniLogger<1024>::Level min_level = OmniLogger<1024>::Level::VERBOSE,
+  static void init(OmniLogger<>::WriteFn write_fn,
+                   OmniLogger<>::FlushFn flush_fn = nullptr,
+                   OmniLogger<>::Level min_level = OmniLogger<>::Level::VERBOSE,
                    std::chrono::milliseconds flush_interval = std::chrono::milliseconds(50),
                    bool with_timestamp = false);
 
   // Returns the singleton; auto-initialises to stdout if init() was not called.
-  static OmniLogger<1024>& get() noexcept;
+  static OmniLogger<>& get() noexcept;
 
  private:
-  static std::unique_ptr<OmniLogger<1024>>& inst_() noexcept;
+  static std::unique_ptr<OmniLogger<>>& inst_() noexcept;
   static std::mutex& mtx_() noexcept;
 };
 

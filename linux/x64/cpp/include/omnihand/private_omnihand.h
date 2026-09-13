@@ -24,57 +24,6 @@ namespace agilink {
 namespace omnihand {
 
 /**
- * @brief Product serial number structure (0xC2 response)
- * @note 19 bytes total:
- *       - supplier_code[3]: 3 bytes supplier code
- *       - material_code[6]: 6 bytes material code
- *       - date[6]: YYMMDD format (6 bytes ASCII)
- *       - serial[4]: 4 bytes serial number
- */
-struct AGIBOT_EXPORT ProductSerialNumber {
-  uint8_t supplier_code[3];   // Supplier code (3 bytes)
-  uint8_t material_code[6];   // Material code (6 bytes)
-  uint8_t date[6];            // Date YYMMDD (6 bytes ASCII)
-  uint8_t serial[4];          // Serial number (4 bytes)
-  
-  ProductSerialNumber() {
-    memset(supplier_code, 0, 3);
-    memset(material_code, 0, 6);
-    memset(date, 0, 6);
-    memset(serial, 0, 4);
-  }
-  
-  /**
-   * @brief Convert to string representation (ASCII format)
-   * @note Device returns 19-byte ASCII string like "AXXX89..."
-   */
-  std::string ToString() const {
-    std::ostringstream oss;
-    for (int i = 0; i < 3; i++) {
-      if (supplier_code[i] >= 0x20 && supplier_code[i] < 0x7F) {
-        oss << static_cast<char>(supplier_code[i]);
-      }
-    }
-    for (int i = 0; i < 6; i++) {
-      if (material_code[i] >= 0x20 && material_code[i] < 0x7F) {
-        oss << static_cast<char>(material_code[i]);
-      }
-    }
-    for (int i = 0; i < 6; i++) {
-      if (date[i] >= 0x20 && date[i] < 0x7F) {
-        oss << static_cast<char>(date[i]);
-      }
-    }
-    for (int i = 0; i < 4; i++) {
-      if (serial[i] >= 0x20 && serial[i] < 0x7F) {
-        oss << static_cast<char>(serial[i]);
-      }
-    }
-    return oss.str();
-  }
-};
-
-/**
  * @brief Firmware version information structure (0xCD response)
  * @note 10 bytes total:
  *       - device_type: Device type (2=O10 dexterous hand, 1=O12, etc.)

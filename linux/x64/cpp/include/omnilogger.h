@@ -107,7 +107,7 @@
 
 namespace agilink {
 
-template <std::size_t SlotSize     = 512,
+template <std::size_t SlotSize     = 1024,
           std::size_t RingCap      = 2048,
           uint8_t     CompileMinLv = 0>   // 0 = Level::VERBOSE; nothing filtered at compile time
 class OmniLogger {

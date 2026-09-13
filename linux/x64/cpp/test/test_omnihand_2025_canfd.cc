@@ -6,15 +6,19 @@
  * @brief CANFD-specific tests for OmniHand 2025 (public factory APIs, non-private)
  *
  * Usage:
- *   ./test_omnihand_2025_canfd [-t TRANSPORT] [-c CHANNEL] [-i CANFD_ID] [-f INTERVAL] [--can-if IF] [--tcp-host H] [--tcp-port P]
+ *   ./test_omnihand_2025_canfd [-t TRANSPORT] [-c CHANNEL] [-i CANFD_ID] [-f INTERVAL]
+ *                              [--device-id ID] [--can-if IF] [--tcp-host H] [--tcp-port P]
  *
- *   -t TRANSPORT  Backend: zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)
- *   --can-if IF   SocketCAN interface name, socketcan only (default: can0)
- *   --tcp-host H  ZLG CANFD-over-TCP peer host, zlgcantcp only (default: 192.168.0.178)
- *   --tcp-port P  TCP port, zlgcantcp only (default: 8000)
- *   -c CHANNEL   CAN channel index for zlgcan / hcan / zlgcantcp (default: 0)
- *   -i CANFD_ID  Adapter device index for zlgcan / hcan (default: 0)
- *   -f INTERVAL  Request interval in ms (default: 5, max: 100)
+ *   -t TRANSPORT     Backend: zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)
+ *   --device-id ID   Target hand device ID to test with (default: 1). SetUp discovers
+ *                    the current ID via broadcast, switches to this value, and TearDown
+ *                    restores the original ID.
+ *   --can-if IF      SocketCAN interface name, socketcan only (default: can0)
+ *   --tcp-host H     ZLG CANFD-over-TCP peer host, zlgcantcp only (default: 192.168.0.178)
+ *   --tcp-port P     TCP port, zlgcantcp only (default: 8000)
+ *   -c CHANNEL       CAN channel index for zlgcan / hcan / zlgcantcp (default: 0)
+ *   -i CANFD_ID      Adapter device index for zlgcan / hcan (default: 0)
+ *   -f INTERVAL      Request interval in ms (default: 5, max: 100)
  */
 
 #include <gtest/gtest.h>
@@ -41,6 +45,7 @@ static CanfdTransport g_transport = CanfdTransport::kZlgcan;
 static int g_channel_id = 0;
 static int g_canfd_id = 0;
 static int g_request_interval = 5;  // CANFD default: 5ms
+static int g_device_id = 1;         // target hand device ID (--device-id)
 static std::string g_can_if = "can0";
 static std::string g_tcp_host = "192.168.0.178";
 static uint16_t g_tcp_port = 8000;
@@ -63,24 +68,26 @@ class OmniHand2025CanfdTest : public ::testing::Test {
   void SetUp() override {
     using agilink::omnihand::HandType;
     using agilink::omnihand::OmniHand2025;
-    constexpr uint8_t kHandDeviceId = 1;
+    // Use device ID 0 (broadcast) for initial discovery so we find the hand
+    // regardless of its current ID.
+    constexpr uint8_t kBroadcastId = 0;
 
     switch (g_transport) {
       case CanfdTransport::kZlgcan:
         hand_ = OmniHand2025::createHandByZlgcan(
-            HandType::LEFT, kHandDeviceId,
+            HandType::LEFT, kBroadcastId,
             static_cast<uint8_t>(g_canfd_id),
             static_cast<uint8_t>(g_channel_id));
         break;
       case CanfdTransport::kHcan:
         hand_ = OmniHand2025::createHandByHcan(
-            HandType::LEFT, kHandDeviceId,
+            HandType::LEFT, kBroadcastId,
             static_cast<uint8_t>(g_canfd_id),
             static_cast<uint8_t>(g_channel_id));
         break;
       case CanfdTransport::kSocketCan:
 #if defined(__linux__)
-        hand_ = OmniHand2025::createHandSocketCan(HandType::LEFT, kHandDeviceId, g_can_if);
+        hand_ = OmniHand2025::createHandSocketCan(HandType::LEFT, kBroadcastId, g_can_if);
 #else
         AgilinkLogger::get().warnf(TAG, "[Warning] SocketCAN requires Linux; skipping hand creation.");
         hand_ = nullptr;
@@ -89,7 +96,7 @@ class OmniHand2025CanfdTest : public ::testing::Test {
       case CanfdTransport::kZlgCanTcp:
 #if OMNIHAND_ZLG_TCP_SUPPORTED
         hand_ = OmniHand2025::createHandByZlgCanTcp(
-            HandType::LEFT, kHandDeviceId, g_tcp_host, g_tcp_port,
+            HandType::LEFT, kBroadcastId, g_tcp_host, g_tcp_port,
             static_cast<uint8_t>(g_channel_id));
 #else
         AgilinkLogger::get().warnf(TAG, "[Warning] ZLG CANFD over TCP not supported on this platform.");
@@ -112,9 +119,25 @@ class OmniHand2025CanfdTest : public ::testing::Test {
     if (!hand_ || !device_available_) {
       GTEST_SKIP() << "CANFD device not available";
     }
+
+    // Discover and cache the actual device ID via broadcast response.
+    auto info = hand_->GetDeviceInfo();
+    original_device_id_ = static_cast<uint8_t>(info.hand_device_id);
+    AgilinkLogger::get().infof(TAG, "[SetUp] Discovered device ID: %d, switching to: %d",
+                               original_device_id_, g_device_id);
+    if (static_cast<uint8_t>(g_device_id) != original_device_id_) {
+      hand_->SetDeviceId(static_cast<uint8_t>(g_device_id));
+    }
   }
 
   void TearDown() override {
+    if (hand_ && device_available_ && original_device_id_ != 0) {
+      if (static_cast<uint8_t>(g_device_id) != original_device_id_) {
+        AgilinkLogger::get().infof(TAG, "[TearDown] Restoring device ID: %d -> %d",
+                                   g_device_id, original_device_id_);
+        hand_->SetDeviceId(original_device_id_);
+      }
+    }
     hand_.reset();
   }
 
@@ -124,6 +147,7 @@ class OmniHand2025CanfdTest : public ::testing::Test {
 
   std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
   bool device_available_ = false;
+  uint8_t original_device_id_ = 0;
 };
 
 // ============================================================================
@@ -164,28 +188,18 @@ TEST_F(OmniHand2025CanfdTest, GetDeviceInfo) {
   AgilinkLogger::get().infof(TAG, "[GetDeviceInfo] Device Info:\n%s", device_info.ToString().c_str());
 
   ASSERT_NE(device_info.hand_device_id, 0) << "GetDeviceInfo timed out";
-  EXPECT_EQ(device_info.hand_device_id, 1);
+  EXPECT_EQ(device_info.hand_device_id, static_cast<uint8_t>(g_device_id));
 }
 
 TEST_F(OmniHand2025CanfdTest, SetDeviceId) {
   RequireDevice();
 
-  auto current_info = hand_->GetDeviceInfo();
-  ASSERT_NE(current_info.hand_device_id, 0) << "Cannot get current device ID";
-
-  // Change to ID 2
-  hand_->SetDeviceId(2);
-  AgilinkLogger::get().infof(TAG, "[SetDeviceId] Set to 2");
-
-  auto new_info = hand_->GetDeviceInfo();
-  EXPECT_EQ(new_info.hand_device_id, 2);
-
-  // Reset to ID 1
-  hand_->SetDeviceId(1);
-  AgilinkLogger::get().infof(TAG, "[SetDeviceId] Reset to 1");
-
-  auto reset_info = hand_->GetDeviceInfo();
-  EXPECT_EQ(reset_info.hand_device_id, 1);
+  // SetUp already switched to g_device_id; just verify the physical ID is correct.
+  auto info = hand_->GetDeviceInfo();
+  ASSERT_NE(info.hand_device_id, 0) << "GetDeviceInfo timed out";
+  EXPECT_EQ(info.hand_device_id, static_cast<uint8_t>(g_device_id));
+  AgilinkLogger::get().infof(TAG, "[SetDeviceId] Current device ID: %d (target: %d)",
+                             info.hand_device_id, g_device_id);
 }
 
 // ============================================================================
@@ -657,6 +671,8 @@ int main(int argc, char** argv) {
 
     if ((arg == "-d" || arg == "--device") && i + 1 < argc) {
       g_transport = ParseTransport(argv[++i]);
+    } else if ((arg == "--device-id" || arg == "--id") && i + 1 < argc) {
+      g_device_id = std::stoi(argv[++i]);
     } else if (arg == "-c" && i + 1 < argc) {
       g_channel_id = std::stoi(argv[++i]);
     } else if (arg == "-i" && i + 1 < argc) {
@@ -674,7 +690,8 @@ int main(int argc, char** argv) {
       AgilinkLogger::get().infof(TAG, "OmniHand 2025 CANFD Test\n");
       AgilinkLogger::get().infof(TAG, "Usage: %s [options]\n", argv[0]);
       AgilinkLogger::get().infof(TAG, "Options:");
-      AgilinkLogger::get().infof(TAG, "  -d, --device NAME   zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)");
+      AgilinkLogger::get().infof(TAG, "  -d, --device NAME    zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)");
+      AgilinkLogger::get().infof(TAG, "  --device-id ID       target hand device ID (default: 1); SetUp discovers & switches, TearDown restores");
       AgilinkLogger::get().infof(TAG, "  -c CHANNEL             CAN channel (zlgcan/hcan/zlgcantcp), default 0");
       AgilinkLogger::get().infof(TAG, "  -i CANFD_ID             device index (zlgcan/hcan), default 0");
       AgilinkLogger::get().infof(TAG, "  --can-if IFACE         SocketCAN iface (socketcan), default can0");
@@ -708,6 +725,7 @@ int main(int argc, char** argv) {
   }
   AgilinkLogger::get().infof(TAG, "Channel ID: %d", g_channel_id);
   AgilinkLogger::get().infof(TAG, "CANFD ID: %d", g_canfd_id);
+  AgilinkLogger::get().infof(TAG, "Target Device ID: %d", g_device_id);
   AgilinkLogger::get().infof(TAG, "Request Interval: %d ms", g_request_interval);
   AgilinkLogger::get().infof(TAG, "================================");
 
