@@ -138,6 +138,21 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0);
 
+  /**
+   * @brief Factory method - RS485 communication (standard serial protocol)
+   * @param hand_type Hand type (a gripper has no chirality; pass HandType::UNKNOWN)
+   * @param hand_device_id Hand device ID
+   * @param uart_port Serial port path (e.g., "/dev/ttyUSB0" or "COM3")
+   * @param baudrate Baud rate (default 460800)
+   * @return A unique pointer to OmniPicker3 instance
+   * @note Firmware update (OTA) is not supported over RS485 yet.
+   */
+  static std::unique_ptr<OmniPicker3> createHandByRs485(
+      HandType hand_type,
+      uint8_t hand_device_id,
+      const std::string& uart_port,
+      int32_t baudrate = 460800);
+
 
   /**
    * @brief Get device information from broadcast address (hand_device_id = 0x00)
@@ -146,6 +161,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
    *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
    *        - Single-channel (USBCANFD-100U): always 0
    * @return DeviceInfo structure, or empty DeviceInfo if request failed
+   * @note Only works with CAN communication, not supported for RS485
    */
   static DeviceInfo GetDeviceInfoFromBroadcast(
       uint8_t canfd_device_id,
@@ -220,6 +236,23 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
   void SetHandGesture(int gesture_num = 1) override;
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
+
+  /**
+   * @brief 0x24: Set joint motor position, also returning running/error status feedback.
+   * @param joint_motor_index Joint motor index (1-based, matches SetJointMotorPosi)
+   * @param posi Target position
+   * @return Position + running code + error code after the write; default (all-zero) if unsupported
+   * @note Default implementation returns an empty result, so CAN backends need no changes.
+   */
+  virtual JointPosiStatus SetJointMotorPosiWithStatus(uint8_t joint_motor_index, int16_t posi) { return {}; }
+
+  /**
+   * @brief 0x26: Get detailed status info (bus + joint) of one joint.
+   * @param joint_index Joint index (0-based, unlike SetJointMotorPosi's 1-based indexing)
+   * @return Joint detail info; default (all-zero) if unsupported
+   * @note Default implementation returns an empty result, so CAN backends need no changes.
+   */
+  virtual JointDetailInfo GetJointDetailInfo(uint8_t joint_index) const { return {}; }
 
  protected:
   /**
