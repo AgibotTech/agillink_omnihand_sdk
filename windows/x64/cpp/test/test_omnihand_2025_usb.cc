@@ -36,6 +36,7 @@
 #include <vector>
 #include "agilink_logger.h"
 #include <cstdio>
+#include <stdexcept>
 #include <string>
 #include <thread>
 #include <chrono>
@@ -87,6 +88,7 @@ class OmniHand2025UsbTest : public ::testing::Test {
 
   void TearDown() override {
     hand_.reset();
+    AgilinkLogger::get().flush();
   }
 
   void RequireDevice() {
@@ -431,7 +433,8 @@ TEST_F(OmniHand2025UsbTest, GetNumOfTactilePoints) {
         agilink::omnihand::ToString(finger).c_str(), pts);
     EXPECT_GT(pts, 0u) << "Expected >0 points for " << agilink::omnihand::ToString(finger);
   }
-  EXPECT_EQ(hand_->GetNumOfTactilePoints(agilink::omnihand::Finger::UNKNOWN), 0u);
+  EXPECT_THROW(hand_->GetNumOfTactilePoints(agilink::omnihand::Finger::UNKNOWN),
+               std::invalid_argument);
 }
 
 TEST_F(OmniHand2025UsbTest, GetLenOfTactileDatum) {
@@ -443,34 +446,33 @@ TEST_F(OmniHand2025UsbTest, GetLenOfTactileDatum) {
         agilink::omnihand::ToString(finger).c_str(), len);
     EXPECT_GT(len, 0u) << "Expected >0 bytes per datum for " << agilink::omnihand::ToString(finger);
   }
-  EXPECT_EQ(hand_->GetLenOfTactileDatum(agilink::omnihand::Finger::UNKNOWN), 0u);
+  EXPECT_THROW(hand_->GetLenOfTactileDatum(agilink::omnihand::Finger::UNKNOWN),
+               std::invalid_argument);
 }
 
 TEST_F(OmniHand2025UsbTest, GetNumOfRepliedTactileFrames) {
   RequireDevice();
 
   for (auto finger : hand_->GetSensorOrder()) {
-    if (finger == agilink::omnihand::Finger::DORSUM) continue;
     size_t frames = hand_->GetNumOfRepliedTactileFrames(finger);
     AgilinkLogger::get().infof(TAG, "[GetNumOfRepliedTactileFrames] %s: %zu frame(s)",
         agilink::omnihand::ToString(finger).c_str(), frames);
     EXPECT_GT(frames, 0u) << "Expected >=1 frame for " << agilink::omnihand::ToString(finger);
   }
-  EXPECT_EQ(hand_->GetNumOfRepliedTactileFrames(agilink::omnihand::Finger::DORSUM), 0u);
-  EXPECT_EQ(hand_->GetNumOfRepliedTactileFrames(agilink::omnihand::Finger::UNKNOWN), 0u);
+  EXPECT_THROW(hand_->GetNumOfRepliedTactileFrames(agilink::omnihand::Finger::UNKNOWN),
+               std::invalid_argument);
 }
 
 TEST_F(OmniHand2025UsbTest, GetSNOfTactileSensor) {
   RequireDevice();
 
   for (auto finger : hand_->GetSensorOrder()) {
-    if (finger == agilink::omnihand::Finger::DORSUM) continue;
     std::string sn = hand_->GetSNOfTactileSensor(finger);
     AgilinkLogger::get().infof(TAG, "[GetSNOfTactileSensor] %s: \"%s\"",
         agilink::omnihand::ToString(finger).c_str(), sn.c_str());
   }
-  EXPECT_EQ(hand_->GetSNOfTactileSensor(agilink::omnihand::Finger::DORSUM), "");
-  EXPECT_EQ(hand_->GetSNOfTactileSensor(agilink::omnihand::Finger::UNKNOWN), "");
+  EXPECT_THROW(hand_->GetSNOfTactileSensor(agilink::omnihand::Finger::UNKNOWN),
+               std::invalid_argument);
 }
 
 // ============================================================================
@@ -1019,6 +1021,7 @@ int main(int argc, char** argv) {
 #else
       AgilinkLogger::get().infof(TAG, "  %s -p /dev/ttyACM0 -b 460800 -f 500", argv[0]);
 #endif
+      AgilinkLogger::get().flush();
       return 0;
     } else {
       gtest_args.push_back(argv[i]);
@@ -1032,6 +1035,7 @@ int main(int argc, char** argv) {
   AgilinkLogger::get().infof(TAG, "Frame Recv Timeout: %d ms", g_frame_recv_timeout);
   AgilinkLogger::get().infof(TAG, "Dangerous actions: %s", g_run_dangerous_actions ? "ON" : "OFF");
   AgilinkLogger::get().infof(TAG, "==============================");
+  AgilinkLogger::get().flush();
 
   int gtest_argc = static_cast<int>(gtest_args.size());
   ::testing::InitGoogleTest(&gtest_argc, gtest_args.data());
