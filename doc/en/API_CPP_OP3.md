@@ -17,7 +17,7 @@ On OP3, the mixed-control bus protocol implements **position + force (`MixContro
 | `MixControlByPVT(positions, velocities, torques)` | **Not supported** |
 
 ```cpp
-#include "omnihand/omni_picker_3.h"
+#include "omnihand/omnipicker_3.h"
 
 // Array index i maps to mix-control joint id i (0-based); OP3 has one joint.
 std::vector<MixCtrl> echo = hand->MixControlByPT({pos}, {torque});

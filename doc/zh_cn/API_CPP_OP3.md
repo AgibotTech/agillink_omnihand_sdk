@@ -17,7 +17,7 @@ OP3 在总线混合控制协议上仅实现 **位置 + 力矩（`MixControlMode:
 | `MixControlByPVT(positions, velocities, torques)` | **不支持** |
 
 ```cpp
-#include "omnihand/omni_picker_3.h"
+#include "omnihand/omnipicker_3.h"
 
 // positions / torques 长度按关节数（OP3 为 1）；数组下标 i 对应混合控制关节 id i（0-based）
 std::vector<MixCtrl> echo = hand->MixControlByPT({pos}, {torque});
