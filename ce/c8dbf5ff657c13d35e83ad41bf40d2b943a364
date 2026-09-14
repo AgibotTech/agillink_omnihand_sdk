@@ -1,0 +1,61 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.10.2",
+  "base_commit_sha": "cec8dbf5ff657c13d35e83ad41bf40d2b943a364",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "windows/x64/cpp/demo/omnipicker_3/CMakeLists.txt",
+      "additions": {
+        "human": 19
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/CMakeLists.txt",
+      "new_path": "windows/x64/cpp/demo/CMakeLists.txt",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omni_picker_3/CMakeLists.txt",
+      "deletions": {
+        "human": 19
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omni_picker_3/OP3_demo_canfd_id.cc",
+      "new_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_canfd_id.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omni_picker_3/OP3_demo_rs485.cc",
+      "new_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_rs485.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omni_picker_3.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnipicker_3.h",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 3
+      }
+    }
+  ]
+}
