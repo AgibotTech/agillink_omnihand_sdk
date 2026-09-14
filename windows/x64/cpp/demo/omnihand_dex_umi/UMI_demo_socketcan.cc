@@ -44,7 +44,7 @@ void printUsage(const char* program_name) {
   AgilinkLogger::get().infof(TAG, "  left   - Read left hand data only (uses can0)");
   AgilinkLogger::get().infof(TAG, "  right  - Read right hand data only (uses can0)");
   AgilinkLogger::get().infof(TAG, "  both   - Read both hands data simultaneously (uses can0 and can1)");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Before running, configure CAN interfaces:");
   AgilinkLogger::get().infof(TAG, "  sudo ip link set can0 type can bitrate 1000000 dbitrate 5000000 fd on");
   AgilinkLogger::get().infof(TAG, "  sudo ip link set can0 up");

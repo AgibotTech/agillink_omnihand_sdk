@@ -34,7 +34,7 @@ void printUsage(const char* program_name) {
   AgilinkLogger::get().infof(TAG, "  left   - Read left hand data only");
   AgilinkLogger::get().infof(TAG, "  right  - Read right hand data only");
   AgilinkLogger::get().infof(TAG, "  both   - Read both hands data simultaneously");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Note: UMI protocol is read-only, position/velocity/torque control is not supported");
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 #ifndef AGILINK_OMNI_PICKER_3_H
@@ -145,7 +145,6 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
    * @param uart_port Serial port path (e.g., "/dev/ttyUSB0" or "COM3")
    * @param baudrate Baud rate (default 460800)
    * @return A unique pointer to OmniPicker3 instance
-   * @note Firmware update (OTA) is not supported over RS485 yet.
    */
   static std::unique_ptr<OmniPicker3> createHandByRs485(
       HandType hand_type,

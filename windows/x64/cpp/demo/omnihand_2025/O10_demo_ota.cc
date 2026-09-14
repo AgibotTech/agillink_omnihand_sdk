@@ -40,7 +40,7 @@ void printUsage(const char* program_name) {
   AgilinkLogger::get().infof(TAG, "  canfd_channel_id    - CAN channel ID (default: 0)");
   AgilinkLogger::get().infof(TAG, "  hand_type           - Hand type: left or right (default: right)");
   AgilinkLogger::get().infof(TAG, "  hand_device_id      - Hand device ID (default: 1)");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Example:");
   AgilinkLogger::get().infof(TAG, "  %s ../../release/firmware/O10/ag001_hc00_app_v1.2.2_20260123.bin 0 0 right 1", program_name);
   AgilinkLogger::get().infof(TAG, "  %s ../../release/firmware/O10/ag001_hc00_app_v99.02.06_20260202.bin", program_name);
@@ -82,13 +82,13 @@ int main(int argc, char* argv[]) {
   AgilinkLogger::get().infof(TAG, "Firmware file: %s", absolute_firmware_path.c_str());
   AgilinkLogger::get().infof(TAG, "File size: %zu bytes", static_cast<size_t>(std::filesystem::file_size(absolute_firmware_path)));
 
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "=== OmniHand 2025 OTA Firmware Upgrade Demo ===");
   AgilinkLogger::get().infof(TAG, "CANFD Device ID: %d", static_cast<int>(canfd_device_id));
   AgilinkLogger::get().infof(TAG, "CAN Channel ID: %d", static_cast<int>(canfd_channel_id));
   AgilinkLogger::get().infof(TAG, "Hand Type: %s", (hand_type == agilink::omnihand::HandType::LEFT ? "Left" : "Right"));
   AgilinkLogger::get().infof(TAG, "Hand Device ID: %d", static_cast<int>(hand_device_id));
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
 
   // Create OmniHand 2025 instance (CANFD communication)
   AgilinkLogger::get().infof(TAG, "Initializing OmniHand 2025...");
@@ -106,26 +106,26 @@ int main(int argc, char* argv[]) {
   AgilinkLogger::get().infof(TAG, "[INFO]: OmniHand 2025 initialized successfully");
 
   // Get vendor info before upgrade
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "=== Device Information (Before Upgrade) ===");
   auto vendor_info_before = hand->GetVendorInfo();
   AgilinkLogger::get().infof(TAG, "Vendor Info: %s", vendor_info_before.ToString().c_str());
 
   // Confirm upgrade
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "=== Warning ===");
   AgilinkLogger::get().infof(TAG, "You are about to upgrade the firmware. This process may take several minutes.");
   AgilinkLogger::get().infof(TAG, "DO NOT power off or restart the device during the upgrade process!");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Press Enter to continue or Ctrl+C to cancel...");
   std::cin.get();
 
   // Start OTA upgrade
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "=== Starting OTA Firmware Upgrade ===");
   AgilinkLogger::get().infof(TAG, "This may take several minutes depending on firmware size...");
   AgilinkLogger::get().infof(TAG, "Please wait and do not interrupt the process.");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
 
   // Define progress callback
   agilink::omnihand::OtaProgressCallback progress_callback = [](int current_packet, int total_packets, agilink::omnihand::OtaProgressStatus status) {
@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
         {
           AgilinkLogger::get().infof(TAG, "[OTA] Transmitting: %d/%d", current_packet, total_packets);
           if (current_packet == total_packets) {
-            AgilinkLogger::get().infof(TAG, "");
+            AgilinkLogger::get().info("");
             AgilinkLogger::get().infof(TAG, "[OTA] All %d packets transmitted successfully", total_packets);
           }
         }
@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
           if (current_packet < 0) {
             // SDK error
             agilink::omnihand::OtaErrorCode error_code = static_cast<agilink::omnihand::OtaErrorCode>(current_packet);
-            AgilinkLogger::get().errorf(TAG, "");
+            AgilinkLogger::get().error("");
             switch (error_code) {
               case agilink::omnihand::OtaErrorCode::AGILINK_OTA_FILE_NOT_FOUND:
                 AgilinkLogger::get().errorf(TAG, "[OTA ERROR] SDK error: File not found");
@@ -194,7 +194,7 @@ int main(int argc, char* argv[]) {
             }
           } else {
             // Device error
-            AgilinkLogger::get().errorf(TAG, "");
+            AgilinkLogger::get().error("");
             AgilinkLogger::get().errorf(TAG, "[OTA ERROR] Device error code: %d", current_packet);
           }
         }
@@ -211,20 +211,20 @@ int main(int argc, char* argv[]) {
     auto end_time = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
 
-    AgilinkLogger::get().infof(TAG, "");
+    AgilinkLogger::get().info("");
     AgilinkLogger::get().infof(TAG, "=== OTA Upgrade Completed ===");
-    AgilinkLogger::get().infof(TAG, "Total time: %lld seconds", duration);
-    AgilinkLogger::get().infof(TAG, "");
+    AgilinkLogger::get().infof(TAG, "Total time: %ld seconds", duration);
+    AgilinkLogger::get().info("");
     AgilinkLogger::get().infof(TAG, "The device will restart automatically after upgrade.");
     AgilinkLogger::get().infof(TAG, "Please wait for the device to restart and reconnect...");
 
     // Wait for device to restart
-    AgilinkLogger::get().infof(TAG, "");
+    AgilinkLogger::get().info("");
     AgilinkLogger::get().infof(TAG, "Waiting for device to restart (2 seconds)...");
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
     // Try to reconnect and get vendor info
-    AgilinkLogger::get().infof(TAG, "");
+    AgilinkLogger::get().info("");
     AgilinkLogger::get().infof(TAG, "=== Reconnecting to Device ===");
     hand.reset();
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -238,19 +238,19 @@ int main(int argc, char* argv[]) {
     AgilinkLogger::get().infof(TAG, "[INFO]: Reconnected successfully");
 
     // Get vendor info after upgrade
-    AgilinkLogger::get().infof(TAG, "");
+    AgilinkLogger::get().info("");
     AgilinkLogger::get().infof(TAG, "=== Device Information (After Upgrade) ===");
     auto vendor_info_after = hand->GetVendorInfo();
     AgilinkLogger::get().infof(TAG, "Vendor Info: %s", vendor_info_after.ToString().c_str());
 
     // Compare versions
     if (vendor_info_before.softwareVersion != vendor_info_after.softwareVersion) {
-      AgilinkLogger::get().infof(TAG, "");
+      AgilinkLogger::get().info("");
       AgilinkLogger::get().infof(TAG, "[SUCCESS]: Firmware version changed - Upgrade successful!");
       AgilinkLogger::get().infof(TAG, "  Before: %s", vendor_info_before.softwareVersion.ToString().c_str());
       AgilinkLogger::get().infof(TAG, "  After:  %s", vendor_info_after.softwareVersion.ToString().c_str());
     } else {
-      AgilinkLogger::get().infof(TAG, "");
+      AgilinkLogger::get().info("");
       AgilinkLogger::get().infof(TAG, "[INFO]: Firmware version unchanged (same version or upgrade failed)");
     }
 
@@ -259,7 +259,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "=== Demo Completed ===");
   return 0;
 }

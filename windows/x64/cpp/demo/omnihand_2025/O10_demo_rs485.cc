@@ -34,30 +34,30 @@ void printUsage(const char* program_name) {
   AgilinkLogger::get().infof(TAG, "  left   - Control left hand only");
   AgilinkLogger::get().infof(TAG, "  right  - Control right hand only");
   AgilinkLogger::get().infof(TAG, "  both   - Control both hands simultaneously");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Note: Serial port paths in code need to be modified according to actual devices");
 }
 
 void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, const std::string& hand_name) {
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "=== %s Hand Control ===", hand_name.c_str());
 
   // ============ Get Device Info ============
   auto vendor_info = hand->GetVendorInfo();
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Vendor Info:%s", vendor_info.ToString().c_str());
 
   auto device_info = hand->GetDeviceInfo();
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Device Info:%s", device_info.ToString().c_str());
 
   // ============ Read Sensor Data ============
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "=== Reading Sensor Data ===");
 
   // Note: RS485 does not support raw tactile sensor data reading (GetTactileSensorDataRaw)
   // But it supports GetTactileSensorData (downsampled data)
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Tactile Sensor Data (1D):");
   try {
     auto thumb_tactile = hand->GetTactileSensorData(agilink::omnihand::Finger::THUMB);
@@ -84,12 +84,12 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
   }
 
   // Note: RS485 does not support temperature/current/error report/velocity reads
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Note: RS485 communication does not support temperature/current/error/velocity reports");
 
   // ============ Joint Angle Control Demo ============
   // Use joint-angle control (recommended; underlying layer auto-converts)
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Setting joint angles...");
   std::vector<double> angles(10, 0.0);
   hand->SetAllActiveJointAngles(angles);
@@ -187,7 +187,7 @@ int main(int argc, char** argv) {
       controlSingleHand(right_hand, "Right");
     } else {
       // both mode: control simultaneously
-      AgilinkLogger::get().infof(TAG, "");
+      AgilinkLogger::get().info("");
       AgilinkLogger::get().infof(TAG, "=== Dual Hand Control ===");
 
       auto left_hand = agilink::omnihand::OmniHand2025::createHandByRs485(
@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
       }
 
       // Use joint-angle control (recommended; underlying layer auto-converts)
-      AgilinkLogger::get().infof(TAG, "");
+      AgilinkLogger::get().info("");
       AgilinkLogger::get().infof(TAG, "Setting joint angles for both hands...");
       std::vector<double> left_angles(10, 0.0);
       std::vector<double> right_angles(10, 0.5);
@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "[Done]: Example completed successfully!");
   return 0;
 }

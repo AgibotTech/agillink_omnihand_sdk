@@ -45,7 +45,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3UltraM>& hand
     std::string msg = "  [";
     char buf[64];
     for (size_t i = 0; i < temperatures.size(); ++i) {
-      snprintf(buf, sizeof(buf), "%.4f", temperatures[i]);
+      snprintf(buf, sizeof(buf), "%d", temperatures[i]);
       msg += buf;
       if (i < temperatures.size() - 1) msg += ", ";
     }

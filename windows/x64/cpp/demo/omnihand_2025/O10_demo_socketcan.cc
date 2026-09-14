@@ -43,7 +43,7 @@ void printUsage(const char* program_name) {
   AgilinkLogger::get().infof(TAG, "  left   - Control left hand only (uses can0)");
   AgilinkLogger::get().infof(TAG, "  right  - Control right hand only (uses can0)");
   AgilinkLogger::get().infof(TAG, "  both   - Control both hands simultaneously (uses can0 and can1)");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Before running, configure CAN interfaces:");
   AgilinkLogger::get().infof(TAG, "  sudo ip link set can0 type can bitrate 1000000 dbitrate 5000000 fd on");
   AgilinkLogger::get().infof(TAG, "  sudo ip link set can0 up");
@@ -52,24 +52,24 @@ void printUsage(const char* program_name) {
 }
 
 void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, const std::string& hand_name) {
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "=== %s Hand Control ===", hand_name.c_str());
 
   // ============ Get Device Info ============
   auto vendor_info = hand->GetVendorInfo();
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Vendor Info:%s", vendor_info.ToString().c_str());
 
   auto device_info = hand->GetDeviceInfo();
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Device Info:%s", device_info.ToString().c_str());
 
   // ============ Read Sensor Data ============
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "=== Reading Sensor Data ===");
 
   // Read tactile sensor data
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Tactile Sensor Data (1D):");
   try {
     auto thumb_tactile = hand->GetTactileSensorData(agilink::omnihand::Finger::THUMB);
@@ -96,7 +96,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
   }
 
   // Read temperature report
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Temperature Reports:");
   auto temperatures = hand->GetAllTemperatureReport();
   {
@@ -109,7 +109,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
   }
 
   // Read current report
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Current Reports:");
   auto currents = hand->GetAllCurrentReport();
   {
@@ -122,7 +122,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
   }
 
   // Read error report
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Error Reports:");
   auto errors = hand->GetAllErrorReport();
   for (size_t i = 0; i < errors.size(); ++i) {
@@ -147,7 +147,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
   }
 
   // Read velocity (read-only, not control)
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Joint Velocities:");
   auto velocities = hand->GetAllJointMotorVelo();
   {
@@ -161,7 +161,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand2025>& hand, c
 
   // ============ Joint Angle Control Demo ============
   // Use joint-angle control (recommended; underlying layer auto-converts)
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Setting joint angles...");
   std::vector<double> angles(10, 0.0);
   hand->SetAllActiveJointAngles(angles);
@@ -255,7 +255,7 @@ int main(int argc, char** argv) {
       controlSingleHand(right_hand, "Right");
     } else {
       // both mode: control simultaneously
-      AgilinkLogger::get().infof(TAG, "");
+      AgilinkLogger::get().info("");
       AgilinkLogger::get().infof(TAG, "=== Dual Hand Control ===");
 
       auto left_hand = agilink::omnihand::OmniHand2025::createHandSocketCan(
@@ -269,7 +269,7 @@ int main(int argc, char** argv) {
       }
 
       // Use joint-angle control (recommended; underlying layer auto-converts)
-      AgilinkLogger::get().infof(TAG, "");
+      AgilinkLogger::get().info("");
       AgilinkLogger::get().infof(TAG, "Setting joint angles for both hands...");
       std::vector<double> left_angles(10, 0.0);
       std::vector<double> right_angles(10, 0.5);
@@ -306,7 +306,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "[Done]: Example completed successfully!");
   return 0;
 }
