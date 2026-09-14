@@ -1,0 +1,7 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.10.2",
+  "base_commit_sha": "277c69251fb17fab478ff7132ab063950c4fdc7e",
+  "prompts": {}
+}
