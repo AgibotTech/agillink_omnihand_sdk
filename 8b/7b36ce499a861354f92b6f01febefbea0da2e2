@@ -1,0 +1,36 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.10.2",
+  "base_commit_sha": "8b7b36ce499a861354f92b6f01febefbea0da2e2",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_canfd_id.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_canfd_id.cc",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_canfd_serial.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_canfd_serial.cc",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025_canfd.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025_canfd.cc",
+      "deletions": {
+        "human": 4
+      }
+    }
+  ]
+}
