@@ -1,0 +1,199 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.10.2",
+  "base_commit_sha": "74e4b269718bca3e70e63780136c7d501f7590ca",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_canfd_id.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_canfd_id.cc",
+      "additions": {
+        "human": 16
+      },
+      "deletions": {
+        "human": 16
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_canfd_serial.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_canfd_serial.cc",
+      "additions": {
+        "human": 16
+      },
+      "deletions": {
+        "human": 16
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_ota.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_ota.cc",
+      "additions": {
+        "human": 20
+      },
+      "deletions": {
+        "human": 20
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_rs485.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_rs485.cc",
+      "additions": {
+        "human": 11
+      },
+      "deletions": {
+        "human": 11
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_socketcan.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_socketcan.cc",
+      "additions": {
+        "human": 14
+      },
+      "deletions": {
+        "human": 14
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_zlgcan_tcp.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_2025/O10_demo_zlgcan_tcp.cc",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_3_lite/O4_demo_canfd_id.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_3_lite/O4_demo_canfd_id.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_3_lite/O4_demo_canfd_serial.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_3_lite/O4_demo_canfd_serial.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_3_ultra_m/h3u_m_demo_canfd_id.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_3_ultra_m/h3u_m_demo_canfd_id.cc",
+      "additions": {
+        "human": 6
+      },
+      "deletions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_3_ultra_m/h3u_m_demo_canfd_serial.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_3_ultra_m/h3u_m_demo_canfd_serial.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_3_ultra_m/h3u_m_demo_socketcan.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_3_ultra_m/h3u_m_demo_socketcan.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_dex_umi/UMI_demo_canfd_id.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_dex_umi/UMI_demo_canfd_id.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_dex_umi/UMI_demo_canfd_serial.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_dex_umi/UMI_demo_canfd_serial.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_dex_umi/UMI_demo_socketcan.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_dex_umi/UMI_demo_socketcan.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_canfd_id.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_canfd_id.cc",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_canfd_serial.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_canfd_serial.cc",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_socketcan.cc",
+      "new_path": "windows/x64/cpp/demo/omnihand_pro_2025/O12_demo_socketcan.cc",
+      "additions": {
+        "human": 8
+      },
+      "deletions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omni_picker_3.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omni_picker_3.h",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025_canfd.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025_canfd.cc",
+      "additions": {
+        "human": 4
+      },
+      "deletions": {
+        "human": 4
+      }
+    }
+  ]
+}
