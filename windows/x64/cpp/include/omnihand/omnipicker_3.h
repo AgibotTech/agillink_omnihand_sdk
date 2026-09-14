@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
-#ifndef AGILINK_OMNI_PICKER_3_H
-#define AGILINK_OMNI_PICKER_3_H
+#ifndef AGILINK_OMNIPICKER_3_H
+#define AGILINK_OMNIPICKER_3_H
 
 #include <cstdint>
 #include <memory>
@@ -270,4 +270,4 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 }  // namespace omnihand
 }  // namespace agilink
 
-#endif  // AGILINK_OMNI_PICKER_3_H
+#endif  // AGILINK_OMNIPICKER_3_H
