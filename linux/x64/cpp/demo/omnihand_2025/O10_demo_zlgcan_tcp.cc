@@ -31,7 +31,7 @@ void printUsage(const char* program_name) {
   AgilinkLogger::get().infof(TAG, "  right  - Control right hand");
   AgilinkLogger::get().infof(TAG, "  host   - TCP server IP (default: 192.168.0.178)");
   AgilinkLogger::get().infof(TAG, "  port   - TCP server port (default: 8000)");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Example:");
   AgilinkLogger::get().infof(TAG, "  %s left", program_name);
   AgilinkLogger::get().infof(TAG, "  %s right 192.168.0.178 8000", program_name);
@@ -90,17 +90,17 @@ int main(int argc, char** argv) {
 
   // Vendor info
   auto vendor_info = hand->GetVendorInfo();
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Vendor Info:%s", vendor_info.ToString().c_str());
 
   // Device info
   auto device_info = hand->GetDeviceInfo();
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Device Info: hand_device_id=%d", static_cast<int>(device_info.hand_device_id));
 
   // Get positions
   auto positions = hand->GetAllJointMotorPosi();
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   {
     std::string msg;
     for (size_t i = 0; i < positions.size(); ++i) {
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
     AgilinkLogger::get().infof(TAG, "Active joint angles (rad): [%s]", msg.c_str());
   }
 
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "[Done]: ZLG CAN TCP demo completed.");
   return 0;
 }

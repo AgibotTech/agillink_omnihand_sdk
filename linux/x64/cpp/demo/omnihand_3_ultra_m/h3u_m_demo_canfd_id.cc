@@ -48,7 +48,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3UltraM>& hand
     std::string msg = "  All Joint Temperatures (C): [";
     char buf[64];
     for (size_t i = 0; i < temperatures.size(); ++i) {
-      snprintf(buf, sizeof(buf), "%.4f", temperatures[i]);
+      snprintf(buf, sizeof(buf), "%d", temperatures[i]);
       msg += buf;
       if (i < temperatures.size() - 1) msg += ", ";
     }
@@ -62,7 +62,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3UltraM>& hand
     std::string msg = "  All Joint Currents: [";
     char buf[64];
     for (size_t i = 0; i < currents.size(); ++i) {
-      snprintf(buf, sizeof(buf), "%.4f", currents[i]);
+      snprintf(buf, sizeof(buf), "%d", currents[i]);
       msg += buf;
       if (i < currents.size() - 1) msg += ", ";
     }
@@ -92,7 +92,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3UltraM>& hand
     std::string msg = "  All Joint Velocities: [";
     char buf[64];
     for (size_t i = 0; i < velocities.size(); ++i) {
-      snprintf(buf, sizeof(buf), "%.4f", velocities[i]);
+      snprintf(buf, sizeof(buf), "%d", velocities[i]);
       msg += buf;
       if (i < velocities.size() - 1) msg += ", ";
     }
@@ -129,7 +129,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3UltraM>& hand
       std::string msg = "  Max: [";
       char buf[64];
       for (size_t i = 0; i < limits.max_limits.size(); ++i) {
-        snprintf(buf, sizeof(buf), "%.4f", limits.max_limits[i]);
+        snprintf(buf, sizeof(buf), "%d", limits.max_limits[i]);
         msg += buf;
         if (i < limits.max_limits.size() - 1) msg += ", ";
       }
@@ -140,7 +140,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3UltraM>& hand
       std::string msg = "  Min: [";
       char buf[64];
       for (size_t i = 0; i < limits.min_limits.size(); ++i) {
-        snprintf(buf, sizeof(buf), "%.4f", limits.min_limits[i]);
+        snprintf(buf, sizeof(buf), "%d", limits.min_limits[i]);
         msg += buf;
         if (i < limits.min_limits.size() - 1) msg += ", ";
       }
@@ -155,7 +155,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3UltraM>& hand
     std::string msg = "  [";
     char buf[64];
     for (size_t i = 0; i < actual_pos.size(); ++i) {
-      snprintf(buf, sizeof(buf), "%.4f", actual_pos[i]);
+      snprintf(buf, sizeof(buf), "%d", actual_pos[i]);
       msg += buf;
       if (i < actual_pos.size() - 1) msg += ", ";
     }

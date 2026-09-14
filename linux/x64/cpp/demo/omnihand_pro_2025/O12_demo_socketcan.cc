@@ -43,7 +43,7 @@ void printUsage(const char* program_name) {
   AgilinkLogger::get().infof(TAG, "  left   - Control left hand only (uses can0)");
   AgilinkLogger::get().infof(TAG, "  right  - Control right hand only (uses can0)");
   AgilinkLogger::get().infof(TAG, "  both   - Control both hands simultaneously (uses can0 and can1)");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Before running, configure CAN interfaces:");
   AgilinkLogger::get().infof(TAG, "  sudo ip link set can0 type can bitrate 1000000 dbitrate 5000000 fd on");
   AgilinkLogger::get().infof(TAG, "  sudo ip link set can0 up");
@@ -71,15 +71,15 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     AgilinkLogger::get().infof(TAG, "  Thumb:");
     AgilinkLogger::get().infof(TAG, "    Online State: %s", (thumb_sensor.online_state ? "Online" : "Offline"));
     AgilinkLogger::get().infof(TAG, "    Normal Force: %d (0.1N, max: 3000)", thumb_sensor.normal_force);
-    AgilinkLogger::get().infof(TAG, "    Tangent Force: %.4f", thumb_sensor.tangent_force);
-    AgilinkLogger::get().infof(TAG, "    Tangent Force Angle: %.4f°", thumb_sensor.tangent_force_angle);
+    AgilinkLogger::get().infof(TAG, "    Tangent Force: %d", thumb_sensor.tangent_force);
+    AgilinkLogger::get().infof(TAG, "    Tangent Force Angle: %d°", thumb_sensor.tangent_force_angle);
 
     auto index_sensor = hand->GetTactileSensor3DData(agilink::omnihand::Finger::INDEX);
     AgilinkLogger::get().infof(TAG, "  Index:");
     AgilinkLogger::get().infof(TAG, "    Online State: %s", (index_sensor.online_state ? "Online" : "Offline"));
     AgilinkLogger::get().infof(TAG, "    Normal Force: %d (0.1N, max: 3000)", index_sensor.normal_force);
-    AgilinkLogger::get().infof(TAG, "    Tangent Force: %.4f", index_sensor.tangent_force);
-    AgilinkLogger::get().infof(TAG, "    Tangent Force Angle: %.4f°", index_sensor.tangent_force_angle);
+    AgilinkLogger::get().infof(TAG, "    Tangent Force: %d", index_sensor.tangent_force);
+    AgilinkLogger::get().infof(TAG, "    Tangent Force Angle: %d°", index_sensor.tangent_force_angle);
   } catch (const std::exception& e) {
     AgilinkLogger::get().infof(TAG, "  Warning: %s", e.what());
   }
@@ -91,7 +91,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::string msg = "  All Joint Temperatures (°C): [";
     for (size_t i = 0; i < temperatures.size(); ++i) {
       char buf[32];
-      snprintf(buf, sizeof(buf), "%.4f", temperatures[i]);
+      snprintf(buf, sizeof(buf), "%d", temperatures[i]);
       msg += buf;
       if (i < temperatures.size() - 1) msg += ", ";
     }
@@ -106,7 +106,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::string msg = "  All Joint Currents: [";
     for (size_t i = 0; i < currents.size(); ++i) {
       char buf[32];
-      snprintf(buf, sizeof(buf), "%.4f", currents[i]);
+      snprintf(buf, sizeof(buf), "%d", currents[i]);
       msg += buf;
       if (i < currents.size() - 1) msg += ", ";
     }
@@ -146,7 +146,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::string msg = "  All Joint Velocities: [";
     for (size_t i = 0; i < velocities.size(); ++i) {
       char buf[32];
-      snprintf(buf, sizeof(buf), "%.4f", velocities[i]);
+      snprintf(buf, sizeof(buf), "%d", velocities[i]);
       msg += buf;
       if (i < velocities.size() - 1) msg += ", ";
     }

@@ -34,7 +34,7 @@ void printUsage(const char* program_name) {
   AgilinkLogger::get().infof(TAG, "  left   - Control left hand only");
   AgilinkLogger::get().infof(TAG, "  right  - Control right hand only");
   AgilinkLogger::get().infof(TAG, "  both   - Control both hands simultaneously");
-  AgilinkLogger::get().infof(TAG, "");
+  AgilinkLogger::get().info("");
   AgilinkLogger::get().infof(TAG, "Note: Serial numbers in code need to be modified according to actual devices");
 }
 
