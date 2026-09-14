@@ -6,7 +6,7 @@
  * @brief OmniPicker 3 control demo - RS485 communication (standard serial protocol)
  */
 
-#include <omnihand/omni_picker_3.h>
+#include <omnihand/omnipicker_3.h>
 
 #include <algorithm>
 #include <chrono>
