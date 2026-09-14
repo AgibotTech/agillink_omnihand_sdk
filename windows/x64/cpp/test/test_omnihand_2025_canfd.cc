@@ -458,12 +458,10 @@ TEST_F(OmniHand2025CanfdTest, GetNumOfRepliedTactileFrames) {
   RequireDevice();
 
   for (auto finger : hand_->GetSensorOrder()) {
-    if (finger == agilink::omnihand::Finger::DORSUM) continue;
     size_t frames = hand_->GetNumOfRepliedTactileFrames(finger);
     AgilinkLogger::get().infof(TAG, "[GetNumOfRepliedTactileFrames] %s: %zu frame(s)", agilink::omnihand::ToString(finger), frames);
     EXPECT_GT(frames, 0u) << "Expected >=1 frame for " << agilink::omnihand::ToString(finger);
   }
-  EXPECT_EQ(hand_->GetNumOfRepliedTactileFrames(agilink::omnihand::Finger::DORSUM), 0u);
   EXPECT_EQ(hand_->GetNumOfRepliedTactileFrames(agilink::omnihand::Finger::UNKNOWN), 0u);
 }
 
@@ -471,11 +469,9 @@ TEST_F(OmniHand2025CanfdTest, GetSNOfTactileSensor) {
   RequireDevice();
 
   for (auto finger : hand_->GetSensorOrder()) {
-    if (finger == agilink::omnihand::Finger::DORSUM) continue;
     std::string sn = hand_->GetSNOfTactileSensor(finger);
     AgilinkLogger::get().infof(TAG, "[GetSNOfTactileSensor] %s: \"%s\"", agilink::omnihand::ToString(finger), sn.c_str());
   }
-  EXPECT_EQ(hand_->GetSNOfTactileSensor(agilink::omnihand::Finger::DORSUM), "");
   EXPECT_EQ(hand_->GetSNOfTactileSensor(agilink::omnihand::Finger::UNKNOWN), "");
 }
 

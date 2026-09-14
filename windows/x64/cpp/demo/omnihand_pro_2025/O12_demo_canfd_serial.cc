@@ -60,7 +60,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::string msg = "  All Joint Temperatures (°C): [";
     for (size_t i = 0; i < temperatures.size(); ++i) {
       char buf[32];
-      snprintf(buf, sizeof(buf), "%.4f", temperatures[i]);
+      snprintf(buf, sizeof(buf), "%d", static_cast<int>(temperatures[i]));
       msg += buf;
       if (i < temperatures.size() - 1) msg += ", ";
     }
@@ -75,7 +75,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::string msg = "  All Joint Currents: [";
     for (size_t i = 0; i < currents.size(); ++i) {
       char buf[32];
-      snprintf(buf, sizeof(buf), "%.4f", currents[i]);
+      snprintf(buf, sizeof(buf), "%d", static_cast<int>(currents[i]));
       msg += buf;
       if (i < currents.size() - 1) msg += ", ";
     }
@@ -115,7 +115,7 @@ void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHandPro2025>& hand
     std::string msg = "  All Joint Velocities: [";
     for (size_t i = 0; i < velocities.size(); ++i) {
       char buf[32];
-      snprintf(buf, sizeof(buf), "%.4f", velocities[i]);
+      snprintf(buf, sizeof(buf), "%d", static_cast<int>(velocities[i]));
       msg += buf;
       if (i < velocities.size() - 1) msg += ", ";
     }
