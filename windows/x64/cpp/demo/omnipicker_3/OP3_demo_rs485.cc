@@ -293,7 +293,7 @@ int main(int argc, char* argv[]) {
             << ", hand device id " << static_cast<unsigned int>(options.hand_device_id)
             << std::endl;
 
-  // OmniPicker 3 is a gripper. Use UNKNOWN for the shared factory's HandType slot.
+  // hand_type carries no meaning for a gripper: OP3 stores it but never uses it, so any value works.
   auto hand = oh::OmniPicker3::createHandByRs485(oh::HandType::UNKNOWN,
                                                  options.hand_device_id,
                                                  options.uart_port,

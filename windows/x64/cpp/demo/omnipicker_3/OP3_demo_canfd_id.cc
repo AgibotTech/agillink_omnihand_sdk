@@ -81,7 +81,7 @@ ParseResult ParseArgs(int argc, char* argv[], CreateType* create_type) {
 }
 
 std::unique_ptr<oh::OmniPicker3> CreateHand(CreateType create_type) {
-  // OmniPicker 3 is a gripper. Use UNKNOWN for the shared factory's HandType slot.
+  // hand_type carries no meaning for a gripper: OP3 stores it but never uses it, so any value works.
   constexpr oh::HandType kFactoryHandType = oh::HandType::UNKNOWN;
   constexpr uint8_t kHandDeviceId = oh::OmniPicker3::kDefaultHandDeviceId;
   constexpr uint8_t kCanfdDeviceId = 0;
