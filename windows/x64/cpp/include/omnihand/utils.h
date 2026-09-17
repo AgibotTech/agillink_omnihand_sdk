@@ -11,6 +11,12 @@
 namespace agilink {
 namespace omnihand {
 
+constexpr uint8_t kBroadcastHandDeviceId = 0x00;
+constexpr uint16_t kPrivateBroadcastHandDeviceId = 0x7FF;
+
+constexpr uint8_t kDefaultHandDeviceId = 0x01;
+constexpr uint16_t kPrivateDefaultHandDeviceId = 0x009;
+
 // Optional sink for ShowDataDetails traffic; when empty, SDK logs to stdout.
 using DataDetailsLogCallback = std::function<void(const std::string& line)>;
 

@@ -55,6 +55,15 @@ static bool g_run_dangerous_actions = false;
 using agilink::AgilinkLogger;
 static constexpr const char* TAG = "OmniHand2025UsbTest";
 
+TEST(OmniHand2025UsbBroadcastTest, GetDeviceInfoFromBroadcastBySerial) {
+  const auto info = agilink::omnihand::OmniHand2025::GetDeviceInfoFromBroadcastBySerial(
+      g_usb_port, g_baudrate);
+  if (info.hand_device_id == 0) {
+    GTEST_SKIP() << "No standard-protocol serial device responded to broadcast";
+  }
+  EXPECT_NE(info.hand_device_id, 0);
+}
+
 class OmniHand2025UsbTest : public ::testing::Test {
  protected:
   void SetUp() override {
@@ -635,9 +644,33 @@ TEST_F(OmniHand2025UsbTest, KinematicsSolver) {
   EXPECT_EQ(all_angles.size(), 16);
 }
 
+TEST_F(OmniHand2025UsbTest, DiscoverHandDeviceId) {
+  RequireDevice();
+
+  const uint16_t device_id = hand_->GetHandDeviceIdByBroadcast();
+  AgilinkLogger::get().infof(
+      TAG, "[PrivateProtocolDiscoverDeviceId] device ID: %u",
+      static_cast<unsigned int>(device_id));
+  EXPECT_EQ(hand_->GetHandDeviceId(), device_id);
+}
+
 // ============================================================================
 // StreamCmd Tests - Split by functionality
 // ============================================================================
+
+TEST_F(OmniHand2025UsbTest, PrivateProtocolDiscoverDeviceId) {
+  RequireDevice();
+
+  const uint16_t private_device_id = hand_->GetPrivateHandDeviceIdByBroadcast();
+  AgilinkLogger::get().infof(
+      TAG, "[PrivateProtocolDiscoverDeviceId] device ID: %u",
+      static_cast<unsigned int>(private_device_id));
+
+  ASSERT_GT(private_device_id, 0u) << "Private-protocol broadcast returned an invalid device ID";
+  ASSERT_LT(private_device_id, agilink::omnihand::kPrivateBroadcastHandDeviceId)
+      << "No private-protocol device responded to broadcast";
+  EXPECT_EQ(hand_->GetPrivateHandDeviceId(), private_device_id);
+}
 
 // 0x01/0x02: Power state
 TEST_F(OmniHand2025UsbTest, StreamCmdPowerState) {

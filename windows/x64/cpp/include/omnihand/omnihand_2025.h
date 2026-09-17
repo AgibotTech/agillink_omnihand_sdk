@@ -206,6 +206,16 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       const std::string& can_interface = "can0");
 #endif
 
+  /**
+   * @brief Discover a device using the standard serial protocol broadcast address.
+   * @param uart_port Serial port path (for example, "COM3" or "/dev/ttyACM0")
+   * @param baudrate Serial baud rate (default 460800)
+   * @return DeviceInfo structure, or an empty DeviceInfo if the request failed
+   */
+  static DeviceInfo GetDeviceInfoFromBroadcastBySerial(
+      const std::string& uart_port,
+      int32_t baudrate = 460800);
+
     /**
    * @brief Get sensor data length for a specific finger
    * @param finger Finger enum value

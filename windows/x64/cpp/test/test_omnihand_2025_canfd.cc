@@ -3,7 +3,7 @@
 
 /**
  * @file test_omnihand_2025_canfd.cc
- * @brief CANFD-specific tests for OmniHand 2025 (public factory APIs, non-private)
+ * @brief CANFD-specific tests for OmniHand 2025 (standard and private protocols)
  *
  * Usage:
  *   ./test_omnihand_2025_canfd [-t TRANSPORT] [-c CHANNEL] [-i CANFD_ID] [-f INTERVAL]
@@ -653,6 +653,86 @@ TEST_F(OmniHand2025CanfdTest, KinematicsSolver) {
 
   EXPECT_EQ(all_angles.size(), 16);
 }
+
+TEST_F(OmniHand2025CanfdTest, DiscoverHandDeviceId) {
+  RequireDevice();
+
+  const uint16_t device_id = hand_->GetHandDeviceIdByBroadcast();
+  AgilinkLogger::get().infof(
+      TAG, "[PrivateProtocolDiscoverDeviceId] device ID: %u",
+      static_cast<unsigned int>(device_id));
+  EXPECT_EQ(hand_->GetHandDeviceId(), device_id);
+}
+
+// ============================================================================
+// Private Protocol Read-Only Tests
+// ============================================================================
+
+TEST_F(OmniHand2025CanfdTest, PrivateProtocolDiscoverDeviceId) {
+  RequireDevice();
+
+  const uint16_t private_device_id = hand_->GetPrivateHandDeviceIdByBroadcast();
+  AgilinkLogger::get().infof(
+      TAG, "[PrivateProtocolDiscoverDeviceId] device ID: %u",
+      static_cast<unsigned int>(private_device_id));
+
+  ASSERT_GT(private_device_id, 0u) << "Private-protocol broadcast returned an invalid device ID";
+  ASSERT_LT(private_device_id, agilink::omnihand::kPrivateBroadcastHandDeviceId)
+      << "No private-protocol device responded to broadcast";
+  EXPECT_EQ(hand_->GetPrivateHandDeviceId(), private_device_id);
+}
+
+TEST_F(OmniHand2025CanfdTest, PrivateProtocolGetPowerState) {
+  RequireDevice();
+
+  const uint16_t private_device_id = hand_->GetPrivateHandDeviceIdByBroadcast();
+  ASSERT_GT(private_device_id, 0u);
+  ASSERT_LT(private_device_id, agilink::omnihand::kPrivateBroadcastHandDeviceId);
+
+  const uint8_t state = hand_->GetPowerState();
+  AgilinkLogger::get().infof(
+      TAG, "[PrivateProtocolGetPowerState] device ID: %u, state: %u",
+      static_cast<unsigned int>(private_device_id), static_cast<unsigned int>(state));
+  EXPECT_LE(state, 2u) << "Unexpected private-protocol power state";
+}
+
+TEST_F(OmniHand2025CanfdTest, PrivateProtocolGetAxisTelemetry) {
+  RequireDevice();
+
+  const uint16_t private_device_id = hand_->GetPrivateHandDeviceIdByBroadcast();
+  ASSERT_GT(private_device_id, 0u);
+  ASSERT_LT(private_device_id, agilink::omnihand::kPrivateBroadcastHandDeviceId);
+
+  const auto positions = hand_->GetAllAxisPos();
+  ASSERT_EQ(positions.size(), 10u)
+      << "Private-protocol GetAllAxisPos timed out or returned an invalid size";
+  for (uint16_t position : positions) {
+    EXPECT_LE(position, 4096u);
+  }
+
+  const auto cvp = hand_->GetAllAxisCvp();
+  ASSERT_EQ(cvp.size(), 60u)
+      << "Private-protocol GetAllAxisCvp timed out or returned an invalid size";
+  AgilinkLogger::get().infof(
+      TAG, "[PrivateProtocolGetAxisTelemetry] device ID: %u, positions: %zu, CVP bytes: %zu",
+      static_cast<unsigned int>(private_device_id), positions.size(), cvp.size());
+}
+
+TEST_F(OmniHand2025CanfdTest, PrivateProtocolGetFirmwareVersion) {
+  RequireDevice();
+
+  const uint16_t private_device_id = hand_->GetPrivateHandDeviceIdByBroadcast();
+  ASSERT_GT(private_device_id, 0u);
+  ASSERT_LT(private_device_id, agilink::omnihand::kPrivateBroadcastHandDeviceId);
+
+  const auto version = hand_->GetFwVersion();
+  AgilinkLogger::get().infof(
+      TAG, "[PrivateProtocolGetFirmwareVersion] device ID: %u, software: %s, hardware: %s, DOF: %u",
+      static_cast<unsigned int>(private_device_id), version.software_version.ToString().c_str(),
+      version.hardware_version.ToString().c_str(), static_cast<unsigned int>(version.dof));
+  EXPECT_EQ(version.dof, 10u) << "Private-protocol GetFwVersion returned invalid data";
+}
+
 
 // ============================================================================
 // Main

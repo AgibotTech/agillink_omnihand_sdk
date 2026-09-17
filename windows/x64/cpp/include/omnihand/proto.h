@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {

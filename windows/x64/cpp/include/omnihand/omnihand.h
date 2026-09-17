@@ -73,6 +73,10 @@ class AGIBOT_EXPORT OmniHand {
     return {};
   };
 
+  virtual uint8_t GetHandDeviceIdByBroadcast() {
+    return kBroadcastHandDeviceId;
+  }
+
   // Returns the locally cached id (from the constructor or the last successful SetDeviceId
   // call), not a hardware read. It can disagree with what the device has stored -- use
   // GetDeviceInfo().hand_device_id to read the id the hardware actually reports.
