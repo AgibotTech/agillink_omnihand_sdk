@@ -194,9 +194,9 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
     };
   }
 
-    /**
+  /**
    * @brief Returns the number of joint motors.
-   * @return Number of joint motors (12)
+   * @return Number of joint motors (1)
    */
   static constexpr uint8_t GetNumOfJointMotors() {
     return kDegreesOfActiveFreedom;
@@ -204,7 +204,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   /**
    * @brief Returns the degrees of active freedom (DoA).
-   * @return Degrees of active freedom (12)
+   * @return Degrees of active freedom (1)
    */
   static constexpr uint8_t GetDoA() {
     return kDegreesOfActiveFreedom;

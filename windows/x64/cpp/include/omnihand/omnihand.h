@@ -10,6 +10,7 @@
 #ifndef AGILINK_OMNIHAND_H
 #define AGILINK_OMNIHAND_H
 
+#include <cstdio>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -77,6 +78,28 @@ class AGIBOT_EXPORT OmniHand {
   // GetDeviceInfo().hand_device_id to read the id the hardware actually reports.
   virtual uint8_t GetHandDeviceId() const {
     return device_id_;
+  }
+
+  /**
+   * @brief Sets the current position of every motor as its zero position.
+   * @return true if the device reports success; false if unsupported or failed.
+   * @note Currently supported only by OmniHand 3 Ultra M (H3U_M).
+   */
+  virtual bool SetAllMotor2Zero() {
+    std::fprintf(stderr, "[WARN][OmniHand][SetAllMotor2Zero] unsupported by this product\n");
+    return false;
+  }
+
+  /**
+   * @brief Sets the current position of one motor as its zero position.
+   * @param joint_motor_index Joint motor index, starting from 1.
+   * @return true if the device reports success; false if unsupported or failed.
+   * @note Currently supported only by OmniHand 3 Ultra M (H3U_M).
+   */
+  virtual bool SetMotor2Zero(unsigned char joint_motor_index) {
+    (void)joint_motor_index;
+    std::fprintf(stderr, "[WARN][OmniHand][SetMotor2Zero] unsupported by this product\n");
+    return false;
   }
 
   // ============ Current Threshold ============

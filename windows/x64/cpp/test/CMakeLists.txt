@@ -161,6 +161,24 @@ if(BUILD_OMNIHAND_3_ULTRA_M)
   add_test(NAME OmniHand3UltraMTest COMMAND test_omnihand_3_ultra_m)
 endif()
 
+# OmniPicker 3 (OP3) Tests
+# Note: BUILD_OMNI_PICKER_3 is defined in the main CMakeLists.txt
+# CANFD only: the RS485 backend needs a serial port name, which does not suit a
+# default ctest run. Use demo_omnipicker_3_rs485 for RS485 verification.
+if(BUILD_OMNI_PICKER_3)
+  add_executable(test_omnipicker_3 test_omnipicker_3.cc)
+  target_link_libraries(
+    test_omnipicker_3
+    PRIVATE
+    ${OMNIHAND_TARGET}
+    GTest::gtest
+  )
+  set_target_properties(test_omnipicker_3 PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${TEST_OUTPUT_DIR}"
+  )
+  add_test(NAME OmniPicker3Test COMMAND test_omnipicker_3)
+endif()
+
 # OmniHand Server tests use a fake IHandDeviceFactory and need no hardware.
 add_executable(test_omnihand_server test_omnihand_server.cc)
 target_link_libraries(
