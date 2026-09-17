@@ -33,10 +33,22 @@
 #include <cctype>
 #include <chrono>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
+
+// Deliberately not <windows.h>: it defines an ERROR macro (via wingdi.h) that collides
+// with OmniLogger<>::Level::ERROR in agilink_logger.h below. Only _isatty is needed, and
+// <io.h> provides it on its own. GoogleTest has already enabled VT processing on the
+// console by the time this file's summary runs, so no SetConsoleMode call is required.
+#if defined(_WIN32)
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 #include "agilink_logger.h"
 #include "omnihand/export_symbols.h"
@@ -61,6 +73,29 @@ int g_device_id = oh::OmniPicker3::kDefaultHandDeviceId;
 std::string g_can_if = "can0";
 std::string g_tcp_host = "192.168.0.178";
 uint16_t g_tcp_port = 8000;
+
+struct CapabilityResult {
+  std::string name;
+  bool supported;
+};
+
+std::vector<CapabilityResult> g_capability_results;
+
+// Colors are emitted only to a real terminal: a redirected log or a CI capture would
+// otherwise be littered with escape sequences.
+bool StdoutSupportsColor() {
+#if defined(_WIN32)
+  static const bool supported = _isatty(_fileno(stdout)) != 0;
+#else
+  static const bool supported = isatty(fileno(stdout)) != 0;
+#endif
+  return supported;
+}
+
+const char* ColorGreen() { return StdoutSupportsColor() ? "\033[32m" : ""; }
+const char* ColorRed() { return StdoutSupportsColor() ? "\033[31m" : ""; }
+const char* ColorYellow() { return StdoutSupportsColor() ? "\033[33m" : ""; }
+const char* ColorReset() { return StdoutSupportsColor() ? "\033[0m" : ""; }
 
 using agilink::AgilinkLogger;
 constexpr const char* TAG = "OmniPicker3Test";
@@ -393,6 +428,7 @@ TEST_F(OmniPicker3Test, MixControlByPVAndPVTAreUnsupported) {
 
   EXPECT_TRUE(hand_->MixControlByPV({8000}, {0}).empty());
   EXPECT_TRUE(hand_->MixControlByPVT({2048}, {8000}, {0}).empty());
+  g_capability_results.push_back({"MixControlByPV / MixControlByPVT", false});
 }
 
 // ============================================================================
@@ -402,10 +438,20 @@ TEST_F(OmniPicker3Test, MixControlByPVAndPVTAreUnsupported) {
 TEST_F(OmniPicker3Test, JointAngleApisAreUnsupported) {
   RequireDevice();
 
+  // OP3 has no kinematics solver, so these APIs return a default vector of zeros rather than empty.
+  // The implementation logs a warning and returns vector<double>(kDegreesOfActiveFreedom, 0.0).
   EXPECT_TRUE(hand_->SetAllActiveJointAngles({0.5}).empty());
-  EXPECT_TRUE(hand_->GetAllActiveJointAngles().empty());
-  EXPECT_TRUE(hand_->GetAllJointAngles().empty());
-  EXPECT_TRUE(hand_->GetAllJointAngles({0.5}).empty());
+  auto active_angles = hand_->GetAllActiveJointAngles();
+  EXPECT_EQ(active_angles.size(), 1u);
+  EXPECT_EQ(active_angles[0], 0.0);
+
+  auto all_angles = hand_->GetAllJointAngles();
+  EXPECT_EQ(all_angles.size(), 1u);
+  EXPECT_EQ(all_angles[0], 0.0);
+
+  auto all_angles_with_input = hand_->GetAllJointAngles({0.5});
+  EXPECT_EQ(all_angles_with_input.size(), 1u);
+  EXPECT_EQ(all_angles_with_input[0], 0.0);
 }
 
 // ============================================================================
@@ -486,6 +532,7 @@ TEST_F(OmniPicker3Test, GetTactileSensorDataDownsampled) {
     GTEST_SKIP() << "InitTactilePointsMap failed; tactile sensors unavailable on this unit";
   }
 
+  bool any_answered = false;
   for (const auto finger : hand_->GetSensorOrder()) {
     auto data = hand_->GetTactileSensorData(finger);
     if (data.data_.empty()) {
@@ -493,10 +540,12 @@ TEST_F(OmniPicker3Test, GetTactileSensorDataDownsampled) {
                                  oh::ToString(finger).c_str());
       continue;
     }
+    any_answered = true;
     AgilinkLogger::get().infof(TAG, "[GetTactileSensorData] %s: %zu points",
                                oh::ToString(finger).c_str(), data.data_.size());
     EXPECT_EQ(data.sensor_id_, finger);
   }
+  g_capability_results.push_back({"0x05 single-sensor downsampled tactile", any_answered});
 }
 
 // ============================================================================
@@ -513,7 +562,9 @@ TEST_F(OmniPicker3Test, VelocityRegisterIsDeprecated) {
   AgilinkLogger::get().infof(TAG, "[GetAllJointMotorVelo] size=%zu values=[%s], GetJointMotorVelo(1)=%d",
                              all_velo.size(), JoinValues(all_velo).c_str(), single_velo);
 
-  if (all_velo.empty()) {
+  const bool supported = !all_velo.empty();
+  g_capability_results.push_back({"0x12 velocity register", supported});
+  if (!supported) {
     AgilinkLogger::get().warnf(TAG, "[GetAllJointMotorVelo] empty (register 0x12 unsupported by this firmware)");
   } else {
     EXPECT_EQ(all_velo.size(), kDoF);
@@ -531,6 +582,7 @@ TEST_F(OmniPicker3Test, CurrentThresholdRegisterIsDeprecated) {
   AgilinkLogger::get().infof(TAG, "[GetAllCurrentThreshold] size=%zu values=[%s], GetCurrentThreshold(1)=%d",
                              thresholds.size(), JoinValues(thresholds).c_str(), single);
 
+  g_capability_results.push_back({"0x03 current threshold register", !thresholds.empty()});
   if (thresholds.empty()) {
     AgilinkLogger::get().warnf(TAG, "[GetAllCurrentThreshold] empty (register 0x03 unsupported by this firmware)");
     return;
@@ -545,6 +597,85 @@ TEST_F(OmniPicker3Test, CurrentThresholdRegisterIsDeprecated) {
   AgilinkLogger::get().infof(TAG, "[SetAllCurrentThreshold] rewrote %s, readback %s",
                              JoinValues(thresholds).c_str(), JoinValues(after).c_str());
   EXPECT_EQ(after, thresholds);
+}
+
+// Prints the two things GoogleTest's own summary cannot show: which registers this
+// firmware answered, and whether the green result actually touched hardware. Written to
+// stdout rather than through AgilinkLogger, so it lands after the gtest report instead
+// of being interleaved by the async log worker.
+void PrintRunSummary() {
+  const auto& unit_test = *::testing::UnitTest::GetInstance();
+
+  std::cout << "\n=== Firmware capability ===\n";
+  if (g_capability_results.empty()) {
+    std::cout << "  (not probed -- the cases that probe firmware support did not run)\n";
+  } else {
+    for (const auto& capability : g_capability_results) {
+      std::cout << "  " << (capability.supported ? "SUPPORTED    " : "NOT SUPPORTED")
+                << "  " << capability.name << "\n";
+    }
+  }
+
+  const int total = unit_test.total_test_count();
+  const int passed = unit_test.successful_test_count();
+  const int failed = unit_test.failed_test_count();
+  const int skipped = unit_test.skipped_test_count();
+
+  std::cout << "\n=== Summary ===\n";
+  std::cout << "  total: " << total << "  passed: " << passed << "  failed: " << failed
+            << "  skipped: " << skipped << "\n";
+
+  if (passed > 0) {
+    std::cout << "\n  Passed tests:\n";
+    for (int i = 0; i < unit_test.total_test_suite_count(); ++i) {
+      const auto& suite = *unit_test.GetTestSuite(i);
+      for (int j = 0; j < suite.total_test_count(); ++j) {
+        const auto& test = *suite.GetTestInfo(j);
+        const auto* result = test.result();
+        if (result != nullptr && !result->Failed() && !result->Skipped()) {
+          std::cout << "    " << ColorGreen() << "[PASSED ]" << ColorReset() << " " << suite.name()
+                    << "." << test.name() << "\n";
+        }
+      }
+    }
+  }
+
+  if (failed > 0) {
+    std::cout << "\n  Failed tests:\n";
+    for (int i = 0; i < unit_test.total_test_suite_count(); ++i) {
+      const auto& suite = *unit_test.GetTestSuite(i);
+      for (int j = 0; j < suite.total_test_count(); ++j) {
+        const auto& test = *suite.GetTestInfo(j);
+        const auto* result = test.result();
+        if (result != nullptr && result->Failed()) {
+          std::cout << "    " << ColorRed() << "[FAILED ]" << ColorReset() << " " << suite.name()
+                    << "." << test.name() << "\n";
+        }
+      }
+    }
+  }
+
+  if (skipped > 0) {
+    std::cout << "\n  Skipped tests:\n";
+    for (int i = 0; i < unit_test.total_test_suite_count(); ++i) {
+      const auto& suite = *unit_test.GetTestSuite(i);
+      for (int j = 0; j < suite.total_test_count(); ++j) {
+        const auto& test = *suite.GetTestInfo(j);
+        const auto* result = test.result();
+        if (result != nullptr && result->Skipped()) {
+          std::cout << "    " << ColorYellow() << "[SKIPPED]" << ColorReset() << " " << suite.name()
+                    << "." << test.name() << "\n";
+        }
+      }
+    }
+  }
+
+  // A suite that skipped everything still exits 0, so say plainly that nothing was
+  // verified -- otherwise a green ctest run reads as "OP3 works" with no hardware present.
+  if (total > 0 && skipped == total) {
+    std::cout << "\n  ALL TESTS SKIPPED -- no hardware was contacted, nothing was verified.\n";
+  }
+  std::cout << std::endl;
 }
 
 // Leaves the gripper closed after the suite. Called once from main() instead of from
@@ -591,28 +722,32 @@ int main(int argc, char** argv) {
     } else if (arg == "--tcp-port" && i + 1 < argc) {
       g_tcp_port = static_cast<uint16_t>(std::stoi(argv[++i]));
     } else if (arg == "--help" || arg == "-h") {
-      AgilinkLogger::get().infof(TAG, "OmniPicker 3 Test\n");
-      AgilinkLogger::get().infof(TAG, "Usage: %s [options]\n", argv[0]);
-      AgilinkLogger::get().infof(TAG, "Options:");
-      AgilinkLogger::get().infof(TAG, "  -d, --device NAME    zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)");
-      AgilinkLogger::get().infof(TAG, "  --device-id ID       hand device ID to address (default: 1); never written by this suite");
-      AgilinkLogger::get().infof(TAG, "  -c CHANNEL           CAN channel (zlgcan/hcan/zlgcantcp), default 0");
-      AgilinkLogger::get().infof(TAG, "  -i CANFD_ID          adapter index (zlgcan/hcan), default 0");
-      AgilinkLogger::get().infof(TAG, "  --can-if IFACE       SocketCAN iface (socketcan), default can0");
-      AgilinkLogger::get().infof(TAG, "  --tcp-host HOST      ZLG TCP host (zlgcantcp), default 192.168.0.178");
-      AgilinkLogger::get().infof(TAG, "  --tcp-port PORT      ZLG TCP port (zlgcantcp), default 8000");
-      AgilinkLogger::get().infof(TAG, "  -f INTERVAL          request interval ms, default 5, max 100");
-      AgilinkLogger::get().infof(TAG, "\nExample:");
-      AgilinkLogger::get().infof(TAG, "  %s -d zlgcan -i 0 -c 0 --id 1 -f 5", argv[0]);
-      AgilinkLogger::get().infof(TAG, "    -d zlgcan  use the ZLG USBCANFD adapter");
-      AgilinkLogger::get().infof(TAG, "    -i 0       adapter index 0");
-      AgilinkLogger::get().infof(TAG, "    -c 0       CAN channel 0");
-      AgilinkLogger::get().infof(TAG, "    --id 1     address the gripper as device id 1");
-      AgilinkLogger::get().infof(TAG, "    -f 5       5 ms between requests");
-      AgilinkLogger::get().infof(TAG, "\nOther transports:");
-      AgilinkLogger::get().infof(TAG, "  %s -d socketcan --can-if can0", argv[0]);
-      AgilinkLogger::get().infof(TAG, "  %s -d zlgcantcp --tcp-host 192.168.0.178 --tcp-port 8000", argv[0]);
-      AgilinkLogger::get().infof(TAG, "\nGoogleTest flags are forwarded, e.g. --gtest_filter=*Tactile*");
+      // Printed through std::cout, not AgilinkLogger: help text is a synchronous
+      // one-shot and must not carry the logger's tag/timestamp prefixes.
+      std::cout
+          << "OmniPicker 3 Test\n\n"
+          << "Usage: " << argv[0] << " [options]\n\n"
+          << "Options:\n"
+          << "  -d, --device NAME    zlgcan | hcan | socketcan | zlgcantcp (default: zlgcan)\n"
+          << "  --device-id ID       hand device ID to address (default: 1); never written by this suite\n"
+          << "  -c CHANNEL           CAN channel (zlgcan/hcan/zlgcantcp), default 0\n"
+          << "  -i CANFD_ID          adapter index (zlgcan/hcan), default 0\n"
+          << "  --can-if IFACE       SocketCAN iface (socketcan), default can0\n"
+          << "  --tcp-host HOST      ZLG TCP host (zlgcantcp), default 192.168.0.178\n"
+          << "  --tcp-port PORT      ZLG TCP port (zlgcantcp), default 8000\n"
+          << "  -f INTERVAL          request interval ms, default 5, max 100\n"
+          << "\nExample:\n"
+          << "  " << argv[0] << " -d zlgcan -i 0 -c 0 --id 1 -f 5\n"
+          << "    -d zlgcan  use the ZLG USBCANFD adapter\n"
+          << "    -i 0       adapter index 0\n"
+          << "    -c 0       CAN channel 0\n"
+          << "    --id 1     address the gripper as device id 1\n"
+          << "    -f 5       5 ms between requests\n"
+          << "\nOther transports:\n"
+          << "  " << argv[0] << " -d socketcan --can-if can0\n"
+          << "  " << argv[0] << " -d zlgcantcp --tcp-host 192.168.0.178 --tcp-port 8000\n"
+          << "\nGoogleTest flags are forwarded, e.g. --gtest_filter=*Tactile*\n"
+          << std::endl;
       return 0;
     } else {
       gtest_args.push_back(argv[i]);
@@ -638,11 +773,15 @@ int main(int argc, char** argv) {
   AgilinkLogger::get().infof(TAG, "CANFD ID: %d", g_canfd_id);
   AgilinkLogger::get().infof(TAG, "Device ID: %d", g_device_id);
   AgilinkLogger::get().infof(TAG, "Request Interval: %d ms", g_request_interval);
+  AgilinkLogger::get().infof(TAG, "Run with --help to list all options.");
   AgilinkLogger::get().infof(TAG, "=========================");
 
   int gtest_argc = static_cast<int>(gtest_args.size());
   ::testing::InitGoogleTest(&gtest_argc, gtest_args.data());
   const int result = RUN_ALL_TESTS();
   ReturnToZeroOnce();
+  // Drain the async logger first, so the summary is not interleaved with buffered log lines.
+  AgilinkLogger::get().flush();
+  PrintRunSummary();
   return result;
 }
