@@ -1,0 +1,47 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.12.1",
+  "base_commit_sha": "42f7afc95d08a6318074eef5747e047f0f5c0b4b",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/demo/CMakeLists.txt",
+      "new_path": "windows/x64/cpp/demo/CMakeLists.txt",
+      "additions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/CMakeLists.txt",
+      "new_path": "windows/x64/cpp/test/CMakeLists.txt",
+      "additions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "additions": {
+        "human": 9
+      },
+      "deletions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "windows/x64/install.bat",
+      "new_path": "windows/x64/install.bat",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "windows/x64/uninstall.bat",
+      "new_path": "windows/x64/uninstall.bat",
+      "additions": {
+        "human": 4
+      }
+    }
+  ]
+}
