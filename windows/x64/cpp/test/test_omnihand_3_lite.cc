@@ -105,6 +105,32 @@ TEST_F(OmniHand3LiteTest, Init) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device. Check hardware connection.";
 }
 
+TEST_F(OmniHand3LiteTest, DiscoverHandDeviceId) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+
+  const uint8_t device_id = hand_->GetHandDeviceIdByBroadcast();
+  AgilinkLogger::get().infof(
+      TAG, "[DiscoverHandDeviceId] device ID: %u",
+      static_cast<unsigned int>(device_id));
+
+  ASSERT_GT(device_id, 0u) << "Standard-protocol broadcast returned an invalid device ID";
+  EXPECT_EQ(hand_->GetHandDeviceId(), device_id);
+}
+
+TEST_F(OmniHand3LiteTest, PrivateProtocolDiscoverDeviceId) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+
+  const uint16_t device_id = hand_->GetPrivateHandDeviceIdByBroadcast();
+  AgilinkLogger::get().infof(
+      TAG, "[PrivateProtocolDiscoverDeviceId] device ID: %u",
+      static_cast<unsigned int>(device_id));
+
+  ASSERT_GT(device_id, 0u) << "Private-protocol broadcast returned an invalid device ID";
+  ASSERT_LT(device_id, kPrivateBroadcastHandDeviceId)
+      << "No private-protocol device responded to broadcast";
+  EXPECT_EQ(hand_->GetPrivateHandDeviceId(), device_id);
+}
+
 // Test vendor info
 TEST_F(OmniHand3LiteTest, GetVendorInfo) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
