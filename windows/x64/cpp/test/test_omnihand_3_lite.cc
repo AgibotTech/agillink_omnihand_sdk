@@ -538,12 +538,10 @@ TEST_F(OmniHand3LiteTest, GetTactileSensorDataRaw) {
     std::string preview;
     if (!data.data_.empty()) {
       preview = " [";
-      size_t cnt = std::min(data.data_.size(), size_t(6));
-      for (size_t i = 0; i < cnt; ++i) {
+      for (size_t i = 0; i < data.data_.size(); ++i) {
         if (i > 0) preview += ", ";
         preview += std::to_string(data.data_[i]);
       }
-      if (data.data_.size() > 6) preview += "...";
       preview += "]";
     }
     AgilinkLogger::get().infof(TAG, "[GetTactileSensorDataRaw] %s: %zu points%s",
@@ -562,7 +560,14 @@ TEST_F(OmniHand3LiteTest, GetAllTactileSensorDataRaw) {
   EXPECT_FALSE(all_data.empty()) << "GetAllTactileSensorDataRaw returned empty";
   AgilinkLogger::get().infof(TAG, "[GetAllTactileSensorDataRaw] %zu fingers:", all_data.size());
   for (const auto& sd : all_data) {
-    AgilinkLogger::get().infof(TAG, "  %s: %zu points", ToString(sd.sensor_id_).c_str(), sd.data_.size());
+    std::string values;
+    for (size_t i = 0; i < sd.data_.size(); ++i) {
+      if (i > 0) values += ", ";
+      values += std::to_string(sd.data_[i]);
+    }
+    AgilinkLogger::get().infof(
+        TAG, "  %s: %zu points [%s]", ToString(sd.sensor_id_).c_str(),
+        sd.data_.size(), values.c_str());
   }
   EXPECT_EQ(all_data.size(), hand_->GetSensorOrder().size());
 }
