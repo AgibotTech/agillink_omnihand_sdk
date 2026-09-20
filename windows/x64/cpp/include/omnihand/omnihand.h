@@ -73,7 +73,7 @@ class AGIBOT_EXPORT OmniHand {
     return {};
   };
 
-  virtual uint8_t GetHandDeviceIdByBroadcast() {
+  virtual uint8_t GetNonPrivateHandDeviceIdByBroadcast() {
     return kBroadcastHandDeviceId;
   }
 
@@ -82,6 +82,17 @@ class AGIBOT_EXPORT OmniHand {
   // GetDeviceInfo().hand_device_id to read the id the hardware actually reports.
   virtual uint8_t GetHandDeviceId() const {
     return device_id_;
+  }
+
+  /**
+   * @brief Selects broadcast or default addressing for subsequent requests.
+   * @param broadcast true uses the standard-protocol broadcast ID (0x00);
+   *        false restores the default device ID.
+   * @note This only changes the SDK's local request destination. It does not
+   *       modify or persist the device ID in hardware.
+   */
+  virtual void SetBroadcast(bool broadcast) {
+    (void)broadcast;
   }
 
   /**
@@ -486,6 +497,7 @@ class AGIBOT_EXPORT OmniHand {
 
  public:
   /**
+   * @deprecated
    * @brief Sets device ID.
    * @param device_id Device ID
    * @note Serial port communication (RS485) does not support this interface.
@@ -494,6 +506,15 @@ class AGIBOT_EXPORT OmniHand {
    */
   virtual void SetDeviceId(unsigned char device_id) {
     (void)device_id;  // Suppress unused parameter warning
+  };
+
+  /**
+   * @brief Sets hand device ID.
+   * @param id Hand device ID
+   */
+  virtual bool SetHandDeviceIdByBroadcast(uint8_t id) {
+    (void)id;
+    return false;
   };
 
   /**

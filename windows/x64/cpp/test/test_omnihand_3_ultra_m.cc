@@ -88,6 +88,14 @@ TEST_F(OmniHand3UltraMTest, GetDeviceInfo) {
   }
 }
 
+TEST_F(OmniHand3UltraMTest, GetNonPrivateHandDeviceIdByBroadcast) {
+  if (!hand_->Init()) return;
+
+  const uint8_t device_id = hand_->GetNonPrivateHandDeviceIdByBroadcast();
+  ASSERT_GT(device_id, 0u) << "No H3U_M replied to the broadcast request";
+  EXPECT_EQ(hand_->GetHandDeviceId(), device_id);
+}
+
 // TEST_F(OmniHand3UltraMTest, SetDeviceId) {
 //   auto current_device_info = hand_->GetDeviceInfo();
 //   unsigned char current_id = current_device_info.hand_device_id;

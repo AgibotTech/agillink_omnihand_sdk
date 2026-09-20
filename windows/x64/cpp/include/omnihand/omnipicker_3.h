@@ -188,6 +188,10 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       const std::string& can_interface = "can0");
 #endif
 
+  virtual uint8_t GetDefaultNonPrivateHandDeviceId() const = 0;
+
+  int GetHandDeviceIdByBroadcast();
+
   std::vector<std::string> GetJointNames() const override {
     return {
       "joint1",
@@ -265,6 +269,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   static constexpr Int16Bound kMotorPositionBound = {0, 4095};
   static constexpr Int16Range kMixCtrlTorqueRange = {0, 6500, 3000}; // unit: mA
+  static constexpr uint8_t kDefaultHandDevideId = 0x01;
 };
 
 }  // namespace omnihand

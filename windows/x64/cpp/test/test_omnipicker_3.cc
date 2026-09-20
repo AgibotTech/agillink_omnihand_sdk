@@ -243,6 +243,14 @@ TEST_F(OmniPicker3Test, GetDeviceInfo) {
   EXPECT_EQ(device_info.hand_device_id, static_cast<uint8_t>(g_device_id));
 }
 
+TEST_F(OmniPicker3Test, GetNonPrivateHandDeviceIdByBroadcast) {
+  RequireDevice();
+
+  const uint8_t device_id = hand_->GetNonPrivateHandDeviceIdByBroadcast();
+  ASSERT_GT(device_id, 0u) << "No OP3 replied to the broadcast request";
+  EXPECT_EQ(hand_->GetHandDeviceId(), device_id);
+}
+
 // ============================================================================
 // Communication Settings (round-trip, no protocol traffic)
 // ============================================================================

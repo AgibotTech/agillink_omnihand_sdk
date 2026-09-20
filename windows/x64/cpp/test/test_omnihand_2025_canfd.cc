@@ -68,26 +68,28 @@ class OmniHand2025CanfdTest : public ::testing::Test {
   void SetUp() override {
     using agilink::omnihand::HandType;
     using agilink::omnihand::OmniHand2025;
-    // Use device ID 0 (broadcast) for initial discovery so we find the hand
-    // regardless of its current ID.
-    constexpr uint8_t kBroadcastId = 0;
+    // A constructor argument of 0 selects the protocol defaults; it is not a
+    // broadcast address.  Device discovery and ID changes use the explicit
+    // broadcast APIs below.
+    constexpr uint8_t kUseProtocolDefaultIds = 0;
 
     switch (g_transport) {
       case CanfdTransport::kZlgcan:
         hand_ = OmniHand2025::createHandByZlgcan(
-            HandType::LEFT, kBroadcastId,
+            HandType::LEFT, kUseProtocolDefaultIds,
             static_cast<uint8_t>(g_canfd_id),
             static_cast<uint8_t>(g_channel_id));
         break;
       case CanfdTransport::kHcan:
         hand_ = OmniHand2025::createHandByHcan(
-            HandType::LEFT, kBroadcastId,
+            HandType::LEFT, kUseProtocolDefaultIds,
             static_cast<uint8_t>(g_canfd_id),
             static_cast<uint8_t>(g_channel_id));
         break;
       case CanfdTransport::kSocketCan:
 #if defined(__linux__)
-        hand_ = OmniHand2025::createHandSocketCan(HandType::LEFT, kBroadcastId, g_can_if);
+        hand_ = OmniHand2025::createHandSocketCan(
+            HandType::LEFT, kUseProtocolDefaultIds, g_can_if);
 #else
         AgilinkLogger::get().warnf(TAG, "[Warning] SocketCAN requires Linux; skipping hand creation.");
         hand_ = nullptr;
@@ -96,7 +98,7 @@ class OmniHand2025CanfdTest : public ::testing::Test {
       case CanfdTransport::kZlgCanTcp:
 #if OMNIHAND_ZLG_TCP_SUPPORTED
         hand_ = OmniHand2025::createHandByZlgCanTcp(
-            HandType::LEFT, kBroadcastId, g_tcp_host, g_tcp_port,
+            HandType::LEFT, kUseProtocolDefaultIds, g_tcp_host, g_tcp_port,
             static_cast<uint8_t>(g_channel_id));
 #else
         AgilinkLogger::get().warnf(TAG, "[Warning] ZLG CANFD over TCP not supported on this platform.");
@@ -120,21 +122,37 @@ class OmniHand2025CanfdTest : public ::testing::Test {
       GTEST_SKIP() << "CANFD device not available";
     }
 
-    // Discover and cache the actual device ID via broadcast response.
-    auto info = hand_->GetDeviceInfo();
-    original_device_id_ = static_cast<uint8_t>(info.hand_device_id);
+    // Discover and cache the actual standard-protocol ID.  The constructor's
+    // zero value above only selected defaults and did not send a broadcast.
+    original_device_id_ = hand_->GetNonPrivateHandDeviceIdByBroadcast();
+    if (original_device_id_ == agilink::omnihand::kBroadcastHandDeviceId) {
+      GTEST_SKIP() << "No standard-protocol device responded to broadcast";
+    }
     AgilinkLogger::get().infof(TAG, "[SetUp] Discovered device ID: %d, switching to: %d",
                                original_device_id_, g_device_id);
     if (static_cast<uint8_t>(g_device_id) != original_device_id_) {
-      hand_->SetDeviceId(static_cast<uint8_t>(g_device_id));
+      original_private_device_id_ = hand_->GetPrivateHandDeviceIdByBroadcast();
+      ASSERT_GT(original_private_device_id_, 0u);
+      ASSERT_LT(original_private_device_id_, agilink::omnihand::kPrivateBroadcastHandDeviceId)
+          << "No private-protocol device responded to broadcast";
+      device_id_change_attempted_ = true;
+      ASSERT_TRUE(hand_->SetHandDeviceIdByBroadcast(static_cast<uint8_t>(g_device_id)))
+          << "Failed to set the standard/private protocol device IDs by broadcast";
     }
   }
 
   void TearDown() override {
-    if (hand_ && device_available_ && original_device_id_ != 0) {
-      if (static_cast<uint8_t>(g_device_id) != original_device_id_) {
-        AgilinkLogger::get().infof(TAG, "[TearDown] Restoring device ID: %d -> %d",
-                                   g_device_id, original_device_id_);
+    if (hand_ && device_available_ && device_id_change_attempted_) {
+      AgilinkLogger::get().infof(
+          TAG, "[TearDown] Restoring device IDs: %d -> standard=%d, private=%u",
+          g_device_id, original_device_id_,
+          static_cast<unsigned int>(original_private_device_id_));
+      // Restore through broadcast as the two-step setup operation can fail
+      // after changing only one protocol ID. First align both protocols with
+      // the original private ID, then restore the standard ID independently.
+      EXPECT_TRUE(hand_->SetHandDeviceIdByBroadcast(
+          static_cast<uint8_t>(original_private_device_id_)));
+      if (original_device_id_ != original_private_device_id_) {
         hand_->SetDeviceId(original_device_id_);
       }
     }
@@ -147,7 +165,9 @@ class OmniHand2025CanfdTest : public ::testing::Test {
 
   std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
   bool device_available_ = false;
+  bool device_id_change_attempted_ = false;
   uint8_t original_device_id_ = 0;
+  uint16_t original_private_device_id_ = 0;
 };
 
 // ============================================================================
@@ -657,11 +677,31 @@ TEST_F(OmniHand2025CanfdTest, KinematicsSolver) {
 TEST_F(OmniHand2025CanfdTest, DiscoverHandDeviceId) {
   RequireDevice();
 
-  const uint16_t device_id = hand_->GetHandDeviceIdByBroadcast();
+  const uint8_t standard_device_id = hand_->GetNonPrivateHandDeviceIdByBroadcast();
+  const uint16_t private_device_id = hand_->GetPrivateHandDeviceIdByBroadcast();
+  ASSERT_NE(standard_device_id, agilink::omnihand::kBroadcastHandDeviceId)
+      << "No standard-protocol device responded to broadcast";
+  ASSERT_GT(private_device_id, 0u);
+  ASSERT_LT(private_device_id, agilink::omnihand::kPrivateBroadcastHandDeviceId)
+      << "No private-protocol device responded to broadcast";
+
+  const int device_id = hand_->GetHandDeviceIdByBroadcast();
   AgilinkLogger::get().infof(
-      TAG, "[PrivateProtocolDiscoverDeviceId] device ID: %u",
-      static_cast<unsigned int>(device_id));
-  EXPECT_EQ(hand_->GetHandDeviceId(), device_id);
+      TAG, "[DiscoverHandDeviceId] standard=%u, private=%u, combined=%d",
+      static_cast<unsigned int>(standard_device_id),
+      static_cast<unsigned int>(private_device_id), device_id);
+
+  // GetHandDeviceIdByBroadcast() returns 0 when both protocol IDs are their
+  // defaults, the common ID when both protocols agree on a custom ID, and -1
+  // when the two protocol IDs are inconsistent.
+  const int expected =
+      (standard_device_id == 1 && private_device_id == 9)
+          ? 0
+          : (standard_device_id == private_device_id
+                 ? static_cast<int>(private_device_id)
+                 : -1);
+  EXPECT_EQ(device_id, expected);
+  EXPECT_EQ(hand_->GetHandDeviceId(), standard_device_id);
 }
 
 // ============================================================================
@@ -782,6 +822,13 @@ int main(int argc, char** argv) {
     } else {
       gtest_args.push_back(argv[i]);
     }
+  }
+
+  if (g_device_id < 1 || g_device_id > 0x7F) {
+    AgilinkLogger::get().errorf(
+        TAG, "Invalid --device-id %d; expected a unicast ID in [1, 0x7f]",
+        g_device_id);
+    return 1;
   }
 
   AgilinkLogger::get().infof(TAG, "=== OmniHand 2025 CANFD Test ===");

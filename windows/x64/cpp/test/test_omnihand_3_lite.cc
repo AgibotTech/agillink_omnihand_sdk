@@ -108,7 +108,7 @@ TEST_F(OmniHand3LiteTest, Init) {
 TEST_F(OmniHand3LiteTest, DiscoverHandDeviceId) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
 
-  const uint8_t device_id = hand_->GetHandDeviceIdByBroadcast();
+  const uint8_t device_id = hand_->GetNonPrivateHandDeviceIdByBroadcast();
   AgilinkLogger::get().infof(
       TAG, "[DiscoverHandDeviceId] device ID: %u",
       static_cast<unsigned int>(device_id));

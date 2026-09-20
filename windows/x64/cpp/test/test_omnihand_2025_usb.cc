@@ -647,7 +647,7 @@ TEST_F(OmniHand2025UsbTest, KinematicsSolver) {
 TEST_F(OmniHand2025UsbTest, DiscoverHandDeviceId) {
   RequireDevice();
 
-  const uint16_t device_id = hand_->GetHandDeviceIdByBroadcast();
+  const uint16_t device_id = hand_->GetNonPrivateHandDeviceIdByBroadcast();
   AgilinkLogger::get().infof(
       TAG, "[PrivateProtocolDiscoverDeviceId] device ID: %u",
       static_cast<unsigned int>(device_id));

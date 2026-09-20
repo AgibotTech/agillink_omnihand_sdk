@@ -216,6 +216,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       const std::string& uart_port,
       int32_t baudrate = 460800);
 
+  int GetHandDeviceIdByBroadcast();
+
     /**
    * @brief Get sensor data length for a specific finger
    * @param finger Finger enum value
@@ -342,6 +344,10 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
   void OnHandTypeChanged() override {
     kinematics_solver_ = std::make_unique<o10::OmniHand2025Solver>(hand_type_ == HandType::LEFT);
   }
+
+  virtual uint8_t GetDefaultNonPrivateHandDeviceId() const = 0;
+
+  virtual uint16_t GetDefaultPrivateHandDeviceId() const = 0;
 
   /**
    * @brief Kinematics solver for OmniHand 2025 (O10)
