@@ -190,7 +190,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   virtual uint8_t GetDefaultNonPrivateHandDeviceId() const = 0;
 
-  int GetHandDeviceIdByBroadcast();
+  int GetHandDeviceIdByBroadcast() override;
 
   std::vector<std::string> GetJointNames() const override {
     return {

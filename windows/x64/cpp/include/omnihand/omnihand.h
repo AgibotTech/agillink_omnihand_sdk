@@ -77,6 +77,17 @@ class AGIBOT_EXPORT OmniHand {
     return kBroadcastHandDeviceId;
   }
 
+  /**
+   * @brief Discovers and caches the hand device ID through the supported
+   *        broadcast protocol.
+   * @return The discovered device ID, or -1 when discovery fails.
+   * @note Products with multiple protocol IDs may use 0 for their default
+   *       state and override this method to validate both IDs.
+   */
+  virtual int GetHandDeviceIdByBroadcast() {
+    return static_cast<int>(GetNonPrivateHandDeviceIdByBroadcast());
+  }
+
   // Returns the locally cached id (from the constructor or the last successful SetDeviceId
   // call), not a hardware read. It can disagree with what the device has stored -- use
   // GetDeviceInfo().hand_device_id to read the id the hardware actually reports.

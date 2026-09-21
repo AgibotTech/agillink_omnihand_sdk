@@ -216,7 +216,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       const std::string& uart_port,
       int32_t baudrate = 460800);
 
-  int GetHandDeviceIdByBroadcast();
+  int GetHandDeviceIdByBroadcast() override;
 
     /**
    * @brief Get sensor data length for a specific finger

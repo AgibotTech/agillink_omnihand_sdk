@@ -202,7 +202,7 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
 
   virtual uint16_t GetDefaultPrivateHandDeviceId() const = 0;
 
-  int GetHandDeviceIdByBroadcast();
+  int GetHandDeviceIdByBroadcast() override;
 
   // ============ Sensor Utilities ============
   // Note: O4 (OmniHand3Lite) does not support tactile sensors
