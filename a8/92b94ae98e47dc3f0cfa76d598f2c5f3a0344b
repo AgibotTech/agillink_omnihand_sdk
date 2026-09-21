@@ -1,0 +1,51 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "a892b94ae98e47dc3f0cfa76d598f2c5f3a0344b",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "deletions": {
+        "human": 50
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_3_lite.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_3_lite.h",
+      "deletions": {
+        "human": 40
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_3_ultra_m.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_3_ultra_m.h",
+      "deletions": {
+        "human": 22
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_pro_2025.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_pro_2025.h",
+      "deletions": {
+        "human": 40
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnipicker_3.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnipicker_3.h",
+      "deletions": {
+        "human": 35
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025_usb.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025_usb.cc",
+      "deletions": {
+        "human": 9
+      }
+    }
+  ]
+}
