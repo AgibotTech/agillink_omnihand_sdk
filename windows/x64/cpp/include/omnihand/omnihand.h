@@ -524,8 +524,8 @@ class AGIBOT_EXPORT OmniHand {
   /**
    * @brief Sets hand device ID.
    * @param id Hand device ID. Products whose GetHandDeviceIdByBroadcast()
-   *           uses 0 to represent the default IDs restore their local default
-   *           addressing state when id is 0.
+   *           uses 0 to represent the default IDs write their protocol-specific
+   *           default IDs to the device through broadcast addressing when id is 0.
    */
   virtual bool SetHandDeviceIdByBroadcast(uint8_t id) {
     (void)id;
