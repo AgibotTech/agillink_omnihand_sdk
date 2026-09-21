@@ -80,9 +80,11 @@ class AGIBOT_EXPORT OmniHand {
   /**
    * @brief Discovers and caches the hand device ID through the supported
    *        broadcast protocol.
-   * @return The discovered device ID, or -1 when discovery fails.
-   * @note Products with multiple protocol IDs may use 0 for their default
-   *       state and override this method to validate both IDs.
+   * @return Standard-only products return the discovered ID (0 if no device
+   *         replies). Products with multiple protocol IDs may return 0 for
+   *         their default state and -1 when the IDs are inconsistent.
+   * @note Products with multiple protocol IDs override this method to
+   *       validate all protocol IDs.
    */
   virtual int GetHandDeviceIdByBroadcast() {
     return static_cast<int>(GetNonPrivateHandDeviceIdByBroadcast());
@@ -521,7 +523,9 @@ class AGIBOT_EXPORT OmniHand {
 
   /**
    * @brief Sets hand device ID.
-   * @param id Hand device ID
+   * @param id Hand device ID. Products whose GetHandDeviceIdByBroadcast()
+   *           uses 0 to represent the default IDs restore their local default
+   *           addressing state when id is 0.
    */
   virtual bool SetHandDeviceIdByBroadcast(uint8_t id) {
     (void)id;
