@@ -55,15 +55,6 @@ static bool g_run_dangerous_actions = false;
 using agilink::AgilinkLogger;
 static constexpr const char* TAG = "OmniHand2025UsbTest";
 
-TEST(OmniHand2025UsbBroadcastTest, GetDeviceInfoFromBroadcastBySerial) {
-  const auto info = agilink::omnihand::OmniHand2025::GetDeviceInfoFromBroadcastBySerial(
-      g_usb_port, g_baudrate);
-  if (info.hand_device_id == 0) {
-    GTEST_SKIP() << "No standard-protocol serial device responded to broadcast";
-  }
-  EXPECT_NE(info.hand_device_id, 0);
-}
-
 class OmniHand2025UsbTest : public ::testing::Test {
  protected:
   void SetUp() override {

@@ -153,41 +153,6 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       int32_t baudrate = 460800);
 
 
-  /**
-   * @brief Get device information from broadcast address (hand_device_id = 0x00)
-   * @param canfd_device_id USB CANFD adapter device index
-   * @param canfd_channel_id CAN channel index (default 0)
-   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
-   *        - Single-channel (USBCANFD-100U): always 0
-   * @return DeviceInfo structure, or empty DeviceInfo if request failed
-   * @note Only works with CAN communication, not supported for RS485
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcast(
-      uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
-
-  /**
-   * @brief Get device information from broadcast address (hand_device_id = 0x00) by serial number
-   * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
-   * @param canfd_channel_id CAN channel index (default 0)
-   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
-   *        - Single-channel (USBCANFD-100U): always 0
-   * @return DeviceInfo structure, or empty DeviceInfo if device not found or request failed
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcast(
-      const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
-
-#ifdef __linux__
-  /**
-   * @brief Get device information from broadcast address (device_id = 0x00) via SocketCAN
-   * @param can_interface CAN interface name (default "can0")
-   * @return DeviceInfo structure, or empty DeviceInfo if request failed
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcastSocketCan(
-      const std::string& can_interface = "can0");
-#endif
-
   virtual uint8_t GetDefaultNonPrivateHandDeviceId() const = 0;
 
   int GetHandDeviceIdByBroadcast() override;

@@ -295,28 +295,6 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint16_t soc_port = 19009,
       const std::string& xense_ip_addr = "192.168.99.2");
 
-  /**
-   * @brief Get device information from broadcast address (hand_device_id = 0x00)
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcast(
-      uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
-
-  /**
-   * @brief Get device information from broadcast address by serial number
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcast(
-      const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
-
-#ifdef __linux__
-  /**
-   * @brief Get device information from broadcast address via SocketCAN
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcastSocketCan(
-      const std::string& can_interface);
-#endif
-
   // ============ Joint Naming ============
   /**
    * @brief Returns the 20 joint names of O20 in motor-index order.
