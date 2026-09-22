@@ -1,0 +1,19 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "572cf4a63707693ff7beddec3229953b1d1f9581",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025_usb.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025_usb.cc",
+      "additions": {
+        "human": 59
+      },
+      "deletions": {
+        "human": 7
+      }
+    }
+  ]
+}
