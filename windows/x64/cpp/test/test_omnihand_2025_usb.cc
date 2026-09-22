@@ -22,12 +22,13 @@
  * - GET_FW_VERSION (0xCD) - GetVendorInfo
  *
  * Usage:
- *   ./test_omnihand_2025_usb [-p PORT] [-b BAUDRATE] [-f INTERVAL]
+ *   ./test_omnihand_2025_usb [-p PORT] [-b BAUDRATE] [-f INTERVAL] [--device-id ID]
  *
  *   Options:
  *     -p PORT      USB serial port (default: Windows COM3, Linux /dev/ttyACM0)
  *     -b BAUDRATE  Baudrate (default: 460800)
  *     -f INTERVAL  Request interval in ms (default: 500, max: 500)
+ *     --device-id ID  Target device ID; setup discovers and restores the original ID
  */
 
 #include <gtest/gtest.h>
@@ -50,6 +51,7 @@ static std::string g_usb_port = "/dev/ttyACM0";
 static int g_baudrate = 460800;
 static int g_request_interval = 500;  // USB default: 500ms
 static int g_frame_recv_timeout = 200;
+static int g_device_id = 1;  // target device ID (--device-id)
 static bool g_run_dangerous_actions = false;
 
 using agilink::AgilinkLogger;
@@ -59,9 +61,14 @@ class OmniHand2025UsbTest : public ::testing::Test {
  protected:
   void SetUp() override {
     try {
+      using agilink::omnihand::HandType;
+      using agilink::omnihand::OmniHand2025;
+      // Zero selects each protocol's constructor default. It is not a
+      // broadcast address; discovery below always uses the explicit APIs.
+      constexpr uint8_t kUseProtocolDefaultIds = 0;
       auto hand = agilink::omnihand::OmniHand2025::createHandByUsb(
-          agilink::omnihand::HandType::LEFT,
-          1,              // device_id
+          HandType::LEFT,
+          kUseProtocolDefaultIds,
           g_usb_port,
           g_baudrate
       );
@@ -84,9 +91,40 @@ class OmniHand2025UsbTest : public ::testing::Test {
     if (!hand_ || !device_available_) {
       GTEST_SKIP() << "USB device not available";
     }
+
+    // Discover and cache the actual standard-protocol ID before any test
+    // changes it. A zero constructor argument only selected defaults.
+    original_device_id_ = hand_->GetNonPrivateHandDeviceIdByBroadcast();
+    if (original_device_id_ == agilink::omnihand::kBroadcastHandDeviceId) {
+      GTEST_SKIP() << "No standard-protocol device responded to broadcast";
+    }
+    AgilinkLogger::get().infof(TAG, "[SetUp] Discovered device ID: %d, switching to: %d",
+                               original_device_id_, g_device_id);
+    if (static_cast<uint8_t>(g_device_id) != original_device_id_) {
+      original_private_device_id_ = hand_->GetPrivateHandDeviceIdByBroadcast();
+      ASSERT_GT(original_private_device_id_, 0u);
+      ASSERT_LT(original_private_device_id_, agilink::omnihand::kPrivateBroadcastHandDeviceId)
+          << "No private-protocol device responded to broadcast";
+      device_id_change_attempted_ = true;
+      ASSERT_TRUE(hand_->SetHandDeviceIdByBroadcast(static_cast<uint8_t>(g_device_id)))
+          << "Failed to set the standard/private protocol device IDs by broadcast";
+    }
   }
 
   void TearDown() override {
+    if (hand_ && device_available_ && device_id_change_attempted_) {
+      AgilinkLogger::get().infof(
+          TAG, "[TearDown] Restoring device IDs: %d -> standard=%d, private=%u",
+          g_device_id, original_device_id_,
+          static_cast<unsigned int>(original_private_device_id_));
+      // Restore both protocols through broadcast first. If their original IDs
+      // differed, restore the standard protocol independently afterwards.
+      EXPECT_TRUE(hand_->SetHandDeviceIdByBroadcast(
+          static_cast<uint8_t>(original_private_device_id_)));
+      if (original_device_id_ != original_private_device_id_) {
+        hand_->SetDeviceId(original_device_id_);
+      }
+    }
     hand_.reset();
     AgilinkLogger::get().flush();
   }
@@ -97,6 +135,9 @@ class OmniHand2025UsbTest : public ::testing::Test {
 
   std::unique_ptr<agilink::omnihand::OmniHand2025> hand_;
   bool device_available_ = false;
+  bool device_id_change_attempted_ = false;
+  uint8_t original_device_id_ = 0;
+  uint16_t original_private_device_id_ = 0;
 };
 
 // ============================================================================
@@ -138,8 +179,8 @@ TEST_F(OmniHand2025UsbTest, GetDeviceInfo) {
   auto device_info = hand_->GetDeviceInfo();
   AgilinkLogger::get().infof(TAG, "[GetDeviceInfo] Device Info:\n%s", device_info.ToString().c_str());
 
-  // USB learns device ID from first received frame
-  EXPECT_NE(device_info.hand_device_id, 0);
+  // SetUp has switched the device to the requested standard-protocol ID.
+  EXPECT_EQ(device_info.hand_device_id, static_cast<uint8_t>(g_device_id));
 }
 
 // ============================================================================
@@ -638,9 +679,9 @@ TEST_F(OmniHand2025UsbTest, KinematicsSolver) {
 TEST_F(OmniHand2025UsbTest, DiscoverHandDeviceId) {
   RequireDevice();
 
-  const uint16_t device_id = hand_->GetNonPrivateHandDeviceIdByBroadcast();
+  const uint8_t device_id = hand_->GetNonPrivateHandDeviceIdByBroadcast();
   AgilinkLogger::get().infof(
-      TAG, "[PrivateProtocolDiscoverDeviceId] device ID: %u",
+      TAG, "[ProtocolDiscoverDeviceId] device ID: %u",
       static_cast<unsigned int>(device_id));
   EXPECT_EQ(hand_->GetHandDeviceId(), device_id);
 }
@@ -1024,6 +1065,8 @@ int main(int argc, char** argv) {
       if (g_request_interval > 500) g_request_interval = 500;
     } else if (arg == "-t" && i + 1 < argc) {
       g_frame_recv_timeout = std::stoi(argv[++i]);
+    } else if ((arg == "--device-id" || arg == "--id") && i + 1 < argc) {
+      g_device_id = std::stoi(argv[++i]);
     } else if (arg == "--dangerous") {
       g_run_dangerous_actions = true;
     } else if (arg == "--help" || arg == "-h") {
@@ -1038,6 +1081,7 @@ int main(int argc, char** argv) {
       AgilinkLogger::get().infof(TAG, "  -b BAUDRATE  Baudrate (default: 460800)");
       AgilinkLogger::get().infof(TAG, "  -f INTERVAL  Request interval in ms (default: 500, max: 500)");
       AgilinkLogger::get().infof(TAG, "  -t MS         Frame receive timeout ms (default: 200)");
+      AgilinkLogger::get().infof(TAG, "  --device-id ID  Target device ID; original IDs are restored after tests");
       AgilinkLogger::get().infof(TAG, "  --dangerous   Enable write/action commands (risk)");
       AgilinkLogger::get().infof(TAG, "\nExample:");
 #if defined(_WIN32)
@@ -1052,11 +1096,19 @@ int main(int argc, char** argv) {
     }
   }
 
+  if (g_device_id < 1 || g_device_id > 0x7F) {
+    AgilinkLogger::get().errorf(
+        TAG, "Invalid --device-id %d; expected a unicast ID in [1, 0x7f]",
+        g_device_id);
+    return 1;
+  }
+
   AgilinkLogger::get().infof(TAG, "=== OmniHand 2025 USB Test ===");
   AgilinkLogger::get().infof(TAG, "Port: %s", g_usb_port.c_str());
   AgilinkLogger::get().infof(TAG, "Baudrate: %d", g_baudrate);
   AgilinkLogger::get().infof(TAG, "Request Interval: %d ms", g_request_interval);
   AgilinkLogger::get().infof(TAG, "Frame Recv Timeout: %d ms", g_frame_recv_timeout);
+  AgilinkLogger::get().infof(TAG, "Target Device ID: %d", g_device_id);
   AgilinkLogger::get().infof(TAG, "Dangerous actions: %s", g_run_dangerous_actions ? "ON" : "OFF");
   AgilinkLogger::get().infof(TAG, "==============================");
   AgilinkLogger::get().flush();
