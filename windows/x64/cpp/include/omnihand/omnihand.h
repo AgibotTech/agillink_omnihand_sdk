@@ -62,6 +62,14 @@ class AGIBOT_EXPORT OmniHand {
   virtual VendorInfo GetVendorInfo() const {
     return {};
   };
+
+  virtual std::string GetVendorSerialNumber() const {
+    return "";
+  }
+
+  virtual std::string GetSN() const {
+    return "";
+  }
   
   /**
    * @brief 0x02: Gets device information.

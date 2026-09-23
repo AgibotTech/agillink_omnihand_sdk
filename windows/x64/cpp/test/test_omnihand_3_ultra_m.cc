@@ -2,14 +2,18 @@
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 #include <gtest/gtest.h>
+#include "agilink_logger.h"
 #include "omnihand/omnihand_3_ultra_m.h"
-#include <memory>
-#include <vector>
-#include <iostream>
-#include <iomanip>
-#include <thread>
 #include <chrono>
+#include <memory>
+#include <sstream>
 #include <string>
+#include <thread>
+#include <vector>
+
+using agilink::AgilinkLogger;
+
+static constexpr const char* TAG = "OmniHand3UltraMTest";
 
 static int g_request_interval = 5;
 static std::string g_device_type = "zlgcan";
@@ -23,6 +27,16 @@ static std::string GetDeviceType() {
   return g_device_type;
 }
 
+template <typename T>
+static std::string ValuesToString(const std::vector<T>& values) {
+  std::ostringstream stream;
+  for (size_t i = 0; i < values.size(); ++i) {
+    if (i > 0) stream << ", ";
+    stream << static_cast<long long>(values[i]);
+  }
+  return stream.str();
+}
+
 class OmniHand3UltraMTest : public ::testing::Test {
  protected:
   void SetUp() override {
@@ -30,22 +44,22 @@ class OmniHand3UltraMTest : public ::testing::Test {
     if (device_type == "hcan") {
       hand_ = agilink::omnihand::OmniHand3UltraM::createHandByHcan(
           agilink::omnihand::HandType::LEFT, 9, 0, 0);
-      std::cout << "[Info]: Using HCAN device" << std::endl;
+      AgilinkLogger::get().infof(TAG, "Using HCAN device");
 #ifdef __linux__
     } else if (device_type == "socketcan") {
       hand_ = agilink::omnihand::OmniHand3UltraM::createHandSocketCan(
           agilink::omnihand::HandType::LEFT, 9, g_can_interface);
-      std::cout << "[Info]: Using SocketCAN device (" << g_can_interface << ")" << std::endl;
+      AgilinkLogger::get().infof(TAG, "Using SocketCAN device (%s)", g_can_interface.c_str());
 #endif
     } else {
       hand_ = agilink::omnihand::OmniHand3UltraM::createHandByZlgcan(
           agilink::omnihand::HandType::LEFT, 9, 0, 0);
-      std::cout << "[Info]: Using ZLG CAN device" << std::endl;
+      AgilinkLogger::get().infof(TAG, "Using ZLG CAN device");
     }
     int request_interval = GetRequestInterval();
     hand_->SetRequestInterval(request_interval);
     if (request_interval != 0) {
-      std::cout << "[Info]: Using request interval: " << request_interval << " ms" << std::endl;
+      AgilinkLogger::get().infof(TAG, "Using request interval: %d ms", request_interval);
     }
   }
 
@@ -67,10 +81,9 @@ TEST_F(OmniHand3UltraMTest, Init) {
 TEST_F(OmniHand3UltraMTest, GetVendorInfo) {
   if (hand_->Init()) {
     auto vendor_info = hand_->GetVendorInfo();
-    std::cout << "[GetVendorInfo] Vendor Info:" << std::endl;
-    std::cout << vendor_info.ToString() << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetVendorInfo] %s", vendor_info.ToString().c_str());
     if (vendor_info.dof == 0) {
-      std::cout << "[GetVendorInfo] Failed: got empty vendor info (timeout)" << std::endl;
+      AgilinkLogger::get().warnf(TAG, "[GetVendorInfo] Failed: got empty vendor info (timeout)");
       return;
     }
     EXPECT_EQ(vendor_info.dof, 20);
@@ -80,8 +93,7 @@ TEST_F(OmniHand3UltraMTest, GetVendorInfo) {
 TEST_F(OmniHand3UltraMTest, GetDeviceInfo) {
   if (hand_->Init()) {
     auto device_info = hand_->GetDeviceInfo();
-    std::cout << "[GetDeviceInfo] Device Info:" << std::endl;
-    std::cout << device_info.ToString() << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetDeviceInfo] %s", device_info.ToString().c_str());
     if (device_info.hand_device_id != 0) {
       EXPECT_EQ(device_info.hand_device_id, 9);
     }
@@ -96,6 +108,20 @@ TEST_F(OmniHand3UltraMTest, GetNonPrivateHandDeviceIdByBroadcast) {
   EXPECT_EQ(hand_->GetHandDeviceId(), device_id);
 }
 
+TEST_F(OmniHand3UltraMTest, MixControlRejectsInvalidArguments) {
+  constexpr size_t kDof = agilink::omnihand::OmniHand3UltraM::kDegreesOfActiveFreedom;
+  const std::vector<int16_t> valid(kDof, 0);
+  const std::vector<int16_t> short_values(kDof - 1, 0);
+
+  EXPECT_TRUE(hand_->MixControlByPT(short_values, short_values).empty());
+  EXPECT_TRUE(hand_->MixControlByPVT(valid, short_values, valid).empty());
+
+  const auto invalid_pt = hand_->MixControlByPT(0, 0, 0);
+  EXPECT_EQ(invalid_pt.ctrl_mode_, 0);
+  const auto invalid_pvt = hand_->MixControlByPVT(static_cast<uint8_t>(kDof + 1), 0, 0, 0);
+  EXPECT_EQ(invalid_pvt.ctrl_mode_, 0);
+}
+
 // TEST_F(OmniHand3UltraMTest, SetDeviceId) {
 //   auto current_device_info = hand_->GetDeviceInfo();
 //   unsigned char current_id = current_device_info.hand_device_id;
@@ -103,14 +129,14 @@ TEST_F(OmniHand3UltraMTest, GetNonPrivateHandDeviceIdByBroadcast) {
 
 //   unsigned char target_id = 2;
 //   hand_->SetDeviceId(target_id);
-//   std::cout << "[SetDeviceId] Set Device ID: " << static_cast<int>(target_id) << std::endl;
+//   AgilinkLogger::get().infof(TAG, "[SetDeviceId] Set Device ID: %d", static_cast<int>(target_id));
 //   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 //   auto device_info = hand_->GetDeviceInfo();
 //   EXPECT_EQ(device_info.hand_device_id, 2);
 
 //   unsigned char original_id = 9;
 //   hand_->SetDeviceId(original_id);
-//   std::cout << "[SetDeviceId] Reset Device ID: " << static_cast<int>(original_id) << std::endl;
+//   AgilinkLogger::get().infof(TAG, "[SetDeviceId] Reset Device ID: %d", static_cast<int>(original_id));
 //   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 //   auto device_info1 = hand_->GetDeviceInfo();
 //   EXPECT_EQ(device_info1.hand_device_id, 9);
@@ -127,7 +153,7 @@ TEST_F(OmniHand3UltraMTest, GestureDance) {
   std::vector<unsigned char> pp_modes(MOTOR_TOTAL_COUNT, static_cast<unsigned char>(agilink::omnihand::ControlMode::PROFILE_POSITION));
   std::vector<unsigned char> csp_modes(MOTOR_TOTAL_COUNT, static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION));
 
-  std::cout << "[GestureDance] Switching to PP mode (PROFILE_POSITION=7)" << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Switching to PP mode (PROFILE_POSITION=7)");
   hand_->SetAllControlMode(pp_modes);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
@@ -179,41 +205,33 @@ TEST_F(OmniHand3UltraMTest, GestureDance) {
 
   std::vector<int16_t> zero_posi(MOTOR_TOTAL_COUNT, 0);
 
-  std::cout << "[GestureDance] Phase 1: Zero position" << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Phase 1: Zero position");
   hand_->SetAllJointMotorPosi(zero_posi);
   std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
   auto read_posi = hand_->GetAllJointMotorPosi();
   EXPECT_EQ(read_posi.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
-  std::cout << "[GestureDance] Current positions: ";
-  for (size_t i = 0; i < read_posi.size(); ++i) {
-    std::cout << read_posi[i];
-    if (i < read_posi.size() - 1) std::cout << ", ";
-  }
-  std::cout << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Current positions: %s",
+                            ValuesToString(read_posi).c_str());
 
-  std::cout << "[GestureDance] Phase 2: Single-joint sequence (" << SINGLE_STEPS << " steps)" << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Phase 2: Single-joint sequence (%d steps)", SINGLE_STEPS);
   for (int s = 0; s < SINGLE_STEPS; ++s) {
     int16_t posi_val = static_cast<int16_t>(ang_joint[s] * 10);
     auto ret = hand_->SetJointMotorPosi(idx_joint[s], posi_val);
-    std::cout << "  Step " << (s + 1) << "/" << SINGLE_STEPS
-              << ": Joint " << static_cast<int>(idx_joint[s])
-              << " -> " << ang_joint[s] << " deg (ret=" << ret << ")" << std::endl;
+    AgilinkLogger::get().infof(TAG, "  Step %d/%d: Joint %d -> %.1f deg (ret=%d)",
+                              s + 1, SINGLE_STEPS, static_cast<int>(idx_joint[s]),
+                              static_cast<double>(ang_joint[s]), static_cast<int>(ret));
     std::this_thread::sleep_for(std::chrono::milliseconds(time_joint[s]));
   }
 
   auto after_single = hand_->GetAllJointMotorPosi();
   EXPECT_EQ(after_single.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
-  std::cout << "[GestureDance] Positions after single-joint phase: ";
-  for (size_t i = 0; i < after_single.size(); ++i) {
-    std::cout << after_single[i];
-    if (i < after_single.size() - 1) std::cout << ", ";
-  }
-  std::cout << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Positions after single-joint phase: %s",
+                            ValuesToString(after_single).c_str());
 
-  std::cout << "[GestureDance] Phase 3: Full-hand gestures (" << GESTURE_COUNT << " gestures)" << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Phase 3: Full-hand gestures (%d gestures)", GESTURE_COUNT);
   for (int g = 0; g < GESTURE_COUNT; ++g) {
-    std::cout << "  Gesture " << (g + 1) << "/" << GESTURE_COUNT << std::endl;
+    AgilinkLogger::get().infof(TAG, "  Gesture %d/%d", g + 1, GESTURE_COUNT);
     run_gesture(gesture_eng[g]);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
@@ -221,40 +239,32 @@ TEST_F(OmniHand3UltraMTest, GestureDance) {
     EXPECT_EQ(cur.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
   }
 
-  std::cout << "[GestureDance] Phase 4: Return to zero" << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Phase 4: Return to zero");
   hand_->SetAllJointMotorPosi(zero_posi);
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
   auto final_posi = hand_->GetAllJointMotorPosi();
   EXPECT_EQ(final_posi.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
-  std::cout << "[GestureDance] Final positions: ";
-  for (size_t i = 0; i < final_posi.size(); ++i) {
-    std::cout << final_posi[i];
-    if (i < final_posi.size() - 1) std::cout << ", ";
-  }
-  std::cout << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Final positions: %s",
+                            ValuesToString(final_posi).c_str());
 
-  std::cout << "[GestureDance] Switching back to CSP mode (POSITION=0)" << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Switching back to CSP mode (POSITION=0)");
   hand_->SetAllControlMode(csp_modes);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  std::cout << "[GestureDance] Done!" << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GestureDance] Done!");
 }
 
 TEST_F(OmniHand3UltraMTest, ControlMode) {
   if (hand_->Init()) {
     auto current_modes = hand_->GetAllControlMode();
     if (current_modes.empty() || current_modes.size() != 20) {
-      std::cout << "[GetAllControlMode] Failed: got " << current_modes.size()
-                << " modes, expected 20" << std::endl;
+      AgilinkLogger::get().warnf(TAG, "[GetAllControlMode] Failed: got %zu modes, expected 20",
+                                current_modes.size());
       return;
     }
-    std::cout << "[GetAllControlMode] Control Modes: ";
-    for (size_t i = 0; i < current_modes.size(); ++i) {
-      std::cout << static_cast<int>(current_modes[i]);
-      if (i < current_modes.size() - 1) std::cout << ", ";
-    }
-    std::cout << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetAllControlMode] Control Modes: %s",
+                              ValuesToString(current_modes).c_str());
     EXPECT_EQ(current_modes.size(), 20);
   }
 }
@@ -263,12 +273,14 @@ TEST_F(OmniHand3UltraMTest, ErrorReport) {
   if (hand_->Init()) {
     auto error_reports = hand_->GetAllErrorReport();
     if (error_reports.empty()) return;
-    std::cout << "[GetAllErrorReport] Error Reports (20 joints): ";
+    std::ostringstream reports;
     for (size_t i = 0; i < error_reports.size(); ++i) {
-      std::cout << "J" << (i+1) << ":[" << agilink::omnihand::H3UMErrorReportToString(error_reports[i]) << "]";
-      if (i < error_reports.size() - 1) std::cout << " ";
+      if (i > 0) reports << " ";
+      reports << "J" << (i + 1) << ":["
+              << agilink::omnihand::H3UMErrorReportToString(error_reports[i]) << "]";
     }
-    std::cout << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetAllErrorReport] Error Reports (20 joints): %s",
+                              reports.str().c_str());
     EXPECT_EQ(error_reports.size(), 20);
   }
 }
@@ -276,10 +288,10 @@ TEST_F(OmniHand3UltraMTest, ErrorReport) {
 TEST_F(OmniHand3UltraMTest, ClearErrorReport) {
   if (hand_->Init()) {
     hand_->ClearAllErrorReport();
-    std::cout << "[ClearAllErrorReport] Done" << std::endl;
+    AgilinkLogger::get().infof(TAG, "[ClearAllErrorReport] Done");
 
     hand_->ClearErrorReport(1);
-    std::cout << "[ClearErrorReport] Joint 1 Done" << std::endl;
+    AgilinkLogger::get().infof(TAG, "[ClearErrorReport] Joint 1 Done");
   }
 }
 
@@ -287,12 +299,13 @@ TEST_F(OmniHand3UltraMTest, TemperatureReport) {
   if (hand_->Init()) {
     auto temp_reports = hand_->GetAllTemperatureReport();
     if (temp_reports.empty()) return;
-    std::cout << "[GetAllTemperatureReport] Temperature Reports (C): ";
+    std::ostringstream reports;
     for (size_t i = 0; i < temp_reports.size(); ++i) {
-      std::cout << "J" << (i+1) << ":" << temp_reports[i];
-      if (i < temp_reports.size() - 1) std::cout << ", ";
+      if (i > 0) reports << ", ";
+      reports << "J" << (i + 1) << ":" << temp_reports[i];
     }
-    std::cout << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetAllTemperatureReport] Temperature Reports (C): %s",
+                              reports.str().c_str());
     EXPECT_EQ(temp_reports.size(), 20);
   }
 }
@@ -301,12 +314,13 @@ TEST_F(OmniHand3UltraMTest, CurrentReport) {
   if (hand_->Init()) {
     auto current_reports = hand_->GetAllCurrentReport();
     if (current_reports.empty()) return;
-    std::cout << "[GetAllCurrentReport] Current Reports (mA): ";
+    std::ostringstream reports;
     for (size_t i = 0; i < current_reports.size(); ++i) {
-      std::cout << "J" << (i+1) << ":" << current_reports[i];
-      if (i < current_reports.size() - 1) std::cout << ", ";
+      if (i > 0) reports << ", ";
+      reports << "J" << (i + 1) << ":" << current_reports[i];
     }
-    std::cout << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetAllCurrentReport] Current Reports (mA): %s",
+                              reports.str().c_str());
     EXPECT_EQ(current_reports.size(), 20);
   }
 }
@@ -315,16 +329,12 @@ TEST_F(OmniHand3UltraMTest, GetAllJointMotorVelo) {
   if (hand_->Init()) {
     auto current_velocities = hand_->GetAllJointMotorVelo();
     if (current_velocities.empty() || current_velocities.size() != 20) {
-      std::cout << "[GetAllJointMotorVelo] Failed: got " << current_velocities.size()
-                << " velocities, expected 20" << std::endl;
+      AgilinkLogger::get().warnf(TAG, "[GetAllJointMotorVelo] Failed: got %zu velocities, expected 20",
+                                current_velocities.size());
       return;
     }
-    std::cout << "[GetAllJointMotorVelo] Current Velocities: ";
-    for (size_t i = 0; i < current_velocities.size(); ++i) {
-      std::cout << current_velocities[i];
-      if (i < current_velocities.size() - 1) std::cout << ", ";
-    }
-    std::cout << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetAllJointMotorVelo] Current Velocities: %s",
+                              ValuesToString(current_velocities).c_str());
     EXPECT_EQ(current_velocities.size(), 20);
   }
 }
@@ -333,21 +343,13 @@ TEST_F(OmniHand3UltraMTest, AxisLimitPos) {
   if (hand_->Init()) {
     auto limits = hand_->GetAxisLimitPos();
     if (limits.empty()) {
-      std::cout << "[GetAxisLimitPos] Failed: empty result" << std::endl;
+      AgilinkLogger::get().warnf(TAG, "[GetAxisLimitPos] Failed: empty result");
       return;
     }
-    std::cout << "[GetAxisLimitPos] Min Limits (0.1 deg): ";
-    for (size_t i = 0; i < limits.min_limits.size(); ++i) {
-      std::cout << limits.min_limits[i];
-      if (i < limits.min_limits.size() - 1) std::cout << ", ";
-    }
-    std::cout << std::endl;
-    std::cout << "[GetAxisLimitPos] Max Limits (0.1 deg): ";
-    for (size_t i = 0; i < limits.max_limits.size(); ++i) {
-      std::cout << limits.max_limits[i];
-      if (i < limits.max_limits.size() - 1) std::cout << ", ";
-    }
-    std::cout << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetAxisLimitPos] Min Limits (0.1 deg): %s",
+                              ValuesToString(limits.min_limits).c_str());
+    AgilinkLogger::get().infof(TAG, "[GetAxisLimitPos] Max Limits (0.1 deg): %s",
+                              ValuesToString(limits.max_limits).c_str());
     EXPECT_EQ(limits.min_limits.size(), 20);
     EXPECT_EQ(limits.max_limits.size(), 20);
   }
@@ -357,19 +359,15 @@ TEST_F(OmniHand3UltraMTest, ActualAxisPos) {
   if (hand_->Init()) {
     auto actual_pos = hand_->GetAllActualAxisPos();
     if (actual_pos.empty()) {
-      std::cout << "[GetAllActualAxisPos] Failed: empty result" << std::endl;
+      AgilinkLogger::get().warnf(TAG, "[GetAllActualAxisPos] Failed: empty result");
       return;
     }
-    std::cout << "[GetAllActualAxisPos] Actual Positions (0.1 deg): ";
-    for (size_t i = 0; i < actual_pos.size(); ++i) {
-      std::cout << actual_pos[i];
-      if (i < actual_pos.size() - 1) std::cout << ", ";
-    }
-    std::cout << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetAllActualAxisPos] Actual Positions (0.1 deg): %s",
+                              ValuesToString(actual_pos).c_str());
     EXPECT_EQ(actual_pos.size(), 20);
 
     auto single = hand_->GetSingleActualAxisPos(1);
-    std::cout << "[GetSingleActualAxisPos] Joint 1: " << single << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetSingleActualAxisPos] Joint 1: %d", static_cast<int>(single));
   }
 }
 
@@ -387,11 +385,11 @@ int main(int argc, char** argv) {
           ++i;
           continue;
         } else {
-          std::cerr << "[Error]: -f value " << interval << " is out of range (0-100ms)" << std::endl;
+          AgilinkLogger::get().errorf(TAG, "-f value %d is out of range (0-100ms)", interval);
           return 1;
         }
       } catch (const std::exception& e) {
-        std::cerr << "[Error]: Invalid -f value: " << argv[i + 1] << std::endl;
+        AgilinkLogger::get().errorf(TAG, "Invalid -f value: %s", argv[i + 1]);
         return 1;
       }
     } else if (arg == "-d" && i + 1 < argc) {
@@ -401,7 +399,9 @@ int main(int argc, char** argv) {
         ++i;
         continue;
       } else {
-        std::cerr << "[Error]: -d value must be 'zlgcan', 'hcan' or 'socketcan', got: " << device_type << std::endl;
+        AgilinkLogger::get().errorf(TAG,
+                                   "-d value must be 'zlgcan', 'hcan' or 'socketcan', got: %s",
+                                   device_type.c_str());
         return 1;
       }
     } else if (arg == "-c" && i + 1 < argc) {
@@ -409,10 +409,10 @@ int main(int argc, char** argv) {
       ++i;
       continue;
     } else if (arg == "--help" || arg == "-h") {
-      std::cout << "Usage: " << argv[0] << " [-f INTERVAL] [-d DEVICE] [-c CAN_INTERFACE]" << std::endl;
-      std::cout << "  -f INTERVAL       Set CAN request interval (0-100ms, default: 5ms)" << std::endl;
-      std::cout << "  -d DEVICE         Set CAN device type (zlgcan, hcan or socketcan, default: zlgcan)" << std::endl;
-      std::cout << "  -c CAN_INTERFACE  Set SocketCAN interface name (default: can0)" << std::endl;
+      AgilinkLogger::get().infof(TAG, "Usage: %s [-f INTERVAL] [-d DEVICE] [-c CAN_INTERFACE]", argv[0]);
+      AgilinkLogger::get().infof(TAG, "  -f INTERVAL       Set CAN request interval (0-100ms, default: 5ms)");
+      AgilinkLogger::get().infof(TAG, "  -d DEVICE         Set CAN device type (zlgcan, hcan or socketcan, default: zlgcan)");
+      AgilinkLogger::get().infof(TAG, "  -c CAN_INTERFACE  Set SocketCAN interface name (default: can0)");
       return 0;
     }
     gtest_args.push_back(argv[i]);
