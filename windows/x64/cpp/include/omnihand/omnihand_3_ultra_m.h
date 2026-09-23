@@ -334,6 +334,11 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
     return kActualMotorPositionBound;
   }
 
+  static constexpr Int16Range GetMinMaxDefaultMixCtrlTorque(uint8_t joint_motor_index) {
+    if (joint_motor_index == 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0, 0};
+    return kMixCtrlTorqueRange;
+  }
+
   // ============ Gesture Control ============
   void SetHandGesture(h3um::H3UMGesture gesture);
 
@@ -432,6 +437,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    */
   std::unique_ptr<h3um::OmniHand3UltraMSolver> joint_motor_solver_;
   static constexpr Int16Bound kActualMotorPositionBound = {-1800, 1800};
+  static constexpr Int16Range kMixCtrlTorqueRange = {0, 10000, 1000};  // unit: mA
 };
 
 }  // namespace omnihand
