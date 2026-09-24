@@ -1,0 +1,58 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "3e8f78ca81857e973b1d7981fff80d7c105413f6",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/test/CMakeLists.txt",
+      "new_path": "windows/x64/cpp/test/CMakeLists.txt",
+      "deletions": {
+        "human": 26
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "additions": {
+        "human": 1155
+      },
+      "deletions": {
+        "human": 327
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025_canfd.cc",
+      "deletions": {
+        "human": 858
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025_usb.cc",
+      "deletions": {
+        "human": 1119
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "additions": {
+        "human": 78
+      },
+      "deletions": {
+        "human": 26
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_3_ultra_m.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_3_ultra_m.cc",
+      "additions": {
+        "human": 21
+      },
+      "deletions": {
+        "human": 89
+      }
+    }
+  ]
+}
