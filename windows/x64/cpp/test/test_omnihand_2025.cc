@@ -20,10 +20,10 @@
  *   -f INTERVAL        Request interval ms. CAN default 5 (max 100),
  *                      USB default 500 (max 500). Value applies to the
  *                      selected transport.
- *   --device-id ID     Target hand device ID (default: 1), unicast range
- *                      [1, 0x7f]. SetUp discovers the current ID via
- *                      broadcast, switches the device to this value, and
- *                      TearDown restores the original ID afterwards.
+ *   --device-id ID     Optional target hand device ID, unicast range
+ *                      [1, 0x7f]. When omitted, SetUp only discovers and
+ *                      caches the current IDs. When specified, SetUp switches
+ *                      the IDs and TearDown restores both original IDs.
  *
  * CAN options (zlgcan / hcan / socketcan / zlgcantcp):
  *   -c CHANNEL         CAN channel index (zlgcan/hcan/zlgcantcp), default 0
@@ -102,9 +102,12 @@ static int g_baudrate = 460800;
 // commands with margin. Tune via -t if needed.
 static int g_frame_recv_timeout = 200;
 
-// Target hand device ID (--device-id). SetUp discovers the current ID via
-// broadcast, switches to this value, and TearDown restores the original ID.
-static int g_device_id = 1;
+// Target hand device ID (--device-id). Without this option SetUp only
+// discovers the current IDs and updates the SDK caches; it does not write the
+// device. With this option SetUp switches both supported protocol IDs and
+// TearDown restores their original values independently.
+static int g_device_id = 0;
+static bool g_device_id_specified = false;
 
 static const char* TransportName(Transport t) {
   switch (t) {
@@ -151,25 +154,29 @@ class OmniHand2025Test : public ::testing::Test {
   void SetUp() override {
     using agilink::omnihand::HandType;
     using agilink::omnihand::OmniHand2025;
-    constexpr uint8_t kHandDeviceId = 1;
+    // Let every protocol start from its own default (standard=1, private=9 on
+    // CAN). Passing one concrete ID here would incorrectly initialize both
+    // protocol caches to that same value.
+    constexpr uint8_t kUseProtocolDefaultIds = 0;
 
     try {
       switch (g_transport) {
         case Transport::kZlgcan:
           hand_ = OmniHand2025::createHandByZlgcan(
-              HandType::LEFT, kHandDeviceId,
+              HandType::LEFT, kUseProtocolDefaultIds,
               static_cast<uint8_t>(g_canfd_id),
               static_cast<uint8_t>(g_channel_id));
           break;
         case Transport::kHcan:
           hand_ = OmniHand2025::createHandByHcan(
-              HandType::LEFT, kHandDeviceId,
+              HandType::LEFT, kUseProtocolDefaultIds,
               static_cast<uint8_t>(g_canfd_id),
               static_cast<uint8_t>(g_channel_id));
           break;
         case Transport::kSocketCan:
 #if defined(__linux__)
-          hand_ = OmniHand2025::createHandSocketCan(HandType::LEFT, kHandDeviceId, g_can_if);
+          hand_ = OmniHand2025::createHandSocketCan(
+              HandType::LEFT, kUseProtocolDefaultIds, g_can_if);
 #else
           AgilinkLogger::get().warnf(TAG, "[Warning] SocketCAN requires Linux; skipping hand creation.");
           hand_ = nullptr;
@@ -178,7 +185,7 @@ class OmniHand2025Test : public ::testing::Test {
         case Transport::kZlgCanTcp:
 #if OMNIHAND_ZLG_TCP_SUPPORTED
           hand_ = OmniHand2025::createHandByZlgCanTcp(
-              HandType::LEFT, kHandDeviceId, g_tcp_host, g_tcp_port,
+              HandType::LEFT, kUseProtocolDefaultIds, g_tcp_host, g_tcp_port,
               static_cast<uint8_t>(g_channel_id));
 #else
           AgilinkLogger::get().warnf(TAG, "[Warning] ZLG CANFD over TCP not supported on this platform.");
@@ -187,11 +194,11 @@ class OmniHand2025Test : public ::testing::Test {
           break;
         case Transport::kUsb:
           hand_ = OmniHand2025::createHandByUsb(
-              HandType::LEFT, kHandDeviceId, g_usb_port, g_baudrate);
+              HandType::LEFT, kUseProtocolDefaultIds, g_usb_port, g_baudrate);
           break;
         case Transport::kRs485:
           hand_ = OmniHand2025::createHandByRs485(
-              HandType::LEFT, kHandDeviceId, g_rs485_port, g_baudrate);
+              HandType::LEFT, kUseProtocolDefaultIds, g_rs485_port, g_baudrate);
           break;
         default:
           hand_ = nullptr;
@@ -221,22 +228,47 @@ class OmniHand2025Test : public ::testing::Test {
       GTEST_SKIP() << TransportName(g_transport) << " device not available";
     }
 
-    // Discover and cache the actual standard-protocol ID before any test
-    // changes it, then switch to the target ID. TearDown restores the original.
-    original_device_id_ = hand_->GetNonPrivateHandDeviceIdByBroadcast();
-    if (original_device_id_ == agilink::omnihand::kBroadcastHandDeviceId) {
-      GTEST_SKIP() << "No standard-protocol device responded to broadcast";
-    }
-    AgilinkLogger::get().infof(TAG, "[SetUp] Discovered device ID: %d, switching to: %d",
-                               static_cast<int>(original_device_id_), g_device_id);
-    if (static_cast<uint8_t>(g_device_id) != original_device_id_) {
-      original_private_device_id_ = hand_->GetPrivateHandDeviceIdByBroadcast();
-      ASSERT_GT(original_private_device_id_, 0u);
-      ASSERT_LT(original_private_device_id_, agilink::omnihand::kPrivateBroadcastHandDeviceId)
-          << "No private-protocol device responded to broadcast";
+    if (!g_device_id_specified) {
+      // Discovery updates the SDK's standard/private ID caches. A return value
+      // of zero means the device uses the protocol defaults; it is success,
+      // not the broadcast ID.
+      const int discovered = hand_->GetHandDeviceIdByBroadcast();
+      if (discovered < 0) {
+        GTEST_SKIP() << "No consistent device ID responded to broadcast";
+      }
+      original_device_id_ = hand_->GetHandDeviceId();
+      AgilinkLogger::get().infof(
+          TAG, "[SetUp] Discovered device IDs (result=%d, standard cache=%u)",
+          discovered, static_cast<unsigned int>(original_device_id_));
+    } else {
+      if (g_transport == Transport::kRs485) {
+        // RS485 firmware supports only one protocol generation at a time.
+        const int discovered = hand_->GetHandDeviceIdByBroadcast();
+        if (discovered < 0) {
+          GTEST_SKIP() << "No RS485 device responded to broadcast";
+        }
+        original_device_id_ = discovered == 0
+                                  ? hand_->GetHandDeviceId()
+                                  : static_cast<uint8_t>(discovered);
+        original_private_device_id_ = original_device_id_;
+      } else {
+        original_device_id_ = hand_->GetNonPrivateHandDeviceIdByBroadcast();
+        if (original_device_id_ == agilink::omnihand::kBroadcastHandDeviceId) {
+          GTEST_SKIP() << "No standard-protocol device responded to broadcast";
+        }
+        original_private_device_id_ = hand_->GetPrivateHandDeviceIdByBroadcast();
+        ASSERT_GT(original_private_device_id_, 0u);
+        ASSERT_LT(original_private_device_id_, agilink::omnihand::kPrivateBroadcastHandDeviceId)
+            << "No private-protocol device responded to broadcast";
+      }
+
+      AgilinkLogger::get().infof(
+          TAG, "[SetUp] Switching device IDs: standard=%u, private=%u -> %d",
+          static_cast<unsigned int>(original_device_id_),
+          static_cast<unsigned int>(original_private_device_id_), g_device_id);
       device_id_change_attempted_ = true;
       ASSERT_TRUE(hand_->SetHandDeviceIdByBroadcast(static_cast<uint8_t>(g_device_id)))
-          << "Failed to set the standard/private protocol device IDs by broadcast";
+          << "Failed to set the device IDs by broadcast";
     }
   }
 
@@ -246,12 +278,11 @@ class OmniHand2025Test : public ::testing::Test {
           TAG, "[TearDown] Restoring device IDs: %d -> standard=%d, private=%u",
           g_device_id, static_cast<int>(original_device_id_),
           static_cast<unsigned int>(original_private_device_id_));
-      // Restore through broadcast as the two-step setup operation can fail
-      // after changing only one protocol ID. First align both protocols with
-      // the original private ID, then restore the standard ID independently.
-      EXPECT_TRUE(hand_->SetHandDeviceIdByBroadcast(
-          static_cast<uint8_t>(original_private_device_id_)));
-      if (original_device_id_ != original_private_device_id_) {
+      if (g_transport == Transport::kRs485) {
+        EXPECT_TRUE(hand_->SetHandDeviceIdByBroadcast(original_device_id_));
+      } else {
+        // Restore each independent protocol ID through its own interface.
+        EXPECT_TRUE(hand_->SetId(original_private_device_id_));
         hand_->SetDeviceId(original_device_id_);
       }
     }
@@ -1182,7 +1213,7 @@ static void PrintUsage(const char* prog) {
   AgilinkLogger::get().infof(TAG, "Options:");
   AgilinkLogger::get().infof(TAG, "  -d, --device NAME  Backend: zlgcan | hcan | socketcan | zlgcantcp | usb | rs485 (default: zlgcan)");
   AgilinkLogger::get().infof(TAG, "  -f INTERVAL        Request interval ms (CAN: default 5, max 100; USB/RS485: default 500, max 500)");
-  AgilinkLogger::get().infof(TAG, "  --device-id ID     Target hand device ID (default: 1); SetUp discovers & switches, TearDown restores");
+  AgilinkLogger::get().infof(TAG, "  --device-id ID     Optional target ID [1,0x7f]; omitted means discover only");
   AgilinkLogger::get().infof(TAG, "CAN options (zlgcan/hcan/socketcan/zlgcantcp):");
   AgilinkLogger::get().infof(TAG, "  -c CHANNEL         CAN channel (zlgcan/hcan/zlgcantcp), default 0");
   AgilinkLogger::get().infof(TAG, "  -i CANFD_ID        Device index (zlgcan/hcan), default 0");
@@ -1217,6 +1248,7 @@ int main(int argc, char** argv) {
       g_transport = ParseTransport(argv[++i]);
     } else if ((arg == "--device-id" || arg == "--id") && i + 1 < argc) {
       g_device_id = std::stoi(argv[++i]);
+      g_device_id_specified = true;
     } else if (arg == "-c" && i + 1 < argc) {
       g_channel_id = std::stoi(argv[++i]);
     } else if (arg == "-i" && i + 1 < argc) {
@@ -1251,7 +1283,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  if (g_device_id < 1 || g_device_id > 0x7F) {
+  if (g_device_id_specified && (g_device_id < 1 || g_device_id > 0x7F)) {
     AgilinkLogger::get().errorf(
         TAG, "Invalid --device-id %d; expected a unicast ID in [1, 0x7f]", g_device_id);
     return 1;
@@ -1281,7 +1313,11 @@ int main(int argc, char** argv) {
   if (IsUsbOrRs485Transport()) {
     AgilinkLogger::get().infof(TAG, "Frame Recv Timeout: %d ms", g_frame_recv_timeout);
   }
-  AgilinkLogger::get().infof(TAG, "Target Device ID: %d", g_device_id);
+  if (g_device_id_specified) {
+    AgilinkLogger::get().infof(TAG, "Target Device ID: %d", g_device_id);
+  } else {
+    AgilinkLogger::get().infof(TAG, "Target Device ID: discover only");
+  }
   AgilinkLogger::get().infof(TAG, "===================================");
   AgilinkLogger::get().flush();
 
