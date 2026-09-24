@@ -1,0 +1,29 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "dfb0b8a061e28472d055a7fe7a5d205861b06cfc",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "additions": {
+        "human": 38
+      },
+      "deletions": {
+        "human": 38
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "additions": {
+        "human": 21
+      },
+      "deletions": {
+        "human": 21
+      }
+    }
+  ]
+}
