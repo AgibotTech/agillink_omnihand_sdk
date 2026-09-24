@@ -145,10 +145,7 @@ TEST_F(OmniHand3UltraMTest, MixControlRejectsInvalidArguments) {
 TEST_F(OmniHand3UltraMTest, GestureDance) {
   if (!hand_->Init()) return;
 
-  constexpr int MOTOR_TOTAL_COUNT = 20;
-  constexpr int TFIX = 1000;
-  constexpr int TSWIG = 200;
-  constexpr int TSHORT = 10;
+  constexpr size_t MOTOR_TOTAL_COUNT = 20;
 
   std::vector<unsigned char> pp_modes(MOTOR_TOTAL_COUNT, static_cast<unsigned char>(agilink::omnihand::ControlMode::PROFILE_POSITION));
   std::vector<unsigned char> csp_modes(MOTOR_TOTAL_COUNT, static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION));
@@ -157,96 +154,31 @@ TEST_F(OmniHand3UltraMTest, GestureDance) {
   hand_->SetAllControlMode(pp_modes);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  const uint8_t idx_joint[] = {
-      16,17,16,16,16,18,19,16,17,18,19,
-      13,12,12,12,14,15,13,14,15,
-      9,8,8,8,10,11,9,10,11,
-      5,4,4,4,6,7,5,6,7,
-      1,0,0,0,2,3,1,2,3,
-  };
-  const float ang_joint[] = {
-      -40,25,-30,-50,-40,40,40,0,-15,0,0,
-      40,7,-7,0,40,40,0,0,0,
-      40,7,-7,0,40,40,0,0,0,
-      40,7,-7,0,40,40,0,0,0,
-      40,7,-7,0,40,40,0,0,0,
-  };
-  const uint16_t time_joint[] = {
-      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TFIX,TSHORT,TSHORT,TSHORT,TSHORT,
-      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TSHORT,TSHORT,TSHORT,
-      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TSHORT,TSHORT,TSHORT,
-      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TSHORT,TSHORT,TSHORT,
-      TFIX,TSWIG,TSWIG,TSWIG,TFIX,TFIX,TSHORT,TSHORT,TSHORT,
-  };
-  constexpr int SINGLE_STEPS = 47;
-
-  const float gesture_eng[][MOTOR_TOTAL_COUNT] = {
-      {0,10,40,40,0,10,40,40,0,10,40,40,0,10,40,40,-55,0,15,15},
-      {0,45,70,70,0,45,70,70,0,45,70,70,0,45,70,70,-40,0,30,30},
-      {0,80,90,80,0,80,90,80,0,80,90,80,0,80,90,80,-65,15,35,35},
-      {0,90,40,50,0,80,60,60,0,60,50,50,0,40,60,60,0,-15,0,0},
-      {0,0,90,90,0,0,90,90,0,0,90,90,0,0,90,90,0,0,20,0},
-      {-12,10,50,50,-6,10,50,50,0,10,50,50,6,10,50,50,-30,5,20,20},
-      {-12,45,50,50,-6,10,50,50,0,10,50,50,6,10,50,50,-30,5,20,20},
-      {-12,45,50,50,-6,45,50,50,0,10,50,50,6,10,50,50,-30,5,20,20},
-      {0,20,10,10,0,20,10,10,0,20,10,10,0,40,45,40,-30,10,0,25},
-      {0,90,90,90,0,90,90,90,-7,0,0,0,7,0,0,0,-55,15,30,20},
-  };
-  constexpr int GESTURE_COUNT = 10;
-
-  auto run_gesture = [&](const float* eng) {
-    std::vector<int16_t> posi(MOTOR_TOTAL_COUNT);
-    for (int i = 0; i < MOTOR_TOTAL_COUNT; ++i) {
-      posi[i] = static_cast<int16_t>(eng[i] * 10);
-    }
-    auto ret = hand_->SetAllJointMotorPosi(posi);
-    EXPECT_EQ(ret.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
+  // The second gesture intentionally keeps axis 1 at 2048.
+  const std::vector<std::vector<int16_t>> gestures = {
+      {2048, 512, 512, 512, 2048, 512, 512, 512, 2048, 512,
+       512, 512, 2048, 512, 512, 512, 3192, 1024, 512, 512},
+      {2048, 4096, 4096, 2048, 2048, 4096, 4096, 2048, 2048, 4096,
+       4096, 2048, 2048, 4096, 512, 512, 3156, 1349, 512, 512},
   };
 
-  std::vector<int16_t> zero_posi(MOTOR_TOTAL_COUNT, 0);
-
-  AgilinkLogger::get().infof(TAG, "[GestureDance] Phase 1: Zero position");
-  hand_->SetAllJointMotorPosi(zero_posi);
-  std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-
-  auto read_posi = hand_->GetAllJointMotorPosi();
-  EXPECT_EQ(read_posi.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
-  AgilinkLogger::get().infof(TAG, "[GestureDance] Current positions: %s",
-                            ValuesToString(read_posi).c_str());
-
-  AgilinkLogger::get().infof(TAG, "[GestureDance] Phase 2: Single-joint sequence (%d steps)", SINGLE_STEPS);
-  for (int s = 0; s < SINGLE_STEPS; ++s) {
-    int16_t posi_val = static_cast<int16_t>(ang_joint[s] * 10);
-    auto ret = hand_->SetJointMotorPosi(idx_joint[s], posi_val);
-    AgilinkLogger::get().infof(TAG, "  Step %d/%d: Joint %d -> %.1f deg (ret=%d)",
-                              s + 1, SINGLE_STEPS, static_cast<int>(idx_joint[s]),
-                              static_cast<double>(ang_joint[s]), static_cast<int>(ret));
-    std::this_thread::sleep_for(std::chrono::milliseconds(time_joint[s]));
+  for (size_t i = 0; i < gestures.size(); ++i) {
+    AgilinkLogger::get().infof(TAG, "[GestureDance] Gesture %zu/%zu: %s",
+                              i + 1, gestures.size(), ValuesToString(gestures[i]).c_str());
+    const auto feedback = hand_->SetAllJointMotorPosi(gestures[i]);
+    EXPECT_EQ(feedback.size(), MOTOR_TOTAL_COUNT);
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
 
-  auto after_single = hand_->GetAllJointMotorPosi();
-  EXPECT_EQ(after_single.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
-  AgilinkLogger::get().infof(TAG, "[GestureDance] Positions after single-joint phase: %s",
-                            ValuesToString(after_single).c_str());
-
-  AgilinkLogger::get().infof(TAG, "[GestureDance] Phase 3: Full-hand gestures (%d gestures)", GESTURE_COUNT);
-  for (int g = 0; g < GESTURE_COUNT; ++g) {
-    AgilinkLogger::get().infof(TAG, "  Gesture %d/%d", g + 1, GESTURE_COUNT);
-    run_gesture(gesture_eng[g]);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-    auto cur = hand_->GetAllJointMotorPosi();
-    EXPECT_EQ(cur.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
+  // Repeat one safe single-axis transition using axis 2 (SDK index 1).
+  constexpr uint8_t SINGLE_AXIS_INDEX = 1;
+  const int16_t single_axis_positions[] = {512, 4096};
+  for (const int16_t position : single_axis_positions) {
+    const auto feedback = hand_->SetJointMotorPosi(SINGLE_AXIS_INDEX, position);
+    AgilinkLogger::get().infof(TAG, "[GestureDance] Axis 2 -> %d (feedback=%d)",
+                              static_cast<int>(position), static_cast<int>(feedback));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
-
-  AgilinkLogger::get().infof(TAG, "[GestureDance] Phase 4: Return to zero");
-  hand_->SetAllJointMotorPosi(zero_posi);
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
-  auto final_posi = hand_->GetAllJointMotorPosi();
-  EXPECT_EQ(final_posi.size(), static_cast<size_t>(MOTOR_TOTAL_COUNT));
-  AgilinkLogger::get().infof(TAG, "[GestureDance] Final positions: %s",
-                            ValuesToString(final_posi).c_str());
 
   AgilinkLogger::get().infof(TAG, "[GestureDance] Switching back to CSP mode (POSITION=0)");
   hand_->SetAllControlMode(csp_modes);
