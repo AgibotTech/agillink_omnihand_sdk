@@ -822,37 +822,37 @@ TEST_F(OmniHand3LiteTest, PrivateOmniHandWriteCommands) {
   EXPECT_TRUE(private_hand.SetPowerState(power_state));
 
   const uint16_t position = private_hand.GetSingleAxisPos(1);
-  // EXPECT_LE(private_hand.SetSingleAxisPos(1, position), 4096u);
+  EXPECT_LE(private_hand.SetSingleAxisPos(1, position), 4096u);
   const auto positions = private_hand.GetAllAxisPos();
   ASSERT_EQ(positions.size(), OmniHand3Lite::kDegreesOfActiveFreedom);
-  // EXPECT_FALSE(private_hand.SetAllAxisPos(positions).empty());
+  EXPECT_FALSE(private_hand.SetAllAxisPos(positions).empty());
 
   const int16_t actual_position = private_hand.GetSingleActualAxisPos(1);
-  // EXPECT_TRUE(private_hand.SetAxisHoming(1, actual_position));
-  // EXPECT_LE(static_cast<int>(private_hand.SetSingleActualAxisPos(1, actual_position)), 4095);
+  EXPECT_TRUE(private_hand.SetAxisHoming(1, actual_position));
+  EXPECT_LE(static_cast<int>(private_hand.SetSingleActualAxisPos(1, actual_position)), 4095);
   const auto actual_positions = private_hand.GetAllActualAxisPos();
   ASSERT_EQ(actual_positions.size(), OmniHand3Lite::kDegreesOfActiveFreedom);
-  // EXPECT_EQ(private_hand.SetAllActualAxisPos(actual_positions).size(),
-  //           OmniHand3Lite::kDegreesOfActiveFreedom);
+  EXPECT_EQ(private_hand.SetAllActualAxisPos(actual_positions).size(),
+            OmniHand3Lite::kDegreesOfActiveFreedom);
 
   EXPECT_TRUE(private_hand.ClearError());
   EXPECT_TRUE(private_hand.PlayAction(0));
-  // EXPECT_TRUE(private_hand.SetRunMode(1, static_cast<uint8_t>(ControlMode::SERVO)));
+  EXPECT_TRUE(private_hand.SetRunMode(1, static_cast<uint8_t>(ControlMode::SERVO)));
 
   const auto limits = private_hand.GetAxisLimitPos();
   ASSERT_FALSE(limits.empty());
-  // EXPECT_TRUE(private_hand.ClearAllLimitPos());
-  // EXPECT_TRUE(private_hand.SetAxisMinPos(1, limits.min_limits[0]));
-  // EXPECT_TRUE(private_hand.SetAxisMaxPos(1, limits.max_limits[0]));
+  EXPECT_TRUE(private_hand.ClearAllLimitPos());
+  EXPECT_TRUE(private_hand.SetAxisMinPos(1, limits.min_limits[0]));
+  EXPECT_TRUE(private_hand.SetAxisMaxPos(1, limits.max_limits[0]));
 
-  // EXPECT_TRUE(private_hand.SetAllRunSpeed(std::vector<int16_t>(10, 0)));
-  // EXPECT_TRUE(private_hand.SetOverloadTorque(1, 1000));
-  // EXPECT_TRUE(private_hand.SetOverloadProtectionTime(1, 0));
-  // EXPECT_TRUE(private_hand.SetProtectedTorque(1, 100));
-  // EXPECT_TRUE(private_hand.SetMinTorque(1, 0));
-  // EXPECT_TRUE(private_hand.SetProtectiveCurrent(1, 3250));
-  // EXPECT_TRUE(private_hand.SetAllAxisCvpUploadInterval(0));
-  // EXPECT_TRUE(private_hand.SetRightOrLeft(static_cast<uint8_t>(HandType::LEFT)));
+  EXPECT_TRUE(private_hand.SetAllRunSpeed(std::vector<int16_t>(10, 0)));
+  EXPECT_TRUE(private_hand.SetOverloadTorque(1, 1000));
+  EXPECT_TRUE(private_hand.SetOverloadProtectionTime(1, 0));
+  EXPECT_TRUE(private_hand.SetProtectedTorque(1, 100));
+  EXPECT_TRUE(private_hand.SetMinTorque(1, 0));
+  EXPECT_TRUE(private_hand.SetProtectiveCurrent(1, 3250));
+  EXPECT_TRUE(private_hand.SetAllAxisCvpUploadInterval(0));
+  EXPECT_TRUE(private_hand.SetRightOrLeft(static_cast<uint8_t>(HandType::LEFT)));
 
   const std::vector<int16_t> speeds(OmniHand3Lite::kDegreesOfActiveFreedom, 0);
   const std::vector<uint16_t> torques(OmniHand3Lite::kDegreesOfActiveFreedom, 0);
@@ -876,8 +876,8 @@ TEST_F(OmniHand3LiteTest, PrivateOmniHandWriteCommands) {
                        product_serial.material_code + 6);
   serial_number.insert(serial_number.end(), product_serial.date, product_serial.date + 6);
   serial_number.insert(serial_number.end(), product_serial.serial, product_serial.serial + 4);
-  // EXPECT_TRUE(private_hand.SetProductSerialNumber(serial_number));
-  // EXPECT_TRUE(private_hand.SaveParam());
+  EXPECT_TRUE(private_hand.SetProductSerialNumber(serial_number));
+  EXPECT_TRUE(private_hand.SaveParam());
 }
 
 // Main function for gtest
