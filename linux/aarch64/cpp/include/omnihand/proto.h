@@ -12,11 +12,13 @@
 #define AGILINK_PROTO_H
 
 #include <cstdint>
+#include <cstring>
 #include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -197,6 +199,50 @@ struct AGIBOT_EXPORT JointMotorErrorReport {
 };
 
 /**
+ * @brief Reply of 0x24 (position control with status): position + running/error code feedback
+ */
+struct AGIBOT_EXPORT JointPosiStatus {
+  int16_t position;
+  uint16_t running_code;
+  uint16_t error_code;
+
+  std::string ToString() const {
+    std::stringstream sstream;
+    sstream << "[Position: " << position << "][Running Code: " << running_code
+            << "][Error Code: " << error_code << "]";
+    return sstream.str();
+  }
+};
+
+/**
+ * @brief Reply of 0x26 (joint detail info): whole-hand bus stats + one joint's detailed state
+ */
+struct AGIBOT_EXPORT JointDetailInfo {
+  int16_t hand_bus_voltage;   // whole-hand bus voltage
+  int16_t hand_bus_current;   // whole-hand bus current
+  int16_t hand_temperature;   // whole-hand temperature
+  int16_t joint_position;
+  int16_t joint_velocity;
+  int16_t joint_current;
+  int16_t joint_temperature;
+  int16_t joint_bus_voltage;
+  int16_t joint_running_code;
+  int16_t joint_error_code;
+  int16_t joint_debug;
+
+  std::string ToString() const {
+    std::stringstream sstream;
+    sstream << "[Hand Bus Voltage: " << hand_bus_voltage << "][Hand Bus Current: " << hand_bus_current
+            << "][Hand Temperature: " << hand_temperature << "][Joint Position: " << joint_position
+            << "][Joint Velocity: " << joint_velocity << "][Joint Current: " << joint_current
+            << "][Joint Temperature: " << joint_temperature << "][Joint Bus Voltage: " << joint_bus_voltage
+            << "][Joint Running Code: " << joint_running_code << "][Joint Error Code: " << joint_error_code
+            << "][Joint Debug: " << joint_debug << "]";
+    return sstream.str();
+  }
+};
+
+/**
  * @brief data structure for 3D tactile sensor data (O12 only)
  */
 struct AGIBOT_EXPORT TactileSensor3DData {
@@ -247,6 +293,10 @@ struct AGIBOT_EXPORT Version {
     return res > other.res;
   }
 
+  bool operator<(const Version& other) const {
+    return other > *this;
+  }
+
   bool operator>=(const Version& other) const {
     if (major < other.major) return false;
     if (major > other.major) return true;
@@ -255,6 +305,10 @@ struct AGIBOT_EXPORT Version {
     if (patch < other.patch) return false;
     if (patch > other.patch) return true;
     return res >= other.res;
+  }
+
+  bool operator<=(const Version& other) const {
+    return other >= *this;
   }
 
   bool operator==(const Version& other) const {
@@ -269,11 +323,60 @@ struct AGIBOT_EXPORT Version {
     std::stringstream sstream;
     sstream << static_cast<unsigned int>(major) << "."
             << static_cast<unsigned int>(minor) << "."
-            << static_cast<unsigned int>(patch);
-    if (res != 0) {
-      sstream << "." << static_cast<unsigned int>(res);
-    }
+            << static_cast<unsigned int>(patch) << "."
+            << static_cast<unsigned int>(res);
     return sstream.str();
+  }
+};
+
+/**
+ * @brief Product serial number structure (0xC2 response)
+ * @note 19 bytes total:
+ *       - supplier_code[3]: 3 bytes supplier code
+ *       - material_code[6]: 6 bytes material code
+ *       - date[6]: YYMMDD format (6 bytes ASCII)
+ *       - serial[4]: 4 bytes serial number
+ */
+struct AGIBOT_EXPORT ProductSerialNumber {
+  uint8_t supplier_code[3];   // Supplier code (3 bytes)
+  uint8_t material_code[6];   // Material code (6 bytes)
+  uint8_t date[6];            // Date YYMMDD (6 bytes ASCII)
+  uint8_t serial[4];          // Serial number (4 bytes)
+
+  ProductSerialNumber() {
+    memset(supplier_code, 0, 3);
+    memset(material_code, 0, 6);
+    memset(date, 0, 6);
+    memset(serial, 0, 4);
+  }
+
+  /**
+   * @brief Convert to string representation (ASCII format)
+   * @note Device returns 19-byte ASCII string like "AXXX89..."
+   */
+  std::string ToString() const {
+    std::ostringstream oss;
+    for (int i = 0; i < 3; i++) {
+      if (supplier_code[i] >= 0x20 && supplier_code[i] < 0x7F) {
+        oss << static_cast<char>(supplier_code[i]);
+      }
+    }
+    for (int i = 0; i < 6; i++) {
+      if (material_code[i] >= 0x20 && material_code[i] < 0x7F) {
+        oss << static_cast<char>(material_code[i]);
+      }
+    }
+    for (int i = 0; i < 6; i++) {
+      if (date[i] >= 0x20 && date[i] < 0x7F) {
+        oss << static_cast<char>(date[i]);
+      }
+    }
+    for (int i = 0; i < 4; i++) {
+      if (serial[i] >= 0x20 && serial[i] < 0x7F) {
+        oss << static_cast<char>(serial[i]);
+      }
+    }
+    return oss.str();
   }
 };
 
@@ -330,13 +433,22 @@ struct AGIBOT_EXPORT CommuParams {
  * @brief Device information
  */
 struct AGIBOT_EXPORT DeviceInfo {
+  // The id the hardware reports, not the SDK's cached one (see OmniHand::GetHandDeviceId).
+  // 0 means the query failed -- it is never a real unicast id (0 is the CAN broadcast address).
+  // Where the value is read from is backend-specific: the OP3 paths (RS485 and CAN) take it from
+  // the reply frame's address field, which is where the device actually answered and stays valid
+  // even when a truncated/misaligned reply garbles the payload; the other CAN paths still take
+  // payload byte 0, which is the device's report of itself and can hold a stale value.
+  // Callers that need to act on a mismatch should re-read rather than trust one sample.
   uint8_t hand_device_id;
   CommuParams commu_params;
+  HandType hand_type{HandType::UNKNOWN};
 
   std::string ToString() const {
     std::stringstream sstream;
     sstream << "\t[Hand Device ID: " << static_cast<unsigned int>(hand_device_id) << "]\n";
     sstream << commu_params.ToString();
+    sstream << "\t[Hand Type: " << agilink::omnihand::ToString(hand_type) << "]\n";
     return sstream.str();
   }
 };

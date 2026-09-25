@@ -11,6 +11,13 @@ else()
   # Building separately: find installed omnihand package
   # Users can specify: cmake -DCMAKE_PREFIX_PATH=/custom/path
   # Default: /usr/local
+  if(NOT CMAKE_PREFIX_PATH AND DEFINED ENV{CMAKE_PREFIX_PATH})
+    if(WIN32)
+      set(CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
+    else()
+      string(REPLACE ":" ";" CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
+    endif()
+  endif()
   if(NOT CMAKE_PREFIX_PATH)
     list(APPEND CMAKE_PREFIX_PATH "/usr/local")
   endif()
@@ -36,7 +43,10 @@ endif()
 add_subdirectory(omnihand_2025)
 add_subdirectory(omnihand_pro_2025)
 add_subdirectory(omnihand_dex_umi)
-add_subdirectory(omni_picker_3)
+# Add OmniPicker 3 demos conditionally
+if(BUILD_OMNI_PICKER_3)
+  add_subdirectory(omnipicker_3)
+endif()
 # Add OmniPicker 2025 demo conditionally
 if(BUILD_OMNI_PICKER_2025)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/omnipicker_2025")

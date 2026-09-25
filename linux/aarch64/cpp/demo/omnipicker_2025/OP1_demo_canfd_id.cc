@@ -1,25 +1,29 @@
 #include <chrono>
 #include <cstdint>
-#include <iostream>
+#include <cstdio>
 #include <memory>
 #include <thread>
 #include <utility>
 #include <vector>
+#include "agilink_logger.h"
 #include "omnihand/omnipicker_2025.h"
+
+using agilink::AgilinkLogger;
+static constexpr const char* TAG = "OmniPicker2025Demo";
 
 int main() {
   using namespace agilink::omnihand;
 
   auto picker = OmniPicker2025::createHandByHcan(HandType::LEFT, 1, 0, 0);
   if (!picker || !picker->Init()) {
-    std::cerr << "[ERROR][INIT] failed to init OmniPicker2025" << std::endl;
+    AgilinkLogger::get().errorf(TAG, "[ERROR][INIT] failed to init OmniPicker2025");
     return 1;
   }
 
   picker->ShowDataDetails(true);
 
   const auto info = picker->ShowDeviceInfo();
-  std::cout << ToString(info) << std::endl;
+  AgilinkLogger::get().infof(TAG, "%s", ToString(info).c_str());
 
   // ---- single-node sync control ----
   Op1CanfdCtrlFrame frame{};
