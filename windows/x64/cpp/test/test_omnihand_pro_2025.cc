@@ -83,6 +83,15 @@ TEST_F(OmniHandPro2025Test, Init) {
   // We don't assert on init_result as it depends on hardware availability
 }
 
+TEST_F(OmniHandPro2025Test, BroadcastDeviceIdUnsupported) {
+  const uint8_t original_id = hand_->GetHandDeviceId();
+  EXPECT_EQ(hand_->GetNonPrivateHandDeviceIdByBroadcast(), 0);
+  EXPECT_EQ(hand_->GetHandDeviceIdByBroadcast(), 0);
+  EXPECT_FALSE(hand_->SetHandDeviceIdByBroadcast(2));
+  hand_->SetBroadcast(true);
+  EXPECT_EQ(hand_->GetHandDeviceId(), original_id);
+}
+
 // Test vendor info (may require hardware)
 TEST_F(OmniHandPro2025Test, GetVendorInfo) {
   if (hand_->Init()) {

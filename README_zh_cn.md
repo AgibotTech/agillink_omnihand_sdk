@@ -54,7 +54,6 @@ AGILINK OmniHand SDK 支持以下产品型号：
 - [OmniHand 3 Lite (H3L) C++ API](doc/zh_cn/API_CPP_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) C++ API](doc/zh_cn/API_CPP_O10_UMI.md)
 - [OmniHand 3 Ultra M (H3UM/O20) C++ API](doc/zh_cn/API_CPP_H3UM.md)
-- [从 1.1.8 迁移到 1.1.9](doc/zh_cn/MIGRATION_1_1_8_TO_1_1_9.md)
 
 ### Python API
 - [Python API 索引](doc/zh_cn/API_PYTHON.md)

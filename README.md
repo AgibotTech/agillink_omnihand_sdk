@@ -54,7 +54,6 @@ A read-only dexterous hand using UMI protocol.
 - [OmniHand 3 Lite (H3L) C++ API](doc/en/API_CPP_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) C++ API](doc/en/API_CPP_O10_UMI.md)
 - [OmniHand 3 Ultra M (H3UM/O20) C++ API](doc/en/API_CPP_H3UM.md)
-- [1.1.8 to 1.1.9 migration](doc/en/MIGRATION_1_1_8_TO_1_1_9.md)
 
 ### Python API
 - [Python API Index](doc/en/API_PYTHON.md)

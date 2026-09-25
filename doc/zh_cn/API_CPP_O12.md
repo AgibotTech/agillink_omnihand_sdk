@@ -194,21 +194,12 @@ static std::unique_ptr<OmniHandPro2025> createHandSocketCan(
 VendorInfo GetVendorInfo() const;
 DeviceInfo GetDeviceInfo() const;
 
-// 通过标准协议广播地址 0x00 查询并缓存设备 ID；无回复时返回 0。
-uint8_t GetNonPrivateHandDeviceIdByBroadcast();
-int GetHandDeviceIdByBroadcast();
-
-// 仅切换 SDK 本地请求地址，不修改设备中保存的 ID。
-void SetBroadcast(bool broadcast);
-
-// 通过广播设置设备 ID，有效范围 0x00..0x7f；0 表示恢复 O12 出厂默认 ID 1。
-bool SetHandDeviceIdByBroadcast(uint8_t id);
-
 // 兼容旧代码的废弃接口。
 void SetDeviceId(unsigned char hand_device_id);
 ```
 
-O12 只有标准协议，不存在私有协议设备 ID。
+O12 只有标准协议，不存在私有协议设备 ID，也不支持通过广播查询或设置设备 ID。
+创建对象时必须提供当前设备 ID；`SetDeviceId()` 使用当前 ID 定向发送设置指令。
 
 ### 关节角度控制
 

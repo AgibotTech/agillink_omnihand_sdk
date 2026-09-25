@@ -258,24 +258,13 @@ VendorInfo GetVendorInfo() const;
  */
 DeviceInfo GetDeviceInfo() const;
 
-// Discover the standard-protocol ID through address 0x00 and cache it.
-// Returns 0 when no device replies.
-uint8_t GetNonPrivateHandDeviceIdByBroadcast();
-int GetHandDeviceIdByBroadcast();
-
-// Select broadcast (true) or the O12 default ID (false) locally.
-// This does not change the ID stored in the device.
-void SetBroadcast(bool broadcast);
-
-// Persist an ID through broadcast addressing. Valid range: 0x00..0x7f.
-// Passing 0 restores the O12 factory default ID (1).
-bool SetHandDeviceIdByBroadcast(uint8_t id);
-
 // Deprecated compatibility API.
 void SetDeviceId(unsigned char hand_device_id);
 ```
 
-O12 supports only the standard protocol; it has no private-protocol device ID.
+O12 supports only the standard protocol and does not support discovering or
+setting its device ID through broadcast addressing. Supply the current device
+ID when creating the object; `SetDeviceId()` sends an addressed setting command.
 
 ## Joint Angle Control
 
