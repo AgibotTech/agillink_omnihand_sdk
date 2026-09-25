@@ -76,6 +76,7 @@ struct VendorInfo {
 struct DeviceInfo {
     unsigned char hand_device_id; // Hand device ID
     CommuParams commu_params;     // Communication parameters
+    HandType hand_type;           // Reported hand type
     
     std::string toString() const;
 };
@@ -237,12 +238,21 @@ VendorInfo GetVendorInfo() const;
  */
 DeviceInfo GetDeviceInfo() const;
 
-/**
- * @brief Sets the device ID.
- * @param hand_device_id The device ID.
- */
+// Discover the standard-protocol ID through address 0x00 and cache it.
+// Returns 0 when no device replies.
+uint8_t GetNonPrivateHandDeviceIdByBroadcast();
+int GetHandDeviceIdByBroadcast();
+
+// Select broadcast (true) or the UMI default ID (false) locally.
+// This does not change the ID stored in the device.
+void SetBroadcast(bool broadcast);
+
+// Deprecated compatibility API. UMI does not implement the new
+// SetHandDeviceIdByBroadcast() persistence operation.
 void SetDeviceId(unsigned char hand_device_id);
 ```
+
+UMI supports only the standard protocol; it has no private-protocol device ID.
 
 ## Position Query
 
@@ -321,6 +331,12 @@ OmniHand Dex UMI (O10 UMI) uses **1D tactile sensors** similar to OmniHand 2025 
   - **Pn6.01~Pn6.06**: Read individual sensor data (sensor 1-6)
 
 ```cpp
+size_t GetNumOfTactileSensors() const;
+size_t GetNumOfTactilePoints(Finger finger) const;
+size_t GetLenOfTactileDatum(Finger finger) const;
+size_t GetNumOfRepliedTactileFrames(Finger finger) const;
+std::string GetSNOfTactileSensor(Finger finger) const;
+
 /**
  * @brief Gets all 1D tactile sensor raw data from all sensors at once.
  * @return Vector of TactileSensorData structures
@@ -345,7 +361,7 @@ TactileSensorData GetTactileSensorDataRaw(Finger eFinger) const;
  * @return Sensor data length in bytes
  * @note For UMI: Returns 0 for DORSUM (UMI does not have dorsum sensor)
  */
-static size_t GetSensorDataLength(Finger eFinger);
+size_t GetSensorDataLength(Finger eFinger) const;
 
 /**
  * @brief Get sensor order vector (static method)
@@ -353,8 +369,10 @@ static size_t GetSensorDataLength(Finger eFinger);
  * @note For UMI: The returned vector includes DORSUM, but UMI devices do not have dorsum sensor.
  *       When using GetAllTactileSensorDataRaw(), only sensors available on UMI (Thumb, Index, Middle, Ring, Little, Palm) are returned.
  */
-static const std::vector<Finger>& GetSensorOrder();
+const std::vector<Finger>& GetSensorOrder() const;
 ```
+
+`GetSensorDataLength()` is deprecated; use `GetNumOfTactilePoints()` for point counts.
 
 ## Debugging Features
 

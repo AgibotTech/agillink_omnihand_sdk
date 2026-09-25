@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Agibot Co., Ltd.
+﻿// Copyright (c) 2025, Agibot Co., Ltd.
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 /**
@@ -145,44 +145,24 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
 
 
   /**
-   * @brief Get device information from broadcast address (hand_device_id = 0x00)
-   * @param canfd_device_id USB CANFD adapter device index
-   * @param canfd_channel_id CAN channel index (default 0)
-   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
-   *        - Single-channel (USBCANFD-100U): always 0
-   * @return DeviceInfo structure, or empty DeviceInfo if request failed
-   * @note This function sends a broadcast request to discover devices on the CAN bus
-   * @note Only works with CAN communication
+   * @brief Factory method - Serial (UART/RS-485) communication
+   * @param hand_type Hand type (left/right)
+   * @param hand_device_id Hand device ID
+   * @param serial_port Serial port path (e.g. "/dev/ttyUSB0" on Linux, "COM3" on Windows)
+   * @param baud_rate Baud rate (default 460800)
+   * @return A unique pointer to OmniHand3Lite instance
    */
-  static DeviceInfo GetDeviceInfoFromBroadcast(
-      uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+  static std::unique_ptr<OmniHand3Lite> createHandByRs485(
+      HandType hand_type,
+      uint8_t hand_device_id,
+      const std::string& serial_port,
+      uint32_t baud_rate = 460800);
 
-  /**
-   * @brief Get device information from broadcast address (hand_device_id = 0x00) by serial number
-   * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
-   * @param canfd_channel_id CAN channel index (default 0)
-   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
-   *        - Single-channel (USBCANFD-100U): always 0
-   * @return DeviceInfo structure, or empty DeviceInfo if device not found or request failed
-   * @note This function sends a broadcast request to discover devices on the CAN bus
-   * @note Only works with CAN communication
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcast(
-      const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
+  virtual uint8_t GetDefaultNonPrivateHandDeviceId() const = 0;
 
-#ifdef __linux__
-  /**
-   * @brief Get device information from broadcast address (device_id = 0x00) via SocketCAN
-   * @param can_interface CAN interface name (e.g., "can0", "can1")
-   * @return DeviceInfo structure, or empty DeviceInfo if request failed
-   * @note This function sends a broadcast request to discover devices on the CAN bus
-   * @note Only works with CAN communication
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcastSocketCan(
-      const std::string& can_interface = "can0");
-#endif
+  virtual uint16_t GetDefaultPrivateHandDeviceId() const = 0;
+
+  int GetHandDeviceIdByBroadcast() override;
 
   // ============ Sensor Utilities ============
   // Note: O4 (OmniHand3Lite) does not support tactile sensors

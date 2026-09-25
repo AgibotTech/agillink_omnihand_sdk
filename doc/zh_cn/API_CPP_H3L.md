@@ -10,7 +10,7 @@
 - 支持 CAN（ZLG USB CANFD / HCAN）通信
 - 支持 SocketCAN（仅 Linux）
 - 支持 ZLG CAN TCP（仅 Linux x64 / Windows）
-- **无触觉传感器**
+- 文档所述 H3L 硬件**无触觉传感器**；U16 触觉方法作为协议/固件兼容接口保留
 - **无运动学求解器**：不支持角度控制（`SetAllActiveJointAngles` 为桩实现）。请使用电机位置控制（`SetAllJointMotorPosi` / `SetAllJointMotorPosi`）
 
 ## 包含头文件
@@ -80,6 +80,7 @@ struct VendorInfo {
 struct DeviceInfo {
     unsigned char hand_device_id; // 手部设备 ID
     CommuParams commu_params;     // 通信参数
+    HandType hand_type;           // 设备上报的手型
     std::string toString() const;
 };
 ```
@@ -163,6 +164,16 @@ static std::unique_ptr<OmniHand3Lite> createHandByZlgCanTcp(
     uint16_t tcp_port,
     uint8_t canfd_channel_id = 0);
 #endif
+```
+
+### RS485
+
+```cpp
+static std::unique_ptr<OmniHand3Lite> createHandByRs485(
+    HandType hand_type,
+    uint8_t hand_device_id,
+    const std::string& serial_port,
+    uint32_t baud_rate = 460800);
 ```
 
 ## 主要接口
@@ -270,8 +281,31 @@ std::vector<int16_t> GetAllCurrentReport() const;
 ```cpp
 VendorInfo GetVendorInfo() const;
 DeviceInfo GetDeviceInfo() const;
-void SetDeviceId(unsigned char device_id);
+std::string GetSN() const;
+
+uint8_t GetNonPrivateHandDeviceIdByBroadcast();
+uint16_t GetPrivateHandDeviceIdByBroadcast();
+int GetHandDeviceIdByBroadcast();
+bool SetHandDeviceIdByBroadcast(uint8_t id);
 ```
+
+H3L 的 `GetHandDeviceIdByBroadcast()` 在使用协议默认 ID 时返回 `0`，两种协议查询到相同自定义 ID 时返回正数，查询失败或 ID 不一致时返回 `-1`。向 `SetHandDeviceIdByBroadcast()` 传入 `0` 会恢复各协议的默认 ID。`SetDeviceId()` 仅作为废弃的兼容接口保留。
+
+### U16 1D 触觉传感器
+
+```cpp
+size_t GetNumOfTactileSensors() const;
+size_t GetNumOfTactilePoints(Finger finger) const;
+size_t GetLenOfTactileDatum(Finger finger) const;
+size_t GetNumOfRepliedTactileFrames(Finger finger) const;
+std::string GetSNOfTactileSensor(Finger finger) const;
+
+TactileSensorDataU16 GetTactileSensorData(Finger finger) const;
+TactileSensorDataU16 GetTactileSensorDataRaw(Finger finger) const;
+std::vector<TactileSensorDataU16> GetAllTactileSensorDataRaw() const;
+```
+
+这些方法用于协议/固件兼容；在无触觉传感器的 H3L 硬件上返回 `0`、空字符串或空数据。`GetSensorDataLength()` 已废弃；获取触觉点数请使用 `GetNumOfTactilePoints()`。
 
 ### 调试功能
 

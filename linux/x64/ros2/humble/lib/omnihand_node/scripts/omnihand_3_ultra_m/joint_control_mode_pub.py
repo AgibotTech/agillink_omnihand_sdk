@@ -23,6 +23,7 @@ if _scripts not in sys.path:
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int8MultiArray
+from omnihand_node_msgs.msg import Int8MultiArrayStamped
 from ros_multi_array_utils import make_int8_multi_array
 
 NUM_JOINTS = 20
@@ -40,13 +41,13 @@ class ControlModePubSub(Node):
         self.publisher = self.create_publisher(
             Int8MultiArray, f'/{product}/{hand_side}/joint_control_mode_cmd', 10)
         self.subscription = self.create_subscription(
-            Int8MultiArray, f'/{product}/{hand_side}/joint_control_mode_states', self.callback, 10)
+            Int8MultiArrayStamped, f'/{product}/{hand_side}/joint_control_mode_states', self.callback, 10)
 
         payload = [mode] * NUM_JOINTS
         self.publisher.publish(make_int8_multi_array(payload))
         self.get_logger().info(f'{product}/{hand_side} set control_mode={mode} for all {NUM_JOINTS} joints')
 
-    def callback(self, msg: Int8MultiArray):
+    def callback(self, msg: Int8MultiArrayStamped):
         pairs = [f'joint_{i}={msg.data[i]}' for i in range(len(msg.data))]
         self.get_logger().info(f'{self.product}/{self.hand_side} control_mode read-back: [{", ".join(pairs)}]')
         raise SystemExit(0)

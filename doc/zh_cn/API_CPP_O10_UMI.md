@@ -162,6 +162,22 @@ static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
 
 ## UMI 特有接口
 
+### 设备 ID
+
+```cpp
+// 通过标准协议广播地址 0x00 查询并缓存设备 ID；无回复时返回 0。
+uint8_t GetNonPrivateHandDeviceIdByBroadcast();
+int GetHandDeviceIdByBroadcast();
+
+// 仅切换 SDK 本地请求地址，不修改设备中保存的 ID。
+void SetBroadcast(bool broadcast);
+
+// 兼容旧代码的废弃接口。UMI 未实现新的 SetHandDeviceIdByBroadcast() 持久化操作。
+void SetDeviceId(unsigned char hand_device_id);
+```
+
+UMI 只有标准协议，不存在私有协议设备 ID。
+
 ### 位置查询
 
 ```cpp
@@ -225,6 +241,12 @@ void SetMaxPositionCalibration(unsigned char joint_index);
 ### 触觉传感器数据
 
 ```cpp
+size_t GetNumOfTactileSensors() const;
+size_t GetNumOfTactilePoints(Finger finger) const;
+size_t GetLenOfTactileDatum(Finger finger) const;
+size_t GetNumOfRepliedTactileFrames(Finger finger) const;
+std::string GetSNOfTactileSensor(Finger finger) const;
+
 /**
  * @brief 一次性获取所有 1D 触觉传感器原始数据
  * @return TactileSensorData 结构向量
@@ -248,7 +270,7 @@ TactileSensorData GetTactileSensorDataRaw(Finger eFinger) const;
  * @return 传感器数据长度（字节）
  * @note 对于 UMI：DORSUM 返回 0（UMI 没有手背传感器）
  */
-static size_t GetSensorDataLength(Finger eFinger);
+size_t GetSensorDataLength(Finger eFinger) const;
 
 /**
  * @brief 获取传感器顺序向量（静态方法）
@@ -256,8 +278,10 @@ static size_t GetSensorDataLength(Finger eFinger);
  * @note 对于 UMI：返回的向量包含 DORSUM，但 UMI 设备没有手背传感器。
  *       使用 GetAllTactileSensorDataRaw() 时，只返回 UMI 上可用的传感器（Thumb, Index, Middle, Ring, Little, Palm）。
  */
-static const std::vector<Finger>& GetSensorOrder();
+const std::vector<Finger>& GetSensorOrder() const;
 ```
+
+`GetSensorDataLength()` 已废弃；获取触觉点数请使用 `GetNumOfTactilePoints()`。
 
 ## DeviceInfo 的 UMI 特定字段
 
@@ -265,6 +289,7 @@ static const std::vector<Finger>& GetSensorOrder();
 struct DeviceInfo {
     unsigned char hand_device_id; // 手部设备 ID
     CommuParams commu_params;     // 通信参数
+    HandType hand_type;           // 设备上报的手型
 };
 ```
 

@@ -231,6 +231,21 @@ def get_all_joint_positions(self) -> List[int]:
 ### 触觉传感器数据
 
 ```python
+def get_num_of_tactile_sensors(self) -> int:
+    """返回设备上报的触觉传感器数量。"""
+
+def get_num_of_tactile_points(self, finger_index: int) -> int:
+    """返回指定传感器的触觉点数。"""
+
+def get_len_of_tactile_datum(self, finger_index: int) -> int:
+    """返回单个触觉数据项的字节长度。"""
+
+def get_num_of_replied_tactile_frames(self, finger_index: int) -> int:
+    """返回指定传感器回复所使用的帧数。"""
+
+def get_sn_of_tactile_sensor(self, finger_index: int) -> str:
+    """返回触觉传感器序列号。"""
+
 def get_tactile_sensor_data(self, eFinger: Finger) -> List[int]:
     """获取指定部位的触觉传感器数据（仅 O10）。
     
@@ -284,25 +299,26 @@ def get_tactile_sensor_data_raw(self, eFinger: Finger) -> TactileSensorData:
 
 **💡 建议：在需要获取多个传感器数据时，始终优先使用 `get_all_tactile_sensor_data_raw()`，以获得更好的性能和可靠性。**
 
-@staticmethod
+```python
 def get_sensor_data_length(finger_index: int) -> int:
-    """获取特定手指的传感器数据长度（静态方法）。
+    """用于兼容旧代码的废弃接口，返回指定传感器的触觉点数。
     
     Args:
         finger_index: 手指枚举值（Finger）。
     
     Returns:
-        int: 传感器数据长度（字节）。
+        int: 触觉点数。
     """
 
-@staticmethod
 def get_sensor_order() -> List[int]:
-    """获取传感器顺序向量（静态方法）。
+    """获取传感器顺序向量。
     
     Returns:
         List[int]: 传感器顺序向量的引用。
     """
 ```
+
+`get_sensor_data_length()` 已废弃，请使用 `get_num_of_tactile_points()`。
 
 ## 速度控制
 

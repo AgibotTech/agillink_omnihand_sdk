@@ -15,7 +15,8 @@ import sys
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Empty, Int16MultiArray
+from std_msgs.msg import Empty
+from omnihand_node_msgs.msg import Int16MultiArrayStamped
 
 # topic:
 # /h3u_m/left/joint_current_cmd; /h3u_m/right/joint_current_cmd;
@@ -30,12 +31,12 @@ class JointCurrentNode(Node):
         self.publisher = self.create_publisher(
             Empty, f'/{product}/{hand_side}/joint_current_cmd', 10)
         self.subscription = self.create_subscription(
-            Int16MultiArray, f'/{product}/{hand_side}/joint_current_states',
+            Int16MultiArrayStamped, f'/{product}/{hand_side}/joint_current_states',
             self.callback, 10)
         self.timer = self.create_timer(1.0 / hz, lambda: self.publisher.publish(Empty()))
         self.get_logger().info(f'{product}/{hand_side} joint_current started ({hz} Hz)')
 
-    def callback(self, msg: Int16MultiArray):
+    def callback(self, msg: Int16MultiArrayStamped):
         pairs = [f'joint_{i}={msg.data[i]}' for i in range(len(msg.data))]
         self.get_logger().info(
             f'{self.product}/{self.hand_side} current: [{", ".join(pairs)}]')

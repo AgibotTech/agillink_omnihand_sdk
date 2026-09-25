@@ -43,7 +43,7 @@ AGILINK OmniHand SDK 支持以下产品型号：
 
 - **[Linux (x64/amd64)](linux/x64/README_zh_cn.md)** - 安装、USB 配置、ROS2
 - **[Linux (arm64/aarch64)](linux/aarch64/README_zh_cn.md)** - 安装、USB 配置、ROS2
-- **[Windows (x64)](windows/README_zh_cn.md)** - 安装、驱动配置
+- **[Windows (x64)](windows/x64/README_zh_cn.md)** - 安装、驱动配置
 
 ## API 文档
 
@@ -53,6 +53,8 @@ AGILINK OmniHand SDK 支持以下产品型号：
 - [OmniHand Pro 2025 (O12) C++ API](doc/zh_cn/API_CPP_O12.md)
 - [OmniHand 3 Lite (H3L) C++ API](doc/zh_cn/API_CPP_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) C++ API](doc/zh_cn/API_CPP_O10_UMI.md)
+- [OmniHand 3 Ultra M (H3UM/O20) C++ API](doc/zh_cn/API_CPP_H3UM.md)
+- [从 1.1.8 迁移到 1.1.9](doc/zh_cn/MIGRATION_1_1_8_TO_1_1_9.md)
 
 ### Python API
 - [Python API 索引](doc/zh_cn/API_PYTHON.md)
@@ -60,6 +62,7 @@ AGILINK OmniHand SDK 支持以下产品型号：
 - [OmniHand Pro 2025 (O12) Python API](doc/zh_cn/API_PYTHON_O12.md)
 - [OmniHand 3 Lite (H3L) Python API](doc/zh_cn/API_PYTHON_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) Python API](doc/zh_cn/API_PYTHON_UMI.md)
+- [OmniHand 3 Ultra M (H3UM/O20) Python API](doc/zh_cn/API_PYTHON_H3UM.md)
 
 ### 运动学 API
 - [OmniHand 2025 (O10) 运动学 C++](doc/zh_cn/API_KINEMATICS_CPP_O10.md)

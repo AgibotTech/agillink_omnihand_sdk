@@ -21,6 +21,10 @@ REM Remove C:\omnihand\bin from system PATH
 powershell -NoProfile -Command "$p = [Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($p -like '*C:\omnihand\bin*') { $new = ($p -split ';' | Where-Object { $_ -ne 'C:\omnihand\bin' }) -join ';'; [Environment]::SetEnvironmentVariable('Path', $new, 'Machine'); Write-Host '[OK] Removed C:\omnihand\bin from system PATH' } else { Write-Host '[SKIP] C:\omnihand\bin not in PATH' }"
 echo.
 
+REM Remove only the OmniHand SDK prefix from system CMAKE_PREFIX_PATH
+powershell -NoProfile -Command "$p = [string][Environment]::GetEnvironmentVariable('CMAKE_PREFIX_PATH', 'Machine'); $items = @($p -split ';' | Where-Object { $_ -and $_ -ne 'C:\omnihand' }); $new = $items -join ';'; if ($new -ne $p) { [Environment]::SetEnvironmentVariable('CMAKE_PREFIX_PATH', $(if ($new) { $new } else { $null }), 'Machine'); Write-Host '[OK] Removed C:\omnihand from system CMAKE_PREFIX_PATH' } else { Write-Host '[SKIP] C:\omnihand not in CMAKE_PREFIX_PATH' }"
+echo.
+
 REM Uninstall C++ SDK
 if exist "%INSTALL_DIR%" (
     echo Removing: %INSTALL_DIR%

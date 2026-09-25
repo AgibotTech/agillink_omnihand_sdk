@@ -10,6 +10,7 @@
 #ifndef AGILINK_OMNIHAND_H
 #define AGILINK_OMNIHAND_H
 
+#include <cstdio>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -61,6 +62,14 @@ class AGIBOT_EXPORT OmniHand {
   virtual VendorInfo GetVendorInfo() const {
     return {};
   };
+
+  virtual std::string GetVendorSerialNumber() const {
+    return "";
+  }
+
+  virtual std::string GetSN() const {
+    return "";
+  }
   
   /**
    * @brief 0x02: Gets device information.
@@ -72,8 +81,61 @@ class AGIBOT_EXPORT OmniHand {
     return {};
   };
 
+  virtual uint8_t GetNonPrivateHandDeviceIdByBroadcast() {
+    return kBroadcastHandDeviceId;
+  }
+
+  /**
+   * @brief Discovers and caches the hand device ID through the supported
+   *        broadcast protocol.
+   * @return Standard-only products return the discovered ID (0 if no device
+   *         replies). Products with multiple protocol IDs may return 0 for
+   *         their default state and -1 when the IDs are inconsistent.
+   * @note Products with multiple protocol IDs override this method to
+   *       validate all protocol IDs.
+   */
+  virtual int GetHandDeviceIdByBroadcast() {
+    return static_cast<int>(GetNonPrivateHandDeviceIdByBroadcast());
+  }
+
+  // Returns the locally cached id (from the constructor or the last successful SetDeviceId
+  // call), not a hardware read. It can disagree with what the device has stored -- use
+  // GetDeviceInfo().hand_device_id to read the id the hardware actually reports.
   virtual uint8_t GetHandDeviceId() const {
     return device_id_;
+  }
+
+  /**
+   * @brief Selects broadcast or default addressing for subsequent requests.
+   * @param broadcast true uses the standard-protocol broadcast ID (0x00);
+   *        false restores the default device ID.
+   * @note This only changes the SDK's local request destination. It does not
+   *       modify or persist the device ID in hardware.
+   */
+  virtual void SetBroadcast(bool broadcast) {
+    (void)broadcast;
+  }
+
+  /**
+   * @brief Sets the current position of every motor as its zero position.
+   * @return true if the device reports success; false if unsupported or failed.
+   * @note Currently supported only by OmniHand 3 Ultra M (H3U_M).
+   */
+  virtual bool SetAllMotor2Zero() {
+    std::fprintf(stderr, "[WARN][OmniHand][SetAllMotor2Zero] unsupported by this product\n");
+    return false;
+  }
+
+  /**
+   * @brief Sets the current position of one motor as its zero position.
+   * @param joint_motor_index Joint motor index, starting from 1.
+   * @return true if the device reports success; false if unsupported or failed.
+   * @note Currently supported only by OmniHand 3 Ultra M (H3U_M).
+   */
+  virtual bool SetMotor2Zero(unsigned char joint_motor_index) {
+    (void)joint_motor_index;
+    std::fprintf(stderr, "[WARN][OmniHand][SetMotor2Zero] unsupported by this product\n");
+    return false;
   }
 
   // ============ Current Threshold ============
@@ -456,6 +518,7 @@ class AGIBOT_EXPORT OmniHand {
 
  public:
   /**
+   * @deprecated
    * @brief Sets device ID.
    * @param device_id Device ID
    * @note Serial port communication (RS485) does not support this interface.
@@ -464,6 +527,17 @@ class AGIBOT_EXPORT OmniHand {
    */
   virtual void SetDeviceId(unsigned char device_id) {
     (void)device_id;  // Suppress unused parameter warning
+  };
+
+  /**
+   * @brief Sets hand device ID.
+   * @param id Hand device ID. Products whose GetHandDeviceIdByBroadcast()
+   *           uses 0 to represent the default IDs write their protocol-specific
+   *           default IDs to the device through broadcast addressing when id is 0.
+   */
+  virtual bool SetHandDeviceIdByBroadcast(uint8_t id) {
+    (void)id;
+    return false;
   };
 
   /**

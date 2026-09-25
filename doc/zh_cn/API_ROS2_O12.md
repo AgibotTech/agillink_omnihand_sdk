@@ -14,19 +14,23 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 |-------|---------|------|------|
 | `joint_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | `position[0..11]` = rad，触发控制+回读 |
 | `joint_states` | `sensor_msgs/JointState` | 发布 (你订阅) | `position[0..11]` = rad |
+| `joint_cmd_source` | `std_msgs/Int8` | 订阅 (你发布) | `0=NORMAL`、`1=ANGLE`、`2=POSITION` |
+| `joint_angle_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | 命令源为 `1` 时的角度覆盖 |
+| `joint_position_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 命令源为 `2` 时的电机原始位置覆盖 |
+| `joint_position_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 带时间戳的原始位置回读 |
 | `joint_mix_control_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | 位置+力混合控制（见下文） |
 | `joint_error_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllErrorReport()` |
-| `joint_error_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | `data[]` = 错误码 bitmask (5 bit) |
+| `joint_error_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | `header.stamp` + 错误码 `data[]` |
 | `joint_temperature_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllTemperatureReport()` |
-| `joint_temperature_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | `data[]` = 温度值 |
+| `joint_temperature_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | `header.stamp` + 温度 `data[]` |
 | `joint_current_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllCurrentReport()` |
-| `joint_current_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | `data[]` = 电流值 |
+| `joint_current_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | `header.stamp` + 电流 `data[]` |
 | `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | 订阅 (你发布) | 写入控制模式 `data[0..11]`；电压模式为 `4` |
-| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | 发布 (你订阅) | 回读控制模式 `data[0..11]` |
+| `joint_control_mode_states` | `omnihand_node_msgs/Int8MultiArrayStamped` | 发布 (你订阅) | 带时间戳的控制模式回读 `data[0..11]` |
 | `joint_voltage_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电压指令 `data[0..11]` |
-| `joint_voltage_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 回读电压指令 `data[0..11]` |
+| `joint_voltage_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 带时间戳的电压回读 `data[0..11]` |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电流阈值 `data[0..11]` |
-| `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | 发布 (你订阅) | 回读电流阈值 `data[0..11]` |
+| `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 带时间戳的电流阈值回读 `data[0..11]` |
 | `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | 触觉流频率 Hz（>0 启动，0 停止）；上限 **100 Hz**（节点内写死） |
 | `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | 发布 (你订阅) | 流开启期间周期发布 3D 触觉 |
 
@@ -47,8 +51,8 @@ O12 ROS2 节点提供 12 自由度灵巧手的统一 Topic 接口，遵循 [ROS2
 
 电压控制使用两组 topic：
 
-- `joint_control_mode_cmd/states` (`std_msgs/Int8MultiArray`)：将 12 个关节切换到 `ControlMode.VOLTAGE` (`4`)。
-- `joint_voltage_cmd/states` (`std_msgs/Int16MultiArray`)：写入并回读电压指令。
+- `joint_control_mode_cmd`（`std_msgs/Int8MultiArray`）与 `joint_control_mode_states`（`omnihand_node_msgs/Int8MultiArrayStamped`）：将 12 个关节切换到 `ControlMode.VOLTAGE` (`4`)并带时间戳回读。
+- `joint_voltage_cmd`（`std_msgs/Int16MultiArray`）与 `joint_voltage_states`（`omnihand_node_msgs/Int16MultiArrayStamped`）：写入并带时间戳回读电压指令。
 
 > 注意：O12 固件截至 1.2.15（含）尚不支持电压读回，因此 `joint_voltage_states` 仅适用于后续支持该能力的固件。
 
