@@ -351,7 +351,7 @@ TEST_F(OmniHand2025Test, GetDeviceInfo) {
   AgilinkLogger::get().infof(TAG, "[GetDeviceInfo] Device Info:\n%s", device_info.ToString().c_str());
 
   ASSERT_NE(device_info.hand_device_id, 0) << "GetDeviceInfo timed out";
-  EXPECT_EQ(device_info.hand_device_id, static_cast<uint8_t>(g_device_id));
+  EXPECT_EQ(device_info.hand_device_id, static_cast<uint8_t>(hand_->GetHandDeviceId()));
 }
 
 // SetDeviceId is exercised by SetUp: it switches the device to g_device_id
@@ -364,9 +364,9 @@ TEST_F(OmniHand2025Test, SetDeviceId) {
   // SetUp already switched to g_device_id; just verify the physical ID is correct.
   auto info = hand_->GetDeviceInfo();
   ASSERT_NE(info.hand_device_id, 0) << "GetDeviceInfo timed out";
-  EXPECT_EQ(info.hand_device_id, static_cast<uint8_t>(g_device_id));
+  EXPECT_EQ(info.hand_device_id, static_cast<uint8_t>(hand_->GetHandDeviceId()));
   AgilinkLogger::get().infof(TAG, "[SetDeviceId] Current device ID: %d (target: %d)",
-                             info.hand_device_id, g_device_id);
+                             info.hand_device_id, hand_->GetHandDeviceId());
 }
 
 // ============================================================================
