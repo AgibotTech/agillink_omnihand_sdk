@@ -26,7 +26,8 @@ import sys
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Empty, Int16MultiArray
+from std_msgs.msg import Empty
+from omnihand_node_msgs.msg import Int16MultiArrayStamped
 
 # topic:
 # /h3l/left/joint_error_cmd; /h3l/right/joint_error_cmd;
@@ -58,13 +59,13 @@ class JointErrorNode(Node):
         self.publisher = self.create_publisher(
             Empty, f'/{product}/{hand_side}/joint_error_cmd', 10)
         self.subscription = self.create_subscription(
-            Int16MultiArray, f'/{product}/{hand_side}/joint_error_states',
+            Int16MultiArrayStamped, f'/{product}/{hand_side}/joint_error_states',
             self.callback, 10)
         self.timer = self.create_timer(1.0 / hz, lambda: self.publisher.publish(Empty()))
         self.get_logger().info(
             f'{product}/{hand_side} joint_error started ({hz} Hz, O10 10 DOF)')
 
-    def callback(self, msg: Int16MultiArray):
+    def callback(self, msg: Int16MultiArrayStamped):
         lines = [f'{self.product}/{self.hand_side} joint_error_states:']
         has_error = False
         for i, val in enumerate(msg.data):

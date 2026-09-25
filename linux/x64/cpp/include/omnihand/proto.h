@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
+#include "omnihand/utils.h"
 
 namespace agilink {
 namespace omnihand {
@@ -434,10 +435,11 @@ struct AGIBOT_EXPORT CommuParams {
 struct AGIBOT_EXPORT DeviceInfo {
   // The id the hardware reports, not the SDK's cached one (see OmniHand::GetHandDeviceId).
   // 0 means the query failed -- it is never a real unicast id (0 is the CAN broadcast address).
-  // Where the value is read from is backend-specific: the OP3 RS485 path takes it from the reply
-  // frame's address field, which stays valid even when a truncated/misaligned reply garbles the
-  // payload, while the CAN paths take payload byte 0 and can surface a garbage id on such a
-  // reply. Callers that need to act on a mismatch should re-read rather than trust one sample.
+  // Where the value is read from is backend-specific: the OP3 paths (RS485 and CAN) take it from
+  // the reply frame's address field, which is where the device actually answered and stays valid
+  // even when a truncated/misaligned reply garbles the payload; the other CAN paths still take
+  // payload byte 0, which is the device's report of itself and can hold a stale value.
+  // Callers that need to act on a mismatch should re-read rather than trust one sample.
   uint8_t hand_device_id;
   CommuParams commu_params;
   HandType hand_type{HandType::UNKNOWN};

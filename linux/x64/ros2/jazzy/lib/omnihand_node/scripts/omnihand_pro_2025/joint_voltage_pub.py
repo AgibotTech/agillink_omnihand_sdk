@@ -26,6 +26,7 @@ if _scripts not in sys.path:
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int16MultiArray
+from omnihand_node_msgs.msg import Int16MultiArrayStamped
 from ros_multi_array_utils import make_int16_multi_array
 
 NUM_JOINTS = 12
@@ -39,12 +40,12 @@ class JointVoltagePubSub(Node):
         self.publisher = self.create_publisher(
             Int16MultiArray, f'/{product}/{hand_side}/joint_voltage_cmd', 10)
         self.subscription = self.create_subscription(
-            Int16MultiArray, f'/{product}/{hand_side}/joint_voltage_states', self.callback, 10)
+            Int16MultiArrayStamped, f'/{product}/{hand_side}/joint_voltage_states', self.callback, 10)
 
         self.publisher.publish(make_int16_multi_array([voltage] * NUM_JOINTS))
         self.get_logger().info(f'{product}/{hand_side} set voltage={voltage} for all {NUM_JOINTS} joints')
 
-    def callback(self, msg: Int16MultiArray):
+    def callback(self, msg: Int16MultiArrayStamped):
         pairs = [f'joint_{i}={msg.data[i]}' for i in range(len(msg.data))]
         self.get_logger().info(f'{self.product}/{self.hand_side} voltage read-back: [{", ".join(pairs)}]')
         raise SystemExit(0)

@@ -43,7 +43,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by canfd_device_id
-   * @param hand_type Hand type (left/right)
+   * @param hand_type Hand type; stored and returned by GetHandType() but not used in any OP3 control logic -- any value is accepted
    * @param hand_device_id Hand device ID
    * @param canfd_device_id USB CANFD adapter device index
    * @param canfd_channel_id CAN channel index (default 0)
@@ -59,7 +59,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
-   * @param hand_type Hand type (left/right)
+   * @param hand_type Hand type; stored and returned by GetHandType() but not used in any OP3 control logic -- any value is accepted
    * @param hand_device_id Hand device ID
    * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
    * @param canfd_channel_id CAN channel index (default 0)
@@ -76,7 +76,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
    * @brief Factory method - ZLG CANFD over TCP (WiFi/Ethernet to CANFD, this machine acts as TCP client)
-   * @param hand_type Hand type (left/right)
+   * @param hand_type Hand type; stored and returned by GetHandType() but not used in any OP3 control logic -- any value is accepted
    * @param hand_device_id Hand device ID
    * @param tcp_host TCP server IP or hostname (e.g. "192.168.0.178")
    * @param tcp_port TCP server port (e.g. 8000)
@@ -95,7 +95,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 #ifdef __linux__
   /**
    * @brief Factory method - SocketCAN communication (Linux native CAN interface)
-   * @param hand_type Hand type (left/right)
+   * @param hand_type Hand type; stored and returned by GetHandType() but not used in any OP3 control logic -- any value is accepted
    * @param hand_device_id Hand device ID
    * @param can_interface CAN interface name (default "can0")
    * @return A unique pointer to OmniPicker3 instance
@@ -108,7 +108,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by canfd_device_id)
-   * @param hand_type Hand type (left/right)
+   * @param hand_type Hand type; stored and returned by GetHandType() but not used in any OP3 control logic -- any value is accepted
    * @param hand_device_id Hand device ID
    * @param canfd_device_id HCAN device index
    * @param canfd_channel_id CAN channel index (default 0)
@@ -124,7 +124,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
-   * @param hand_type Hand type (left/right)
+   * @param hand_type Hand type; stored and returned by GetHandType() but not used in any OP3 control logic -- any value is accepted
    * @param hand_device_id Hand device ID
    * @param hcan_serial_number HCAN device serial number (supports partial matching)
    * @param canfd_channel_id CAN channel index (default 0)
@@ -140,7 +140,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   /**
    * @brief Factory method - RS485 communication (standard serial protocol)
-   * @param hand_type Hand type (a gripper has no chirality; pass HandType::UNKNOWN)
+   * @param hand_type Hand type; stored and returned by GetHandType() but not used in any OP3 control logic -- any value is accepted
    * @param hand_device_id Hand device ID
    * @param uart_port Serial port path (e.g., "/dev/ttyUSB0" or "COM3")
    * @param baudrate Baud rate (default 460800)
@@ -153,40 +153,9 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       int32_t baudrate = 460800);
 
 
-  /**
-   * @brief Get device information from broadcast address (hand_device_id = 0x00)
-   * @param canfd_device_id USB CANFD adapter device index
-   * @param canfd_channel_id CAN channel index (default 0)
-   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
-   *        - Single-channel (USBCANFD-100U): always 0
-   * @return DeviceInfo structure, or empty DeviceInfo if request failed
-   * @note Only works with CAN communication, not supported for RS485
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcast(
-      uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+  virtual uint8_t GetDefaultNonPrivateHandDeviceId() const = 0;
 
-  /**
-   * @brief Get device information from broadcast address (hand_device_id = 0x00) by serial number
-   * @param usbcanfd_serial_number USB CANFD device serial number (supports partial matching)
-   * @param canfd_channel_id CAN channel index (default 0)
-   *        - Dual-channel (USBCANFD-200U): can0=0, can1=1
-   *        - Single-channel (USBCANFD-100U): always 0
-   * @return DeviceInfo structure, or empty DeviceInfo if device not found or request failed
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcast(
-      const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
-
-#ifdef __linux__
-  /**
-   * @brief Get device information from broadcast address (device_id = 0x00) via SocketCAN
-   * @param can_interface CAN interface name (default "can0")
-   * @return DeviceInfo structure, or empty DeviceInfo if request failed
-   */
-  static DeviceInfo GetDeviceInfoFromBroadcastSocketCan(
-      const std::string& can_interface = "can0");
-#endif
+  int GetHandDeviceIdByBroadcast() override;
 
   std::vector<std::string> GetJointNames() const override {
     return {
@@ -194,9 +163,9 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
     };
   }
 
-    /**
+  /**
    * @brief Returns the number of joint motors.
-   * @return Number of joint motors (12)
+   * @return Number of joint motors (1)
    */
   static constexpr uint8_t GetNumOfJointMotors() {
     return kDegreesOfActiveFreedom;
@@ -204,7 +173,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   /**
    * @brief Returns the degrees of active freedom (DoA).
-   * @return Degrees of active freedom (12)
+   * @return Degrees of active freedom (1)
    */
   static constexpr uint8_t GetDoA() {
     return kDegreesOfActiveFreedom;
@@ -257,7 +226,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
   /**
    * @brief Initialize base class members
    * @param device_id Device ID
-   * @param hand_type Hand type (left/right)
+   * @param hand_type Hand type; stored only, not used in any OP3 control logic
    */
   void Reset(unsigned char device_id, HandType hand_type) {
     OmniHand::Reset(ProductType::OMNI_PICKER_3, device_id, hand_type);
@@ -265,6 +234,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   static constexpr Int16Bound kMotorPositionBound = {0, 4095};
   static constexpr Int16Range kMixCtrlTorqueRange = {0, 6500, 3000}; // unit: mA
+  static constexpr uint8_t kDefaultHandDevideId = 0x01;
 };
 
 }  // namespace omnihand

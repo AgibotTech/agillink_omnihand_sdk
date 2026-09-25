@@ -125,6 +125,14 @@ class AGIBOT_EXPORT PrivateOmniHand : public IOmniHandCalibrator {
    *       pos range [-4095, 4095]; ignored when axis_index==0.
    */
 
+  virtual uint16_t GetPrivateHandDeviceIdByBroadcast() {
+    return kPrivateBroadcastHandDeviceId;
+  }
+
+  virtual uint16_t GetPrivateHandDeviceId() {
+    return private_hand_device_id_;
+  }
+
   /**
    * @brief 0x04: Set device ID
    * @param id Device ID, range [1, 0x7FF)
@@ -399,6 +407,8 @@ class AGIBOT_EXPORT PrivateOmniHand : public IOmniHandCalibrator {
   virtual FirmwareVersionInfo GetFwVersion() const = 0;
 
  protected:
+  uint16_t private_hand_device_id_ = kPrivateBroadcastHandDeviceId;
+
   /**
    * @brief Constructor - protected to prevent direct instantiation
    * @note Users should use PrivateOmniHand2025 or PrivateOmniHand3Lite

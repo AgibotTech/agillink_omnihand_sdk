@@ -24,6 +24,9 @@ static int g_request_interval = 5;  // Default: 5ms
 static std::string g_device_type = "zlgcan";  // Default: zlgcan
 // Global variables for RS-485 serial connection
 static std::string g_serial_port = "/dev/ttyUSB0";  // Default serial port
+// Target hand device ID. SetUp discovers the current IDs, switches both
+// protocols to this value, and TearDown restores the original IDs.
+static int g_device_id = 1;
 // Commands that can alter calibration, identity, limits, or protection settings.
 static bool g_run_dangerous_actions = false;
 
@@ -51,29 +54,36 @@ static std::string ValuesToString(const std::vector<T>& values) {
 class OmniHand3LiteTest : public ::testing::Test {
  protected:
   void SetUp() override {
+    constexpr uint8_t kUseProtocolDefaultIds = 0;
+
     // Create hand instance for testing based on device type
     std::string device_type = GetDeviceType();
     if (device_type == "hcan") {
       hand_ = OmniHand3Lite::createHandByHcan(
           HandType::LEFT,
-          1,   // hand_device_id
+          kUseProtocolDefaultIds,
           0,   // canfd_device_id
           0    // canfd_channel_id
       );
     } else if (device_type == "rs485") {
       hand_ = OmniHand3Lite::createHandByRs485(
           HandType::LEFT,
-          1,              // hand_device_id
+          kUseProtocolDefaultIds,
           g_serial_port   // serial port path
       );
     } else {  // default: zlgcan
       hand_ = OmniHand3Lite::createHandByZlgcan(
           HandType::LEFT,
-          1,   // hand_device_id
+          kUseProtocolDefaultIds,
           0,   // canfd_device_id
           0    // canfd_channel_id
       );
     }
+
+    if (!hand_ || !hand_->Init()) {
+      GTEST_SKIP() << "Failed to initialize device";
+    }
+
     int request_interval = GetRequestInterval();
     hand_->SetRequestInterval(request_interval);
     AgilinkLogger::get().infof(TAG, "Using frame recv timeout: %d ms", hand_->GetFrameRecvTimeout());
@@ -85,14 +95,47 @@ class OmniHand3LiteTest : public ::testing::Test {
     if (device_type == "rs485") {
       AgilinkLogger::get().infof(TAG, "Serial port: %s", g_serial_port.c_str());
     }
+
+    original_device_id_ = hand_->GetNonPrivateHandDeviceIdByBroadcast();
+    if (original_device_id_ == kBroadcastHandDeviceId) {
+      GTEST_SKIP() << "No standard-protocol device responded to broadcast";
+    }
+
+    AgilinkLogger::get().infof(
+        TAG, "[SetUp] Discovered device ID: %u, switching to: %d",
+        static_cast<unsigned int>(original_device_id_), g_device_id);
+    if (static_cast<uint8_t>(g_device_id) != original_device_id_) {
+      original_private_device_id_ = hand_->GetPrivateHandDeviceIdByBroadcast();
+      ASSERT_GT(original_private_device_id_, 0u);
+      ASSERT_LT(original_private_device_id_, kPrivateBroadcastHandDeviceId)
+          << "No private-protocol device responded to broadcast";
+
+      device_id_change_attempted_ = true;
+      ASSERT_TRUE(hand_->SetHandDeviceIdByBroadcast(static_cast<uint8_t>(g_device_id)))
+          << "Failed to set the standard/private protocol device IDs by broadcast";
+    }
   }
 
   void TearDown() override {
+    if (hand_ && hand_->Init() && device_id_change_attempted_) {
+      AgilinkLogger::get().infof(
+          TAG, "[TearDown] Restoring device IDs: %d -> standard=%u, private=%u",
+          g_device_id, static_cast<unsigned int>(original_device_id_),
+          static_cast<unsigned int>(original_private_device_id_));
+      EXPECT_TRUE(hand_->SetHandDeviceIdByBroadcast(
+          static_cast<uint8_t>(original_private_device_id_)));
+      if (original_device_id_ != original_private_device_id_) {
+        hand_->SetDeviceId(original_device_id_);
+      }
+    }
     hand_.reset();
     AgilinkLogger::get().flush();
   }
 
   std::unique_ptr<OmniHand3Lite> hand_;
+  bool device_id_change_attempted_ = false;
+  uint8_t original_device_id_ = 0;
+  uint16_t original_private_device_id_ = 0;
 };
 
 // Test factory method
@@ -103,6 +146,32 @@ TEST_F(OmniHand3LiteTest, CreateHand) {
 // Test initialization
 TEST_F(OmniHand3LiteTest, Init) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device. Check hardware connection.";
+}
+
+TEST_F(OmniHand3LiteTest, DiscoverHandDeviceId) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+
+  const uint8_t device_id = hand_->GetNonPrivateHandDeviceIdByBroadcast();
+  AgilinkLogger::get().infof(
+      TAG, "[DiscoverHandDeviceId] device ID: %u",
+      static_cast<unsigned int>(device_id));
+
+  ASSERT_GT(device_id, 0u) << "Standard-protocol broadcast returned an invalid device ID";
+  EXPECT_EQ(hand_->GetHandDeviceId(), device_id);
+}
+
+TEST_F(OmniHand3LiteTest, PrivateProtocolDiscoverDeviceId) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+
+  const uint16_t device_id = hand_->GetPrivateHandDeviceIdByBroadcast();
+  AgilinkLogger::get().infof(
+      TAG, "[PrivateProtocolDiscoverDeviceId] device ID: %u",
+      static_cast<unsigned int>(device_id));
+
+  ASSERT_GT(device_id, 0u) << "Private-protocol broadcast returned an invalid device ID";
+  ASSERT_LT(device_id, kPrivateBroadcastHandDeviceId)
+      << "No private-protocol device responded to broadcast";
+  EXPECT_EQ(hand_->GetPrivateHandDeviceId(), device_id);
 }
 
 // Test vendor info
@@ -118,7 +187,7 @@ TEST_F(OmniHand3LiteTest, GetDeviceInfo) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   auto device_info = hand_->GetDeviceInfo();
   AgilinkLogger::get().infof(TAG, "[GetDeviceInfo] Device Info:\n%s", device_info.ToString().c_str());
-  EXPECT_EQ(device_info.hand_device_id, 1);
+  EXPECT_EQ(device_info.hand_device_id, static_cast<uint8_t>(g_device_id));
 }
 
 // // Test setting device ID
@@ -538,12 +607,10 @@ TEST_F(OmniHand3LiteTest, GetTactileSensorDataRaw) {
     std::string preview;
     if (!data.data_.empty()) {
       preview = " [";
-      size_t cnt = std::min(data.data_.size(), size_t(6));
-      for (size_t i = 0; i < cnt; ++i) {
+      for (size_t i = 0; i < data.data_.size(); ++i) {
         if (i > 0) preview += ", ";
         preview += std::to_string(data.data_[i]);
       }
-      if (data.data_.size() > 6) preview += "...";
       preview += "]";
     }
     AgilinkLogger::get().infof(TAG, "[GetTactileSensorDataRaw] %s: %zu points%s",
@@ -562,7 +629,14 @@ TEST_F(OmniHand3LiteTest, GetAllTactileSensorDataRaw) {
   EXPECT_FALSE(all_data.empty()) << "GetAllTactileSensorDataRaw returned empty";
   AgilinkLogger::get().infof(TAG, "[GetAllTactileSensorDataRaw] %zu fingers:", all_data.size());
   for (const auto& sd : all_data) {
-    AgilinkLogger::get().infof(TAG, "  %s: %zu points", ToString(sd.sensor_id_).c_str(), sd.data_.size());
+    std::string values;
+    for (size_t i = 0; i < sd.data_.size(); ++i) {
+      if (i > 0) values += ", ";
+      values += std::to_string(sd.data_[i]);
+    }
+    AgilinkLogger::get().infof(
+        TAG, "  %s: %zu points [%s]", ToString(sd.sensor_id_).c_str(),
+        sd.data_.size(), values.c_str());
   }
   EXPECT_EQ(all_data.size(), hand_->GetSensorOrder().size());
 }
@@ -826,16 +900,25 @@ int main(int argc, char** argv) {
       }
     } else if ((arg == "-p" || arg == "--port") && i + 1 < argc) {
       g_serial_port = argv[++i];
+    } else if ((arg == "--device-id" || arg == "--id") && i + 1 < argc) {
+      g_device_id = std::stoi(argv[++i]);
     } else if (arg == "--dangerous") {
       g_run_dangerous_actions = true;
     } else if (arg == "--help" || arg == "-h") {
-      AgilinkLogger::get().infof(TAG, "Usage: %s [--request-interval MS] [-d DEVICE] [-p PORT] [--dangerous]", argv[0]);
+      AgilinkLogger::get().infof(TAG, "Usage: %s [--request-interval MS] [-d DEVICE] [-p PORT] [--device-id ID] [--dangerous]", argv[0]);
       AgilinkLogger::get().infof(TAG, "  --request-interval MS  Set request interval in ms (default: 5)");
       AgilinkLogger::get().infof(TAG, "  -d DEVICE              Device type: zlgcan | hcan | rs485 (default: zlgcan)");
       AgilinkLogger::get().infof(TAG, "  -p PORT                Serial port for rs485 (default: /dev/ttyUSB0)");
+      AgilinkLogger::get().infof(TAG, "  --device-id ID         Target device ID in [1, 0x7f]; original IDs are restored after each test");
       AgilinkLogger::get().infof(TAG, "  --dangerous             Run commands that modify device configuration");
       return 0;
     }
+  }
+
+  if (g_device_id < 1 || g_device_id > 0x7F) {
+    AgilinkLogger::get().errorf(
+        TAG, "Invalid --device-id %d; expected a unicast ID in [1, 0x7f]", g_device_id);
+    return 1;
   }
 
   return RUN_ALL_TESTS();

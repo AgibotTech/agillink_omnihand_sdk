@@ -48,15 +48,24 @@ std::string GetProgramName(const char* argv0) {
 
 void PrintUsage(const std::string& program_name) {
   std::cout << "Usage: " << program_name
-            << " [-h|--help] [-p|--port <port>] [-b|--baudrate <baudrate>] [-i|--id <device_id>]"
-               " [-v|--verbose]"
+            << " [-p|--port <port>] [-b|--baudrate <baudrate>] [--id <device_id>]"
+               " [-v|--verbose] [-h|--help]"
             << std::endl;
-  std::cout << "  -p, --port\t\t\tserial port (default /dev/ttyUSB0 on Linux, COM3 on Windows)"
+  std::cout << "  -p, --port\t\tserial port (default /dev/ttyUSB0 on Linux, COM3 on Windows)"
             << std::endl;
-  std::cout << "  -b, --baudrate\t\tbaud rate (default 460800)" << std::endl;
-  std::cout << "  -i, --id\t\t\thand device id (default 1)" << std::endl;
-  std::cout << "  -v, --verbose\t\t\tdump raw serial frames (TX/RX hex)" << std::endl;
-  std::cout << "  -h, --help\t\t\tshow help of project" << std::endl;
+  std::cout << "  -b, --baudrate\tbaud rate (default 460800)" << std::endl;
+  std::cout << "  --id\t\t\thand device id to address (default 1; --device-id accepted too)"
+            << std::endl;
+  std::cout << "  -v, --verbose\t\tdump raw serial frames (TX/RX hex)" << std::endl;
+  std::cout << "  -h, --help\t\tshow this help" << std::endl;
+  std::cout << "\nExample (runs the full demo against a gripper on COM3 at 460800, id 1):"
+            << std::endl;
+  std::cout << "  " << program_name << " -p COM3 -b 460800 --id 1 -v" << std::endl;
+  std::cout << "    -p COM3     serial port (use /dev/ttyUSB0 on Linux)" << std::endl;
+  std::cout << "    -b 460800   baud rate the gripper is configured for" << std::endl;
+  std::cout << "    --id 1      address the gripper as device id 1" << std::endl;
+  std::cout << "    -v          dump raw serial frames while running" << std::endl;
+  std::cout << "  Drop -v for quieter output; drop -b/--id to accept the defaults." << std::endl;
 }
 
 ParseResult ParseArgs(int argc, char* argv[], Options* options) {
@@ -83,7 +92,7 @@ ParseResult ParseArgs(int argc, char* argv[], Options* options) {
       options->uart_port = value;
     } else if (arg == "-b" || arg == "--baudrate") {
       options->baudrate = static_cast<int32_t>(std::atol(value.c_str()));
-    } else if (arg == "-i" || arg == "--id") {
+    } else if (arg == "--id" || arg == "--device-id") {
       options->hand_device_id = static_cast<uint8_t>(std::atoi(value.c_str()));
     } else {
       std::cout << "error: unsupported option: " << arg << std::endl;
@@ -170,8 +179,21 @@ void DemoDeviceInfo(oh::OmniPicker3& hand) {
 
 void DemoCommunicationSettings(oh::OmniPicker3& hand) {
   std::cout << "\n========== Communication Settings ==========" << std::endl;
-  std::cout << "Request interval: " << hand.GetRequestInterval() << " ms" << std::endl;
-  std::cout << "Frame receive timeout: " << hand.GetFrameRecvTimeout() << " ms" << std::endl;
+  const int request_interval = hand.GetRequestInterval();
+  const int recv_timeout = hand.GetFrameRecvTimeout();
+  const int send_timeout = hand.GetFrameSendTimeout();
+
+  std::cout << "Request interval: " << request_interval << " ms" << std::endl;
+  std::cout << "Frame receive timeout: " << recv_timeout << " ms" << std::endl;
+  // A serial write completes synchronously, so this is a stored value only (see
+  // OmniPicker3SerialImpl::SetFrameSendTimeout).
+  std::cout << "Frame send timeout: " << send_timeout << " ms" << std::endl;
+
+  // Write the values straight back: exercises the setters without changing behavior.
+  // ShowDataDetails is deliberately left alone here -- main() owns it via -v/--verbose.
+  hand.SetRequestInterval(request_interval);
+  hand.SetFrameRecvTimeout(recv_timeout);
+  hand.SetFrameSendTimeout(send_timeout);
 }
 
 // OP3 has no kinematics solver; these are expected to log a warning and return without
@@ -232,12 +254,40 @@ void DemoGesture(oh::OmniPicker3& hand) {
 
 void DemoReports(oh::OmniPicker3& hand) {
   std::cout << "\n========== Reports ==========" << std::endl;
+  std::cout << "GetErrorReport(1): " << hand.GetErrorReport(1).ToString() << std::endl;
   PrintAllErrorReports(hand.GetAllErrorReport());
+  std::cout << "GetTemperatureReport(1): " << hand.GetTemperatureReport(1) << std::endl;
   PrintVector("GetAllTemperatureReport()", hand.GetAllTemperatureReport());
+  std::cout << "GetCurrentReport(1): " << hand.GetCurrentReport(1) << std::endl;
   PrintVector("GetAllCurrentReport()", hand.GetAllCurrentReport());
+  // Register 0x12 (VELOCITY_CTRL) is absent from the current protocol spec's register
+  // table and times out on current firmware; see BACKLOG.md. Shown for evidence.
   std::cout << "GetJointMotorVelo(1): " << hand.GetJointMotorVelo(1) << std::endl;
   PrintVector("GetAllJointMotorVelo()", hand.GetAllJointMotorVelo());
-  PrintVector("GetAllCurrentThreshold()", hand.GetAllCurrentThreshold());
+}
+
+// Register 0x03 (CURRENT_THRESHOLD) is likewise absent from the current spec's register
+// table and times out on current firmware (BACKLOG.md). The write is still demoed as a
+// read/modify/restore round-trip so it can never leave a changed value behind.
+void DemoCurrentThreshold(oh::OmniPicker3& hand) {
+  std::cout << "\n========== Current Threshold (0x03) ==========" << std::endl;
+  const auto original = hand.GetAllCurrentThreshold();
+  PrintVector("GetAllCurrentThreshold()", original);
+  std::cout << "GetCurrentThreshold(1): " << hand.GetCurrentThreshold(1) << std::endl;
+
+  if (original.empty()) {
+    std::cout << "read returned nothing, skipping the write round-trip" << std::endl;
+    return;
+  }
+
+  std::cout << "SetCurrentThreshold(1, " << original[0] << ") (same value, no-op write)"
+            << std::endl;
+  hand.SetCurrentThreshold(1, original[0]);
+  std::cout << "readback: " << hand.GetCurrentThreshold(1) << std::endl;
+
+  std::cout << "SetAllCurrentThreshold(original) (restore)" << std::endl;
+  hand.SetAllCurrentThreshold(original);
+  PrintVector("readback", hand.GetAllCurrentThreshold());
 }
 
 void DemoMixControl(oh::OmniPicker3& hand) {
@@ -245,6 +295,14 @@ void DemoMixControl(oh::OmniPicker3& hand) {
   std::cout << "MixControlByPT({2048}, {0})" << std::endl;
   PrintMixControlReply(hand.MixControlByPT({2048}, {0}));
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  // Neither OP3 impl overrides the PV/PVT forms, so these hit the OmniHand base-class
+  // no-ops: they send no frame and return empty. Demoed to document that.
+  std::cout << "\nMixControlByPV / MixControlByPVT are not implemented on OP3 "
+               "(base-class no-ops, no frame sent)"
+            << std::endl;
+  PrintMixControlReply(hand.MixControlByPV({0}, {0}));
+  PrintMixControlReply(hand.MixControlByPVT({2048}, {0}, {0}));
 }
 
 void DemoTactileSensor(oh::OmniPicker3& hand) {
@@ -256,9 +314,28 @@ void DemoTactileSensor(oh::OmniPicker3& hand) {
   }
 
   const auto& sensor_order = hand.GetSensorOrder();
+  std::cout << "GetSensorOrder(): [";
+  for (size_t i = 0; i < sensor_order.size(); ++i) {
+    if (i > 0) {
+      std::cout << ", ";
+    }
+    std::cout << oh::ToString(sensor_order[i]);
+  }
+  std::cout << "]" << std::endl;
+
+  std::cout << "GetNumOfTactileSensors(): " << hand.GetNumOfTactileSensors() << std::endl;
+
   for (const auto finger : sensor_order) {
-    std::cout << "GetSensorDataLength(" << oh::ToString(finger)
-              << "): " << hand.GetSensorDataLength(finger) << std::endl;
+    const std::string name = oh::ToString(finger);
+    std::cout << "GetSensorDataLength(" << name << "): " << hand.GetSensorDataLength(finger)
+              << ", GetNumOfTactilePoints(): " << hand.GetNumOfTactilePoints(finger)
+              << ", GetLenOfTactileDatum(): " << hand.GetLenOfTactileDatum(finger)
+              << ", GetNumOfRepliedTactileFrames(): "
+              << hand.GetNumOfRepliedTactileFrames(finger)
+              << ", GetSNOfTactileSensor(): \"" << hand.GetSNOfTactileSensor(finger) << "\""
+              << std::endl;
+    // Register 0x05 (single-sensor downsampled query) times out on current OP3 firmware
+    // while 0x06 (the *Raw multi-frame path) works; see BACKLOG.md.
     PrintTactilePreview(hand.GetTactileSensorData(finger));
     PrintTactilePreview(hand.GetTactileSensorDataRaw(finger));
   }
@@ -293,7 +370,7 @@ int main(int argc, char* argv[]) {
             << ", hand device id " << static_cast<unsigned int>(options.hand_device_id)
             << std::endl;
 
-  // OmniPicker 3 is a gripper. Use UNKNOWN for the shared factory's HandType slot.
+  // hand_type carries no meaning for a gripper: OP3 stores it but never uses it, so any value works.
   auto hand = oh::OmniPicker3::createHandByRs485(oh::HandType::UNKNOWN,
                                                  options.hand_device_id,
                                                  options.uart_port,
@@ -319,6 +396,7 @@ int main(int argc, char* argv[]) {
   DemoKinematicsStubs(*hand);
   DemoGesture(*hand);
   DemoReports(*hand);
+  DemoCurrentThreshold(*hand);
   DemoMixControl(*hand);
   DemoTactileSensor(*hand);
   ReturnToZero(*hand);
