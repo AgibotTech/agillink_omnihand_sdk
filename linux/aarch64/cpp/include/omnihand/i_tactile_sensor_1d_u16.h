@@ -18,7 +18,19 @@ struct AGIBOT_EXPORT TactileSensorDataU16 {
 
 class AGIBOT_EXPORT ITactileSensor1DU16 {
  public:
+  virtual size_t GetNumOfTactileSensors() const = 0;
+
+  virtual size_t GetNumOfTactilePoints(Finger finger) const = 0;
+
+  // @Deprecated
   virtual size_t GetSensorDataLength(Finger finger) const = 0;
+
+  virtual size_t GetLenOfTactileDatum(Finger finger) const = 0;
+
+  virtual size_t GetNumOfRepliedTactileFrames(Finger finger) const = 0;
+
+  virtual std::string GetSNOfTactileSensor(Finger finger) const = 0;
+
   virtual const std::vector<Finger>& GetSensorOrder() const = 0;
 
   virtual bool InitTactilePointsMap() = 0;

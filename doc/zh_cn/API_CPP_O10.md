@@ -99,6 +99,7 @@ struct VendorInfo {
 struct DeviceInfo {
     unsigned char hand_device_id; // 手部设备 ID
     CommuParams commu_params;     // 通信参数
+    HandType hand_type;           // 设备上报的手型
     std::string toString() const;
 };
 ```
@@ -269,6 +270,7 @@ bool Init() const;
  * @return 包含产品型号、序列号、硬件版本、软件版本的 VendorInfo 结构）
  */
 VendorInfo GetVendorInfo() const;
+std::string GetSN() const;
 
 /**
  * @brief 获取设备信息）
@@ -277,14 +279,16 @@ VendorInfo GetVendorInfo() const;
  */
 DeviceInfo GetDeviceInfo() const;
 
-/**
- * @brief 设置设备 ID。
- * @param hand_device_id 设备 ID。
- * @note 串口通信（RS485）不支持此接口）
- */
-void SetDeviceId(unsigned char hand_device_id);
+int GetHandDeviceIdByBroadcast();
+uint8_t GetNonPrivateHandDeviceIdByBroadcast();
+uint16_t GetPrivateHandDeviceIdByBroadcast();
+
+// id 为 0 时恢复各协议的出厂默认 ID。
+bool SetHandDeviceIdByBroadcast(uint8_t id);
 
 ```
+
+`GetHandDeviceIdByBroadcast()` 在出厂默认状态返回 `0`，标准协议与私有协议的自定义 ID 一致时返回正数，查询失败或不一致时返回 `-1`。`SetDeviceId()` 仅作为废弃的兼容接口保留。RS485 固件可能只支持构造时选中的一种协议，此接口会避免查询不受支持的协议。
 
 ## 关节角度控制
 
@@ -401,6 +405,18 @@ std::vector<int16_t> GetAllJointMotorVelo() const;
 ```
 
 ## 触觉传感器数据
+
+可在运行时查询传感器元数据：
+
+```cpp
+size_t GetNumOfTactileSensors() const;
+size_t GetNumOfTactilePoints(Finger finger) const;
+size_t GetLenOfTactileDatum(Finger finger) const;
+size_t GetNumOfRepliedTactileFrames(Finger finger) const;
+std::string GetSNOfTactileSensor(Finger finger) const;
+```
+
+`GetSensorDataLength()` 已废弃；获取触觉点数请使用 `GetNumOfTactilePoints()`。
 
 OmniHand 2025 (O10) 使用 **1D 触觉传感器），具有以下特性：
 - **数据单位**：1g

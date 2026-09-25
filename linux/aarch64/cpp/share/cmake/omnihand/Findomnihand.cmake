@@ -35,7 +35,7 @@ find_package_handle_standard_args(omnihand
 if(omnihand_FOUND)
   # Set RPATH to find dependency libraries in the same directory
   set(_rpath "${_lib_dir}")
-  
+
   if(NOT TARGET omnihand)
     add_library(omnihand SHARED IMPORTED)
     set_target_properties(omnihand PROPERTIES
@@ -43,6 +43,19 @@ if(omnihand_FOUND)
       INTERFACE_INCLUDE_DIRECTORIES "${omnihand_INCLUDE_DIRS}"
       IMPORTED_NO_SONAME TRUE)
   endif()
-  
+
+  find_library(AGILINK_LOGGER_LIBRARY NAMES agilink_logger HINTS "${_lib_dir}" NO_DEFAULT_PATH)
+  if(AGILINK_LOGGER_LIBRARY)
+    if(NOT TARGET agilink_logger)
+      add_library(agilink_logger SHARED IMPORTED)
+      set_target_properties(agilink_logger PROPERTIES
+        IMPORTED_LOCATION "${AGILINK_LOGGER_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${omnihand_INCLUDE_DIRS}"
+        IMPORTED_NO_SONAME TRUE)
+    endif()
+    set_property(TARGET omnihand APPEND PROPERTY
+      INTERFACE_LINK_LIBRARIES agilink_logger)
+  endif()
+
   message(STATUS "Found omnihand (unified library): ${_lib_dir}")
 endif()

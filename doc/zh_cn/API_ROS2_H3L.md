@@ -16,17 +16,21 @@ H3L ROS2 节点提供 4 自由度灵巧手的统一 Topic 接口，遵循 [ROS2 
 |-------|---------|------|------|
 | `joint_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | `position[0..3]` = 电机 ticks（0–4095），触发控制+回读 |
 | `joint_states` | `sensor_msgs/JointState` | 发布 (你订阅) | `position[0..3]` = 电机 ticks（0–4095） |
+| `joint_cmd_source` | `std_msgs/Int8` | 订阅 (你发布) | `0=NORMAL`、`1=ANGLE`、`2=POSITION` |
+| `joint_angle_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | 命令源为 `1`；H3L 仍通过现有位置路径解释数值 |
+| `joint_position_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 命令源为 `2`；电机原始位置 |
+| `joint_position_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 带时间戳的原始位置回读 |
 | `joint_mix_control_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | 位置+力矩混合控制（见下文） |
 | `joint_error_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllErrorReport()` |
-| `joint_error_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | `data[]` = 错误码 bitmask (5 bit) |
+| `joint_error_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | `header.stamp` + 错误码 `data[]` |
 | `joint_temperature_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllTemperatureReport()` |
-| `joint_temperature_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | `data[]` = 温度值（°C） |
+| `joint_temperature_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | `header.stamp` + 温度 `data[]`（°C） |
 | `joint_current_cmd` | `std_msgs/Empty` | 订阅 (你发布) | 触发 `GetAllCurrentReport()` |
-| `joint_current_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | `data[]` = 电流值 |
-| `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | 订阅 (你发布) | 写入电流阈值 `data[0..3]` |
-| `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | 发布 (你订阅) | 回读电流阈值 `data[0..3]` |
+| `joint_current_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | `header.stamp` + 电流 `data[]` |
+| `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电流阈值 `data[0..3]` |
+| `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 带时间戳的电流阈值回读 `data[0..3]` |
 
-**注意**: H3L 有 4 个自由度。所有数组包含 4 个元素。**无触觉传感器**，因此没有 `tactile_*` topics。
+**注意**：H3L 有 4 个自由度。所有数组包含 4 个元素。**无触觉传感器**，因此没有 `tactile_*` topic。
 
 **触发式回读**：节点不会自动周期发布状态。温度、电流、错误码等需要你先发送对应的 `*_cmd`（如 `joint_temperature_cmd`），节点才会查询硬件并在 `*_states` 上发布一次回读。`joint_cmd` 例外——发送位置指令后自动回读 `joint_states`。这样设计是为了避免占用 CAN 总线带宽，保证控制指令的实时性。
 

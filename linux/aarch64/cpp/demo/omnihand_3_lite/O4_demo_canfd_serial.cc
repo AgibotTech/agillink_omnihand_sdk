@@ -17,81 +17,97 @@
  * Note: serial numbers in code should be updated for your setup
  */
 
-#include <iostream>
-#include <iomanip>
+#include <cstdio>
 #include <vector>
 #include <thread>
 #include <chrono>
 #include <string>
 #include <algorithm>
+#include "agilink_logger.h"
 #include "omnihand/omnihand_3_lite.h"
 
+using agilink::AgilinkLogger;
+static constexpr const char* TAG = "OmniHand3LiteDemo";
+
 void printUsage(const char* program_name) {
-  std::cout << "Usage: " << program_name << " [left|right|both]" << std::endl;
-  std::cout << "  left   - Control left hand only" << std::endl;
-  std::cout << "  right  - Control right hand only" << std::endl;
-  std::cout << "  both   - Control both hands simultaneously" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Note: Serial numbers in code need to be modified according to actual devices"
-            << std::endl;
+  AgilinkLogger::get().infof(TAG, "Usage: %s [left|right|both]", program_name);
+  AgilinkLogger::get().infof(TAG, "  left   - Control left hand only");
+  AgilinkLogger::get().infof(TAG, "  right  - Control right hand only");
+  AgilinkLogger::get().infof(TAG, "  both   - Control both hands simultaneously");
+  AgilinkLogger::get().info("");
+  AgilinkLogger::get().infof(TAG, "Note: Serial numbers in code need to be modified according to actual devices");
 }
 
 void controlSingleHand(std::unique_ptr<agilink::omnihand::OmniHand3Lite>& hand,
                        const std::string& hand_name) {
-  std::cout << "\n=== " << hand_name << " Hand Control ===" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\n=== %s Hand Control ===", hand_name.c_str());
 
   auto vendor_info = hand->GetVendorInfo();
-  std::cout << "\nVendor Info:" << vendor_info.ToString() << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nVendor Info:%s", vendor_info.ToString().c_str());
 
   auto device_info = hand->GetDeviceInfo();
-  std::cout << "\nDevice Info:" << device_info.ToString() << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nDevice Info:%s", device_info.ToString().c_str());
 
-  std::cout << "\nTemperature Reports: [";
   auto temperatures = hand->GetAllTemperatureReport();
-  for (size_t i = 0; i < temperatures.size(); ++i)
-    std::cout << (i ? ", " : "") << temperatures[i];
-  std::cout << "]" << std::endl;
+  {
+    std::string msg = "\nTemperature Reports: [";
+    for (size_t i = 0; i < temperatures.size(); ++i) {
+      if (i) msg += ", ";
+      msg += std::to_string(temperatures[i]);
+    }
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
+  }
 
   // ============ Gesture Control Demo ============
-  std::cout << "\n=== Gesture Control ===" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\n=== Gesture Control ===");
 
-  std::cout << "Setting gesture: FIST..." << std::endl;
+  AgilinkLogger::get().infof(TAG, "Setting gesture: FIST...");
   hand->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_FIST);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   auto fist_positions = hand->GetAllJointMotorPosi();
-  std::cout << "FIST positions: [";
-  for (size_t i = 0; i < fist_positions.size(); ++i) {
-    std::cout << fist_positions[i];
-    if (i < fist_positions.size() - 1) std::cout << ", ";
+  {
+    std::string msg = "FIST positions: [";
+    for (size_t i = 0; i < fist_positions.size(); ++i) {
+      if (i > 0) msg += ", ";
+      msg += std::to_string(fist_positions[i]);
+    }
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 
-  std::cout << "Setting gesture: OPEN..." << std::endl;
+  AgilinkLogger::get().infof(TAG, "Setting gesture: OPEN...");
   hand->SetHandGesture(agilink::omnihand::h3l::OmniHand3LiteGesture::OMNI_HAND_3_LITE_GESTURE_OPEN);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   auto open_positions = hand->GetAllJointMotorPosi();
-  std::cout << "OPEN positions: [";
-  for (size_t i = 0; i < open_positions.size(); ++i) {
-    std::cout << open_positions[i];
-    if (i < open_positions.size() - 1) std::cout << ", ";
+  {
+    std::string msg = "OPEN positions: [";
+    for (size_t i = 0; i < open_positions.size(); ++i) {
+      if (i > 0) msg += ", ";
+      msg += std::to_string(open_positions[i]);
+    }
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 
-  std::cout << "\nSetting joint motor positions (0~4096)..." << std::endl;
+  AgilinkLogger::get().infof(TAG, "\nSetting joint motor positions (0~4096)...");
   std::vector<int16_t> positions(
       static_cast<size_t>(agilink::omnihand::OmniHand3Lite::kDegreesOfActiveFreedom), 2048);
   hand->SetAllJointMotorPosi(positions);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   auto read_positions = hand->GetAllJointMotorPosi();
-  std::cout << "Joint Motor Positions: [";
-  for (size_t i = 0; i < read_positions.size(); ++i) {
-    std::cout << read_positions[i];
-    if (i < read_positions.size() - 1) std::cout << ", ";
+  {
+    std::string msg = "Joint Motor Positions: [";
+    for (size_t i = 0; i < read_positions.size(); ++i) {
+      if (i > 0) msg += ", ";
+      msg += std::to_string(read_positions[i]);
+    }
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << "]" << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -104,16 +120,16 @@ int main(int argc, char** argv) {
     } else if (arg == "left" || arg == "right" || arg == "both") {
       mode = arg;
     } else {
-      std::cerr << "[Error]: Invalid argument: " << arg << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Invalid argument: %s", arg.c_str());
       printUsage(argv[0]);
       return 1;
     }
   }
 
-  std::cout << "============================================" << std::endl;
-  std::cout << "OmniHand 3 Lite (O4) - CANFD Control (by serial_number)" << std::endl;
-  std::cout << "Mode: " << mode << std::endl;
-  std::cout << "============================================" << std::endl;
+  AgilinkLogger::get().infof(TAG, "============================================");
+  AgilinkLogger::get().infof(TAG, "OmniHand 3 Lite (O4) - CANFD Control (by serial_number)");
+  AgilinkLogger::get().infof(TAG, "Mode: %s", mode.c_str());
+  AgilinkLogger::get().infof(TAG, "============================================");
 
   unsigned char device_id = 1;
   // Note: serial numbers should be updated for your setup
@@ -124,15 +140,15 @@ int main(int argc, char** argv) {
     auto left_hand = agilink::omnihand::OmniHand3Lite::createHandByZlgcan(
         agilink::omnihand::HandType::LEFT, device_id, left_serial, 0);
     if (!left_hand) {
-      std::cerr << "[Error]: Failed to create left hand instance" << std::endl;
-      std::cerr << "Please check if device with serial number is connected" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to create left hand instance");
+      AgilinkLogger::get().errorf(TAG, "Please check if device with serial number is connected");
       return 1;
     }
     if (!left_hand->Init()) {
-      std::cerr << "[Error]: Failed to initialize left hand" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to initialize left hand");
       return 1;
     }
-    std::cout << "[OK]: Left hand initialized successfully" << std::endl;
+    AgilinkLogger::get().infof(TAG, "[OK]: Left hand initialized successfully");
     controlSingleHand(left_hand, "Left");
   }
 
@@ -140,32 +156,37 @@ int main(int argc, char** argv) {
     auto right_hand = agilink::omnihand::OmniHand3Lite::createHandByZlgcan(
         agilink::omnihand::HandType::RIGHT, device_id, right_serial, 0);
     if (!right_hand) {
-      std::cerr << "[Error]: Failed to create right hand instance" << std::endl;
-      std::cerr << "Please check if device with serial number is connected" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to create right hand instance");
+      AgilinkLogger::get().errorf(TAG, "Please check if device with serial number is connected");
       return 1;
     }
     if (!right_hand->Init()) {
-      std::cerr << "[Error]: Failed to initialize right hand" << std::endl;
+      AgilinkLogger::get().errorf(TAG, "[Error]: Failed to initialize right hand");
       return 1;
     }
-    std::cout << "[OK]: Right hand initialized successfully" << std::endl;
+    AgilinkLogger::get().infof(TAG, "[OK]: Right hand initialized successfully");
     if (mode == "right") {
       controlSingleHand(right_hand, "Right");
     } else {
-      std::cout << "\n=== Dual Hand (Right) ===" << std::endl;
+      AgilinkLogger::get().infof(TAG, "\n=== Dual Hand (Right) ===");
       auto right_vendor = right_hand->GetVendorInfo();
-      std::cout << "Right Hand: " << right_vendor.productModel << " Serial: "
-                << right_vendor.productSeqNum << std::endl;
+      AgilinkLogger::get().infof(TAG, "Right Hand: %s Serial: %s", right_vendor.productModel.c_str(), right_vendor.productSeqNum.c_str());
       std::vector<int16_t> pos(4, 2048);
       right_hand->SetAllJointMotorPosi(pos);
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
       auto rp = right_hand->GetAllJointMotorPosi();
-      std::cout << "Right positions: [";
-      for (size_t i = 0; i < rp.size(); ++i) std::cout << (i ? ", " : "") << rp[i];
-      std::cout << "]" << std::endl;
+      {
+        std::string msg = "Right positions: [";
+        for (size_t i = 0; i < rp.size(); ++i) {
+          if (i) msg += ", ";
+          msg += std::to_string(rp[i]);
+        }
+        msg += "]";
+        AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
+      }
     }
   }
 
-  std::cout << "\n[Done]: Example completed successfully!" << std::endl;
+  AgilinkLogger::get().infof(TAG, "\n[Done]: Example completed successfully!");
   return 0;
 }

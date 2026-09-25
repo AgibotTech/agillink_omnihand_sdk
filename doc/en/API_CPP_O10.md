@@ -91,6 +91,7 @@ struct VendorInfo {
 struct DeviceInfo {
     unsigned char hand_device_id; // Hand device ID
     CommuParams commu_params;     // Communication parameters
+    HandType hand_type;           // Reported hand type
     std::string toString() const;
 };
 ```
@@ -261,6 +262,7 @@ bool Init() const;
  * @return VendorInfo structure containing product model, serial number, hardware version, software version, etc.
  */
 VendorInfo GetVendorInfo() const;
+std::string GetSN() const;
 
 /**
  * @brief Gets device information.
@@ -269,14 +271,16 @@ VendorInfo GetVendorInfo() const;
  */
 DeviceInfo GetDeviceInfo() const;
 
-/**
- * @brief Sets the device ID.
- * @param hand_device_id The device ID.
- * @note This interface is not supported for serial port communication (RS485).
- */
-void SetDeviceId(unsigned char hand_device_id);
+int GetHandDeviceIdByBroadcast();
+uint8_t GetNonPrivateHandDeviceIdByBroadcast();
+uint16_t GetPrivateHandDeviceIdByBroadcast();
+
+// id == 0 restores the protocol-specific factory defaults.
+bool SetHandDeviceIdByBroadcast(uint8_t id);
 
 ```
+
+`GetHandDeviceIdByBroadcast()` returns `0` for factory defaults, a positive custom ID when the standard and private IDs agree, and `-1` on failure/mismatch. `SetDeviceId()` remains deprecated compatibility API. RS485 firmware may expose only the protocol selected during construction; this method avoids querying the unsupported protocol.
 
 ## Joint Angle Control
 
@@ -393,6 +397,18 @@ std::vector<int16_t> GetAllJointMotorVelo() const;
 ```
 
 ## Tactile Sensor Data
+
+Sensor metadata can be queried at runtime:
+
+```cpp
+size_t GetNumOfTactileSensors() const;
+size_t GetNumOfTactilePoints(Finger finger) const;
+size_t GetLenOfTactileDatum(Finger finger) const;
+size_t GetNumOfRepliedTactileFrames(Finger finger) const;
+std::string GetSNOfTactileSensor(Finger finger) const;
+```
+
+`GetSensorDataLength()` is deprecated; use `GetNumOfTactilePoints()` for point counts.
 
 OmniHand 2025 (O10) uses **1D tactile sensors** with the following characteristics:
 - **Data unit**: 1g

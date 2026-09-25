@@ -43,7 +43,7 @@ A read-only dexterous hand using UMI protocol.
 
 - **[Linux (x64/amd64)](linux/x64/README.md)** - Installation, USB setup, ROS2
 - **[Linux (arm64/aarch64)](linux/aarch64/README.md)** - Installation, USB setup, ROS2
-- **[Windows (x64)](windows/README.md)** - Installation, driver setup
+- **[Windows (x64)](windows/x64/README.md)** - Installation, driver setup
 
 ## API Documentation
 
@@ -53,6 +53,8 @@ A read-only dexterous hand using UMI protocol.
 - [OmniHand Pro 2025 (O12) C++ API](doc/en/API_CPP_O12.md)
 - [OmniHand 3 Lite (H3L) C++ API](doc/en/API_CPP_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) C++ API](doc/en/API_CPP_O10_UMI.md)
+- [OmniHand 3 Ultra M (H3UM/O20) C++ API](doc/en/API_CPP_H3UM.md)
+- [1.1.8 to 1.1.9 migration](doc/en/MIGRATION_1_1_8_TO_1_1_9.md)
 
 ### Python API
 - [Python API Index](doc/en/API_PYTHON.md)
@@ -60,6 +62,7 @@ A read-only dexterous hand using UMI protocol.
 - [OmniHand Pro 2025 (O12) Python API](doc/en/API_PYTHON_O12.md)
 - [OmniHand 3 Lite (H3L) Python API](doc/en/API_PYTHON_H3L.md)
 - [OmniHand Dex UMI (O10 UMI) Python API](doc/en/API_PYTHON_UMI.md)
+- [OmniHand 3 Ultra M (H3UM/O20) Python API](doc/en/API_PYTHON_H3UM.md)
 
 ### Kinematics API
 - [OmniHand 2025 (O10) Kinematics C++](doc/en/API_KINEMATICS_CPP_O10.md)

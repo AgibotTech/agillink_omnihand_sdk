@@ -39,19 +39,23 @@ All products follow the same topic naming and interaction pattern:
 |-------|-------------|-----------|---------|-------------|
 | `joint_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | — | Position command `position[]` = rad |
 | `joint_states` | `sensor_msgs/JointState` | Publish (you sub) | On `joint_cmd` received | Position readback `position[]` = rad |
+| `joint_cmd_source` | `std_msgs/Int8` | Subscribe (you pub) | — | Select active command source: `0=NORMAL`, `1=ANGLE`, `2=POSITION` |
+| `joint_angle_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Source `1` | Angle override, `position[]` = rad |
+| `joint_position_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Source `2` | Raw motor-position override |
+| `joint_position_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On accepted `joint_position_cmd` | Timestamped raw motor-position readback |
 | `joint_mix_control_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | — | Position+torque mixed control (O10/O12 only, see below) |
 | `joint_error_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger error report query |
-| `joint_error_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_error_cmd` received | `data[]` = error bitmask |
+| `joint_error_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On `joint_error_cmd` received | `header.stamp` + `data[]` error bitmask |
 | `joint_temperature_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger temperature query |
-| `joint_temperature_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_temperature_cmd` received | `data[]` = temperature |
+| `joint_temperature_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On `joint_temperature_cmd` received | `header.stamp` + `data[]` temperature |
 | `joint_current_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger current query |
-| `joint_current_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_current_cmd` received | `data[]` = current |
+| `joint_current_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On `joint_current_cmd` received | `header.stamp` + `data[]` current |
 | `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | Subscribe (you pub) | — | Write control mode `data[]` (O12/H3U_M only) |
-| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | Publish (you sub) | On `joint_control_mode_cmd` received | Readback control mode `data[]` (O12/H3U_M only) |
+| `joint_control_mode_states` | `omnihand_node_msgs/Int8MultiArrayStamped` | Publish (you sub) | On `joint_control_mode_cmd` received | Timestamped control-mode readback (O12/H3U_M only) |
 | `joint_voltage_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | — | Write voltage command `data[]` (O12 only) |
-| `joint_voltage_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_voltage_cmd` received | Readback voltage command `data[]` (O12 only; unavailable on O12 firmware <= 1.2.15) |
+| `joint_voltage_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On `joint_voltage_cmd` received | Timestamped voltage readback (O12 only; unavailable on O12 firmware <= 1.2.15) |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | — | Write current threshold `data[]` |
-| `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | On `joint_current_threshold_cmd` received | Readback current threshold `data[]` |
+| `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On `joint_current_threshold_cmd` received | Timestamped current-threshold readback |
 | `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | — | Tactile stream: `data` = Hz (>0 start/restart, 0 stop); max **50 Hz** (O10) / **100 Hz** (O12), hardcoded in node |
 | `tactile_states` | Product-specific msg (see below) | Publish (you sub) | While tactile stream active | Tactile sensor data at the requested rate |
 
@@ -92,9 +96,9 @@ O10 and O12 have different tactile sensor data structures, each using product-sp
 | O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + seven `uint8[]` (Raw full resolution via `GetAllTactileSensorDataRaw()`); typical lengths: thumb 16, four fingers 18 each, palm 78, dorsum 102 (see [API_ROS2_O10.md](API_ROS2_O10.md)) |
 | O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + six `TactileSensorData` fields: `thumb`, `index`, `middle`, `ring`, `little`, `palm` (`online_state`, `channel_value[6]`, forces, angle, `capa_approach[4]`) |
 
-### `std_msgs` array payloads
+### Timestamped array payloads
 
-Error, temperature, current, current-threshold, and O12 voltage topics carry per-joint `int16` values in `std_msgs/Int16MultiArray` (`data[]`, with a 1-D `layout.dim` entry). O12/H3U_M control modes use `std_msgs/Int8MultiArray` the same way. Tactile data remains in product-specific `omnihand_*_node_msgs` types.
+State topics use `omnihand_node_msgs/Int16MultiArrayStamped` or `Int8MultiArrayStamped`, containing `header`, `layout`, and `data`; subscribers can read the acquisition time from `header.stamp`. Command topics continue to use `std_msgs/Int16MultiArray` or `std_msgs/Int8MultiArray`. `joint_states` remains `sensor_msgs/JointState` and also carries `header.stamp`. Tactile data remains in product-specific `omnihand_*_node_msgs` types.
 
 ## Configuration
 
@@ -197,7 +201,7 @@ python3 joint_voltage_pub.py 0 left o12
 The release package includes a ROS2 C++ demo showing how to control OmniHand via standard ROS2 topics (without depending on the OmniHand C++ SDK).
 
 The demo is located at `ros2/humble/share/omnihand_node/demo/` and contains:
-- `ros2_joint_cmd_demo.cpp` — Uses `sensor_msgs/JointState` for position control + `std_msgs/Int16MultiArray` for temperature and current readback
+- `ros2_joint_cmd_demo.cpp` — Uses `sensor_msgs/JointState` for position control and timestamped `omnihand_node_msgs` arrays for temperature/current readback
 - `CMakeLists.txt` / `package.xml` — Standard ament_cmake package configuration
 
 ### Quick Start

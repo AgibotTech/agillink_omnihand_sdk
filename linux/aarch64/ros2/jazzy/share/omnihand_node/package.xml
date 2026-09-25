@@ -12,6 +12,7 @@
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
+  <depend>omnihand_node_msgs</depend>
   <depend>builtin_interfaces</depend>
   <depend>omnihand_2025_node_msgs</depend>
   <depend>omnihand_pro_2025_node_msgs</depend>

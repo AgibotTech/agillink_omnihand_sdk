@@ -11,7 +11,10 @@ echo ""
 # Uninstall C++ SDK
 echo "Removing C++ SDK..."
 sudo rm -rf "$PREFIX/include/omnihand"
+sudo rm -f "$PREFIX/include/agilink_logger.h"
+sudo rm -f "$PREFIX/include/omnilogger.h"
 sudo rm -f "$PREFIX/lib/libomnihand.so"*
+sudo rm -f "$PREFIX/lib/libagilink_logger.so"*
 sudo rm -f "$PREFIX/lib/libusbcanfd.so"*
 sudo rm -f "$PREFIX/lib/libusb-1.0.so"*
 sudo rm -f "$PREFIX/lib/libcanbus.so"*

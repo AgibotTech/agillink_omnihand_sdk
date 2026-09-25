@@ -16,15 +16,19 @@ All topics are prefixed with `/h3l/<side>/`, where `<side>` is `left` or `right`
 |-------|-------------|-----------|-------------|
 | `joint_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | `position[0..3]` = motor ticks (0-4095), triggers control + readback |
 | `joint_states` | `sensor_msgs/JointState` | Publish (you sub) | `position[0..3]` = motor ticks (0-4095) |
+| `joint_cmd_source` | `std_msgs/Int8` | Subscribe (you pub) | `0=NORMAL`, `1=ANGLE`, `2=POSITION` |
+| `joint_angle_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Source `1`; H3L still interprets values through its available position path |
+| `joint_position_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Source `2`; raw motor positions |
+| `joint_position_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | Timestamped raw position readback |
 | `joint_mix_control_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Position+torque mixed control (see below) |
 | `joint_error_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllErrorReport()` |
-| `joint_error_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = error bitmask (5 bit) |
+| `joint_error_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + error bitmask `data[]` |
 | `joint_temperature_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllTemperatureReport()` |
-| `joint_temperature_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = temperature (°C) |
+| `joint_temperature_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + temperature `data[]` (°C) |
 | `joint_current_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllCurrentReport()` |
-| `joint_current_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | `data[]` = current |
-| `joint_current_threshold_cmd` | `omnihand_msgs/JointStateInt16` | Subscribe (you pub) | Write current threshold `data[0..3]` |
-| `joint_current_threshold_states` | `omnihand_msgs/JointStateInt16` | Publish (you sub) | Readback current threshold `data[0..3]` |
+| `joint_current_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + current `data[]` |
+| `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..3]` |
+| `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | Timestamped current-threshold readback `data[0..3]` |
 
 **Note**: H3L has 4 degrees of freedom. All arrays contain 4 elements. **No tactile sensors**, therefore no `tactile_*` topics.
 

@@ -14,19 +14,23 @@ All topics are prefixed with `/o12/<side>/`, where `<side>` is `left` or `right`
 |-------|-------------|-----------|-------------|
 | `joint_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | `position[0..11]` = rad, triggers control + readback |
 | `joint_states` | `sensor_msgs/JointState` | Publish (you sub) | `position[0..11]` = rad |
+| `joint_cmd_source` | `std_msgs/Int8` | Subscribe (you pub) | `0=NORMAL`, `1=ANGLE`, `2=POSITION` |
+| `joint_angle_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Angle override active for source `1` |
+| `joint_position_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Raw motor-position override active for source `2` |
+| `joint_position_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | Timestamped raw position readback |
 | `joint_mix_control_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Position+force mixed control (see below) |
 | `joint_error_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllErrorReport()` |
-| `joint_error_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = error bitmask (5 bit) |
+| `joint_error_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + error bitmask `data[]` |
 | `joint_temperature_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllTemperatureReport()` |
-| `joint_temperature_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = temperature |
+| `joint_temperature_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + temperature `data[]` |
 | `joint_current_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllCurrentReport()` |
-| `joint_current_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = current |
+| `joint_current_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + current `data[]` |
 | `joint_control_mode_cmd` | `std_msgs/Int8MultiArray` | Subscribe (you pub) | Write control mode `data[0..11]`; use `4` for voltage mode |
-| `joint_control_mode_states` | `std_msgs/Int8MultiArray` | Publish (you sub) | Readback control mode `data[0..11]` |
+| `joint_control_mode_states` | `omnihand_node_msgs/Int8MultiArrayStamped` | Publish (you sub) | Timestamped control-mode readback `data[0..11]` |
 | `joint_voltage_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write voltage command `data[0..11]` |
-| `joint_voltage_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback voltage command `data[0..11]` |
+| `joint_voltage_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | Timestamped voltage readback `data[0..11]` |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..11]` |
-| `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..11]` |
+| `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | Timestamped current-threshold readback `data[0..11]` |
 | `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | Stream rate in Hz (`>0` start, `0` stop); max **100 Hz** (hardcoded in node) |
 | `tactile_states` | `omnihand_pro_2025_node_msgs/TactileSensor` | Publish (you sub) | 3D tactile while stream active |
 
@@ -47,8 +51,8 @@ The node calls `MixControlByPT` (12 position + effort values). **No readback**.
 
 Voltage control uses two topic pairs:
 
-- `joint_control_mode_cmd/states` (`std_msgs/Int8MultiArray`) for switching all 12 joints to `ControlMode.VOLTAGE` (`4`).
-- `joint_voltage_cmd/states` (`std_msgs/Int16MultiArray`) for writing and reading back voltage commands.
+- `joint_control_mode_cmd` (`std_msgs/Int8MultiArray`) and `joint_control_mode_states` (`omnihand_node_msgs/Int8MultiArrayStamped`) for switching all 12 joints to `ControlMode.VOLTAGE` (`4`).
+- `joint_voltage_cmd` (`std_msgs/Int16MultiArray`) and `joint_voltage_states` (`omnihand_node_msgs/Int16MultiArrayStamped`) for writing and timestamped readback.
 
 > Note: O12 firmware versions up to and including 1.2.15 do not support voltage readback, so `joint_voltage_states` is only usable on newer firmware.
 

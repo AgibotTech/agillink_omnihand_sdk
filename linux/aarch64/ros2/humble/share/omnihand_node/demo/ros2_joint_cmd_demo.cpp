@@ -109,6 +109,7 @@
 #include "std_msgs/msg/empty.hpp"
 #include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/int16_multi_array.hpp"
+#include "omnihand_node_msgs/msg/int16_multi_array_stamped.hpp"
 #include "omnihand_2025_node_msgs/msg/tactile_sensor.hpp"
 #include "omnihand_pro_2025_node_msgs/msg/tactile_sensor.hpp"
 #include "ros_multi_array_demo.hpp"
@@ -119,6 +120,7 @@ using sensor_msgs::msg::JointState;
 using std_msgs::msg::Empty;
 using std_msgs::msg::Float32;
 using std_msgs::msg::Int16MultiArray;
+using Int16MultiArrayStamped = omnihand_node_msgs::msg::Int16MultiArrayStamped;
 using O10Tactile = omnihand_2025_node_msgs::msg::TactileSensor;
 using O12Tactile = omnihand_pro_2025_node_msgs::msg::TactileSensor;
 
@@ -144,20 +146,20 @@ class JointCmdDemo : public rclcpp::Node {
     // --- temperature: pub Empty trigger + sub states (std_msgs/Int16MultiArray) ---
     temp_cmd_pub_ = this->create_publisher<Empty>(
         prefix + "/joint_temperature_cmd", 10);
-    temp_states_sub_ = this->create_subscription<Int16MultiArray>(
+    temp_states_sub_ = this->create_subscription<Int16MultiArrayStamped>(
         prefix + "/joint_temperature_states", 10,
         std::bind(&JointCmdDemo::OnTemperature, this, std::placeholders::_1));
 
     // --- current: pub Empty trigger + sub states (std_msgs/Int16MultiArray) ---
     current_cmd_pub_ = this->create_publisher<Empty>(
         prefix + "/joint_current_cmd", 10);
-    current_states_sub_ = this->create_subscription<Int16MultiArray>(
+    current_states_sub_ = this->create_subscription<Int16MultiArrayStamped>(
         prefix + "/joint_current_states", 10,
         std::bind(&JointCmdDemo::OnCurrent, this, std::placeholders::_1));
 
     current_threshold_cmd_pub_ = this->create_publisher<Int16MultiArray>(
         prefix + "/joint_current_threshold_cmd", 10);
-    current_threshold_states_sub_ = this->create_subscription<Int16MultiArray>(
+    current_threshold_states_sub_ = this->create_subscription<Int16MultiArrayStamped>(
         prefix + "/joint_current_threshold_states", 10,
         std::bind(&JointCmdDemo::OnCurrentThreshold, this, std::placeholders::_1));
 
@@ -241,7 +243,7 @@ class JointCmdDemo : public rclcpp::Node {
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
 
-  void OnTemperature(const Int16MultiArray::SharedPtr msg) {
+  void OnTemperature(const Int16MultiArrayStamped::SharedPtr msg) {
     std::ostringstream oss;
     oss << "temperature (°C): [";
     for (size_t i = 0; i < msg->data.size(); ++i) {
@@ -252,7 +254,7 @@ class JointCmdDemo : public rclcpp::Node {
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
 
-  void OnCurrent(const Int16MultiArray::SharedPtr msg) {
+  void OnCurrent(const Int16MultiArrayStamped::SharedPtr msg) {
     std::ostringstream oss;
     oss << "current (mA): [";
     for (size_t i = 0; i < msg->data.size(); ++i) {
@@ -263,7 +265,7 @@ class JointCmdDemo : public rclcpp::Node {
     RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
   }
 
-  void OnCurrentThreshold(const Int16MultiArray::SharedPtr msg) {
+  void OnCurrentThreshold(const Int16MultiArrayStamped::SharedPtr msg) {
     std::ostringstream oss;
     oss << "current_threshold (mA): [";
     for (size_t i = 0; i < msg->data.size(); ++i) {
@@ -322,9 +324,9 @@ class JointCmdDemo : public rclcpp::Node {
   rclcpp::Publisher<Empty>::SharedPtr current_cmd_pub_;
   rclcpp::Publisher<Int16MultiArray>::SharedPtr current_threshold_cmd_pub_;
   // Temperature / current states: std_msgs/Int16MultiArray
-  rclcpp::Subscription<Int16MultiArray>::SharedPtr temp_states_sub_;
-  rclcpp::Subscription<Int16MultiArray>::SharedPtr current_states_sub_;
-  rclcpp::Subscription<Int16MultiArray>::SharedPtr current_threshold_states_sub_;
+  rclcpp::Subscription<Int16MultiArrayStamped>::SharedPtr temp_states_sub_;
+  rclcpp::Subscription<Int16MultiArrayStamped>::SharedPtr current_states_sub_;
+  rclcpp::Subscription<Int16MultiArrayStamped>::SharedPtr current_threshold_states_sub_;
   // Tactile sensor
   rclcpp::Publisher<Float32>::SharedPtr tactile_cmd_pub_;
   rclcpp::Subscription<O10Tactile>::SharedPtr o10_tactile_sub_;

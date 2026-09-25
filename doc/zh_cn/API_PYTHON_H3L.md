@@ -10,7 +10,7 @@
 - 支持 CAN（ZLG USB CANFD / HCAN）通信
 - 支持 SocketCAN（仅 Linux）
 - 支持 ZLG CAN TCP（仅 Linux x64 / Windows）
-- **无触觉传感器**
+- 文档所述 H3L 硬件**无触觉传感器**；U16 触觉方法作为协议/固件兼容接口保留
 - **无运动学求解器**：不支持角度控制（`set_all_active_joint_angles` 为桩实现）。请使用电机位置控制（`set_all_joint_motor_positions`）
 
 ## 导入
@@ -150,6 +150,18 @@ def create_hand_by_zlgcan_tcp(hand_type: HandType,
     Returns:
         OmniHand3Lite: 灵巧手实例。
     """
+```
+
+### RS485
+
+```python
+@staticmethod
+def create_hand_by_rs485(
+    hand_type: int = 0,
+    hand_device_id: int = 1,
+    serial_port: str = "/dev/ttyUSB0",
+    baud_rate: int = 460800,
+) -> "OmniHand3Lite": ...
 ```
 
 ## 主要接口
@@ -305,6 +317,18 @@ def get_vendor_info(self) -> VendorInfo: ...
 def get_device_info(self) -> DeviceInfo: ...
 def set_device_id(self, device_id: int) -> None: ...
 ```
+
+### U16 1D 触觉传感器
+
+```python
+def get_num_of_tactile_sensors(self) -> int: ...
+def get_num_of_tactile_points(self, finger_index: int) -> int: ...
+def get_len_of_tactile_datum(self, finger_index: int) -> int: ...
+def get_num_of_replied_tactile_frames(self, finger_index: int) -> int: ...
+def get_sn_of_tactile_sensor(self, finger_index: int) -> str: ...
+```
+
+这些方法用于协议/固件兼容，在无触觉传感器的 H3L 硬件上返回 `0` 或空字符串。旧的 `get_sensor_data_length()` 对应 C++ 接口已废弃，H3L Python 类未暴露该名称。
 
 ### 调试功能
 

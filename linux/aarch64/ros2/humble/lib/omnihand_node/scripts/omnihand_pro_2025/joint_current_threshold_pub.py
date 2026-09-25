@@ -21,6 +21,7 @@ if _scripts not in sys.path:
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int16MultiArray
+from omnihand_node_msgs.msg import Int16MultiArrayStamped
 from ros_multi_array_utils import make_int16_multi_array
 
 NUM_JOINTS = 12
@@ -38,12 +39,12 @@ class CurrentThresholdPubSub(Node):
         self.publisher = self.create_publisher(
             Int16MultiArray, f'/{product}/{hand_side}/joint_current_threshold_cmd', 10)
         self.subscription = self.create_subscription(
-            Int16MultiArray, f'/{product}/{hand_side}/joint_current_threshold_states', self.callback, 10)
+            Int16MultiArrayStamped, f'/{product}/{hand_side}/joint_current_threshold_states', self.callback, 10)
 
         self.publisher.publish(make_int16_multi_array([threshold] * NUM_JOINTS))
         self.get_logger().info(f'{product}/{hand_side} set current_threshold={threshold} for all {NUM_JOINTS} joints')
 
-    def callback(self, msg: Int16MultiArray):
+    def callback(self, msg: Int16MultiArrayStamped):
         pairs = [f'joint_{i}={msg.data[i]}' for i in range(len(msg.data))]
         self.get_logger().info(f'{self.product}/{self.hand_side} current_threshold read-back: [{", ".join(pairs)}]')
         raise SystemExit(0)

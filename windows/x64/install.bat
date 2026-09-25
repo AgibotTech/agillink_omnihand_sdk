@@ -153,6 +153,10 @@ REM Add C:\omnihand\bin to system PATH
 powershell -NoProfile -Command "$p = [Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($p -notlike '*C:\omnihand\bin*') { [Environment]::SetEnvironmentVariable('Path', $p.TrimEnd(';') + ';C:\omnihand\bin', 'Machine'); Write-Host '[OK] Added C:\omnihand\bin to system PATH' } else { Write-Host '[OK] C:\omnihand\bin already in PATH' }"
 echo.
 
+REM Register the SDK prefix for CMake package discovery
+powershell -NoProfile -Command "$entry = 'C:\omnihand'; $p = [string][Environment]::GetEnvironmentVariable('CMAKE_PREFIX_PATH', 'Machine'); $items = @($p -split ';' | Where-Object { $_ }); if ($items -notcontains $entry) { $new = (@($items) + $entry) -join ';'; [Environment]::SetEnvironmentVariable('CMAKE_PREFIX_PATH', $new, 'Machine'); Write-Host '[OK] Added C:\omnihand to system CMAKE_PREFIX_PATH' } else { Write-Host '[OK] C:\omnihand already in CMAKE_PREFIX_PATH' }"
+echo.
+
 if exist "%SCRIPT_DIR%ros2" (
     echo [INFO] ROS2 packages available at: %SCRIPT_DIR%ros2
 )
@@ -163,6 +167,8 @@ echo ============================================
 echo.
 echo C++ SDK: %INSTALL_DIR%
 echo PATH: C:\omnihand\bin has been added to system environment.
+echo CMAKE_PREFIX_PATH: C:\omnihand has been added to system environment.
+echo Restart the terminal or IDE before running CMake.
 echo.
 pause
 endlocal
