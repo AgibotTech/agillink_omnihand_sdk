@@ -10,7 +10,7 @@
 - Supports CAN (ZLG USB CANFD / HCAN) communication
 - Supports SocketCAN (Linux only)
 - Supports ZLG CAN TCP (Linux x64 / Windows only)
-- **No tactile sensors**
+- **No tactile sensors** on the documented H3L hardware; U16 tactile methods remain as protocol/firmware compatibility APIs
 - **No kinematics solver**: angle-based control is unavailable (`SetAllActiveJointAngles` is a stub). Use motor position control (`SetAllJointMotorPosi` / `SetAllJointMotorPosi`) instead.
 
 ## Include Header
@@ -80,6 +80,7 @@ struct VendorInfo {
 struct DeviceInfo {
     unsigned char hand_device_id; // Hand device ID
     CommuParams commu_params;     // Communication parameters
+    HandType hand_type;           // Reported hand type
     std::string toString() const;
 };
 ```
@@ -163,6 +164,16 @@ static std::unique_ptr<OmniHand3Lite> createHandByZlgCanTcp(
     uint16_t tcp_port,
     uint8_t canfd_channel_id = 0);
 #endif
+```
+
+### RS485
+
+```cpp
+static std::unique_ptr<OmniHand3Lite> createHandByRs485(
+    HandType hand_type,
+    uint8_t hand_device_id,
+    const std::string& serial_port,
+    uint32_t baud_rate = 460800);
 ```
 
 ## Core API
@@ -273,8 +284,31 @@ std::vector<int16_t> GetAllCurrentReport() const;
 ```cpp
 VendorInfo GetVendorInfo() const;
 DeviceInfo GetDeviceInfo() const;
-void SetDeviceId(unsigned char device_id);
+std::string GetSN() const;
+
+uint8_t GetNonPrivateHandDeviceIdByBroadcast();
+uint16_t GetPrivateHandDeviceIdByBroadcast();
+int GetHandDeviceIdByBroadcast();
+bool SetHandDeviceIdByBroadcast(uint8_t id);
 ```
+
+For H3L, `GetHandDeviceIdByBroadcast()` returns `0` for protocol defaults, a positive custom ID when both protocols agree, and `-1` on failure or mismatch. Passing `0` to `SetHandDeviceIdByBroadcast()` restores the protocol-specific defaults. `SetDeviceId()` remains deprecated compatibility API.
+
+### U16 1D Tactile Sensors
+
+```cpp
+size_t GetNumOfTactileSensors() const;
+size_t GetNumOfTactilePoints(Finger finger) const;
+size_t GetLenOfTactileDatum(Finger finger) const;
+size_t GetNumOfRepliedTactileFrames(Finger finger) const;
+std::string GetSNOfTactileSensor(Finger finger) const;
+
+TactileSensorDataU16 GetTactileSensorData(Finger finger) const;
+TactileSensorDataU16 GetTactileSensorDataRaw(Finger finger) const;
+std::vector<TactileSensorDataU16> GetAllTactileSensorDataRaw() const;
+```
+
+These methods are exposed for protocol/firmware compatibility. On H3L hardware without tactile sensors they return zero, an empty string, or empty data. `GetSensorDataLength()` is deprecated; use `GetNumOfTactilePoints()`.
 
 ### Debugging
 

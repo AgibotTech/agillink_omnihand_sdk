@@ -445,6 +445,21 @@ OmniHand 2025 (O10) uses **1D tactile sensors** with the following characteristi
 - **Sensor locations**: Fingers (16 points each), Palm (78 points), Dorsum (102 points)
 
 ```python
+def get_num_of_tactile_sensors(self) -> int:
+    """Returns the number of tactile sensors reported by the device."""
+
+def get_num_of_tactile_points(self, finger_index: int) -> int:
+    """Returns the sensing-point count for one sensor."""
+
+def get_len_of_tactile_datum(self, finger_index: int) -> int:
+    """Returns the byte length of one tactile datum."""
+
+def get_num_of_replied_tactile_frames(self, finger_index: int) -> int:
+    """Returns the number of reply frames used by one sensor."""
+
+def get_sn_of_tactile_sensor(self, finger_index: int) -> str:
+    """Returns the tactile sensor serial number."""
+
 def get_tactile_sensor_data(self, eFinger: Finger) -> List[int]:
     """Gets the tactile sensor data for a specified part (O10 only).
     
@@ -498,25 +513,26 @@ The following table compares the differences between the two approaches:
 
 **💡 Recommendation: Always prefer `get_all_tactile_sensor_data_raw()` when retrieving data from multiple sensors for better performance and reliability.**
 
-@staticmethod
+```python
 def get_sensor_data_length(finger_index: int) -> int:
-    """Get sensor data length for a specific finger (static method).
+    """Deprecated compatibility method for a sensor's point count.
     
     Args:
         finger_index: Finger enum value (Finger).
     
     Returns:
-        int: Sensor data length in bytes.
+        int: Number of sensing points.
     """
 
-@staticmethod
 def get_sensor_order() -> List[int]:
-    """Get sensor order vector (static method).
+    """Get the sensor order vector.
     
     Returns:
         List[int]: Reference to sensor order vector.
     """
 ```
+
+`get_sensor_data_length()` is deprecated; use `get_num_of_tactile_points()`.
 
 ## Control Mode
 

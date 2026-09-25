@@ -10,7 +10,7 @@
 - Supports CAN (ZLG USB CANFD / HCAN) communication
 - Supports SocketCAN (Linux only)
 - Supports ZLG CAN TCP (Linux x64 / Windows only)
-- **No tactile sensors**
+- **No tactile sensors** on the documented H3L hardware; U16 tactile methods remain as protocol/firmware compatibility APIs
 - **No kinematics solver**: angle-based control is unavailable (`set_all_active_joint_angles` is a stub). Use motor position control (`set_all_joint_motor_positions`) instead.
 
 ## Import
@@ -150,6 +150,18 @@ def create_hand_by_zlgcan_tcp(hand_type: HandType,
     Returns:
         OmniHand3Lite: Dexterous hand instance.
     """
+```
+
+### RS485
+
+```python
+@staticmethod
+def create_hand_by_rs485(
+    hand_type: int = 0,
+    hand_device_id: int = 1,
+    serial_port: str = "/dev/ttyUSB0",
+    baud_rate: int = 460800,
+) -> "OmniHand3Lite": ...
 ```
 
 ## Core API
@@ -308,6 +320,18 @@ def get_vendor_info(self) -> VendorInfo: ...
 def get_device_info(self) -> DeviceInfo: ...
 def set_device_id(self, device_id: int) -> None: ...
 ```
+
+### U16 1D Tactile Sensors
+
+```python
+def get_num_of_tactile_sensors(self) -> int: ...
+def get_num_of_tactile_points(self, finger_index: int) -> int: ...
+def get_len_of_tactile_datum(self, finger_index: int) -> int: ...
+def get_num_of_replied_tactile_frames(self, finger_index: int) -> int: ...
+def get_sn_of_tactile_sensor(self, finger_index: int) -> str: ...
+```
+
+These methods are exposed for protocol/firmware compatibility and return zero or an empty string on H3L hardware without tactile sensors. The older `get_sensor_data_length()` name is deprecated in C++ and is not exposed by the H3L Python class.
 
 ### Debugging
 

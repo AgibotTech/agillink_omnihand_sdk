@@ -14,15 +14,19 @@ All topics are prefixed with `/o10/<side>/`, where `<side>` is `left` or `right`
 |-------|-------------|-----------|-------------|
 | `joint_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | `position[0..9]` = rad, triggers control + readback |
 | `joint_states` | `sensor_msgs/JointState` | Publish (you sub) | `position[0..9]` = rad |
+| `joint_cmd_source` | `std_msgs/Int8` | Subscribe (you pub) | `0=NORMAL`, `1=ANGLE`, `2=POSITION` |
+| `joint_angle_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Angle override active for source `1` |
+| `joint_position_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Raw motor-position override active for source `2` |
+| `joint_position_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | Timestamped raw position readback |
 | `joint_mix_control_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Position+torque mixed control (see below) |
 | `joint_error_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllErrorReport()` |
-| `joint_error_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = error bitmask (5 bit) |
+| `joint_error_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + error bitmask `data[]` |
 | `joint_temperature_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllTemperatureReport()` |
-| `joint_temperature_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = temperature |
+| `joint_temperature_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + temperature `data[]` |
 | `joint_current_cmd` | `std_msgs/Empty` | Subscribe (you pub) | Triggers `GetAllCurrentReport()` |
-| `joint_current_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | `data[]` = current |
+| `joint_current_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + current `data[]` |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..9]` |
-| `joint_current_threshold_states` | `std_msgs/Int16MultiArray` | Publish (you sub) | Readback current threshold `data[0..9]` |
+| `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | Timestamped current-threshold readback `data[0..9]` |
 | `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | Stream rate in Hz (`>0` start, `0` stop); max **50 Hz** (hardcoded in node) |
 | `tactile_states` | `omnihand_2025_node_msgs/TactileSensor` | Publish (you sub) | 1D tactile while stream active (Raw full resolution) |
 
