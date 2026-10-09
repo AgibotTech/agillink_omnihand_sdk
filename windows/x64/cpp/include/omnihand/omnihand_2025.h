@@ -57,7 +57,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -73,7 +74,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -91,7 +93,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       uint8_t hand_device_id,
       const std::string& host,
       uint16_t port,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 #endif  // OMNIHAND_ZLG_TCP_SUPPORTED
 
   /**
@@ -106,7 +109,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& uart_port,
-      int32_t baudrate = 460800);
+      int32_t baudrate = 460800,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - USB communication (OmniHand 2025 only)
@@ -121,7 +125,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& uart_port,
-      int32_t baudrate = 460800);
+      int32_t baudrate = 460800,
+      CommunicationLogOptions log_options = {});
 
 #ifdef __linux__
   /**
@@ -134,7 +139,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
   static std::unique_ptr<OmniHand2025> createHandSocketCan(
       HandType hand_type,
       uint8_t hand_device_id,
-      const std::string& can_interface = "can0");
+      const std::string& can_interface = "can0",
+      CommunicationLogOptions log_options = {});
 #endif
 
   /**
@@ -149,7 +155,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -163,7 +170,8 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
 
   int GetHandDeviceIdByBroadcast() override;

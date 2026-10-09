@@ -27,6 +27,12 @@ namespace omnihand {
 struct MixCtrl;
 struct JointMotorErrorReport;
 
+/** Initial per-device communication logging applied before constructor-time requests. */
+struct AGIBOT_EXPORT CommunicationLogOptions {
+  bool enabled = false;
+  DataDetailsLogCallback callback = nullptr;
+};
+
 #define DEFAULT_DEVICE_ID 0x01
 
 /**

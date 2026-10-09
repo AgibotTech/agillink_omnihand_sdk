@@ -56,7 +56,8 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -72,7 +73,8 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
 #ifdef __linux__
   /**
@@ -85,7 +87,8 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D
   static std::unique_ptr<OmniHandDexUMI> createHandSocketCan(
       HandType hand_type,
       uint8_t hand_device_id,
-      const std::string& can_interface = "can0");
+      const std::string& can_interface = "can0",
+      CommunicationLogOptions log_options = {});
 #endif
 
   /**
@@ -102,7 +105,8 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -118,7 +122,8 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
 
   std::vector<std::string> GetJointNames() const override {

@@ -194,7 +194,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t canfd_device_id,
       uint8_t canfd_channel_id = 0,
       const std::string& tactile_soc_ip = kDefaultTactileSocIp,
-      uint16_t tactile_soc_port = kDefaultTactileSocPort);
+      uint16_t tactile_soc_port = kDefaultTactileSocPort,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -212,7 +213,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       const std::string& usbcanfd_serial_number,
       uint8_t canfd_channel_id = 0,
       const std::string& tactile_soc_ip = kDefaultTactileSocIp,
-      uint16_t tactile_soc_port = kDefaultTactileSocPort);
+      uint16_t tactile_soc_port = kDefaultTactileSocPort,
+      CommunicationLogOptions log_options = {});
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -234,7 +236,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint16_t tcp_port,
       uint8_t canfd_channel_id = 0,
       const std::string& tactile_soc_ip = kDefaultTactileSocIp,
-      uint16_t tactile_soc_port = kDefaultTactileSocPort);
+      uint16_t tactile_soc_port = kDefaultTactileSocPort,
+      CommunicationLogOptions log_options = {});
 #endif
 
 #ifdef __linux__
@@ -252,7 +255,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t hand_device_id,
       const std::string& can_interface = "can0",
       const std::string& tactile_soc_ip = kDefaultTactileSocIp,
-      uint16_t tactile_soc_port = kDefaultTactileSocPort);
+      uint16_t tactile_soc_port = kDefaultTactileSocPort,
+      CommunicationLogOptions log_options = {});
 #endif
 
   /**
@@ -271,7 +275,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       uint8_t canfd_device_id,
       uint8_t canfd_channel_id = 0,
       const std::string& tactile_soc_ip = kDefaultTactileSocIp,
-      uint16_t tactile_soc_port = kDefaultTactileSocPort);
+      uint16_t tactile_soc_port = kDefaultTactileSocPort,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -289,7 +294,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
       const std::string& hcan_serial_number,
       uint8_t canfd_channel_id = 0,
       const std::string& tactile_soc_ip = kDefaultTactileSocIp,
-      uint16_t tactile_soc_port = kDefaultTactileSocPort);
+      uint16_t tactile_soc_port = kDefaultTactileSocPort,
+      CommunicationLogOptions log_options = {});
 
   // ============ Joint Naming ============
   /**
