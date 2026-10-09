@@ -136,11 +136,11 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D
     };
   }
 
-  static constexpr uint8_t GetNumOfJointMotors() {
+  uint8_t GetNumOfJointMotors() const override {
     return kDegreesOfActiveFreedom;
   }
 
-  static constexpr uint8_t GetDoA() {
+  uint8_t GetDoA() const override {
     return kDegreesOfActiveFreedom;
   }
 

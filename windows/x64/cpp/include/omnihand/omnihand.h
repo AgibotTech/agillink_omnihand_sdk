@@ -70,6 +70,21 @@ class AGIBOT_EXPORT OmniHand {
   virtual std::string GetSN() const {
     return "";
   }
+
+  /** @brief Gets the number of controllable joint motors for this instance. */
+  virtual uint8_t GetNumOfJointMotors() const {
+    return GetDoA();
+  }
+
+  /** @brief Gets the number of active degrees of freedom for this instance. */
+  virtual uint8_t GetDoA() const {
+    return 0;
+  }
+
+  /** @brief Gets the number of passive degrees of freedom for this instance. */
+  virtual uint8_t GetDoP() const {
+    return 0;
+  }
   
   /**
    * @brief 0x02: Gets device information.

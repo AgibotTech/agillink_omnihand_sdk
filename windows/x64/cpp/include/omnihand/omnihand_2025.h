@@ -217,15 +217,15 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
     };
   }
 
-  static constexpr uint8_t GetNumOfJointMotors() {
+  uint8_t GetNumOfJointMotors() const override {
     return kDegreesOfActiveFreedom;
   }
 
-  static constexpr uint8_t GetDoA() {
+  uint8_t GetDoA() const override {
     return kDegreesOfActiveFreedom;
   }
 
-  static constexpr uint8_t GetDoP() {
+  uint8_t GetDoP() const override {
     return kDegreesOfPassiveFreedom;
   }
 

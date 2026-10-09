@@ -288,7 +288,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @brief Returns the number of joint motors.
    * @return Number of joint motors (12)
    */
-  static constexpr uint8_t GetNumOfJointMotors() {
+  uint8_t GetNumOfJointMotors() const override {
     return kDegreesOfActiveFreedom;
   }
 
@@ -296,7 +296,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @brief Returns the degrees of active freedom (DoA).
    * @return Degrees of active freedom (12)
    */
-  static constexpr uint8_t GetDoA() {
+  uint8_t GetDoA() const override {
     return kDegreesOfActiveFreedom;
   }
 
@@ -304,7 +304,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @brief Returns the degrees of passive freedom (DoP).
    * @return Degrees of passive freedom (7)
    */
-  static constexpr uint8_t GetDoP() {
+  uint8_t GetDoP() const override {
     return kDegreesOfPassiveFreedom;
   }
 

@@ -23,44 +23,43 @@ pytest -v
 
 ### 运行特定产品的测试
 
-```bash
-# O10 测试（直接使用 pytest）
-pytest -v test_omnihand_2025.py
+O10 测试文件（`test_omnihand_2025.py`）已合并各传输方式（CANFD + USB/RS485），与 `cpp/test/test_omnihand_2025.cc` 保持一致：
 
-# O10 测试（直接使用 Python 运行 - 支持 -f 参数）
+```bash
+# O10 测试（默认 zlgcan；-d 选择传输方式）
+pytest -v test_omnihand_2025.py
 python3 test_omnihand_2025.py -f 0
+python3 test_omnihand_2025.py -d hcan -c 0 -i 0
+python3 test_omnihand_2025.py -d socketcan --can-if can0
+python3 test_omnihand_2025.py -d zlgcantcp --tcp-host 192.168.0.178 --tcp-port 8000
+python3 test_omnihand_2025.py -d usb -p /dev/ttyACM0
+python3 test_omnihand_2025.py -d rs485 -p /dev/ttyUSB0
+
+# 使用 pytest 时，通过环境变量配置：
+OMNIHAND_DEVICE_TYPE=usb OMNIHAND_USB_PORT=/dev/ttyACM0 pytest -v test_omnihand_2025.py
+OMNIHAND_DEVICE_TYPE=rs485 OMNIHAND_RS485_PORT=/dev/ttyUSB0 pytest -v test_omnihand_2025.py
 
 # O12 测试（直接使用 pytest）
-pytest -v test_omnihand_pro_2025_pytest.py
+pytest -v test_omnihand_pro_2025.py
 
 # O12 测试（直接使用 Python 运行 - 支持 -f 参数）
-python3 test_omnihand_pro_2025_pytest.py -f 0
+python3 test_omnihand_pro_2025.py -f 0
 
 # UMI 测试（直接使用 pytest）
 pytest -v test_omnihand_dex_umi.py
 
-# UMI 测试（直接使用 Python 运行）
+# UMI 测试（直接使用 Python）
 python3 test_omnihand_dex_umi.py
 
 # H3L 测试（直接使用 pytest）
 pytest -v test_omnihand_3_lite.py
 
-# H3L 测试（直接使用 Python 运行）
+# H3L 测试（直接使用 Python）
 python3 test_omnihand_3_lite.py
 ```
 
-### 使用请求间隔参数运行（仅 O10 和 O12）
-
-```bash
-# O10 测试，自定义间隔（例如 0ms = 无限制，5ms = 默认值）
-python3 test_omnihand_2025.py -f 0
-
-# O12 测试，自定义间隔（例如 0ms = 无限制，5ms = 默认值）
-python3 test_omnihand_pro_2025_pytest.py -f 0
-```
-
 **注意**：
-- 直接使用 Python 运行时，`-f` 参数指定请求间隔（毫秒，0-100ms）。使用 `0` 表示禁用间隔限制。
+- 直接使用 Python 运行时，`-f` 参数指定请求间隔（毫秒，CAN 为 0-100ms，USB 为 0-500ms）。使用 `0` 表示禁用间隔限制。
 - 直接使用 `pytest` 时，使用环境变量：`OMNIHAND_REQUEST_INTERVAL=0 pytest -v test_omnihand_2025.py`
 - UMI 测试不支持 `-f` 间隔参数，因为 UMI 协议使用固定的周期上报。
 - 直接使用 Python 运行测试会自动启用详细模式（`-v`）以显示详细的测试结果。
@@ -91,7 +90,7 @@ pytest -s
 
 测试组织方式与 C++ gtest 结构类似：
 
-- **test_omnihand_2025.py**：OmniHand 2025 (O10, 10 DOF) 的测试
+- **test_omnihand_2025.py**：OmniHand 2025 (O10, 10 DOF) 各传输方式的统一测试（CANFD + USB/RS485），由原 `test_omnihand_2025_canfd.py` / `test_omnihand_2025_usb.py` / `test_omnihand_2025_zlgcan_tcp.py` 合并而来
 - **test_omnihand_pro_2025.py**：OmniHand Pro 2025 (O12, 12 DOF) 的测试
 - **test_omnihand_3_lite.py**：OmniHand 3 Lite (H3L, 4 DOF) 的测试
 - **test_omnihand_dex_umi.py**：OmniHand Dex UMI (UMI 协议) 的测试

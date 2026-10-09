@@ -208,8 +208,8 @@ TEST_F(OmniPicker3Test, CreateHand) {
 TEST_F(OmniPicker3Test, ProductConstants) {
   RequireDevice();
 
-  EXPECT_EQ(oh::OmniPicker3::GetDoA(), 1u);
-  EXPECT_EQ(oh::OmniPicker3::GetNumOfJointMotors(), 1u);
+  EXPECT_EQ(hand_->GetDoA(), 1u);
+  EXPECT_EQ(hand_->GetNumOfJointMotors(), 1u);
   EXPECT_EQ(hand_->GetJointNames().size(), kDoF);
 
   const auto bound = oh::OmniPicker3::GetMinMaxMotorPosition();

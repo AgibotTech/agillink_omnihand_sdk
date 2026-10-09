@@ -86,7 +86,18 @@ TEST_F(OmniHand3UltraMTest, GetVendorInfo) {
       AgilinkLogger::get().warnf(TAG, "[GetVendorInfo] Failed: got empty vendor info (timeout)");
       return;
     }
-    EXPECT_EQ(vendor_info.dof, 20);
+    const uint8_t doa = hand_->GetDoA();
+    EXPECT_EQ(doa, vendor_info.dof);
+    EXPECT_EQ(hand_->GetNumOfJointMotors(), doa);
+    EXPECT_TRUE(doa == 20 || doa == 21);
+    EXPECT_EQ(hand_->GetRevision(), doa == 20
+        ? agilink::omnihand::H3UMRevision::T1_3
+        : agilink::omnihand::H3UMRevision::T1_5);
+    const auto joint_names = hand_->GetJointNames();
+    EXPECT_EQ(joint_names.size(), doa);
+    if (doa == 21) {
+      EXPECT_EQ(joint_names[16], "thumb_rool_joint");
+    }
   }
 }
 

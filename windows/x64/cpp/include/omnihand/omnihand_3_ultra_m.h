@@ -25,6 +25,12 @@
 namespace agilink {
 namespace omnihand {
 
+enum class H3UMRevision : uint8_t {
+  UNKNOWN = 0,
+  T1_3 = 20,
+  T1_5 = 21,
+};
+
 // ============================================
 // Xense Visual-Tactile Sensor Interface
 // ============================================
@@ -287,31 +293,37 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
 
   // ============ Joint Naming ============
   /**
-   * @brief Returns the 20 joint names of O20 in motor-index order.
+   * @brief Returns the joint names in motor-index order (20 for T1.3, 21 for T1.5).
    * @note Order MUST match SetAllJointMotorPosi / GetAllJointMotorPosi index layout.
    *       This is the single source of truth for "motor index <-> ROS joint name"
    *       binding; ROS2 node code should call this instead of hard-coding the list.
    */
   std::vector<std::string> GetJointNames() const override {
-    return {
+    std::vector<std::string> names{
         "pinky_abad_joint",  "pinky_mcp_joint",  "pinky_pip_joint",  "pinky_dip_joint",
         "ring_abad_joint",   "ring_mcp_joint",   "ring_pip_joint",   "ring_dip_joint",
         "middle_abad_joint", "middle_mcp_joint", "middle_pip_joint", "middle_dip_joint",
         "index_abad_joint",  "index_mcp_joint",  "index_pip_joint",  "index_dip_joint",
         "thumb_abad_joint",  "thumb_mcp_joint",  "thumb_pip_joint",  "thumb_dip_joint",
     };
+    if (revision_ == H3UMRevision::T1_5) {
+      names.insert(names.begin() + 16, "thumb_rool_joint");
+    }
+    return names;
   }
 
-  static constexpr uint8_t GetNumOfJointMotors() {
-    return kDegreesOfActiveFreedom;
+  uint8_t GetNumOfJointMotors() const override {
+    return static_cast<uint8_t>(revision_);
   }
 
-  static constexpr uint8_t GetDoA() {
-    return kDegreesOfActiveFreedom;
-  }
+  uint8_t GetDoA() const override = 0;
 
-  static constexpr uint8_t GetDoP() {
+  uint8_t GetDoP() const override {
     return kDegreesOfPassiveFreedom;
+  }
+
+  H3UMRevision GetRevision() const {
+    return revision_;
   }
 
   static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
@@ -418,6 +430,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    *       joint_motor_solver_ directly without re-implementing init logic.
    */
   void Reset(uint8_t device_id, HandType hand_type);
+  void DetectRevision();
   void OnHandTypeChanged() override;
 
   /**
@@ -426,6 +439,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
    *        Shared by every transport implementation.
    */
   std::unique_ptr<h3um::OmniHand3UltraMSolver> joint_motor_solver_;
+  H3UMRevision revision_{H3UMRevision::UNKNOWN};
   static constexpr Int16Bound kActualMotorPositionBound = {-1800, 1800};
   static constexpr Int16Range kMixCtrlTorqueRange = {0, 10000, 1000};  // unit: mA
 };
