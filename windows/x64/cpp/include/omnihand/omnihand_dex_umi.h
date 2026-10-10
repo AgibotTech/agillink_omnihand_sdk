@@ -160,17 +160,7 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D
     return {static_cast<float>(mn), static_cast<float>(mx)};
   }
 
-  /**
-   * @brief Get sensor data length for a specific finger
-   * @param finger Finger enum value
-   * @return Sensor data length in bytes
-   */
-   virtual size_t GetSensorDataLength(Finger finger) const override;
-   /**
-    * @brief Get sensor order vector
-    * @return Reference to sensor order vector
-    */
-   virtual const std::vector<Finger>& GetSensorOrder() const override;
+  const std::vector<Finger>& GetSensorOrder() const override;
 
   // ============ Position Query (UMI Protocol Pn3=0x13) ============
   /**

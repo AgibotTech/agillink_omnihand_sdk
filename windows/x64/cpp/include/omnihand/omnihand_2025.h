@@ -176,17 +176,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
 
   int GetHandDeviceIdByBroadcast() override;
 
-    /**
-   * @brief Get sensor data length for a specific finger
-   * @param finger Finger enum value
-   * @return Sensor data length in bytes
-   */
-   virtual size_t GetSensorDataLength(Finger finger) const override;
-   /**
-    * @brief Get sensor order vector
-    * @return Reference to sensor order vector
-    */
-   virtual const std::vector<Finger>& GetSensorOrder() const override;
+  const std::vector<Finger>& GetSensorOrder() const override;
 
   /**
    * @brief Gets tactile sensor data for the specified process, such as downsampled data.

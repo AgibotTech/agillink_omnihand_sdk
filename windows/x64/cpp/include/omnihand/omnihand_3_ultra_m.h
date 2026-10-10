@@ -17,6 +17,7 @@
 #include "omnihand/export_symbols.h"
 #include "omnihand/i_control_mode.h"
 #include "omnihand/i_omnihand_calibrator.h"
+#include "omnihand/i_tactile_sensor_3d_i16.h"
 #include "omnihand/kinematics/omnihand_3_ultra_m/omnihand_3_ultra_m_solver.h"
 #include "omnihand/omnihand.h"
 #include "omnihand/proto.h"
@@ -165,7 +166,10 @@ inline std::string H3UMErrorReportToString(const JointMotorErrorReport& report) 
  *   SetHandGesture, and interfaces for accessing passive joints by single joint
  *   name/index are still placeholder implementations.
  */
-class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, public IOmniHandCalibrator {
+class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
+                                      public IControlMode,
+                                      public IOmniHandCalibrator,
+                                      public ITactileSensor3DI16 {
  public:
   // Constants
   static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // DoA
@@ -369,6 +373,8 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand, public IControlMode, publ
   void SetHandGesture(int gesture_num = 1) override;
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
+
+  const std::vector<Finger>& GetSensorOrder() const override;
 
   // ============ Xense Tactile Sensing ============
   /**
