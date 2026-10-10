@@ -175,9 +175,16 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
   static constexpr unsigned char kDegreesOfActiveFreedom = 20;  // DoA
   static constexpr unsigned char kMaxDegreesOfActiveFreedom = 21;
   static constexpr uint8_t kDegreesOfPassiveFreedom = 0; // DoP
-  static constexpr uint8_t kDefaultHandDeviceId = 9u;
+  static constexpr uint8_t kDefaultHandDeviceId = 9u;  // T1.3
+  static constexpr uint8_t kT1_5DefaultHandDeviceId = 1u;
   static constexpr char kDefaultTactileSocIp[] = "192.168.99.2";
   static constexpr uint16_t kDefaultTactileSocPort = 19009;
+
+  static constexpr uint8_t GetDefaultHandDeviceId(H3UMRevision revision) {
+    return revision == H3UMRevision::T1_5
+        ? kT1_5DefaultHandDeviceId
+        : kDefaultHandDeviceId;
+  }
 
   virtual ~OmniHand3UltraM() = default;
 
@@ -312,6 +319,10 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
       const std::string& tactile_soc_ip = kDefaultTactileSocIp,
       uint16_t tactile_soc_port = kDefaultTactileSocPort,
       CommunicationLogOptions log_options = {});
+
+  virtual uint8_t GetDefaultNonPrivateHandDeviceId() const = 0;
+
+  int GetHandDeviceIdByBroadcast() override;
 
   // ============ Joint Naming ============
   /**
