@@ -227,6 +227,9 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
     return kDegreesOfPassiveFreedom;
   }
 
+  std::vector<double> GetAllJointAnglesFromMotorPositions(
+      const std::vector<int16_t>& motor_positions) const override;
+
   static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     (void)joint_motor_index;
     return o10::OmniHand2025Solver::GetMotorPositionRange();

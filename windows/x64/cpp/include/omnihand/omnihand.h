@@ -20,6 +20,8 @@
 #include "omnihand/ota_types.h"
 #include "omnihand/utils.h"
 
+#define OMNIHAND_HAS_JOINT_ANGLES_FROM_MOTOR_POSITIONS 1
+
 namespace agilink {
 namespace omnihand {
 
@@ -274,6 +276,20 @@ class AGIBOT_EXPORT OmniHand {
    * @note This function does not perform hardware communication, only kinematics calculation.
    */
   virtual std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles) const { (void)active_joint_angles; return {}; }
+
+  /**
+   * @brief Calculates all joint angles directly from motor positions.
+   * @param motor_positions Motor positions returned by GetAllJointMotorPosi().
+   * @return All joint angles (unit: radians), or an empty vector when the
+   *         product does not provide the required kinematics solver.
+   * @note This function performs kinematics calculation only and does not
+   *       communicate with the device.
+   */
+  virtual std::vector<double> GetAllJointAnglesFromMotorPositions(
+      const std::vector<int16_t>& motor_positions) const {
+    (void)motor_positions;
+    return {};
+  }
 
   // ============ Velocity Control ============
   /**

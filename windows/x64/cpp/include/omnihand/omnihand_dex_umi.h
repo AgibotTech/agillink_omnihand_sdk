@@ -149,6 +149,12 @@ class AGIBOT_EXPORT OmniHandDexUMI : public OmniHand, public IO10TactileSensor1D
     return kDegreesOfActiveFreedom;
   }
 
+  std::vector<double> GetAllJointAnglesFromMotorPositions(
+      const std::vector<int16_t>& motor_positions) const override;
+
+  std::vector<double> GetAllJointAngles(
+      const std::vector<double>& active_joint_angles) const override;
+
   static constexpr Int16Bound GetMinMaxMotorPosition(uint8_t joint_motor_index) {
     if (joint_motor_index <= 0 || joint_motor_index > kDegreesOfActiveFreedom) return {0, 0};
     auto [mn, mx] = o10::OmniHand2025Solver::GetMotorPositionRange();
