@@ -26,11 +26,6 @@
 namespace agilink {
 namespace omnihand {
 
-enum class H3UMRevision : uint8_t {
-  T1P3 = 20,
-  T1P5 = 21,
-};
-
 // ============================================
 // Xense Visual-Tactile Sensor Interface
 // ============================================
@@ -191,6 +186,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
   // ============ Factory Methods ============
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by canfd_device_id
+   * @note This factory is only for H3UM T1.3. Use createHandT1P5ByZlgcan() for T1.5.
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param canfd_device_id CANFD device ID
@@ -217,6 +213,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
+   * @note This factory is only for H3UM T1.3. Use createHandT1P5ByZlgcan() for T1.5.
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param usbcanfd_serial_number USB CANFD serial number
@@ -245,6 +242,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
   /**
    * @brief Factory method - ZLG CANFD over TCP (WiFi/Ethernet to CANFD, this machine acts as TCP client)
    * @note Only available on Windows and Linux x64 (not supported on Linux aarch64/arm64)
+   * @note This factory is only for H3UM T1.3. Use createHandT1P5ByZlgCanTcp() for T1.5.
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param tcp_host TCP server IP or hostname (e.g. "192.168.0.178")
@@ -276,6 +274,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
 #ifdef __linux__
   /**
    * @brief Factory method - SocketCAN communication (Linux native CAN interface)
+   * @note This factory is only for H3UM T1.3. Use createHandT1P5SocketCan() for T1.5.
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param can_interface CAN interface name (e.g. "can0")
@@ -300,6 +299,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by canfd_device_id)
+   * @note This factory is only for H3UM T1.3. Use createHandT1P5ByHcan() for T1.5.
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param canfd_device_id CANFD device ID
@@ -326,6 +326,7 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
+   * @note This factory is only for H3UM T1.3. Use createHandT1P5ByHcan() for T1.5.
    * @param hand_type Hand type (left/right)
    * @param hand_device_id Hand device ID
    * @param hcan_serial_number HCAN serial number
@@ -359,20 +360,12 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
    * @brief Returns the joint names in motor-index order (20 for T1.3, 21 for T1.5).
    * @note Order MUST match SetAllJointMotorPosi / GetAllJointMotorPosi index layout.
    *       This is the single source of truth for "motor index <-> ROS joint name"
-   *       binding; ROS2 node code should call this instead of hard-coding the list.
-   */
+  *       binding; ROS2 node code should call this instead of hard-coding the list.
+  */
   std::vector<std::string> GetJointNames() const override {
-    std::vector<std::string> names{
-        "pinky_abad_joint",  "pinky_mcp_joint",  "pinky_pip_joint",  "pinky_dip_joint",
-        "ring_abad_joint",   "ring_mcp_joint",   "ring_pip_joint",   "ring_dip_joint",
-        "middle_abad_joint", "middle_mcp_joint", "middle_pip_joint", "middle_dip_joint",
-        "index_abad_joint",  "index_mcp_joint",  "index_pip_joint",  "index_dip_joint",
-        "thumb_abad_joint",  "thumb_mcp_joint",  "thumb_pip_joint",  "thumb_dip_joint",
-    };
-    if (revision_ == H3UMRevision::T1P5) {
-      names.insert(names.begin() + 16, "thumb_rool_joint");
-    }
-    return names;
+    return revision_ == H3UMRevision::T1P5
+        ? h3um::OmniHand3UltraMSolver::kT1P5JointNames
+        : h3um::OmniHand3UltraMSolver::kT1P3JointNames;
   }
 
   uint8_t GetNumOfJointMotors() const override {
