@@ -433,7 +433,7 @@ struct AGIBOT_EXPORT VendorInfo {
   std::string productSeqNum;  // product serial number
   Version hardwareVersion;    // hardware version
   Version softwareVersion;    // software version
-  int16_t voltage;            // supply voltage (mV)
+  uint16_t voltage;           // supply voltage (mV)
   unsigned char dof;          // active degrees of freedom
 
   std::string ToString() const {
