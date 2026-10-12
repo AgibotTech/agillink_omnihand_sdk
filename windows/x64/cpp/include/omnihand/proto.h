@@ -214,6 +214,33 @@ struct AGIBOT_EXPORT JointPosiStatus {
   }
 };
 
+// AllJointPosiStatus is an SDK result object containing std::vector, not a
+// fixed-layout wire frame. Keep it naturally aligned, especially for ARM.
+#pragma pack(pop)
+
+/**
+ * @brief Reply of 0x24/0x00: all joint positions + running/error code feedback
+ */
+struct AGIBOT_EXPORT AllJointPosiStatus {
+  std::vector<int16_t> positions;
+  uint16_t running_code{};
+  uint16_t error_code{};
+
+  std::string ToString() const {
+    std::stringstream sstream;
+    sstream << "[Positions:";
+    for (const auto position : positions) {
+      sstream << ' ' << position;
+    }
+    sstream << "][Running Code: " << running_code
+            << "][Error Code: " << error_code << "]";
+    return sstream.str();
+  }
+};
+
+// Resume 1-byte packing for the fixed-layout protocol structures below.
+#pragma pack(push, 1)
+
 /**
  * @brief Reply of 0x26 (joint detail info): whole-hand bus stats + one joint's detailed state
  */

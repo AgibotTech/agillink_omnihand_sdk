@@ -471,11 +471,6 @@ class AGIBOT_EXPORT OmniHand3UltraM : public OmniHand,
   // Parameters set via Pn7~Pn9 are NOT persisted until this command is sent.
   bool SaveParam() override { return false; }
 
-  // ---- O20-specific extensions (not in IOmniHandCalibrator) ----
-
-  // Pn11 (0x0B): Tactile sensor zero calibration
-  virtual bool CalibrateTactileSensor() { return false; }
-
   // Pn24 (0x18): Start auto calibration for all motors
   virtual bool StartAutoCalibration() { return false; }
 

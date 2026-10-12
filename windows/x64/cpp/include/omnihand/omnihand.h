@@ -161,6 +161,16 @@ class AGIBOT_EXPORT OmniHand {
     return false;
   }
 
+  /**
+   * @brief 0x0B/0x00: Calibrates all tactile sensors.
+   * @return true if the device reports success; false if unsupported or failed.
+   */
+  virtual bool CalibrateTactileSensor() {
+    std::fprintf(stderr,
+                 "[WARN][OmniHand][CalibrateTactileSensor] unsupported by this product\n");
+    return false;
+  }
+
   // ============ Current Threshold ============
   /**
    * @brief 0x03: Sets the current threshold of a single joint motor.
@@ -239,6 +249,52 @@ class AGIBOT_EXPORT OmniHand {
   virtual std::vector<int16_t> GetAllJointMotorPosi() const {
     return {};
   };
+
+  /**
+   * @brief 0x24: Sets one joint motor position and returns position/status feedback.
+   * @param joint_motor_index Joint motor index (1-based, encoded as sub-register 0x01~).
+   * @param posi Target position. O12 uses 1/2000 of maximum position per unit;
+   *             other dexterous hands use 1/4096 per unit.
+   * @return Actual position, running code, and error code. All-zero if unsupported or failed.
+   */
+  virtual JointPosiStatus SetJointMotorPosiWithStatus(
+      unsigned char joint_motor_index, int16_t posi) {
+    (void)joint_motor_index;
+    (void)posi;
+    return {};
+  }
+
+  /**
+   * @brief 0x24: Gets one joint motor position and status feedback.
+   * @param joint_motor_index Joint motor index (1-based, encoded as sub-register 0x01~).
+   * @return Current position, running code, and error code. All-zero if unsupported or failed.
+   */
+  virtual JointPosiStatus GetJointMotorPosiWithStatus(
+      unsigned char joint_motor_index) const {
+    (void)joint_motor_index;
+    return {};
+  }
+
+  /**
+   * @brief 0x24/0x00: Sets all joint motor positions and returns position/status feedback.
+   * @param vec_posi Target positions in product-defined joint order.
+   * @return Actual positions followed by the running code and error code.
+   *         Empty/default result if unsupported or failed.
+   */
+  virtual AllJointPosiStatus SetAllJointMotorPosiWithStatus(
+      const std::vector<int16_t>& vec_posi) {
+    (void)vec_posi;
+    return {};
+  }
+
+  /**
+   * @brief 0x24/0x00: Gets all joint motor positions and status feedback.
+   * @return Current positions followed by the running code and error code.
+   *         Empty/default result if unsupported or failed.
+   */
+  virtual AllJointPosiStatus GetAllJointMotorPosiWithStatus() const {
+    return {};
+  }
 
   // ============ Joint Angle Control ============
   // Note: SetActiveJointAngle and GetActiveJointAngle are not defined in base class.

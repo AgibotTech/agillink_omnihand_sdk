@@ -213,15 +213,6 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
 
   /**
-   * @brief 0x24: Set joint motor position, also returning running/error status feedback.
-   * @param joint_motor_index Joint motor index (1-based, matches SetJointMotorPosi)
-   * @param posi Target position
-   * @return Position + running code + error code after the write; default (all-zero) if unsupported
-   * @note Default implementation returns an empty result, so CAN backends need no changes.
-   */
-  virtual JointPosiStatus SetJointMotorPosiWithStatus(uint8_t joint_motor_index, int16_t posi) { return {}; }
-
-  /**
    * @brief 0x26: Get detailed status info (bus + joint) of one joint.
    * @param joint_index Joint index (0-based, unlike SetJointMotorPosi's 1-based indexing)
    * @return Joint detail info; default (all-zero) if unsupported
