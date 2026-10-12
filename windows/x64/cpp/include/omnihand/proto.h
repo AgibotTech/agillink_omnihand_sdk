@@ -243,6 +243,23 @@ struct AGIBOT_EXPORT AllJointPosiStatus {
 #pragma pack(push, 1)
 
 /**
+ * @brief Reply of 0x26/0x00: whole-hand detailed information
+ */
+struct AGIBOT_EXPORT HandDetailInfo {
+  int16_t hand_bus_voltage;
+  int16_t hand_bus_current;
+  int16_t hand_temperature;
+
+  std::string ToString() const {
+    std::stringstream sstream;
+    sstream << "[Hand Bus Voltage: " << hand_bus_voltage
+            << "][Hand Bus Current: " << hand_bus_current
+            << "][Hand Temperature: " << hand_temperature << "]";
+    return sstream.str();
+  }
+};
+
+/**
  * @brief Reply of 0x26 (joint detail info): whole-hand bus stats + one joint's detailed state
  */
 struct AGIBOT_EXPORT JointDetailInfo {

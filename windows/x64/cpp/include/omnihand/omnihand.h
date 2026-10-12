@@ -468,6 +468,15 @@ class AGIBOT_EXPORT OmniHand {
       const std::vector<int16_t>& velocities,
       const std::vector<int16_t>& torques);
 
+  /** @brief 0x26/0x00: Queries whole-hand bus voltage/current/temperature. */
+  virtual HandDetailInfo GetAllJointDetailInfo() const;
+
+  /**
+   * @brief 0x26/0x01: Queries whole-hand and specified-joint details.
+   * @param joint_index Zero-based joint index carried in request byte 0.
+   */
+  virtual JointDetailInfo GetJointDetailInfo(uint8_t joint_index) const;
+
   // ============ Error Report ============
   /**
    * @brief 0x20: Gets error report of a single joint motor.
