@@ -51,6 +51,41 @@ static std::string ValuesToString(const std::vector<T>& values) {
   return result;
 }
 
+static ::testing::AssertionResult ValidateMixCtrlResult(
+    const MixCtrlResult& result, size_t expected_feedback_count,
+    size_t expected_frame_count, const char* operation) {
+  if (!result.Complete()) {
+    return ::testing::AssertionFailure()
+           << operation << " did not receive all 0x25 status replies";
+  }
+  if (result.frames.size() != expected_frame_count) {
+    return ::testing::AssertionFailure()
+           << operation << " returned " << result.frames.size()
+           << " frames, expected " << expected_frame_count;
+  }
+
+  size_t feedback_count = 0;
+  for (size_t i = 0; i < result.frames.size(); ++i) {
+    const auto& frame = result.frames[i];
+    if (!frame.replied || frame.sub_register != i) {
+      return ::testing::AssertionFailure()
+             << operation << " returned an invalid frame at index " << i;
+    }
+    feedback_count += frame.feedback.size();
+    AgilinkLogger::get().infof(
+        TAG, "[%s] sub=0x%02X feedback=%zu running=0x%04X error=0x%04X",
+        operation, static_cast<unsigned int>(frame.sub_register),
+        frame.feedback.size(), static_cast<unsigned int>(frame.running_code),
+        static_cast<unsigned int>(frame.error_code));
+  }
+  if (feedback_count != expected_feedback_count) {
+    return ::testing::AssertionFailure()
+           << operation << " returned " << feedback_count
+           << " joint feedback entries, expected " << expected_feedback_count;
+  }
+  return ::testing::AssertionSuccess();
+}
+
 class OmniHand3LiteTest : public ::testing::Test {
  protected:
   void SetUp() override {
@@ -276,6 +311,89 @@ TEST_F(OmniHand3LiteTest, MotorPositionControl) {
     AgilinkLogger::get().infof(TAG, "[GetAllJointMotorPosi] Motor Positions: %s", msg.c_str());
   }
   EXPECT_EQ(all_positions.size(), OmniHand3Lite::kDegreesOfActiveFreedom);
+}
+
+TEST_F(OmniHand3LiteTest, PositionControlWithStatus) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+
+  const std::vector<int16_t> positions(
+      OmniHand3Lite::kDegreesOfActiveFreedom, 3072);
+  const auto set_all = hand_->SetAllJointMotorPosiWithStatus(positions);
+  ASSERT_EQ(set_all.positions.size(), positions.size())
+      << "SetAllJointMotorPosiWithStatus timed out";
+  AgilinkLogger::get().infof(TAG, "[0x24 SetAll] %s",
+                             set_all.ToString().c_str());
+
+  const auto get_all = hand_->GetAllJointMotorPosiWithStatus();
+  ASSERT_EQ(get_all.positions.size(), positions.size())
+      << "GetAllJointMotorPosiWithStatus timed out";
+  for (const auto position : get_all.positions) {
+    EXPECT_GE(position, 0);
+    EXPECT_LE(position, 4096);
+  }
+  AgilinkLogger::get().infof(TAG, "[0x24 GetAll] %s",
+                             get_all.ToString().c_str());
+
+  const auto set_one = hand_->SetJointMotorPosiWithStatus(1, positions.front());
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  const auto get_one = hand_->GetJointMotorPosiWithStatus(1);
+  EXPECT_GE(set_one.position, 0);
+  EXPECT_LE(set_one.position, 4096);
+  EXPECT_GT(get_one.position, 0) << "GetJointMotorPosiWithStatus timed out";
+  EXPECT_LE(get_one.position, 4096);
+  AgilinkLogger::get().infof(TAG, "[0x24 SetOne] %s",
+                             set_one.ToString().c_str());
+  AgilinkLogger::get().infof(TAG, "[0x24 GetOne] %s",
+                             get_one.ToString().c_str());
+}
+
+TEST_F(OmniHand3LiteTest, MixedControlWithStatus) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+
+  const std::vector<int16_t> positions(
+      OmniHand3Lite::kDegreesOfActiveFreedom, 3072);
+  const std::vector<int16_t> velocities(positions.size(), 0);
+  const std::vector<int16_t> torques(positions.size(), 0);
+
+  const auto generic = hand_->MixControlWithStatus(
+      {MixCtrl{0, MixControlMode::POSITION_TORQUE, positions[0], 0}});
+  ASSERT_TRUE(ValidateMixCtrlResult(generic, 1, 1,
+                                    "0x25 MixControlWithStatus"));
+  ASSERT_TRUE(ValidateMixCtrlResult(
+      hand_->MixControlByPTWithStatus(1, positions[0], 0), 1, 1,
+      "0x25 PT single"));
+  ASSERT_TRUE(ValidateMixCtrlResult(
+      hand_->MixControlByPTWithStatus(positions, torques), positions.size(), 1,
+      "0x25 PT all"));
+  ASSERT_TRUE(ValidateMixCtrlResult(
+      hand_->MixControlByPVTWithStatus(1, positions[0], 0, 0), 1, 1,
+      "0x25 PVT single"));
+  ASSERT_TRUE(ValidateMixCtrlResult(
+      hand_->MixControlByPVTWithStatus(positions, velocities, torques),
+      positions.size(), 1, "0x25 PVT all"));
+}
+
+TEST_F(OmniHand3LiteTest, JointDetailInfo) {
+  ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
+
+  const auto hand_info = hand_->GetAllJointDetailInfo();
+  ASSERT_GT(hand_info.hand_bus_voltage, 0)
+      << "GetAllJointDetailInfo timed out";
+  AgilinkLogger::get().infof(TAG, "[0x26 GetAll] %s",
+                             hand_info.ToString().c_str());
+
+  for (uint8_t joint = 0; joint < OmniHand3Lite::kDegreesOfActiveFreedom;
+       ++joint) {
+    const auto info = hand_->GetJointDetailInfo(joint);
+    EXPECT_GT(info.hand_bus_voltage, 0)
+        << "GetJointDetailInfo timed out for joint "
+        << static_cast<unsigned int>(joint);
+    EXPECT_GE(info.joint_position, 0);
+    EXPECT_LE(info.joint_position, 4096);
+    AgilinkLogger::get().infof(
+        TAG, "[0x26 Joint %u] %s", static_cast<unsigned int>(joint),
+        info.ToString().c_str());
+  }
 }
 
 // Test joint angle control (not supported for O4, should output warning)
