@@ -1,0 +1,41 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "255ceb50eea84744220a5505e19f0f0ac01265ad",
+  "prompts": {},
+  "sessions": {
+    "s_48b98efb4ca983": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a4ac-9ee9-7561-9cd8-4145b59a83d8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>"
+    },
+    "s_83fa947041b2cd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1292e-9128-77d1-9d2b-b9aeea8a6acd",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>"
+    }
+  },
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "additions": {
+        "human": 134
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "additions": {
+        "human": 118
+      }
+    }
+  ]
+}
