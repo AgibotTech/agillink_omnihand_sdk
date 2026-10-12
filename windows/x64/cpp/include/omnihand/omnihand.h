@@ -438,6 +438,36 @@ class AGIBOT_EXPORT OmniHand {
     return {};
   }
 
+  /**
+   * @brief 0x25: Sends mixed-control entries and preserves each frame's status reply.
+   * @note Entries are split across sub-registers 0x00~0x02 when required.
+   */
+  virtual MixCtrlResult MixControlWithStatus(
+      const std::vector<MixCtrl>& mix_ctrls);
+
+  virtual MixCtrlResult MixControlByPTWithStatus(
+      uint8_t joint_motor_index, int16_t position, int16_t torque);
+
+  virtual MixCtrlResult MixControlByPTWithStatus(
+      const std::vector<int16_t>& positions,
+      const std::vector<int16_t>& torques);
+
+  virtual MixCtrlResult MixControlByPVWithStatus(
+      uint8_t joint_motor_index, int16_t velocity, int16_t torque);
+
+  virtual MixCtrlResult MixControlByPVWithStatus(
+      const std::vector<int16_t>& velocities,
+      const std::vector<int16_t>& torques);
+
+  virtual MixCtrlResult MixControlByPVTWithStatus(
+      uint8_t joint_motor_index, int16_t position, int16_t velocity,
+      int16_t torque);
+
+  virtual MixCtrlResult MixControlByPVTWithStatus(
+      const std::vector<int16_t>& positions,
+      const std::vector<int16_t>& velocities,
+      const std::vector<int16_t>& torques);
+
   // ============ Error Report ============
   /**
    * @brief 0x20: Gets error report of a single joint motor.

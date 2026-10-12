@@ -11,6 +11,7 @@
 #ifndef AGILINK_PROTO_H
 #define AGILINK_PROTO_H
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <optional>
@@ -504,6 +505,27 @@ struct AGIBOT_EXPORT MixCtrl {
 };
 
 #pragma pack(pop)
+
+/** @brief Reply associated with one 0x25 request frame. */
+struct AGIBOT_EXPORT MixCtrlFrameResult {
+  uint8_t sub_register{};
+  std::vector<MixCtrl> feedback;
+  uint16_t running_code{};
+  uint16_t error_code{};
+  bool replied{};
+};
+
+/** @brief Complete result of a possibly multi-frame 0x25 operation. */
+struct AGIBOT_EXPORT MixCtrlResult {
+  std::vector<MixCtrlFrameResult> frames;
+  bool all_frames_sent{};
+
+  bool Complete() const {
+    return all_frames_sent && !frames.empty() &&
+           std::all_of(frames.begin(), frames.end(),
+                       [](const MixCtrlFrameResult& frame) { return frame.replied; });
+  }
+};
 
 }  // namespace omnihand
 }  // namespace agilink
