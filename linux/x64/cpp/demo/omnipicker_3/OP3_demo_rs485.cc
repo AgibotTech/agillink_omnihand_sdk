@@ -327,8 +327,7 @@ void DemoTactileSensor(oh::OmniPicker3& hand) {
 
   for (const auto finger : sensor_order) {
     const std::string name = oh::ToString(finger);
-    std::cout << "GetSensorDataLength(" << name << "): " << hand.GetSensorDataLength(finger)
-              << ", GetNumOfTactilePoints(): " << hand.GetNumOfTactilePoints(finger)
+    std::cout << "GetNumOfTactilePoints(" << name << "): " << hand.GetNumOfTactilePoints(finger)
               << ", GetLenOfTactileDatum(): " << hand.GetLenOfTactileDatum(finger)
               << ", GetNumOfRepliedTactileFrames(): "
               << hand.GetNumOfRepliedTactileFrames(finger)

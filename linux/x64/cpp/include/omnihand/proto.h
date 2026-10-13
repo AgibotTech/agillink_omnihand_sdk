@@ -11,6 +11,7 @@
 #ifndef AGILINK_PROTO_H
 #define AGILINK_PROTO_H
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <optional>
@@ -214,6 +215,50 @@ struct AGIBOT_EXPORT JointPosiStatus {
   }
 };
 
+// AllJointPosiStatus is an SDK result object containing std::vector, not a
+// fixed-layout wire frame. Keep it naturally aligned, especially for ARM.
+#pragma pack(pop)
+
+/**
+ * @brief Reply of 0x24/0x00: all joint positions + running/error code feedback
+ */
+struct AGIBOT_EXPORT AllJointPosiStatus {
+  std::vector<int16_t> positions;
+  uint16_t running_code{};
+  uint16_t error_code{};
+
+  std::string ToString() const {
+    std::stringstream sstream;
+    sstream << "[Positions:";
+    for (const auto position : positions) {
+      sstream << ' ' << position;
+    }
+    sstream << "][Running Code: " << running_code
+            << "][Error Code: " << error_code << "]";
+    return sstream.str();
+  }
+};
+
+// Resume 1-byte packing for the fixed-layout protocol structures below.
+#pragma pack(push, 1)
+
+/**
+ * @brief Reply of 0x26/0x00: whole-hand detailed information
+ */
+struct AGIBOT_EXPORT HandDetailInfo {
+  int16_t hand_bus_voltage;
+  int16_t hand_bus_current;
+  int16_t hand_temperature;
+
+  std::string ToString() const {
+    std::stringstream sstream;
+    sstream << "[Hand Bus Voltage: " << hand_bus_voltage
+            << "][Hand Bus Current: " << hand_bus_current
+            << "][Hand Temperature: " << hand_temperature << "]";
+    return sstream.str();
+  }
+};
+
 /**
  * @brief Reply of 0x26 (joint detail info): whole-hand bus stats + one joint's detailed state
  */
@@ -388,7 +433,7 @@ struct AGIBOT_EXPORT VendorInfo {
   std::string productSeqNum;  // product serial number
   Version hardwareVersion;    // hardware version
   Version softwareVersion;    // software version
-  int16_t voltage;            // supply voltage (mV)
+  uint16_t voltage;           // supply voltage (mV)
   unsigned char dof;          // active degrees of freedom
 
   std::string ToString() const {
@@ -477,6 +522,27 @@ struct AGIBOT_EXPORT MixCtrl {
 };
 
 #pragma pack(pop)
+
+/** @brief Reply associated with one 0x25 request frame. */
+struct AGIBOT_EXPORT MixCtrlFrameResult {
+  uint8_t sub_register{};
+  std::vector<MixCtrl> feedback;
+  uint16_t running_code{};
+  uint16_t error_code{};
+  bool replied{};
+};
+
+/** @brief Complete result of a possibly multi-frame 0x25 operation. */
+struct AGIBOT_EXPORT MixCtrlResult {
+  std::vector<MixCtrlFrameResult> frames;
+  bool all_frames_sent{};
+
+  bool Complete() const {
+    return all_frames_sent && !frames.empty() &&
+           std::all_of(frames.begin(), frames.end(),
+                       [](const MixCtrlFrameResult& frame) { return frame.replied; });
+  }
+};
 
 }  // namespace omnihand
 }  // namespace agilink

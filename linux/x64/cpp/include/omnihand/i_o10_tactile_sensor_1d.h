@@ -7,12 +7,13 @@
 #include <cstddef>
 #include <map>
 #include <vector>
-#include "omnihand/proto.h"
+#include "omnihand/i_tactile_sensor.h"
 
 namespace agilink {
 namespace omnihand {
 
 static const std::map<Finger, size_t> kSensorDataLengths = {
+  {Finger::ALL_FINGERS, 268},
   {Finger::THUMB, 16},
   {Finger::INDEX, 18},
   {Finger::MIDDLE, 18},
@@ -30,31 +31,8 @@ struct AGIBOT_EXPORT TactileSensorData {
 /**
  * @brief Interface for 1D tactile sensor data based on OmniHand2025(O10)
  */
-class AGIBOT_EXPORT IO10TactileSensor1D {
+class AGIBOT_EXPORT IO10TactileSensor1D : public ITactileSensor {
  public:
-  virtual size_t GetNumOfTactileSensors() const = 0;
-
-  virtual size_t GetNumOfTactilePoints(Finger finger) const = 0;
-
-  virtual size_t GetLenOfTactileDatum(Finger finger) const = 0;
-
-  virtual size_t GetNumOfRepliedTactileFrames(Finger finger) const = 0;
-
-  virtual std::string GetSNOfTactileSensor(Finger finger) const = 0;
-
-  /**
-   * @deprecated Use GetNumOfTactilePoints() instead.
-   * @brief Get sensor data length for a specific finger
-   * @param finger Finger enum value
-   * @return Sensor data length in bytes
-   */
-  virtual size_t GetSensorDataLength(Finger finger) const = 0;
-  /**
-   * @brief Get sensor order vector
-   * @return Reference to sensor order vector
-   */
-  virtual const std::vector<Finger>& GetSensorOrder() const = 0;
-
   /**
    * @brief Gets 1D tactile sensor raw data for a single sensor.
    * @param finger Finger/palm enum value
@@ -77,7 +55,7 @@ class AGIBOT_EXPORT IO10TactileSensor1D {
   /**
    * @note Protected to prevent direct instantiation
    */ 
-  virtual ~IO10TactileSensor1D() = default;
+  ~IO10TactileSensor1D() override = default;
 };
 
 }  // namespace omnihand

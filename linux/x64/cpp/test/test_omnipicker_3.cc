@@ -208,8 +208,8 @@ TEST_F(OmniPicker3Test, CreateHand) {
 TEST_F(OmniPicker3Test, ProductConstants) {
   RequireDevice();
 
-  EXPECT_EQ(oh::OmniPicker3::GetDoA(), 1u);
-  EXPECT_EQ(oh::OmniPicker3::GetNumOfJointMotors(), 1u);
+  EXPECT_EQ(hand_->GetDoA(), 1u);
+  EXPECT_EQ(hand_->GetNumOfJointMotors(), 1u);
   EXPECT_EQ(hand_->GetJointNames().size(), kDoF);
 
   const auto bound = oh::OmniPicker3::GetMinMaxMotorPosition();
@@ -786,6 +786,7 @@ int main(int argc, char** argv) {
 
   int gtest_argc = static_cast<int>(gtest_args.size());
   ::testing::InitGoogleTest(&gtest_argc, gtest_args.data());
+  AgilinkLogger::get().flush();
   const int result = RUN_ALL_TESTS();
   ReturnToZeroOnce();
   // Drain the async logger first, so the summary is not interleaved with buffered log lines.

@@ -24,9 +24,9 @@ omnihand_node_msgs__msg__Int8MultiArrayStamped__get_type_hash(
 
 // Include directives for referenced types
 #include "std_msgs/msg/detail/multi_array_layout__functions.h"
-#include "std_msgs/msg/detail/header__functions.h"
-#include "std_msgs/msg/detail/multi_array_dimension__functions.h"
 #include "builtin_interfaces/msg/detail/time__functions.h"
+#include "std_msgs/msg/detail/multi_array_dimension__functions.h"
+#include "std_msgs/msg/detail/header__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

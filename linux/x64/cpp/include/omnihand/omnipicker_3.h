@@ -55,7 +55,8 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -71,7 +72,8 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -89,7 +91,8 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       uint8_t hand_device_id,
       const std::string& tcp_host,
       uint16_t tcp_port,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 #endif  // OMNIHAND_ZLG_TCP_SUPPORTED
 
 #ifdef __linux__
@@ -103,7 +106,8 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
   static std::unique_ptr<OmniPicker3> createHandSocketCan(
       HandType hand_type,
       uint8_t hand_device_id,
-      const std::string& can_interface = "can0");
+      const std::string& can_interface = "can0",
+      CommunicationLogOptions log_options = {});
 #endif
 
   /**
@@ -120,7 +124,8 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -136,7 +141,8 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - RS485 communication (standard serial protocol)
@@ -150,7 +156,8 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& uart_port,
-      int32_t baudrate = 460800);
+      int32_t baudrate = 460800,
+      CommunicationLogOptions log_options = {});
 
 
   virtual uint8_t GetDefaultNonPrivateHandDeviceId() const = 0;
@@ -167,7 +174,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
    * @brief Returns the number of joint motors.
    * @return Number of joint motors (1)
    */
-  static constexpr uint8_t GetNumOfJointMotors() {
+  uint8_t GetNumOfJointMotors() const override {
     return kDegreesOfActiveFreedom;
   }
 
@@ -175,7 +182,7 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
    * @brief Returns the degrees of active freedom (DoA).
    * @return Degrees of active freedom (1)
    */
-  static constexpr uint8_t GetDoA() {
+  uint8_t GetDoA() const override {
     return kDegreesOfActiveFreedom;
   }
 
@@ -204,23 +211,6 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
   void SetHandGesture(int gesture_num = 1) override;
 
   std::vector<int16_t> GetHandGesture(int gesture_num) override;
-
-  /**
-   * @brief 0x24: Set joint motor position, also returning running/error status feedback.
-   * @param joint_motor_index Joint motor index (1-based, matches SetJointMotorPosi)
-   * @param posi Target position
-   * @return Position + running code + error code after the write; default (all-zero) if unsupported
-   * @note Default implementation returns an empty result, so CAN backends need no changes.
-   */
-  virtual JointPosiStatus SetJointMotorPosiWithStatus(uint8_t joint_motor_index, int16_t posi) { return {}; }
-
-  /**
-   * @brief 0x26: Get detailed status info (bus + joint) of one joint.
-   * @param joint_index Joint index (0-based, unlike SetJointMotorPosi's 1-based indexing)
-   * @return Joint detail info; default (all-zero) if unsupported
-   * @note Default implementation returns an empty result, so CAN backends need no changes.
-   */
-  virtual JointDetailInfo GetJointDetailInfo(uint8_t joint_index) const { return {}; }
 
  protected:
   /**
