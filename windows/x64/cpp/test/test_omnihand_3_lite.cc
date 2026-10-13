@@ -67,7 +67,7 @@ static ::testing::AssertionResult ValidateMixCtrlResult(
   size_t feedback_count = 0;
   for (size_t i = 0; i < result.frames.size(); ++i) {
     const auto& frame = result.frames[i];
-    if (!frame.replied || frame.sub_register != i) {
+    if (!frame.replied || frame.sub_register != 0x00) {
       return ::testing::AssertionFailure()
              << operation << " returned an invalid frame at index " << i;
     }

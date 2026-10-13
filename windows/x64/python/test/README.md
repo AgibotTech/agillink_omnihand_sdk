@@ -51,11 +51,16 @@ pytest -v test_omnihand_dex_umi.py
 # UMI tests (running directly with Python)
 python3 test_omnihand_dex_umi.py
 
-# H3L tests (using pytest directly)
+# H3L unified transport tests (default: zlgcan)
 pytest -v test_omnihand_3_lite.py
+python3 test_omnihand_3_lite.py -d hcan -c 0 -i 0
+python3 test_omnihand_3_lite.py -d socketcan --can-if can0
+python3 test_omnihand_3_lite.py -d zlgcantcp --tcp-host 192.168.0.178 --tcp-port 8000
+python3 test_omnihand_3_lite.py -d rs485 -p /dev/ttyUSB0 -b 460800
 
-# H3L tests (running directly with Python)
-python3 test_omnihand_3_lite.py
+# With pytest, select the H3L transport through environment variables
+OMNIHAND_DEVICE_TYPE=hcan pytest -v test_omnihand_3_lite.py
+OMNIHAND_DEVICE_TYPE=rs485 OMNIHAND_RS485_PORT=/dev/ttyUSB0 pytest -v test_omnihand_3_lite.py
 ```
 
 **Note**: 
@@ -82,7 +87,7 @@ The tests are organized similar to the C++ gtest structure:
 
 - **test_omnihand_2025.py**: Unified transport tests (CANFD + USB/RS485) for OmniHand 2025 (O10, 10 DOF), merged from the former `test_omnihand_2025_canfd.py` / `test_omnihand_2025_usb.py` / `test_omnihand_2025_zlgcan_tcp.py`
 - **test_omnihand_pro_2025.py**: Tests for OmniHand Pro 2025 (O12, 12 DOF)
-- **test_omnihand_3_lite.py**: Tests for OmniHand 3 Lite (H3L, 4 DOF)
+- **test_omnihand_3_lite.py**: Unified ZLG/HCAN/SocketCAN/ZLG-TCP/RS485 tests for OmniHand 3 Lite (H3L, 4 DOF)
 - **test_omnihand_dex_umi.py**: Tests for OmniHand Dex UMI (UMI protocol)
 
 ## Test Coverage
