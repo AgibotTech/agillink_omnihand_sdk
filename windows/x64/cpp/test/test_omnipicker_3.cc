@@ -786,6 +786,7 @@ int main(int argc, char** argv) {
 
   int gtest_argc = static_cast<int>(gtest_args.size());
   ::testing::InitGoogleTest(&gtest_argc, gtest_args.data());
+  AgilinkLogger::get().flush();
   const int result = RUN_ALL_TESTS();
   ReturnToZeroOnce();
   // Drain the async logger first, so the summary is not interleaved with buffered log lines.

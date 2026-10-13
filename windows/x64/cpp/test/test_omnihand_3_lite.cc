@@ -71,6 +71,12 @@ static ::testing::AssertionResult ValidateMixCtrlResult(
       return ::testing::AssertionFailure()
              << operation << " returned an invalid frame at index " << i;
     }
+    for (const auto& feedback : frame.feedback) {
+      if (!feedback.motor_status_.has_value()) {
+        return ::testing::AssertionFailure()
+               << operation << " returned feedback without motor status";
+      }
+    }
     feedback_count += frame.feedback.size();
     AgilinkLogger::get().infof(
         TAG, "[%s] sub=0x%02X feedback=%zu running=0x%04X error=0x%04X",

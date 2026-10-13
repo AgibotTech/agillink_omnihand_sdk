@@ -440,6 +440,8 @@ class AGIBOT_EXPORT OmniHand {
 
   /**
    * @brief 0x25: Sends mixed-control entries and preserves each frame's status reply.
+   * @note Each feedback entry contains one additional motor-status byte in
+   *       MixCtrl::motor_status_.
    * @note Entries are split across sub-registers 0x00~0x02 when required.
    */
   virtual MixCtrlResult MixControlWithStatus(
