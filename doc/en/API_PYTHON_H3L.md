@@ -10,13 +10,24 @@
 - Supports CAN (ZLG USB CANFD / HCAN) communication
 - Supports SocketCAN (Linux only)
 - Supports ZLG CAN TCP (Linux x64 / Windows only)
-- **No tactile sensors** on the documented H3L hardware; U16 tactile methods remain as protocol/firmware compatibility APIs
-- **No kinematics solver**: angle-based control is unavailable (`set_all_active_joint_angles` is a stub). Use motor position control (`set_all_joint_motor_positions`) instead.
+- Supports RS485 communication (default 460800 baud)
+- Six U16 1D tactile sensors: five fingers and palm
+- Active-joint angle control and offline motor/angle conversion through `OmniHand3LiteSolver`
+- No full active-plus-passive kinematics solver; `get_all_joint_angles()` and `get_all_joint_angles_from_motor_positions()` are not available for H3L
+
+Calibration, zero-point, parameter-persistence, and firmware-maintenance APIs
+are intentionally not exposed by the H3L Python interface.
 
 ## Import
 
 ```python
-from omnihand import OmniHand3Lite, HandType, ControlMode
+from omnihand.omnihand_3_lite import (
+    OmniHand3Lite,
+    OmniHand3LiteGesture,
+    OmniHand3LiteSolver,
+    TactileSensorDataU16,
+)
+from omnihand import Finger, HandType
 ```
 
 ## Factory Methods
@@ -189,45 +200,45 @@ def set_hand_gesture(self, gesture: OmniHand3LiteGesture) -> None:
 
     Preset gesture positions are defined for the right hand. The solver automatically mirrors motors 1 and 4 for the left hand.
     """
+
+def get_hand_gesture(self, gesture: OmniHand3LiteGesture) -> List[int]: ...
 ```
 
 ### Motor Position Control (Recommended)
 
-> **H3L has no full kinematics solver — use motor position control (ticks).** Angle control methods are stubs. Gesture control is available via `set_hand_gesture()`.
+Motor indices are 1-based. Motor positions use the range 0-4096.
 
 ```python
-def set_joint_motor_posi(self, joint_motor_index: int, posi: int) -> int:
+def set_joint_position(self, joint_motor_index: int, posi: int) -> None:
     """Sets the position of a single joint motor.
 
     Args:
         joint_motor_index: Joint motor index (1-4).
-        posi: Motor position (0-4095).
+        posi: Motor position (0-4096).
 
-    Returns:
-        int: Actual position returned by the device. -1 on failure.
     """
 
-def set_all_joint_motor_positions(self, positions: List[int]) -> List[int]:
+def set_all_joint_positions(self, positions: List[int]) -> List[int]:
     """Sets positions of all joint motors in batch.
 
     Args:
-        positions: Target position list, 4 ints, range 0-4095.
+        positions: Target position list, 4 ints, range 0-4096.
 
     Returns:
         List[int]: Actual position list returned by the device. Empty on failure.
     """
 
-def get_joint_motor_posi(self, joint_motor_index: int) -> int:
+def get_joint_position(self, joint_motor_index: int) -> int:
     """Gets the position of a single joint motor.
 
     Args:
         joint_motor_index: Joint motor index (1-4).
 
     Returns:
-        int: Current motor position (0-4095).
+        int: Current motor position (0-4096).
     """
 
-def get_all_joint_motor_positions(self) -> List[int]:
+def get_all_joint_positions(self) -> List[int]:
     """Gets positions of all joint motors in batch.
 
     Returns:
@@ -235,21 +246,40 @@ def get_all_joint_motor_positions(self) -> List[int]:
     """
 ```
 
-### Joint Angle Control (unavailable)
+### Active Joint Angles and Offline Solver
 
 ```python
-# These methods are stubs on H3L. Use motor position control instead.
 def set_all_active_joint_angles(self, angles: List[float]) -> List[float]: ...
 def get_all_active_joint_angles(self) -> List[float]: ...
+
+class OmniHand3LiteSolver:
+    def __init__(self, is_left_hand: bool) -> None: ...
+    def active_joint_pos_to_actuator_input(
+        self, active_joint_pos: List[float]
+    ) -> List[int]: ...
+    def actuator_input_to_active_joint_pos(
+        self, actuator_input: List[int]
+    ) -> List[float]: ...
+    def single_active_joint_pos_to_actuator_input(
+        self, joint_index: int, angle: float
+    ) -> int: ...
+    def single_actuator_input_to_active_joint_pos(
+        self, joint_index: int, actuator_input: int
+    ) -> float: ...
+    def set_hand_gesture(self, gesture: OmniHand3LiteGesture) -> List[int]: ...
 ```
+
+The solver methods above are pure calculations and do not communicate with the
+device. H3L does not currently provide full active-plus-passive joint-angle
+kinematics.
 
 ### Velocity Control
 
 ```python
-def set_joint_motor_velo(self, joint_motor_index: int, velo: int) -> None: ...   # velo range: 0-32767
-def get_joint_motor_velo(self, joint_motor_index: int) -> int: ...
-def set_all_joint_motor_velo(self, velocities: List[int]) -> None: ...            # range: 0-32767
-def get_all_joint_motor_velo(self) -> List[int]: ...
+def set_joint_velocity(self, joint_motor_index: int, velocity: int) -> None: ...
+def get_joint_velocity(self, joint_motor_index: int) -> int: ...
+def set_all_joint_velocities(self, velocities: List[int]) -> None: ...
+def get_all_joint_velocities(self) -> List[int]: ...
 ```
 
 ### Current Threshold Control
@@ -273,11 +303,59 @@ def mix_control_by_pvt(self, positions: List[int], velocities: List[int], torque
 
     MixCtrl fields:
         joint_index: Joint index (1-4)
-        ctrl_mode: Control mode (only ControlMode.POSITION_TORQUE is available)
-        tgt_posi: Target position (0-4095)
+        ctrl_mode: Control mode (`MixControlMode.POSITION_TORQUE` or `POSITION_VELOCITY_TORQUE`)
+        tgt_posi: Target position (0-4096)
         tgt_torque: Target current (mA)
     """
 ```
+
+H3L also exposes the 0x25 status-returning variants. H3L does not support PV
+mixed control.
+
+```python
+def mix_control_with_status(self, controls: List[MixCtrl]) -> MixCtrlResult: ...
+def mix_control_by_pt_with_status(
+    self, joint_motor_index: int, position: int, torque: int
+) -> MixCtrlResult: ...
+def mix_control_by_pt_with_status(
+    self, positions: List[int], torques: List[int]
+) -> MixCtrlResult: ...
+def mix_control_by_pvt_with_status(
+    self, joint_motor_index: int, position: int, velocity: int, torque: int
+) -> MixCtrlResult: ...
+def mix_control_by_pvt_with_status(
+    self, positions: List[int], velocities: List[int], torques: List[int]
+) -> MixCtrlResult: ...
+```
+
+### Position Control with Status (0x24)
+
+```python
+def set_joint_position_with_status(
+    self, joint_motor_index: int, position: int
+) -> JointPosiStatus: ...
+def get_joint_position_with_status(
+    self, joint_motor_index: int
+) -> JointPosiStatus: ...
+def set_all_joint_positions_with_status(
+    self, positions: List[int]
+) -> AllJointPosiStatus: ...
+def get_all_joint_positions_with_status(self) -> AllJointPosiStatus: ...
+```
+
+### Joint Detail Information (0x26)
+
+The all-joint query returns whole-hand bus information. The single-joint query
+uses a zero-based `joint_index`.
+
+```python
+def get_all_joint_detail_info(self) -> HandDetailInfo: ...
+def get_joint_detail_info(self, joint_index: int) -> JointDetailInfo: ...
+```
+
+The 0x24/0x25/0x26 interfaces require matching firmware support. Firmware that
+does not implement these registers will time out and return empty/default
+result objects.
 
 ### Error Handling
 
@@ -321,17 +399,65 @@ def get_device_info(self) -> DeviceInfo: ...
 def set_device_id(self, device_id: int) -> None: ...
 ```
 
+### Product Metadata and Ranges
+
+```python
+def get_joint_names(self) -> List[str]: ...
+
+@staticmethod
+def get_min_max_motor_position(joint_motor_index: int) -> Int16Bound: ...
+@staticmethod
+def get_min_max_actual_motor_position(joint_motor_index: int) -> Int16Bound: ...
+@staticmethod
+def get_min_max_default_mix_ctrl_velocity(joint_motor_index: int) -> Int16Range: ...
+@staticmethod
+def get_min_max_default_mix_ctrl_torque(joint_motor_index: int) -> Int16Range: ...
+@staticmethod
+def get_min_max_activate_joint_angle(
+    joint_motor_index: int, hand_type: HandType
+) -> FloatBound: ...
+```
+
 ### U16 1D Tactile Sensors
 
 ```python
+class TactileSensorDataU16:
+    sensor_id: Finger
+    data: List[int]
+
 def get_num_of_tactile_sensors(self) -> int: ...
 def get_num_of_tactile_points(self, finger_index: int) -> int: ...
+def init_tactile_points_map(self) -> bool: ...
 def get_len_of_tactile_datum(self, finger_index: int) -> int: ...
 def get_num_of_replied_tactile_frames(self, finger_index: int) -> int: ...
 def get_sn_of_tactile_sensor(self, finger_index: int) -> str: ...
+def get_sensor_data_length(self, finger_index: int) -> int: ...  # deprecated alias
+def get_sensor_order(self) -> List[Finger]: ...
+def get_tactile_sensor_data(
+    self, finger_index: int
+) -> TactileSensorDataU16: ...
+def get_tactile_sensor_data_raw(
+    self, finger_index: int
+) -> TactileSensorDataU16: ...
+def get_all_tactile_sensor_data_raw(self) -> List[TactileSensorDataU16]: ...
 ```
 
-These methods are exposed for protocol/firmware compatibility and return zero or an empty string on H3L hardware without tactile sensors. The older `get_sensor_data_length()` name is deprecated in C++ and is not exposed by the H3L Python class.
+The sensor order is thumb, index, middle, ring, little, and palm. Call
+`init_tactile_points_map()` before relying on cached point counts.
+
+### Communication Settings
+
+```python
+def set_request_interval(self, milliseconds: int) -> None: ...
+def get_request_interval(self) -> int: ...
+def set_frame_recv_timeout(self, milliseconds: int) -> None: ...
+def get_frame_recv_timeout(self) -> int: ...
+def set_frame_send_timeout(self, milliseconds: int) -> None: ...
+def get_frame_send_timeout(self) -> int: ...
+```
+
+Frame-send timeout is a CAN transport setting. The RS485 implementation treats
+the setter as a no-op and returns `0` from the getter.
 
 ### Debugging
 
@@ -365,9 +491,9 @@ print(vendor)
 from omnihand import OmniHand3LiteGesture
 hand.set_hand_gesture(OmniHand3LiteGesture.OMNI_HAND_3_LITE_GESTURE_FIST)
 
-# Set motor positions (4 joints, 0-4095)
+# Set motor positions (4 joints, 0-4096)
 positions = [2048, 2048, 2048, 2048]
-echo = hand.set_all_joint_motor_positions(positions)
+echo = hand.set_all_joint_positions(positions)
 print(f"Motor positions: {echo}")
 
 # Get temperature
