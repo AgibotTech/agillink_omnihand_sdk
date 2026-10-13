@@ -1,0 +1,90 @@
+doc/zh_cn/API_PYTHON_H3L.md
+  s_83fa947041b2cd::t_2aae27553e9480 18
+  s_83fa947041b2cd::t_9fe29e13c08b9c 396-413
+  s_83fa947041b2cd::t_38f979752a49ad 13-17,23-29,202-203,208-209,211,220,230,240,248,253-268,271-273,277-280,309-353,418-421,424,428-450,453
+  s_83fa947041b2cd::t_2b99658e21e849 216,224,237,303-304,486,488
+  s_83fa947041b2cd::t_119d5418177c51 414
+doc/en/API_PYTHON_H3L.md
+  s_83fa947041b2cd::t_0feb7a765514c0 13-17,24-30,203-204,209,212,221,231,241,249,254-269,272-275,279-282,312-359,424-427,430,434-456,459-460
+  s_83fa947041b2cd::t_2aae27553e9480 18-19
+  s_83fa947041b2cd::t_2b99658e21e849 217,225,238,306-307,494,496
+  s_83fa947041b2cd::t_9fe29e13c08b9c 402-419
+  s_83fa947041b2cd::t_5c831842cca586 420
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "22606fa01938f24e8834dd0d273e943798040e06",
+  "prompts": {},
+  "sessions": {
+    "s_48b98efb4ca983": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a4ac-9ee9-7561-9cd8-4145b59a83d8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>"
+    },
+    "s_83fa947041b2cd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1292e-9128-77d1-9d2b-b9aeea8a6acd",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>",
+      "custom_attributes": {
+        "tlab.token_usage.cache_creation_tokens": "0",
+        "tlab.token_usage.input_tokens": "8078871",
+        "tlab.token_usage.output_tokens": "672721",
+        "tlab.session_started_at": "2026-10-13T09:54:19Z",
+        "tlab.token_usage.cache_read_tokens": "177293009"
+      }
+    }
+  },
+  "changes": [
+    {
+      "old_path": "doc/en/API_PYTHON_H3L.md",
+      "new_path": "doc/en/API_PYTHON_H3L.md",
+      "additions": {
+        "human": 148,
+        "ai": [
+          {
+            "session_id": "s_83fa947041b2cd",
+            "lines": 2
+          }
+        ]
+      },
+      "deletions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_83fa947041b2cd",
+            "lines": 23
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_PYTHON_H3L.md",
+      "new_path": "doc/zh_cn/API_PYTHON_H3L.md",
+      "additions": {
+        "human": 143,
+        "ai": [
+          {
+            "session_id": "s_83fa947041b2cd",
+            "lines": 2
+          }
+        ]
+      },
+      "deletions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_83fa947041b2cd",
+            "lines": 22
+          }
+        ]
+      }
+    }
+  ]
+}
