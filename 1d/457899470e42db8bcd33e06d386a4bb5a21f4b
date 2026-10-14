@@ -1,0 +1,140 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "1d457899470e42db8bcd33e06d386a4bb5a21f4b",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/README.md",
+      "new_path": "windows/x64/README.md",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "windows/x64/README_zh_cn.md",
+      "new_path": "windows/x64/README_zh_cn.md",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_canfd_id.cc",
+      "new_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_canfd_id.cc",
+      "additions": {
+        "human": 69
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_rs485.cc",
+      "new_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_rs485.cc",
+      "additions": {
+        "human": 69
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnipicker_3.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnipicker_3.h",
+      "additions": {
+        "human": 62
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/proto.h",
+      "new_path": "windows/x64/cpp/include/omnihand/proto.h",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "additions": {
+        "human": 140
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "additions": {
+        "human": 124
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_dex_umi.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_dex_umi.cc",
+      "additions": {
+        "human": 31
+      },
+      "deletions": {
+        "human": 30
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_pro_2025.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_pro_2025.cc",
+      "additions": {
+        "human": 163
+      },
+      "deletions": {
+        "human": 133
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnipicker_3.cc",
+      "new_path": "windows/x64/cpp/test/test_omnipicker_3.cc",
+      "additions": {
+        "human": 104
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/README.md",
+      "new_path": "windows/x64/python/test/README.md",
+      "additions": {
+        "human": 11
+      },
+      "deletions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/test_omnihand_3_lite_hcan.py",
+      "deletions": {
+        "human": 264
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/test_omnihand_3_lite_zlgcan.py",
+      "deletions": {
+        "human": 263
+      }
+    }
+  ]
+}
