@@ -1,4 +1,4 @@
-# AGILINK OmniHand SDK - Windows ({{ARCH}}) - Version {{VERSION}}
+# AGILINK OmniHand SDK - Windows (x64) - Version 1.1.9
 
 [中文文档](README_zh_cn.md) | [Overview & API Docs](../../README.md)
 
@@ -22,7 +22,7 @@ uninstall.bat
 ## Directory Structure
 
 ```
-{{ARCH}}/
+x64/
 ├── cpp/
 │   ├── share/cmake/omnihand/    # CMake config
 │   ├── include/omnihand/        # Header files
