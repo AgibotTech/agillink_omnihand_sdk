@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 #include "omnihand/export_symbols.h"
@@ -195,6 +196,63 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
   }
 
   /**
+   * @brief Valid clamping-stroke range for MixControlByStroke.
+   * @return {-500, 11200} in 0.01 mm units, i.e. -5.00..112.00 mm. The fully closed end
+   *         reads slightly negative (hardware-observed -449).
+   */
+  static constexpr Int16Bound GetMinMaxStroke() {
+    return kStrokeBound;
+  }
+
+  /**
+   * @brief Valid max-speed range for MixControlByStroke.
+   * @return {0, 5000, 3000} in rpm; 3000 rpm is the firmware's own default.
+   */
+  static constexpr Int16Range GetMinMaxStrokeMixSpeed() {
+    return kStrokeMixSpeedRange;
+  }
+
+  /**
+   * @brief Valid current range for MixControlByStroke.
+   * @return {0, 3500, 3000} in mA; 3000 mA is the firmware's own default when the
+   *         3-byte stroke-only form is used.
+   */
+  static constexpr Int16Range GetMinMaxMixCtrlCurrent() {
+    return kMixCtrlCurrentRange;
+  }
+
+  // ============ Stroke Mixed Control (register 0x14, mode=5, unit: 0.01 mm) ============
+  // mode=5 carries the clamping stroke in 0.01 mm (5000 = 50.00 mm). Register 0x13 and the
+  // *MotorPosi methods keep the 0..4095 position scale and are unaffected.
+
+  /**
+   * @brief 0x14 mode=5: stroke control with optional max speed and max current.
+   * @param stroke Target stroke in 0.01 mm; clamped to GetMinMaxStroke() with a warning log.
+   * @param speed Max speed in rpm; clamped to GetMinMaxStrokeMixSpeed(). Omit together with
+   *              current to send the 3-byte stroke-only form, in which the firmware applies
+   *              its own defaults.
+   * @param current Max current in mA; clamped to GetMinMaxMixCtrlCurrent().
+   * @note The protocol has only the 3-byte and 7-byte forms, so when exactly one of speed /
+   *       current is given the other is filled with the documented firmware default
+   *       (GetMinMaxStrokeMixSpeed() / GetMinMaxMixCtrlCurrent() default_value).
+   * @return Actual stroke from the device reply, sampled when the command arrives (not the
+   *         target), or -1 on failure. The stroke can be slightly negative near the fully
+   *         closed end (hardware-observed -449), so -1 is a valid reading too; check the log.
+   */
+  virtual int16_t MixControlByStroke(int16_t stroke,
+                                     std::optional<int16_t> speed = std::nullopt,
+                                     std::optional<int16_t> current = std::nullopt);
+
+  /**
+   * @brief 0x15: enters gentle grip mode.
+   * @param iq_limit_ma Optional additional iq limit in mA, sent only when set.
+   * @return Raw reply payload as received. The documented lengths are inconsistent, so the
+   *         bytes are returned verbatim rather than decoded into named fields.
+   */
+  virtual std::vector<uint8_t> SetGentleGrip(
+      std::optional<uint16_t> iq_limit_ma = std::nullopt);
+
+  /**
    * @brief Sets the gripper to a predefined gesture (typed API).
    */
   void SetHandGesture(OmniPicker3Gesture gesture);
@@ -224,6 +282,10 @@ class AGIBOT_EXPORT OmniPicker3 : public OmniHand, public ITactileSensor1DU16 {
 
   static constexpr Int16Bound kMotorPositionBound = {0, 4095};
   static constexpr Int16Range kMixCtrlTorqueRange = {0, 6500, 3000}; // unit: mA
+  // Stroke-mode limits live only here so they can be changed or lifted in one edit.
+  static constexpr Int16Bound kStrokeBound = {-500, 11200};           // unit: 0.01 mm
+  static constexpr Int16Range kStrokeMixSpeedRange = {0, 5000, 3000}; // unit: rpm
+  static constexpr Int16Range kMixCtrlCurrentRange = {0, 3500, 3000}; // unit: mA
   static constexpr uint8_t kDefaultHandDevideId = 0x01;
 };
 
