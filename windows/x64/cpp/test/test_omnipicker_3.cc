@@ -35,6 +35,7 @@
 #include <cstdint>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string>
 #include <thread>
 #include <utility>
@@ -322,6 +323,108 @@ TEST_F(OmniPicker3Test, JointIndexBounds) {
   EXPECT_EQ(hand_->GetJointMotorPosi(kDoF + 1), -1);
   EXPECT_EQ(hand_->SetJointMotorPosi(0, 1024), -1);
   EXPECT_EQ(hand_->SetJointMotorPosi(kDoF + 1, 1024), -1);
+}
+
+// The stroke limits are compile-time facts about the SDK, so unlike every other case here
+// they must not be skipped when no adapter is present -- a suite that skips them proves
+// nothing about the constants they assert.
+TEST(OmniPicker3StaticTest, StrokeLimits) {
+  const auto bound = oh::OmniPicker3::GetMinMaxStroke();
+  EXPECT_EQ(bound.min_value, -500) << "fully closed end reads slightly negative";
+  EXPECT_EQ(bound.max_value, 11200) << "11200 * 0.01 mm = 112 mm";
+
+  const auto speed = oh::OmniPicker3::GetMinMaxStrokeMixSpeed();
+  EXPECT_EQ(speed.min_value, 0);
+  EXPECT_EQ(speed.max_value, 5000);
+  EXPECT_EQ(speed.default_value, 3000) << "firmware default for the stroke-only form";
+
+  const auto current = oh::OmniPicker3::GetMinMaxMixCtrlCurrent();
+  EXPECT_EQ(current.min_value, 0);
+  EXPECT_EQ(current.max_value, 3500);
+  EXPECT_EQ(current.default_value, 3000) << "firmware default for the stroke-only form";
+
+  // Unchanged by this work; asserted so a later edit to the stroke limits cannot
+  // silently move the deprecated position scale too.
+  const auto position = oh::OmniPicker3::GetMinMaxMotorPosition();
+  EXPECT_EQ(position.min_value, 0);
+  EXPECT_EQ(position.max_value, 4095);
+  const auto torque = oh::OmniPicker3::GetMinMaxMixCtrlTorque();
+  EXPECT_EQ(torque.min_value, 0);
+  EXPECT_EQ(torque.max_value, 6500);
+  EXPECT_EQ(torque.default_value, 3000);
+}
+
+// ============================================================================
+// Stroke Mixed Control (0x14 mode=5, 0.01 mm) and Gentle Grip (0x15)
+// ============================================================================
+
+// The mode=5 reply carries the stroke sampled when the command arrives, not the target, so
+// the target is checked by repeating the command once the gripper has settled. Tolerances
+// come from hardware runs on 2026-10-13, which settled within 0.2 mm of the target.
+constexpr int16_t kStrokeTolerance = 100;  // 1.00 mm
+constexpr auto kStrokeSettleTime = std::chrono::milliseconds(1500);
+
+TEST_F(OmniPicker3Test, MixControlByStroke) {
+  RequireDevice();
+
+  constexpr int16_t kTarget = 5000;  // 50.00 mm
+  const int16_t pure = hand_->MixControlByStroke(kTarget);
+  AgilinkLogger::get().infof(TAG, "[MixControlByStroke] stroke-only reply=%d", pure);
+  std::this_thread::sleep_for(kStrokeSettleTime);
+
+  const int16_t full = hand_->MixControlByStroke(kTarget, 3000, 3000);
+  AgilinkLogger::get().infof(TAG, "[MixControlByStroke] stroke/speed/current reply=%d", full);
+  EXPECT_NEAR(full, kTarget, kStrokeTolerance) << "reply is not in 0.01 mm or did not reach the target";
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  // Only current given: the 7-byte form, speed filled with the 3000 rpm firmware default.
+  const int16_t partial = hand_->MixControlByStroke(kTarget, std::nullopt, 2000);
+  AgilinkLogger::get().infof(TAG, "[MixControlByStroke] current-only reply=%d", partial);
+  EXPECT_NEAR(partial, kTarget, kStrokeTolerance);
+}
+
+// A stroke of 12000 is sent as 11200 (with a warn log), so the gripper settles at the limit.
+// An over-limit current is sent as 3500; the reply's iq field is the actual current, not the
+// limit, so that clamp is only visible in the log and the frame dump.
+TEST_F(OmniPicker3Test, ClampOutOfRangeStrokeAndCurrent) {
+  RequireDevice();
+
+  const int16_t first = hand_->MixControlByStroke(12000);
+  AgilinkLogger::get().infof(TAG, "[Clamp] MixControlByStroke(12000) reply=%d", first);
+  std::this_thread::sleep_for(kStrokeSettleTime);
+
+  const int16_t at_limit = hand_->MixControlByStroke(12000);
+  AgilinkLogger::get().infof(TAG, "[Clamp] settled reply=%d", at_limit);
+  EXPECT_NEAR(at_limit, oh::OmniPicker3::GetMinMaxStroke().max_value, kStrokeTolerance);
+  EXPECT_LE(at_limit, oh::OmniPicker3::GetMinMaxStroke().max_value);
+
+  const int16_t clamped_current = hand_->MixControlByStroke(5000, 3000, 5000);
+  AgilinkLogger::get().infof(TAG, "[Clamp] MixControlByStroke(current=5000) reply=%d",
+                             clamped_current);
+  EXPECT_NE(clamped_current, -1) << "no reply to the clamped-current command";
+  std::this_thread::sleep_for(kStrokeSettleTime);
+}
+
+// Hardware-observed 0x15 reply (2026-10-13, CAN and RS485): 4 bytes, mode(1) contact(1)
+// iq_limit(u16 LE). The first call's content depends on the state left by earlier runs, so
+// only its size is asserted. There is no exit command: the gripper stays in gentle grip until
+// power-cycled, which the 0x13 / mode=5 cases that follow tolerate.
+TEST_F(OmniPicker3Test, SetGentleGrip) {
+  RequireDevice();
+
+  const auto default_reply = hand_->SetGentleGrip();
+  AgilinkLogger::get().infof(TAG, "[SetGentleGrip] default-limit reply: %s",
+                             JoinValues(std::vector<int>(default_reply.begin(), default_reply.end())).c_str());
+  EXPECT_EQ(default_reply.size(), 4u);
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  const auto limited_reply = hand_->SetGentleGrip(static_cast<uint16_t>(1000));
+  AgilinkLogger::get().infof(TAG, "[SetGentleGrip] 1000 mA limit reply: %s",
+                             JoinValues(std::vector<int>(limited_reply.begin(), limited_reply.end())).c_str());
+  ASSERT_EQ(limited_reply.size(), 4u);
+  EXPECT_EQ(limited_reply[0], 1u) << "not in gentle grip mode";
+  const uint16_t iq_limit = static_cast<uint16_t>(limited_reply[2] | (limited_reply[3] << 8));
+  EXPECT_EQ(iq_limit, 1000u);
 }
 
 // ============================================================================
@@ -786,6 +889,7 @@ int main(int argc, char** argv) {
 
   int gtest_argc = static_cast<int>(gtest_args.size());
   ::testing::InitGoogleTest(&gtest_argc, gtest_args.data());
+  AgilinkLogger::get().flush();
   const int result = RUN_ALL_TESTS();
   ReturnToZeroOnce();
   // Drain the async logger first, so the summary is not interleaved with buffered log lines.

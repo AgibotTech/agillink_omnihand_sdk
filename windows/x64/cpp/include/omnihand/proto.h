@@ -509,6 +509,8 @@ struct AGIBOT_EXPORT MixCtrl {
   std::optional<short> tgt_posi_;
   std::optional<short> tgt_velo_;
   std::optional<short> tgt_torque_;
+  // Present in 0x25 feedback only; one status byte is returned per motor.
+  std::optional<unsigned char> motor_status_;
 
   MixCtrl() : joint_index_(0), ctrl_mode_(0) {}
 

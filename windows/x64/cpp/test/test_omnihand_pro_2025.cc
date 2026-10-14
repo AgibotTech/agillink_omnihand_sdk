@@ -5,14 +5,18 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
-#include <iomanip>
+#include <cstdio>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <thread>
 #include <vector>
+#include "agilink_logger.h"
 #include "omnihand/omnihand_pro_2025.h"
 #include "omnihand/proto.h"
+
+using agilink::AgilinkLogger;
+static constexpr const char* TAG = "OmniHandPro2025Test";
 
 // Global variable to store request interval from command line argument
 static int g_request_interval = 5;  // Default: 5ms
@@ -42,7 +46,7 @@ class OmniHandPro2025Test : public ::testing::Test {
           0,                                  // canfd_device_id: HCAN device index
           0                                   // canfd_channel_id: CAN channel index (0=can0, 1=can1)
       );
-      std::cout << "[Info]: Using HCAN device" << std::endl;
+      AgilinkLogger::get().infof(TAG, "Using HCAN device");
     } else {
       // Default: ZLG CAN
       hand_ = agilink::omnihand::OmniHandPro2025::createHandByZlgcan(
@@ -51,13 +55,13 @@ class OmniHandPro2025Test : public ::testing::Test {
           0,                                  // canfd_device_id: USB CANFD adapter device index
           0                                   // canfd_channel_id: CAN channel index (0=can0, 1=can1)
       );
-      std::cout << "[Info]: Using ZLG CAN device" << std::endl;
+      AgilinkLogger::get().infof(TAG, "Using ZLG CAN device");
     }
     // hand_->ShowDataDetails(true);
     int request_interval = GetRequestInterval();
     hand_->SetRequestInterval(request_interval);
     if (request_interval != 0) {
-      std::cout << "[Info]: Using request interval: " << request_interval << " ms" << std::endl;
+      AgilinkLogger::get().infof(TAG, "Using request interval: %d ms", request_interval);
     }
     hand_->SetFrameRecvTimeout(300);
   }
@@ -96,13 +100,12 @@ TEST_F(OmniHandPro2025Test, BroadcastDeviceIdUnsupported) {
 TEST_F(OmniHandPro2025Test, GetVendorInfo) {
   if (hand_->Init()) {
     auto vendor_info = hand_->GetVendorInfo();
-    std::cout << "[GetVendorInfo] Vendor Info:" << std::endl;
-    std::cout << vendor_info.ToString() << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetVendorInfo] Vendor Info:\n%s", vendor_info.ToString().c_str());
 
     // Check if request succeeded (non-zero dof indicates success)
     // If request failed (timeout), skip assertion to avoid false failure
     if (vendor_info.dof == 0) {
-      std::cout << "[GetVendorInfo] Failed: got empty vendor info (timeout)" << std::endl;
+      AgilinkLogger::get().infof(TAG, "[GetVendorInfo] Failed: got empty vendor info (timeout)");
       return;
     }
 
@@ -114,8 +117,7 @@ TEST_F(OmniHandPro2025Test, GetVendorInfo) {
 TEST_F(OmniHandPro2025Test, GetDeviceInfo) {
   if (hand_->Init()) {
     auto device_info = hand_->GetDeviceInfo();
-    std::cout << "[GetDeviceInfo] Device Info:" << std::endl;
-    std::cout << device_info.ToString() << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetDeviceInfo] Device Info:\n%s", device_info.ToString().c_str());
     // Only check deviceId if request succeeded (non-zero indicates success)
     if (device_info.hand_device_id != 0) {
       EXPECT_EQ(device_info.hand_device_id, 1);
@@ -170,42 +172,52 @@ TEST_F(OmniHandPro2025Test, JointAngleControl) {
     hand_->SetAllActiveJointAngles(angles);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    std::cout << "[SetAllActiveJointAngles] Set Active Joint Angles (rad): ";
-    for (size_t i = 0; i < angles.size(); ++i) {
-      std::cout << std::fixed << std::setprecision(4) << angles[i];
-      if (i < angles.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[SetAllActiveJointAngles] Set Active Joint Angles (rad): ";
+      for (size_t i = 0; i < angles.size(); ++i) {
+        if (i > 0) msg += ", ";
+        char buf[24];
+        snprintf(buf, sizeof(buf), "%.4f", angles[i]);
+        msg += buf;
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
 
     auto active_angles = hand_->GetAllActiveJointAngles();
     // Check if request succeeded (non-empty result and correct size)
     if (active_angles.empty() || active_angles.size() != 12) {
       // Request failed (timeout) or incorrect size, skip remaining assertions
-      std::cout << "[GetAllActiveJointAngles] Failed: got " << active_angles.size()
-                << " angles, expected 12" << std::endl;
+      AgilinkLogger::get().infof(TAG, "[GetAllActiveJointAngles] Failed: got %zu angles, expected 12", active_angles.size());
       return;
     }
-    std::cout << "[GetAllActiveJointAngles] Active Joint Angles (rad): ";
-    for (size_t i = 0; i < active_angles.size(); ++i) {
-      std::cout << std::fixed << std::setprecision(4) << active_angles[i];
-      if (i < active_angles.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[GetAllActiveJointAngles] Active Joint Angles (rad): ";
+      for (size_t i = 0; i < active_angles.size(); ++i) {
+        if (i > 0) msg += ", ";
+        char buf[24];
+        snprintf(buf, sizeof(buf), "%.4f", active_angles[i]);
+        msg += buf;
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
     EXPECT_EQ(active_angles.size(), 12);
 
     auto all_angles = hand_->GetAllJointAngles();
     // Check if request succeeded (non-empty result and correct size)
     if (all_angles.empty() || all_angles.size() != 19) {
-      std::cout << "[GetAllJointAngles] Failed: got " << all_angles.size()
-                << " angles, expected 19" << std::endl;
+      AgilinkLogger::get().infof(TAG, "[GetAllJointAngles] Failed: got %zu angles, expected 19", all_angles.size());
       return;
     }
-    std::cout << "[GetAllJointAngles] All Joint Angles (rad, " << all_angles.size() << " joints): ";
-    for (size_t i = 0; i < all_angles.size(); ++i) {
-      std::cout << std::fixed << std::setprecision(4) << all_angles[i];
-      if (i < all_angles.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[GetAllJointAngles] All Joint Angles (rad, " + std::to_string(all_angles.size()) + " joints): ";
+      for (size_t i = 0; i < all_angles.size(); ++i) {
+        if (i > 0) msg += ", ";
+        char buf[24];
+        snprintf(buf, sizeof(buf), "%.4f", all_angles[i]);
+        msg += buf;
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
     EXPECT_EQ(all_angles.size(), 19);  // 12 active + 7 passive
     hand_->SetAllActiveJointAngles(std::vector<double>(agilink::omnihand::OmniHandPro2025::kDegreesOfActiveFreedom, 0.6));
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -228,16 +240,17 @@ TEST_F(OmniHandPro2025Test, ControlMode) {
     // Check if request succeeded (non-empty result and correct size)
     if (current_modes.empty() || current_modes.size() != 12) {
       // Request failed (timeout) or incorrect size, skip assertion to avoid false failure
-      std::cout << "[GetAllControlMode] Failed: got " << current_modes.size()
-                << " modes, expected 12" << std::endl;
+      AgilinkLogger::get().infof(TAG, "[GetAllControlMode] Failed: got %zu modes, expected 12", current_modes.size());
       return;
     }
-    std::cout << "[GetAllControlMode] Control Modes: ";
-    for (size_t i = 0; i < current_modes.size(); ++i) {
-      std::cout << static_cast<int>(current_modes[i]);
-      if (i < current_modes.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[GetAllControlMode] Control Modes: ";
+      for (size_t i = 0; i < current_modes.size(); ++i) {
+        if (i > 0) msg += ", ";
+        msg += std::to_string(static_cast<int>(current_modes[i]));
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
     EXPECT_EQ(current_modes.size(), 12);
   }
 }
@@ -247,16 +260,14 @@ TEST_F(OmniHandPro2025Test, TactileSensor3D) {
   if (hand_->Init()) {
     // Test single sensor
     auto thumb_tactile = hand_->GetTactileSensor3DData(agilink::omnihand::Finger::THUMB);
-    std::cout << "[GetTactileSensor3DData] Thumb 3D Tactile Data:" << std::endl;
-    std::cout << thumb_tactile.ToString() << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetTactileSensor3DData] Thumb 3D Tactile Data:\n%s", thumb_tactile.ToString().c_str());
     EXPECT_GE(thumb_tactile.normal_force, 0);
 
     // Test multiple sensors
     std::vector<agilink::omnihand::Finger> fingers = {agilink::omnihand::Finger::INDEX, agilink::omnihand::Finger::MIDDLE, agilink::omnihand::Finger::RING, agilink::omnihand::Finger::LITTLE};
     for (const auto& finger : fingers) {
       auto tactile_data = hand_->GetTactileSensor3DData(finger);
-      std::cout << "[GetTactileSensor3DData] " << static_cast<int>(finger) << " 3D Tactile Data:" << std::endl;
-      std::cout << tactile_data.ToString() << std::endl;
+      AgilinkLogger::get().infof(TAG, "[GetTactileSensor3DData] %d 3D Tactile Data:\n%s", static_cast<int>(finger), tactile_data.ToString().c_str());
     }
   }
 }
@@ -271,37 +282,37 @@ TEST_F(OmniHandPro2025Test, ErrorReport) {
       // This is expected if device is not responding
       return;
     }
-    std::cout << "[GetAllErrorReport] Error Reports (12 joints): ";
+    std::string err_msg = "[GetAllErrorReport] Error Reports (12 joints): ";
     bool has_errors = false;
     for (size_t i = 0; i < error_reports.size(); ++i) {
-      std::cout << "J" << (i + 1) << ":[";
+      if (i > 0) err_msg += " ";
+      err_msg += "J" + std::to_string(i + 1) + ":[";
       if (error_reports[i].bits.stalled_) {
-        std::cout << "S";  // Stalled
+        err_msg += "S";  // Stalled
         has_errors = true;
       }
       if (error_reports[i].bits.overheat_) {
-        std::cout << "H";  // Overheat
+        err_msg += "H";  // Overheat
         has_errors = true;
       }
       if (error_reports[i].bits.over_current_) {
-        std::cout << "C";  // Over-current
+        err_msg += "C";  // Over-current
         has_errors = true;
       }
       if (error_reports[i].bits.motor_except_) {
-        std::cout << "M";  // Motor exception
+        err_msg += "M";  // Motor exception
         has_errors = true;
       }
       if (error_reports[i].bits.commu_except_) {
-        std::cout << "X";  // Communication exception
+        err_msg += "X";  // Communication exception
         has_errors = true;
       }
-      std::cout << "]";
-      if (i < error_reports.size() - 1) std::cout << " ";
+      err_msg += "]";
     }
-    std::cout << std::endl;
+    AgilinkLogger::get().infof(TAG, "%s", err_msg.c_str());
     if (has_errors) {
-      std::cout << "[Note] Error flags: S=Stalled, H=Overheat, C=Over-current, M=Motor exception, X=Communication exception" << std::endl;
-      std::cout << "[Note] X (Communication exception) may indicate historical communication errors. This is normal if the device had previous communication timeouts." << std::endl;
+      AgilinkLogger::get().infof(TAG, "[Note] Error flags: S=Stalled, H=Overheat, C=Over-current, M=Motor exception, X=Communication exception");
+      AgilinkLogger::get().infof(TAG, "[Note] X (Communication exception) may indicate historical communication errors. This is normal if the device had previous communication timeouts.");
     }
     EXPECT_EQ(error_reports.size(), 12);
   }
@@ -317,12 +328,14 @@ TEST_F(OmniHandPro2025Test, TemperatureReport) {
       // This is expected if report periods are not set or device hasn't sent reports yet
       return;
     }
-    std::cout << "[GetAllTemperatureReport] Temperature Reports (°C): ";
-    for (size_t i = 0; i < temp_reports.size(); ++i) {
-      std::cout << "J" << (i + 1) << ":" << temp_reports[i];
-      if (i < temp_reports.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[GetAllTemperatureReport] Temperature Reports (°C): ";
+      for (size_t i = 0; i < temp_reports.size(); ++i) {
+        if (i > 0) msg += ", ";
+        msg += "J" + std::to_string(i + 1) + ":" + std::to_string(temp_reports[i]);
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
     EXPECT_EQ(temp_reports.size(), 12);
   }
 }
@@ -337,12 +350,14 @@ TEST_F(OmniHandPro2025Test, CurrentReport) {
       // This is expected if report periods are not set or device hasn't sent reports yet
       return;
     }
-    std::cout << "[GetAllCurrentReport] Current Reports (mA): ";
-    for (size_t i = 0; i < current_reports.size(); ++i) {
-      std::cout << "J" << (i + 1) << ":" << current_reports[i];
-      if (i < current_reports.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[GetAllCurrentReport] Current Reports (mA): ";
+      for (size_t i = 0; i < current_reports.size(); ++i) {
+        if (i > 0) msg += ", ";
+        msg += "J" + std::to_string(i + 1) + ":" + std::to_string(current_reports[i]);
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
     EXPECT_EQ(current_reports.size(), 12);
   }
 }
@@ -353,8 +368,7 @@ TEST_F(OmniHandPro2025Test, KinematicsSolver) {
     // First verify we can get motor positions (prerequisite check)
     auto motor_positions = hand_->GetAllJointMotorPosi();
     if (motor_positions.empty() || motor_positions.size() != 12) {
-      std::cout << "[KinematicsSolver] Failed to get motor positions: got "
-                << motor_positions.size() << ", expected 12" << std::endl;
+      AgilinkLogger::get().infof(TAG, "[KinematicsSolver] Failed to get motor positions: got %zu, expected 12", motor_positions.size());
       return;
     }
 
@@ -364,18 +378,20 @@ TEST_F(OmniHandPro2025Test, KinematicsSolver) {
 
     // Check if calculation succeeded (non-empty result and correct size)
     if (all_angles.empty() || all_angles.size() != 19) {
-      std::cout << "[GetAllJointAngles] Failed: got " << all_angles.size()
-                << " angles, expected 19" << std::endl;
+      AgilinkLogger::get().infof(TAG, "[GetAllJointAngles] Failed: got %zu angles, expected 19", all_angles.size());
       return;
     }
 
-    std::cout << "[GetAllJointAngles] Forward Kinematics (input: 12 active angles, output: "
-              << all_angles.size() << " joint angles): ";
-    for (size_t i = 0; i < all_angles.size(); ++i) {
-      std::cout << std::fixed << std::setprecision(4) << all_angles[i];
-      if (i < all_angles.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[GetAllJointAngles] Forward Kinematics (input: 12 active angles, output: " + std::to_string(all_angles.size()) + " joint angles): ";
+      for (size_t i = 0; i < all_angles.size(); ++i) {
+        if (i > 0) msg += ", ";
+        char buf[24];
+        snprintf(buf, sizeof(buf), "%.4f", all_angles[i]);
+        msg += buf;
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
     EXPECT_EQ(all_angles.size(), 19);  // 12 active + 7 passive
   }
 }
@@ -386,27 +402,30 @@ TEST_F(OmniHandPro2025Test, VelocityControl) {
     // Test setting velocity
     std::vector<int16_t> velocities(12, 1000);
     hand_->SetAllJointMotorVelo(velocities);
-    std::cout << "[SetAllJointMotorVelo] Set Velocities: ";
-    for (size_t i = 0; i < velocities.size(); ++i) {
-      std::cout << velocities[i];
-      if (i < velocities.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[SetAllJointMotorVelo] Set Velocities: ";
+      for (size_t i = 0; i < velocities.size(); ++i) {
+        if (i > 0) msg += ", ";
+        msg += std::to_string(velocities[i]);
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
 
     auto current_velocities = hand_->GetAllJointMotorVelo();
     // Check if request succeeded (non-empty result and correct size)
     if (current_velocities.empty() || current_velocities.size() != 12) {
       // Request failed (timeout) or incorrect size, skip assertion to avoid false failure
-      std::cout << "[GetAllJointMotorVelo] Failed: got " << current_velocities.size()
-                << " velocities, expected 12" << std::endl;
+      AgilinkLogger::get().infof(TAG, "[GetAllJointMotorVelo] Failed: got %zu velocities, expected 12", current_velocities.size());
       return;
     }
-    std::cout << "[GetAllJointMotorVelo] Current Velocities: ";
-    for (size_t i = 0; i < current_velocities.size(); ++i) {
-      std::cout << current_velocities[i];
-      if (i < current_velocities.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[GetAllJointMotorVelo] Current Velocities: ";
+      for (size_t i = 0; i < current_velocities.size(); ++i) {
+        if (i > 0) msg += ", ";
+        msg += std::to_string(current_velocities[i]);
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
     EXPECT_EQ(current_velocities.size(), 12);
   }
 }
@@ -420,7 +439,7 @@ TEST_F(OmniHandPro2025Test, VoltageControl) {
       for (unsigned char joint = 1; joint <= kDof; ++joint) {
         hand_->SetControlMode(joint, agilink::omnihand::ControlMode::POSITION);
       }
-      std::cout << "[SetControlMode] Restored all joints to position mode" << std::endl;
+      AgilinkLogger::get().infof(TAG, "[SetControlMode] Restored all joints to position mode");
     };
     hand_->SetAllControlMode(std::vector<unsigned char>(12, static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION)));
     constexpr unsigned char kProbeJoint = 1;
@@ -438,22 +457,22 @@ TEST_F(OmniHandPro2025Test, VoltageControl) {
       hand_->SetJointMotorVoltage(joint, kSafeVoltage);
     }
 
-    std::cout << "[GetAllControlMode] Reading control modes after voltage mode switch..." << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetAllControlMode] Reading control modes after voltage mode switch...");
     auto voltage_modes = hand_->GetAllControlMode();
     if (voltage_modes.empty() || voltage_modes.size() != kDof) {
-      std::cout << "[GetAllControlMode] Failed after voltage mode switch: got "
-                << voltage_modes.size() << " modes, expected "
-                << static_cast<int>(kDof) << std::endl;
+      AgilinkLogger::get().infof(TAG, "[GetAllControlMode] Failed after voltage mode switch: got %zu modes, expected %d", voltage_modes.size(), static_cast<int>(kDof));
       restore_position_mode();
       return;
     }
 
-    std::cout << "[GetAllControlMode] Voltage Control Modes: ";
-    for (size_t i = 0; i < voltage_modes.size(); ++i) {
-      std::cout << static_cast<int>(voltage_modes[i]);
-      if (i < voltage_modes.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[GetAllControlMode] Voltage Control Modes: ";
+      for (size_t i = 0; i < voltage_modes.size(); ++i) {
+        if (i > 0) msg += ", ";
+        msg += std::to_string(static_cast<int>(voltage_modes[i]));
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
 
     const auto voltage_mode = static_cast<unsigned char>(agilink::omnihand::ControlMode::VOLTAGE);
     const bool all_modes_are_voltage =
@@ -465,33 +484,35 @@ TEST_F(OmniHandPro2025Test, VoltageControl) {
       return;
     }
 
-    std::cout << "[SetAllControlMode] Voltage Control ..." << std::endl;
+    AgilinkLogger::get().infof(TAG, "[SetAllControlMode] Voltage Control ...");
     hand_->SetAllControlMode(std::vector<unsigned char>(12, static_cast<unsigned char>(agilink::omnihand::ControlMode::POSITION)));
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
     voltage_modes = hand_->GetAllControlMode();
     if (voltage_modes.empty() || voltage_modes.size() != kDof) {
-      std::cout << "[GetAllControlMode] Failed after voltage mode switch: got "
-                << voltage_modes.size() << " modes, expected "
-                << static_cast<int>(kDof) << std::endl;
+      AgilinkLogger::get().infof(TAG, "[GetAllControlMode] Failed after voltage mode switch: got %zu modes, expected %d", voltage_modes.size(), static_cast<int>(kDof));
       restore_position_mode();
       return;
     }
 
-    std::cout << "[GetAllControlMode] Modes: ";
-    for (size_t i = 0; i < voltage_modes.size(); ++i) {
-      std::cout << static_cast<int>(voltage_modes[i]);
-      if (i < voltage_modes.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[GetAllControlMode] Modes: ";
+      for (size_t i = 0; i < voltage_modes.size(); ++i) {
+        if (i > 0) msg += ", ";
+        msg += std::to_string(static_cast<int>(voltage_modes[i]));
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
 
     std::vector<int16_t> voltages(kDof, kSafeVoltage);
     hand_->SetAllJointMotorVoltage(voltages);
-    std::cout << "[SetAllJointMotorVoltage] Set Voltages: ";
-    for (size_t i = 0; i < voltages.size(); ++i) {
-      std::cout << voltages[i];
-      if (i < voltages.size() - 1) std::cout << ", ";
+    {
+      std::string msg = "[SetAllJointMotorVoltage] Set Voltages: ";
+      for (size_t i = 0; i < voltages.size(); ++i) {
+        if (i > 0) msg += ", ";
+        msg += std::to_string(voltages[i]);
+      }
+      AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     }
-    std::cout << std::endl;
 
     restore_position_mode();
   }
@@ -503,32 +524,38 @@ TEST_F(OmniHandPro2025Test, TorqueControl) {
   }
   
   const size_t kDof = agilink::omnihand::OmniHandPro2025::kDegreesOfActiveFreedom;
-  std::cout << "Set control mode to Torque Control" << std::endl;
+  AgilinkLogger::get().infof(TAG, "Set control mode to Torque Control");
   for (unsigned char joint = 1; joint <= kDof; ++joint) {
     hand_->SetControlMode(joint, agilink::omnihand::ControlMode::TORQUE);
   }
-  std::cout << "[GetControlMode]:";
-  for (unsigned char joint = 1; joint <= kDof; ++joint) {
-    std::cout << ToString(hand_->GetControlMode(joint)) << " ";
+  {
+    std::string msg = "[GetControlMode]:";
+    for (unsigned char joint = 1; joint <= kDof; ++joint) {
+      msg += " " + ToString(hand_->GetControlMode(joint));
+    }
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << std::endl;
   // for (unsigned char joint = 0)
   std::vector<int16_t> torqueFromGetJointMotorTorque(kDof, 320);
   for (int i = 1; i <= kDof; ++ i) {
     torqueFromGetJointMotorTorque[i-1] = hand_->GetJointMotorTorque(i);
   }
   std::vector<int16_t> torqueFromGetAllJointMotorTorque = hand_->GetAllJointMotorTorque();
-  std::cout << "[GetJointMotorTorque] Torque Values: ";
-  for (auto torque : torqueFromGetJointMotorTorque) {
-    std::cout << torque << " ";
+  {
+    std::string msg = "[GetJointMotorTorque] Torque Values: ";
+    for (auto torque : torqueFromGetJointMotorTorque) {
+      msg += std::to_string(torque) + " ";
+    }
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << std::endl;
-  std::cout << "[GetAllJointMotorTorque] Torque Values: ";
-  for (auto torque : torqueFromGetAllJointMotorTorque) {
-    std::cout << torque << " ";
+  {
+    std::string msg = "[GetAllJointMotorTorque] Torque Values: ";
+    for (auto torque : torqueFromGetAllJointMotorTorque) {
+      msg += std::to_string(torque) + " ";
+    }
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << std::endl;
-  
+
   hand_->SetJointMotorTorque(1, 300);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   //recovery
@@ -541,16 +568,20 @@ TEST_F(OmniHandPro2025Test, TorqueControl) {
     torqueFromGetJointMotorTorque[i-1] = hand_->GetJointMotorTorque(i);
   }
   torqueFromGetAllJointMotorTorque = hand_->GetAllJointMotorTorque();
-  std::cout << "[GetJointMotorTorque] Torque Values: ";
-  for (auto torque : torqueFromGetJointMotorTorque) {
-    std::cout << torque << " ";
+  {
+    std::string msg = "[GetJointMotorTorque] Torque Values: ";
+    for (auto torque : torqueFromGetJointMotorTorque) {
+      msg += std::to_string(torque) + " ";
+    }
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << std::endl;
-  std::cout << "[GetAllJointMotorTorque] Torque Values: ";
-  for (auto torque : torqueFromGetAllJointMotorTorque) {
-    std::cout << torque << " ";
+  {
+    std::string msg = "[GetAllJointMotorTorque] Torque Values: ";
+    for (auto torque : torqueFromGetAllJointMotorTorque) {
+      msg += std::to_string(torque) + " ";
+    }
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
-  std::cout << std::endl;
   for (unsigned char joint = 1; joint <= kDof; ++joint) {
     hand_->SetControlMode(joint, agilink::omnihand::ControlMode::POSITION);
   }
@@ -574,12 +605,11 @@ int main(int argc, char** argv) {
           ++i;  // Skip the next argument (the interval value)
           continue;
         } else {
-          std::cerr << "[Error]: -f value " << interval
-                    << " is out of range (0-100ms)" << std::endl;
+          AgilinkLogger::get().errorf(TAG, "[Error]: -f value %d is out of range (0-100ms)", interval);
           return 1;
         }
       } catch (const std::exception& e) {
-        std::cerr << "[Error]: Invalid -f value: " << argv[i + 1] << std::endl;
+        AgilinkLogger::get().errorf(TAG, "[Error]: Invalid -f value: %s", argv[i + 1]);
         return 1;
       }
     } else if (arg == "-d" && i + 1 < argc) {
@@ -590,7 +620,7 @@ int main(int argc, char** argv) {
         ++i;  // Skip the next argument (the device type value)
         continue;
       } else {
-        std::cerr << "[Error]: -d value must be 'zlgcan' or 'hcan', got: " << device_type << std::endl;
+        AgilinkLogger::get().errorf(TAG, "[Error]: -d value must be 'zlgcan' or 'hcan', got: %s", device_type.c_str());
         return 1;
       }
     } else if (arg == "--help" || arg == "-h") {

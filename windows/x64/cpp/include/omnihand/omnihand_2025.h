@@ -196,8 +196,7 @@ class AGIBOT_EXPORT OmniHand2025 : public OmniHand, public PrivateOmniHand, publ
    * @brief Returns the 10 active joint names of O10 in motor-index order.
    * @note Order MUST match the OmnihandActiveJoint enum used by the kinematics
    *       solver and SetAllJointMotorPosi / GetAllJointMotorPosi. Names are
-   *       prefixed with "L_"/"R_" to match the URDF in
-   *       `omnihand_sdk/assets/omnihand_description`.
+   *       prefixed with "L_"/"R_" to match the URDF
    */
   std::vector<std::string> GetJointNames() const override {
     const std::string p = hand_type_ == HandType::LEFT ? "L_" : "R_";
