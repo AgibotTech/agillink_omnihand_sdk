@@ -1,0 +1,97 @@
+doc/en/API_CPP_O12.md
+  s_48b98efb4ca983::t_25bcb2265f352c 265-267
+doc/zh_cn/API_CPP_O12.md
+  s_48b98efb4ca983::t_25bcb2265f352c 201-202
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "9fd14b6c5c611b2a6d804ff7f6912ef0e181a608",
+  "prompts": {},
+  "sessions": {
+    "s_48b98efb4ca983": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a4ac-9ee9-7561-9cd8-4145b59a83d8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>",
+      "custom_attributes": {
+        "tlab.session_started_at": "2026-09-25T06:40:15Z",
+        "tlab.token_usage.cache_creation_tokens": "0",
+        "tlab.token_usage.input_tokens": "98253339",
+        "tlab.token_usage.output_tokens": "1575610",
+        "tlab.token_usage.cache_read_tokens": "363283537"
+      }
+    }
+  },
+  "changes": [
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "README_zh_cn.md",
+      "new_path": "README_zh_cn.md",
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "doc/en/API_CPP_O12.md",
+      "new_path": "doc/en/API_CPP_O12.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 3
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 14
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_CPP_O12.md",
+      "new_path": "doc/zh_cn/API_CPP_O12.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 11
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/MIGRATION_1_1_8_TO_1_1_9.md",
+      "deletions": {
+        "human": 110
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_pro_2025.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_pro_2025.cc",
+      "additions": {
+        "human": 9
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "e2a3c11dbad0f01280dcefd2763bc5284b9147d8",
+  "prompts": {},
+  "sessions": {
+    "s_48b98efb4ca983": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a4ac-9ee9-7561-9cd8-4145b59a83d8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.10.2",
+  "base_commit_sha": "120d3d2c940bc3570591f7b75800e52e1ec51c2f",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_canfd_id.cc",
+      "new_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_canfd_id.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_rs485.cc",
+      "new_path": "windows/x64/cpp/demo/omnipicker_3/OP3_demo_rs485.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnipicker_3.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnipicker_3.h",
+      "additions": {
+        "human": 8
+      },
+      "deletions": {
+        "human": 8
+      }
+    }
+  ]
+}

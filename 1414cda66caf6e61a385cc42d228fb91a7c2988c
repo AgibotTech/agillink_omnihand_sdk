@@ -1,0 +1,760 @@
+doc/zh_cn/API_CPP_O10_UMI.md
+  s_48b98efb4ca983::t_72e6ee4f699447 292
+  s_48b98efb4ca983::t_174e5e606c7023 165-180,244-249,273,281,284-285
+doc/en/API_PYTHON_O10.md
+  s_48b98efb4ca983::t_ead04bec65d840 516
+  s_48b98efb4ca983::t_1a0c0b4357e6aa 448-461,518,524,528,535-536
+  s_48b98efb4ca983::t_d91cb3183baac1 462
+doc/zh_cn/API_CPP_H3L.md
+  s_48b98efb4ca983::t_ec9b8613fffb77 293-307,309
+  s_48b98efb4ca983::t_72e6ee4f699447 83
+  s_48b98efb4ca983::t_63abea489f29a5 169-178,284-289,292
+  s_48b98efb4ca983::t_1e89b31abc178c 13,308
+doc/en/API_ROS2_O10.md
+  s_48b98efb4ca983::t_a36ec9b62a7f2b 17-20,23,25,27,29
+doc/en/API_CPP_H3L.md
+  s_48b98efb4ca983::t_72e6ee4f699447 83
+  s_48b98efb4ca983::t_63abea489f29a5 169-178,287-292,295
+  s_48b98efb4ca983::t_1e89b31abc178c 13,311
+  s_48b98efb4ca983::t_ec9b8613fffb77 296-310,312
+doc/en/API_ROS2_H3L.md
+  s_48b98efb4ca983::t_f1eaf88ba346bb 19-22,25,27,29-31
+doc/zh_cn/API_CPP.md
+  s_48b98efb4ca983::t_1e89b31abc178c 22
+  s_48b98efb4ca983::t_f4b68fd3cd4f81 5,11,24,26
+doc/en/API_CPP_H3UM.md
+  s_48b98efb4ca983::t_1ee123511be2c4 1-129
+doc/zh_cn/API_ROS2_H3L.md
+  s_48b98efb4ca983::t_f1eaf88ba346bb 19-22,25,27,29-31
+  s_48b98efb4ca983::t_1e89b31abc178c 33
+doc/zh_cn/API_ROS2_O12.md
+  s_48b98efb4ca983::t_a36ec9b62a7f2b 17-20,23,25,27,29,31,33,54-55
+doc/en/API_PYTHON.md
+  s_48b98efb4ca983::t_20e5ae6cbab883 23
+  s_48b98efb4ca983::t_82a6eb19ad5349 5,11,24
+  s_48b98efb4ca983::t_1e89b31abc178c 21
+doc/en/API_CPP.md
+  s_48b98efb4ca983::t_f4b68fd3cd4f81 5,11,24,26
+  s_48b98efb4ca983::t_1e89b31abc178c 22
+doc/zh_cn/API_CPP_O10.md
+  s_48b98efb4ca983::t_b12a7e1027850b 273,282-287,291-292,409-420
+  s_48b98efb4ca983::t_72e6ee4f699447 102
+doc/zh_cn/API_CPP_OP3.md
+  s_48b98efb4ca983::t_a83aaf4f4f2f40 5-42,46,68-72
+doc/zh_cn/API_CPP_O12.md
+  s_48b98efb4ca983::t_174e5e606c7023 191-211
+  s_48b98efb4ca983::t_a8d9c237dcd6aa 212
+doc/zh_cn/MIGRATION_1_1_8_TO_1_1_9.md
+  s_48b98efb4ca983::t_4cc5f92682640f 62
+  s_48b98efb4ca983::t_1e89b31abc178c 68
+  s_48b98efb4ca983::t_b54725a6edc5ce 1-61,63-67,69-77,79-95,97-110
+  s_48b98efb4ca983::t_df1afe5970f997 78,96
+doc/en/API_ROS2.md
+  s_48b98efb4ca983::t_e42bce6837dd7c 42-45,48,50,52,54,56,58,99,101,204
+README.md
+  s_48b98efb4ca983::t_c9a918eae2bcf7 46,56-57,65
+README_zh_cn.md
+  s_48b98efb4ca983::t_c9a918eae2bcf7 46,56-57,65
+doc/en/API_CPP_O12.md
+  s_48b98efb4ca983::t_174e5e606c7023 261-274,278-279
+  s_48b98efb4ca983::t_72e6ee4f699447 97
+doc/en/API_ROS2_O12.md
+  s_48b98efb4ca983::t_a36ec9b62a7f2b 17-20,23,25,27,29,31,33,54-55
+doc/en/API_CPP_O10_UMI.md
+  s_48b98efb4ca983::t_72e6ee4f699447 79
+  s_48b98efb4ca983::t_174e5e606c7023 241-251,255-256,334-339,364,372,375-376
+doc/en/MIGRATION_1_1_8_TO_1_1_9.md
+  s_48b98efb4ca983::t_1e89b31abc178c 68
+  s_48b98efb4ca983::t_df1afe5970f997 78,96
+  s_48b98efb4ca983::t_b54725a6edc5ce 1-61,63-67,69-77,79-95,97-110
+  s_48b98efb4ca983::t_4cc5f92682640f 62
+doc/zh_cn/API_ROS2_O10.md
+  s_48b98efb4ca983::t_a36ec9b62a7f2b 17-20,23,25,27,29
+doc/en/API_PYTHON_H3UM.md
+  s_48b98efb4ca983::t_20e5ae6cbab883 1-59
+doc/zh_cn/API_PYTHON.md
+  s_48b98efb4ca983::t_82a6eb19ad5349 5,11,24
+  s_48b98efb4ca983::t_20e5ae6cbab883 23
+  s_48b98efb4ca983::t_1e89b31abc178c 21
+doc/zh_cn/API_CPP_H3UM.md
+  s_48b98efb4ca983::t_1ee123511be2c4 1-129
+doc/en/API_CPP_OP3.md
+  s_48b98efb4ca983::t_a83aaf4f4f2f40 5-42,46,68-72
+doc/zh_cn/API_ROS2.md
+  s_48b98efb4ca983::t_e42bce6837dd7c 42-45,48,50,52,54,56,58,96,98,199
+doc/en/API_CPP_O10.md
+  s_48b98efb4ca983::t_6eac596073ff49 265,274-279,283-284,401-412
+  s_48b98efb4ca983::t_72e6ee4f699447 94
+doc/en/API_PYTHON_H3L.md
+  s_48b98efb4ca983::t_82a6eb19ad5349 155-166
+  s_48b98efb4ca983::t_ec9b8613fffb77 324-333,335
+  s_48b98efb4ca983::t_1e89b31abc178c 13,334
+doc/zh_cn/API_PYTHON_O10.md
+  s_48b98efb4ca983::t_1a0c0b4357e6aa 234-247,304,310,314,321-322
+  s_48b98efb4ca983::t_ead04bec65d840 302
+  s_48b98efb4ca983::t_5ccbe474783f43 248
+doc/zh_cn/API_PYTHON_H3UM.md
+  s_48b98efb4ca983::t_20e5ae6cbab883 1-59
+doc/zh_cn/API_PYTHON_H3L.md
+  s_48b98efb4ca983::t_1e89b31abc178c 13,331
+  s_48b98efb4ca983::t_82a6eb19ad5349 155-166
+  s_48b98efb4ca983::t_ec9b8613fffb77 321-330,332
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "1414cda66caf6e61a385cc42d228fb91a7c2988c",
+  "prompts": {},
+  "sessions": {
+    "s_48b98efb4ca983": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a4ac-9ee9-7561-9cd8-4145b59a83d8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>",
+      "custom_attributes": {
+        "tlab.token_usage.input_tokens": "89893205",
+        "tlab.session_started_at": "2026-09-25T04:06:15Z",
+        "tlab.token_usage.output_tokens": "1524555",
+        "tlab.token_usage.cache_read_tokens": "358116014",
+        "tlab.token_usage.cache_creation_tokens": "0"
+      }
+    }
+  },
+  "changes": [
+    {
+      "new_path": "doc/en/API_CPP_H3UM.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 129
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "doc/en/API_PYTHON_H3UM.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 59
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "doc/en/MIGRATION_1_1_8_TO_1_1_9.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 110
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "doc/zh_cn/API_CPP_H3UM.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 129
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "doc/zh_cn/API_PYTHON_H3UM.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 59
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "doc/zh_cn/MIGRATION_1_1_8_TO_1_1_9.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 110
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 3
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 1
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "README_zh_cn.md",
+      "new_path": "README_zh_cn.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 4
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 1
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_CPP.md",
+      "new_path": "doc/en/API_CPP.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_CPP_H3L.md",
+      "new_path": "doc/en/API_CPP_H3L.md",
+      "additions": {
+        "human": 2,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 34
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_CPP_O10.md",
+      "new_path": "doc/en/API_CPP_O10.md",
+      "additions": {
+        "human": 2,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 20
+          }
+        ]
+      },
+      "deletions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_CPP_O10_UMI.md",
+      "new_path": "doc/en/API_CPP_O10_UMI.md",
+      "additions": {
+        "human": 3,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 21
+          }
+        ]
+      },
+      "deletions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_CPP_O12.md",
+      "new_path": "doc/en/API_CPP_O12.md",
+      "additions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 16
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 4
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_CPP_OP3.md",
+      "new_path": "doc/en/API_CPP_OP3.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 44
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_PYTHON.md",
+      "new_path": "doc/en/API_PYTHON.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_PYTHON_H3L.md",
+      "new_path": "doc/en/API_PYTHON_H3L.md",
+      "additions": {
+        "human": 2,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 23
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 1
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_PYTHON_O10.md",
+      "new_path": "doc/en/API_PYTHON_O10.md",
+      "additions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 20
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_ROS2.md",
+      "new_path": "doc/en/API_ROS2.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 13
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 9
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_ROS2_H3L.md",
+      "new_path": "doc/en/API_ROS2_H3L.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 9
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_ROS2_O10.md",
+      "new_path": "doc/en/API_ROS2_O10.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 8
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 4
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/en/API_ROS2_O12.md",
+      "new_path": "doc/en/API_ROS2_O12.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 12
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 8
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_CPP.md",
+      "new_path": "doc/zh_cn/API_CPP.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_CPP_H3L.md",
+      "new_path": "doc/zh_cn/API_CPP_H3L.md",
+      "additions": {
+        "human": 2,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 34
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_CPP_O10.md",
+      "new_path": "doc/zh_cn/API_CPP_O10.md",
+      "additions": {
+        "human": 2,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 20
+          }
+        ]
+      },
+      "deletions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_CPP_O10_UMI.md",
+      "new_path": "doc/zh_cn/API_CPP_O10_UMI.md",
+      "additions": {
+        "human": 2,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 25
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_CPP_O12.md",
+      "new_path": "doc/zh_cn/API_CPP_O12.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 22
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_CPP_OP3.md",
+      "new_path": "doc/zh_cn/API_CPP_OP3.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 44
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_PYTHON.md",
+      "new_path": "doc/zh_cn/API_PYTHON.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_PYTHON_H3L.md",
+      "new_path": "doc/zh_cn/API_PYTHON_H3L.md",
+      "additions": {
+        "human": 2,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 23
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 1
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_PYTHON_O10.md",
+      "new_path": "doc/zh_cn/API_PYTHON_O10.md",
+      "additions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 20
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 5
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_ROS2.md",
+      "new_path": "doc/zh_cn/API_ROS2.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 13
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 9
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_ROS2_H3L.md",
+      "new_path": "doc/zh_cn/API_ROS2_H3L.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 10
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 6
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_ROS2_O10.md",
+      "new_path": "doc/zh_cn/API_ROS2_O10.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 8
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 4
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_ROS2_O12.md",
+      "new_path": "doc/zh_cn/API_ROS2_O12.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 12
+          }
+        ]
+      },
+      "deletions": {
+        "ai": [
+          {
+            "session_id": "s_48b98efb4ca983",
+            "lines": 8
+          }
+        ]
+      }
+    }
+  ]
+}

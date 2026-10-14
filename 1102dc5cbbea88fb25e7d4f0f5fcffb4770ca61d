@@ -1,0 +1,85 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "1102dc5cbbea88fb25e7d4f0f5fcffb4770ca61d",
+  "prompts": {},
+  "sessions": {
+    "s_48b98efb4ca983": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a4ac-9ee9-7561-9cd8-4145b59a83d8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>"
+    },
+    "s_83fa947041b2cd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1292e-9128-77d1-9d2b-b9aeea8a6acd",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "windows/x64/python/test/test_omnihand_3_lite.py",
+      "additions": {
+        "human": 549
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/README.md",
+      "new_path": "windows/x64/python/test/README.md",
+      "additions": {
+        "human": 10
+      },
+      "deletions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/test_omnihand_3_lite_hcan.py",
+      "deletions": {
+        "human": 264
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/test_omnihand_3_lite_zlgcan.py",
+      "deletions": {
+        "human": 263
+      }
+    }
+  ]
+}

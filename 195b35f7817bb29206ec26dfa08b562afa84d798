@@ -1,0 +1,29 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.12.1",
+  "base_commit_sha": "195b35f7817bb29206ec26dfa08b562afa84d798",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/proto.h",
+      "new_path": "windows/x64/cpp/include/omnihand/proto.h",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnipicker_3.cc",
+      "new_path": "windows/x64/cpp/test/test_omnipicker_3.cc",
+      "additions": {
+        "human": 165
+      },
+      "deletions": {
+        "human": 26
+      }
+    }
+  ]
+}

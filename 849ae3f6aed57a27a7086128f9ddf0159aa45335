@@ -1,0 +1,29 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.10.2",
+  "base_commit_sha": "849ae3f6aed57a27a7086128f9ddf0159aa45335",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "doc/en/API_CPP_OP3.md",
+      "new_path": "doc/en/API_CPP_OP3.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "doc/zh_cn/API_CPP_OP3.md",
+      "new_path": "doc/zh_cn/API_CPP_OP3.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}

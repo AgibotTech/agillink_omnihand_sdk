@@ -1,0 +1,19 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.10.2",
+  "base_commit_sha": "79a6ff70880f2b73b0863cc2489ca42d87e9045b",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025_canfd.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025_canfd.cc",
+      "additions": {
+        "human": 49
+      },
+      "deletions": {
+        "human": 31
+      }
+    }
+  ]
+}

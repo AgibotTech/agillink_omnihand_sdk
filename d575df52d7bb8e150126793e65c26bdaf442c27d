@@ -1,0 +1,164 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "d575df52d7bb8e150126793e65c26bdaf442c27d",
+  "prompts": {},
+  "sessions": {
+    "s_48b98efb4ca983": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a4ac-9ee9-7561-9cd8-4145b59a83d8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>"
+    }
+  },
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "additions": {
+        "human": 15
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_3_lite.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_3_lite.h",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_3_ultra_m.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_3_ultra_m.h",
+      "additions": {
+        "human": 22
+      },
+      "deletions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_dex_umi.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_dex_umi.h",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_pro_2025.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_pro_2025.h",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnipicker_2025.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnipicker_2025.h",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnipicker_3.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnipicker_3.h",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_3_ultra_m.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_3_ultra_m.cc",
+      "additions": {
+        "human": 12
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnipicker_3.cc",
+      "new_path": "windows/x64/cpp/test/test_omnipicker_3.cc",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/README.md",
+      "new_path": "windows/x64/python/test/README.md",
+      "additions": {
+        "human": 16
+      },
+      "deletions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/README_zh_cn.md",
+      "new_path": "windows/x64/python/test/README_zh_cn.md",
+      "additions": {
+        "human": 18
+      },
+      "deletions": {
+        "human": 19
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/test_omnihand_2025.py",
+      "new_path": "windows/x64/python/test/test_omnihand_2025.py",
+      "additions": {
+        "human": 511
+      },
+      "deletions": {
+        "human": 343
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/test_omnihand_2025_canfd.py",
+      "deletions": {
+        "human": 425
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/test_omnihand_2025_usb.py",
+      "deletions": {
+        "human": 327
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/test_omnihand_2025_zlgcan_tcp.py",
+      "deletions": {
+        "human": 111
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.12.1",
+  "base_commit_sha": "11155a183705240543a4d3e3683c404e84d7926d",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/mock/omnihand_2025_mock.h",
+      "deletions": {
+        "human": 157
+      }
+    }
+  ]
+}

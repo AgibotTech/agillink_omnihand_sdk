@@ -1,0 +1,61 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.12.1",
+  "base_commit_sha": "6642abc3d1a7b60a674d49f17a239269bd925471",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "additions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "additions": {
+        "human": 10
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/private_omnihand.h",
+      "new_path": "windows/x64/cpp/include/omnihand/private_omnihand.h",
+      "additions": {
+        "human": 10
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/proto.h",
+      "new_path": "windows/x64/cpp/include/omnihand/proto.h",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/utils.h",
+      "new_path": "windows/x64/cpp/include/omnihand/utils.h",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025_canfd.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025_canfd.cc",
+      "additions": {
+        "human": 81
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025_usb.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025_usb.cc",
+      "additions": {
+        "human": 33
+      }
+    }
+  ]
+}

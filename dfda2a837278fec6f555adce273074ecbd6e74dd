@@ -1,0 +1,87 @@
+windows/x64/cpp/include/omnihand/omnihand_2025.h
+  s_83fa947041b2cd::t_f7372f0131acbb 230-232
+windows/x64/cpp/include/omnihand/omnihand.h
+  s_83fa947041b2cd::t_9bcd9e6e4a036b 23-24,280-289,292
+  s_83fa947041b2cd::t_50a02c956a8ef8 290-291
+  s_83fa947041b2cd::t_1c3e7b3c61bab5 293
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.0",
+  "base_commit_sha": "dfda2a837278fec6f555adce273074ecbd6e74dd",
+  "prompts": {},
+  "sessions": {
+    "s_48b98efb4ca983": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a4ac-9ee9-7561-9cd8-4145b59a83d8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>"
+    },
+    "s_83fa947041b2cd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1292e-9128-77d1-9d2b-b9aeea8a6acd",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "xuqigui <xuqigui@agibot.com>",
+      "custom_attributes": {
+        "tlab.token_usage.output_tokens": "41299",
+        "tlab.token_usage.cache_read_tokens": "12605296",
+        "tlab.token_usage.cache_creation_tokens": "0",
+        "tlab.token_usage.input_tokens": "499128",
+        "tlab.session_started_at": "2026-10-11T06:54:19Z"
+      }
+    }
+  },
+  "changes": [
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand.h",
+      "additions": {
+        "human": 4,
+        "ai": [
+          {
+            "session_id": "s_83fa947041b2cd",
+            "lines": 12
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_2025.h",
+      "additions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_83fa947041b2cd",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_3_ultra_m.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_3_ultra_m.h",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_dex_umi.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_dex_umi.h",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/include/omnihand/omnihand_pro_2025.h",
+      "new_path": "windows/x64/cpp/include/omnihand/omnihand_pro_2025.h",
+      "additions": {
+        "human": 3
+      }
+    }
+  ]
+}
