@@ -57,6 +57,7 @@ python3 test_omnihand_3_lite.py -d hcan -c 0 -i 0
 python3 test_omnihand_3_lite.py -d socketcan --can-if can0
 python3 test_omnihand_3_lite.py -d zlgcantcp --tcp-host 192.168.0.178 --tcp-port 8000
 python3 test_omnihand_3_lite.py -d rs485 -p /dev/ttyUSB0 -b 460800
+python test_omnihand_3_lite.py -d rs485 -P COM7 -b 460800
 
 # With pytest, select the H3L transport through environment variables
 OMNIHAND_DEVICE_TYPE=hcan pytest -v test_omnihand_3_lite.py
