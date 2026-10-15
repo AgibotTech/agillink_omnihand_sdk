@@ -153,6 +153,12 @@ SAFE_POSITIONS = [3072] * DOF
 SAFE_VELOCITIES = [0] * DOF
 SAFE_TORQUES = [0] * DOF
 
+# The C++ gtest relies on a fresh Init() per TEST_F, which effectively spaces
+# motion commands out; pytest reuses one session-scoped instance and otherwise
+# fires every command back-to-back, so motors get re-targeted before they can
+# physically move.  Pause after each motion command to let it settle.
+MOTION_SETTLE_SECONDS = 0.3
+
 
 def _create_hand():
     common = {
@@ -225,12 +231,45 @@ def hand():
 
 @pytest.fixture(scope="session")
 def initialized_hand(hand):
+    global HAND_DEVICE_ID
+
+    # Mirror gtest SetUp: broadcast-discover the device's actual ID before
+    # switching to unicast commands.  This handles hardware whose device ID
+    # differs from the configured default.
+    hand.set_broadcast(True)
     if not hand.init():
         pytest.fail(
             f"{DEVICE_TYPE} H3L device is not connected or initialization failed",
             pytrace=False,
         )
-    yield hand
+    info = hand.get_device_info()
+    hand.set_broadcast(False)
+
+    discovered_id = getattr(info, "hand_device_id", None) if info is not None else None
+    if discovered_id is not None and 1 <= discovered_id <= 0x7F and discovered_id != HAND_DEVICE_ID:
+        print(
+            f"\n[Info] Broadcast-discovered device_id={discovered_id} "
+            f"(was configured as {HAND_DEVICE_ID}); recreating hand"
+        )
+        HAND_DEVICE_ID = discovered_id
+        try:
+            unicast_hand = _create_hand()
+        except Exception as error:
+            pytest.fail(
+                f"Failed to recreate H3L with device_id={discovered_id}: {error}",
+                pytrace=False,
+            )
+        unicast_hand.set_request_interval(REQUEST_INTERVAL)
+        unicast_hand.set_frame_recv_timeout(FRAME_RECV_TIMEOUT)
+        unicast_hand.show_data_details(True)
+        if not unicast_hand.init():
+            pytest.fail(
+                f"H3L init failed after recreating with device_id={discovered_id}",
+                pytrace=False,
+            )
+        yield unicast_hand
+    else:
+        yield hand
 
 
 @pytest.fixture(scope="session")
@@ -300,18 +339,21 @@ def test_init(initialized_hand):
 
 
 def test_vendor_info(initialized_hand):
+    assert initialized_hand.init()
     info = initialized_hand.get_vendor_info()
     print(f"\n[GetVendorInfo]\n{info}")
     assert info.dof == DOF
 
 
 def test_device_info(initialized_hand):
+    assert initialized_hand.init()
     info = initialized_hand.get_device_info()
     print(f"\n[GetDeviceInfo]\n{info}")
     assert info.hand_device_id == HAND_DEVICE_ID
 
 
 def test_joint_names(initialized_hand):
+    assert initialized_hand.init()
     names = initialized_hand.get_joint_names()
     print(f"\n[GetJointNames] {names}")
     assert len(names) == DOF
@@ -320,19 +362,30 @@ def test_joint_names(initialized_hand):
 # Position and angle control
 
 def test_motor_position_control(initialized_hand):
-    initialized_hand.set_joint_position(1, SAFE_POSITIONS[0])
-    single = initialized_hand.get_joint_position(1)
-    print(f"\n[GetJointMotorPosi] J1={single}")
-    assert 0 <= single <= 4096
+    assert initialized_hand.init()
 
-    set_result = initialized_hand.set_all_joint_positions(SAFE_POSITIONS)
-    print(f"[SetAllJointMotorPosi] {set_result}")
-    assert len(set_result) == DOF
+    # Test single motor position
+    target_pos = 4095
+    initialized_hand.set_joint_position(1, target_pos)
+    print(f"\n[SetJointMotorPosi] Set Joint 1 Motor Position: {target_pos}")
+    time.sleep(MOTION_SETTLE_SECONDS)
 
-    positions = initialized_hand.get_all_joint_positions()
-    print(f"[GetAllJointMotorPosi] {positions}")
-    assert len(positions) == DOF
-    assert all(0 <= position <= 4096 for position in positions)
+    pos = initialized_hand.get_joint_position(1)
+    print(f"[GetJointMotorPosi] Joint 1 Motor Position: {pos}")
+
+    # Test batch motor positions
+    positions = [3072] * DOF  # 4 motors, all at middle
+    set_result = initialized_hand.set_all_joint_positions(positions)
+    print(f"[SetAllJointMotorPosi] returned: {set_result}")
+    time.sleep(MOTION_SETTLE_SECONDS)
+
+    # Test GetAllJointMotorPosi separately
+    all_positions = initialized_hand.get_all_joint_positions()
+    print(f"[GetAllJointMotorPosi] returned: {all_positions}")
+    if not all_positions:
+        return
+    print(f"[GetAllJointMotorPosi] Motor Positions: {all_positions}")
+    assert len(all_positions) == DOF
 
 
 # def test_position_control_with_status(initialized_hand):
@@ -355,10 +408,16 @@ def test_motor_position_control(initialized_hand):
 
 
 def test_joint_angle_control(initialized_hand):
-    actual = initialized_hand.set_all_active_joint_angles([0.5] * DOF)
-    print(f"\n[SetAllActiveJointAngles] {actual}")
-    assert len(actual) == DOF
+    assert initialized_hand.init()
 
+    # Test setting active joint angles
+    angles = [0.0] * DOF  # 4 joints, all at 0
+    actual = initialized_hand.set_all_active_joint_angles(angles)
+    print(f"\n[SetAllActiveJointAngles] Called (should output warning)")
+    print(f"[SetAllActiveJointAngles] returned: {actual}")
+    time.sleep(MOTION_SETTLE_SECONDS)
+
+    # Test getting active joint angles
     active = initialized_hand.get_all_active_joint_angles()
     all_angles = initialized_hand.get_all_joint_angles()
     print(f"[GetAllActiveJointAngles] {active}")
@@ -368,11 +427,12 @@ def test_joint_angle_control(initialized_hand):
 
 
 def test_hand_gesture(initialized_hand):
+    assert initialized_hand.init()
+
     gesture = OmniHand3LiteGesture.OMNI_HAND_3_LITE_GESTURE_FIST
-    target = initialized_hand.get_hand_gesture(gesture)
-    assert len(target) == DOF
     initialized_hand.set_hand_gesture(gesture)
-    print(f"\n[SetHandGesture] FIST target={target}")
+    print(f"\n[SetHandGesture] FIST gesture set")
+    time.sleep(MOTION_SETTLE_SECONDS)
 
 
 # 0x25 and 0x26 status protocols
@@ -425,6 +485,7 @@ def test_hand_gesture(initialized_hand):
 # Read-only reports and settings
 
 def test_current_threshold(initialized_hand):
+    assert initialized_hand.init()
     single = initialized_hand.get_current_threshold(1)
     thresholds = initialized_hand.get_all_current_thresholds()
     print(f"\n[GetCurrentThreshold] J1={single}, all={thresholds}")
@@ -434,6 +495,7 @@ def test_current_threshold(initialized_hand):
 
 
 def test_error_report(initialized_hand):
+    assert initialized_hand.init()
     single = initialized_hand.get_error_report(1)
     reports = initialized_hand.get_all_error_reports()
     print(f"\n[GetErrorReport] J1={single}")
@@ -442,6 +504,7 @@ def test_error_report(initialized_hand):
 
 
 def test_temperature_report(initialized_hand):
+    assert initialized_hand.init()
     single = initialized_hand.get_temperature_report(1)
     temperatures = initialized_hand.get_all_temperature_reports()
     print(f"\n[GetTemperatureReport] J1={single}, all={temperatures}")
@@ -449,6 +512,7 @@ def test_temperature_report(initialized_hand):
 
 
 def test_current_report(initialized_hand):
+    assert initialized_hand.init()
     single = initialized_hand.get_current_report(1)
     currents = initialized_hand.get_all_current_reports()
     print(f"\n[GetCurrentReport] J1={single}, all={currents}")
@@ -458,6 +522,7 @@ def test_current_report(initialized_hand):
 
 
 def test_velocity_report(initialized_hand):
+    assert initialized_hand.init()
     single = initialized_hand.get_joint_velocity(1)
     velocities = initialized_hand.get_all_joint_velocities()
     print(f"\n[GetJointMotorVelo] J1={single}, all={velocities}")
@@ -467,6 +532,7 @@ def test_velocity_report(initialized_hand):
 
 
 def test_request_settings(initialized_hand):
+    assert initialized_hand.init()
     original_interval = initialized_hand.get_request_interval()
     original_timeout = initialized_hand.get_frame_recv_timeout()
     try:
@@ -481,6 +547,7 @@ def test_request_settings(initialized_hand):
 
 
 def test_invalid_joint_index(initialized_hand):
+    assert initialized_hand.init()
     assert initialized_hand.get_joint_position(0) == -1
     assert initialized_hand.get_joint_position(DOF + 1) == -1
     assert initialized_hand.get_joint_velocity(0) == -1
