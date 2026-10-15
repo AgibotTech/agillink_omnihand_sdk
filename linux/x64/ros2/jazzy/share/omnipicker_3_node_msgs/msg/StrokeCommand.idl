@@ -1,0 +1,22 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from omnipicker_3_node_msgs/msg/StrokeCommand.msg
+// generated code does not contain a copyright notice
+
+
+module omnipicker_3_node_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "OP3 distance control. stroke_mm is millimetres; speed/current use SDK units.")
+    struct StrokeCommand {
+      double stroke_mm;
+
+      boolean use_speed;
+
+      int16 speed_rpm;
+
+      boolean use_current;
+
+      int16 current_ma;
+    };
+  };
+};
