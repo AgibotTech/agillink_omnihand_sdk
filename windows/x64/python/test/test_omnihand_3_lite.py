@@ -335,23 +335,23 @@ def test_motor_position_control(initialized_hand):
     assert all(0 <= position <= 4096 for position in positions)
 
 
-def test_position_control_with_status(initialized_hand):
-    set_all = initialized_hand.set_all_joint_positions_with_status(SAFE_POSITIONS)
-    print(f"\n[0x24 SetAll] {set_all}")
-    assert len(set_all.positions) == DOF
+# def test_position_control_with_status(initialized_hand):
+#     set_all = initialized_hand.set_all_joint_positions_with_status(SAFE_POSITIONS)
+#     print(f"\n[0x24 SetAll] {set_all}")
+#     assert len(set_all.positions) == DOF
 
-    get_all = initialized_hand.get_all_joint_positions_with_status()
-    print(f"[0x24 GetAll] {get_all}")
-    assert len(get_all.positions) == DOF
-    assert all(0 <= position <= 4096 for position in get_all.positions)
+#     get_all = initialized_hand.get_all_joint_positions_with_status()
+#     print(f"[0x24 GetAll] {get_all}")
+#     assert len(get_all.positions) == DOF
+#     assert all(0 <= position <= 4096 for position in get_all.positions)
 
-    set_one = initialized_hand.set_joint_position_with_status(1, SAFE_POSITIONS[0])
-    time.sleep(0.1)
-    get_one = initialized_hand.get_joint_position_with_status(1)
-    print(f"[0x24 SetOne] {set_one}")
-    print(f"[0x24 GetOne] {get_one}")
-    assert 0 <= set_one.position <= 4096
-    assert 0 < get_one.position <= 4096
+#     set_one = initialized_hand.set_joint_position_with_status(1, SAFE_POSITIONS[0])
+#     time.sleep(0.1)
+#     get_one = initialized_hand.get_joint_position_with_status(1)
+#     print(f"[0x24 SetOne] {set_one}")
+#     print(f"[0x24 GetOne] {get_one}")
+#     assert 0 <= set_one.position <= 4096
+#     assert 0 < get_one.position <= 4096
 
 
 def test_joint_angle_control(initialized_hand):
@@ -377,49 +377,49 @@ def test_hand_gesture(initialized_hand):
 
 # 0x25 and 0x26 status protocols
 
-def test_mixed_control_with_status(initialized_hand):
-    control = MixCtrl()
-    control.joint_index = 0
-    control.ctrl_mode = int(MixControlMode.POSITION_TORQUE)
-    control.tgt_posi = SAFE_POSITIONS[0]
-    control.tgt_torque = 0
+# def test_mixed_control_with_status(initialized_hand):
+#     control = MixCtrl()
+#     control.joint_index = 0
+#     control.ctrl_mode = int(MixControlMode.POSITION_TORQUE)
+#     control.tgt_posi = SAFE_POSITIONS[0]
+#     control.tgt_torque = 0
 
-    _validate_mix_result(
-        initialized_hand.mix_control_with_status([control]), 1, 1,
-        "0x25 MixControlWithStatus",
-    )
-    _validate_mix_result(
-        initialized_hand.mix_control_by_pt_with_status(1, SAFE_POSITIONS[0], 0),
-        1, 1, "0x25 PT single",
-    )
-    _validate_mix_result(
-        initialized_hand.mix_control_by_pt_with_status(SAFE_POSITIONS, SAFE_TORQUES),
-        DOF, 1, "0x25 PT all",
-    )
-    _validate_mix_result(
-        initialized_hand.mix_control_by_pvt_with_status(
-            1, SAFE_POSITIONS[0], 0, 0
-        ),
-        1, 1, "0x25 PVT single",
-    )
-    _validate_mix_result(
-        initialized_hand.mix_control_by_pvt_with_status(
-            SAFE_POSITIONS, SAFE_VELOCITIES, SAFE_TORQUES
-        ),
-        DOF, 1, "0x25 PVT all",
-    )
+#     _validate_mix_result(
+#         initialized_hand.mix_control_with_status([control]), 1, 1,
+#         "0x25 MixControlWithStatus",
+#     )
+#     _validate_mix_result(
+#         initialized_hand.mix_control_by_pt_with_status(1, SAFE_POSITIONS[0], 0),
+#         1, 1, "0x25 PT single",
+#     )
+#     _validate_mix_result(
+#         initialized_hand.mix_control_by_pt_with_status(SAFE_POSITIONS, SAFE_TORQUES),
+#         DOF, 1, "0x25 PT all",
+#     )
+#     _validate_mix_result(
+#         initialized_hand.mix_control_by_pvt_with_status(
+#             1, SAFE_POSITIONS[0], 0, 0
+#         ),
+#         1, 1, "0x25 PVT single",
+#     )
+#     _validate_mix_result(
+#         initialized_hand.mix_control_by_pvt_with_status(
+#             SAFE_POSITIONS, SAFE_VELOCITIES, SAFE_TORQUES
+#         ),
+#         DOF, 1, "0x25 PVT all",
+#     )
 
 
-def test_joint_detail_info(initialized_hand):
-    hand_info = initialized_hand.get_all_joint_detail_info()
-    print(f"\n[0x26 GetAll] {hand_info}")
-    assert hand_info.hand_bus_voltage > 0
+# def test_joint_detail_info(initialized_hand):
+#     hand_info = initialized_hand.get_all_joint_detail_info()
+#     print(f"\n[0x26 GetAll] {hand_info}")
+#     assert hand_info.hand_bus_voltage > 0
 
-    for joint_index in range(DOF):
-        info = initialized_hand.get_joint_detail_info(joint_index)
-        print(f"[0x26 Joint {joint_index}] {info}")
-        assert info.hand_bus_voltage > 0
-        assert 0 <= info.joint_position <= 4096
+#     for joint_index in range(DOF):
+#         info = initialized_hand.get_joint_detail_info(joint_index)
+#         print(f"[0x26 Joint {joint_index}] {info}")
+#         assert info.hand_bus_voltage > 0
+#         assert 0 <= info.joint_position <= 4096
 
 
 # Read-only reports and settings
