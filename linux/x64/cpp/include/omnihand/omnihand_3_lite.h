@@ -60,7 +60,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -76,7 +77,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -94,7 +96,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
       uint8_t hand_device_id,
       const std::string& tcp_host,
       uint16_t tcp_port,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 #endif  // OMNIHAND_ZLG_TCP_SUPPORTED
 
 #ifdef __linux__
@@ -108,7 +111,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
   static std::unique_ptr<OmniHand3Lite> createHandSocketCan(
       HandType hand_type,
       uint8_t hand_device_id,
-      const std::string& can_interface = "can0");
+      const std::string& can_interface = "can0",
+      CommunicationLogOptions log_options = {});
 #endif
 
   /**
@@ -125,7 +129,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
       HandType hand_type,
       uint8_t hand_device_id,
       uint8_t canfd_device_id,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -141,7 +146,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
 
   /**
@@ -156,7 +162,8 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& serial_port,
-      uint32_t baud_rate = 460800);
+      uint32_t baud_rate = 460800,
+      CommunicationLogOptions log_options = {});
 
   virtual uint8_t GetDefaultNonPrivateHandDeviceId() const = 0;
 
@@ -181,15 +188,15 @@ class AGIBOT_EXPORT OmniHand3Lite : public OmniHand, public PrivateOmniHand, pub
     };
   }
 
-  static constexpr uint8_t GetNumOfJointMotors() {
+  uint8_t GetNumOfJointMotors() const override {
     return kDegreesOfActiveFreedom;
   }
 
-  static constexpr uint8_t GetDoA() {
+  uint8_t GetDoA() const override {
     return kDegreesOfActiveFreedom;
   }
 
-  static constexpr uint8_t GetDoP() {
+  uint8_t GetDoP() const override {
     return kDegreesOfPassiveFreedom;
   }
 

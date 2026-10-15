@@ -10,13 +10,23 @@
 - 支持 CAN（ZLG USB CANFD / HCAN）通信
 - 支持 SocketCAN（仅 Linux）
 - 支持 ZLG CAN TCP（仅 Linux x64 / Windows）
-- 文档所述 H3L 硬件**无触觉传感器**；U16 触觉方法作为协议/固件兼容接口保留
-- **无运动学求解器**：不支持角度控制（`set_all_active_joint_angles` 为桩实现）。请使用电机位置控制（`set_all_joint_motor_positions`）
+- 支持 RS485 通信（默认波特率 460800）
+- 支持 6 个 U16 一维触觉传感器：五指和掌心
+- 支持主动关节角控制，并可通过 `OmniHand3LiteSolver` 离线进行电机位置/角度换算
+- 暂不支持包含主动与被动关节的完整运动学；H3L 不支持 `get_all_joint_angles()` 和 `get_all_joint_angles_from_motor_positions()`
+
+H3L Python 接口有意不暴露标定、零点设置、参数保存和固件维护等破坏性能力。
 
 ## 导入
 
 ```python
-from omnihand import OmniHand3Lite, HandType, ControlMode
+from omnihand.omnihand_3_lite import (
+    OmniHand3Lite,
+    OmniHand3LiteGesture,
+    OmniHand3LiteSolver,
+    TactileSensorDataU16,
+)
+from omnihand import Finger, HandType
 ```
 
 ## 工厂方法
@@ -189,43 +199,45 @@ def set_hand_gesture(self, gesture: OmniHand3LiteGesture) -> None:
 
     预设手势位置以右手为基准，左手时求解器自动镜像电机 1 和电机 4。
     """
+
+def get_hand_gesture(self, gesture: OmniHand3LiteGesture) -> List[int]: ...
 ```
 
 ### 电机位置控制
 
+电机索引从 1 开始，电机位置范围为 0–4096。
+
 ```python
-def set_joint_motor_posi(self, joint_motor_index: int, posi: int) -> int:
+def set_joint_position(self, joint_motor_index: int, posi: int) -> None:
     """设置单个关节电机位置。
 
     Args:
         joint_motor_index: 关节电机索引（1–4）。
-        posi: 电机位置（0–4095）。
+        posi: 电机位置（0–4096）。
 
-    Returns:
-        int: 设备返回的实际位置。-1 表示失败。
     """
 
-def set_all_joint_motor_positions(self, positions: List[int]) -> List[int]:
+def set_all_joint_positions(self, positions: List[int]) -> List[int]:
     """批量设置所有关节电机位置。
 
     Args:
-        positions: 目标位置列表，4 个 int，范围 0–4095。
+        positions: 目标位置列表，4 个 int，范围 0–4096。
 
     Returns:
         List[int]: 设备返回的实际位置列表。失败返回空列表。
     """
 
-def get_joint_motor_posi(self, joint_motor_index: int) -> int:
+def get_joint_position(self, joint_motor_index: int) -> int:
     """获取单个关节电机位置。
 
     Args:
         joint_motor_index: 关节电机索引（1–4）。
 
     Returns:
-        int: 当前电机位置（0–4095）。
+        int: 当前电机位置（0–4096）。
     """
 
-def get_all_joint_motor_positions(self) -> List[int]:
+def get_all_joint_positions(self) -> List[int]:
     """批量获取所有关节电机位置。
 
     Returns:
@@ -233,21 +245,39 @@ def get_all_joint_motor_positions(self) -> List[int]:
     """
 ```
 
-### 关节角度控制（不可用）
+### 主动关节角与离线求解器
 
 ```python
-# 以下方法在 H3L 中为桩实现，不可用。请使用电机位置控制。
 def set_all_active_joint_angles(self, angles: List[float]) -> List[float]: ...
 def get_all_active_joint_angles(self) -> List[float]: ...
+
+class OmniHand3LiteSolver:
+    def __init__(self, is_left_hand: bool) -> None: ...
+    def active_joint_pos_to_actuator_input(
+        self, active_joint_pos: List[float]
+    ) -> List[int]: ...
+    def actuator_input_to_active_joint_pos(
+        self, actuator_input: List[int]
+    ) -> List[float]: ...
+    def single_active_joint_pos_to_actuator_input(
+        self, joint_index: int, angle: float
+    ) -> int: ...
+    def single_actuator_input_to_active_joint_pos(
+        self, joint_index: int, actuator_input: int
+    ) -> float: ...
+    def set_hand_gesture(self, gesture: OmniHand3LiteGesture) -> List[int]: ...
 ```
+
+上述求解器接口仅执行本地计算，不与设备通信。H3L 目前没有包含主动、
+被动关节的完整关节角运动学。
 
 ### 速度控制
 
 ```python
-def set_joint_motor_velo(self, joint_motor_index: int, velo: int) -> None: ...   # velo 范围：0-32767
-def get_joint_motor_velo(self, joint_motor_index: int) -> int: ...
-def set_all_joint_motor_velo(self, velocities: List[int]) -> None: ...            # 范围：0-32767
-def get_all_joint_motor_velo(self) -> List[int]: ...
+def set_joint_velocity(self, joint_motor_index: int, velocity: int) -> None: ...
+def get_joint_velocity(self, joint_motor_index: int) -> int: ...
+def set_all_joint_velocities(self, velocities: List[int]) -> None: ...
+def get_all_joint_velocities(self) -> List[int]: ...
 ```
 
 ### 电流阈值控制
@@ -270,11 +300,56 @@ def mix_control_by_pvt(self, positions: List[int], velocities: List[int], torque
 
     MixCtrl 字段：
         joint_index: 关节索引（1–4）
-        ctrl_mode: 控制模式（仅 ControlMode.POSITION_TORQUE 可用）
-        tgt_posi: 目标位置（0–4095）
+        ctrl_mode: 控制模式（`MixControlMode.POSITION_TORQUE` 或 `POSITION_VELOCITY_TORQUE`）
+        tgt_posi: 目标位置（0–4096）
         tgt_torque: 目标电流（mA）
     """
 ```
+
+H3L 同时暴露带状态回复的 0x25 接口；H3L 不支持 PV 混合控制。
+
+```python
+def mix_control_with_status(self, controls: List[MixCtrl]) -> MixCtrlResult: ...
+def mix_control_by_pt_with_status(
+    self, joint_motor_index: int, position: int, torque: int
+) -> MixCtrlResult: ...
+def mix_control_by_pt_with_status(
+    self, positions: List[int], torques: List[int]
+) -> MixCtrlResult: ...
+def mix_control_by_pvt_with_status(
+    self, joint_motor_index: int, position: int, velocity: int, torque: int
+) -> MixCtrlResult: ...
+def mix_control_by_pvt_with_status(
+    self, positions: List[int], velocities: List[int], torques: List[int]
+) -> MixCtrlResult: ...
+```
+
+### 带状态回复的位置控制（0x24）
+
+```python
+def set_joint_position_with_status(
+    self, joint_motor_index: int, position: int
+) -> JointPosiStatus: ...
+def get_joint_position_with_status(
+    self, joint_motor_index: int
+) -> JointPosiStatus: ...
+def set_all_joint_positions_with_status(
+    self, positions: List[int]
+) -> AllJointPosiStatus: ...
+def get_all_joint_positions_with_status(self) -> AllJointPosiStatus: ...
+```
+
+### 关节详细信息（0x26）
+
+整手查询返回整手母线信息；单关节查询中的 `joint_index` 从 0 开始。
+
+```python
+def get_all_joint_detail_info(self) -> HandDetailInfo: ...
+def get_joint_detail_info(self, joint_index: int) -> JointDetailInfo: ...
+```
+
+0x24/0x25/0x26 接口需要固件支持。未实现相应寄存器的固件会请求超时，
+并返回空或默认结果对象。
 
 ### 错误处理
 
@@ -318,17 +393,64 @@ def get_device_info(self) -> DeviceInfo: ...
 def set_device_id(self, device_id: int) -> None: ...
 ```
 
+### 产品元数据与范围
+
+```python
+def get_joint_names(self) -> List[str]: ...
+
+@staticmethod
+def get_min_max_motor_position(joint_motor_index: int) -> Int16Bound: ...
+@staticmethod
+def get_min_max_actual_motor_position(joint_motor_index: int) -> Int16Bound: ...
+@staticmethod
+def get_min_max_default_mix_ctrl_velocity(joint_motor_index: int) -> Int16Range: ...
+@staticmethod
+def get_min_max_default_mix_ctrl_torque(joint_motor_index: int) -> Int16Range: ...
+@staticmethod
+def get_min_max_activate_joint_angle(
+    joint_motor_index: int, hand_type: HandType
+) -> FloatBound: ...
+```
+
 ### U16 1D 触觉传感器
 
 ```python
+class TactileSensorDataU16:
+    sensor_id: Finger
+    data: List[int]
+
 def get_num_of_tactile_sensors(self) -> int: ...
 def get_num_of_tactile_points(self, finger_index: int) -> int: ...
+def init_tactile_points_map(self) -> bool: ...
 def get_len_of_tactile_datum(self, finger_index: int) -> int: ...
 def get_num_of_replied_tactile_frames(self, finger_index: int) -> int: ...
 def get_sn_of_tactile_sensor(self, finger_index: int) -> str: ...
+def get_sensor_data_length(self, finger_index: int) -> int: ...  # 已弃用别名
+def get_sensor_order(self) -> List[Finger]: ...
+def get_tactile_sensor_data(
+    self, finger_index: int
+) -> TactileSensorDataU16: ...
+def get_tactile_sensor_data_raw(
+    self, finger_index: int
+) -> TactileSensorDataU16: ...
+def get_all_tactile_sensor_data_raw(self) -> List[TactileSensorDataU16]: ...
 ```
 
-这些方法用于协议/固件兼容，在无触觉传感器的 H3L 硬件上返回 `0` 或空字符串。旧的 `get_sensor_data_length()` 对应 C++ 接口已废弃，H3L Python 类未暴露该名称。
+传感器顺序依次为拇指、食指、中指、无名指、小指和掌心。依赖缓存点数前，
+应先调用 `init_tactile_points_map()`。
+
+### 通信设置
+
+```python
+def set_request_interval(self, milliseconds: int) -> None: ...
+def get_request_interval(self) -> int: ...
+def set_frame_recv_timeout(self, milliseconds: int) -> None: ...
+def get_frame_recv_timeout(self) -> int: ...
+def set_frame_send_timeout(self, milliseconds: int) -> None: ...
+def get_frame_send_timeout(self) -> int: ...
+```
+
+发送超时仅适用于 CAN 传输。RS485 实现中的 setter 不执行操作，getter 返回 `0`。
 
 ### 调试功能
 
@@ -361,9 +483,9 @@ print(vendor)
 # 使用预设手势（右手基准，左手自动镜像电机1/4）
 hand.set_hand_gesture(OmniHand3LiteGesture.OMNI_HAND_3_LITE_GESTURE_FIST)
 
-# 设置电机位置（4 个关节，0–4095）
+# 设置电机位置（4 个关节，0–4096）
 positions = [2048, 2048, 2048, 2048]
-echo = hand.set_all_joint_motor_positions(positions)
+echo = hand.set_all_joint_positions(positions)
 print(f"电机位置：{echo}")
 
 # 获取温度

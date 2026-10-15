@@ -16,6 +16,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include "omnihand/export_symbols.h"
@@ -23,6 +24,12 @@
 
 namespace agilink {
 namespace omnihand {
+
+enum class H3UMRevision : uint8_t {
+  T1P3 = 20,
+  T1P5 = 21,
+};
+
 namespace h3um {
 
 /**
@@ -57,6 +64,32 @@ enum class H3UMActiveJoint {
   H3U_M_ACTIVE_JOINT_THUMB_DIP,
 
   H3U_M_ACTIVE_JOINT_COUNT  ///< Total active-joint count = 20.
+};
+
+enum class H3UMT1P5ActiveJoint {
+  H3U_M_ACTIVE_JOINT_PINKY_ABAD = 0,
+  H3U_M_ACTIVE_JOINT_PINKY_MCP,
+  H3U_M_ACTIVE_JOINT_PINKY_PIP,
+  H3U_M_ACTIVE_JOINT_PINKY_DIP,
+  H3U_M_ACTIVE_JOINT_RING_ABAD,
+  H3U_M_ACTIVE_JOINT_RING_MCP,
+  H3U_M_ACTIVE_JOINT_RING_PIP,
+  H3U_M_ACTIVE_JOINT_RING_DIP,
+  H3U_M_ACTIVE_JOINT_MIDDLE_ABAD,
+  H3U_M_ACTIVE_JOINT_MIDDLE_MCP,
+  H3U_M_ACTIVE_JOINT_MIDDLE_PIP,
+  H3U_M_ACTIVE_JOINT_MIDDLE_DIP,
+  H3U_M_ACTIVE_JOINT_INDEX_ABAD,
+  H3U_M_ACTIVE_JOINT_INDEX_MCP,
+  H3U_M_ACTIVE_JOINT_INDEX_PIP,
+  H3U_M_ACTIVE_JOINT_INDEX_DIP,
+  H3U_M_ACTIVE_JOINT_THUMB_ROLL,
+  H3U_M_ACTIVE_JOINT_THUMB_ABAD,
+  H3U_M_ACTIVE_JOINT_THUMB_MCP,
+  H3U_M_ACTIVE_JOINT_THUMB_PIP,
+  H3U_M_ACTIVE_JOINT_THUMB_DIP,
+
+  H3U_M_ACTIVE_JOINT_COUNT  ///< Total active-joint count = 21.
 };
 
 enum class H3UMGesture : int {
@@ -95,10 +128,29 @@ class AGIBOT_EXPORT OmniHand3UltraMSolver {
   /// Number of active joints (= H3UMActiveJoint::H3U_M_ACTIVE_JOINT_COUNT = 20).
   static constexpr std::size_t kActiveJointCount =
       static_cast<std::size_t>(H3UMActiveJoint::H3U_M_ACTIVE_JOINT_COUNT);
+  static constexpr std::size_t kT1P5ActiveJointCount =
+      static_cast<std::size_t>(H3UMT1P5ActiveJoint::H3U_M_ACTIVE_JOINT_COUNT);
   /// Actuator-input value range (matches int16_t domain of
   /// SetAllJointMotorPosi / GetAllJointMotorPosi).
   static constexpr int16_t kActuatorInputMin = 0;
   static constexpr int16_t kActuatorInputMax = 4096;
+
+  inline static const std::vector<std::string> kT1P3JointNames = {
+      "pinky_abad_joint",  "pinky_mcp_joint",  "pinky_pip_joint",  "pinky_dip_joint",
+      "ring_abad_joint",   "ring_mcp_joint",   "ring_pip_joint",   "ring_dip_joint",
+      "middle_abad_joint", "middle_mcp_joint", "middle_pip_joint", "middle_dip_joint",
+      "index_abad_joint",  "index_mcp_joint",  "index_pip_joint",  "index_dip_joint",
+      "thumb_abad_joint",  "thumb_mcp_joint",  "thumb_pip_joint",  "thumb_dip_joint",
+  };
+
+  inline static const std::vector<std::string> kT1P5JointNames = {
+      "pinky_abad_joint",  "pinky_mcp_joint",  "pinky_pip_joint",  "pinky_dip_joint",
+      "ring_abad_joint",   "ring_mcp_joint",   "ring_pip_joint",   "ring_dip_joint",
+      "middle_abad_joint", "middle_mcp_joint", "middle_pip_joint", "middle_dip_joint",
+      "index_abad_joint",  "index_mcp_joint",  "index_pip_joint",  "index_dip_joint",
+      "thumb_roll_joint",  "thumb_abad_joint", "thumb_mcp_joint",  "thumb_pip_joint",
+      "thumb_dip_joint",
+  };
 
   /// Per-joint linear calibration entry.
   struct JointMotorCalib {
@@ -113,6 +165,7 @@ class AGIBOT_EXPORT OmniHand3UltraMSolver {
    * @param is_left_hand true=left hand (uses kLeft), false=right hand (uses kRight).
    */
   explicit OmniHand3UltraMSolver(bool is_left_hand);
+  OmniHand3UltraMSolver(bool is_left_hand, H3UMRevision revision);
   ~OmniHand3UltraMSolver() = default;
 
   static constexpr Int16Bound GetMotorPositionRange() {
@@ -144,16 +197,20 @@ class AGIBOT_EXPORT OmniHand3UltraMSolver {
   /// Direct access to the calibration table currently in use (length = kActiveJointCount).
   const JointMotorCalib* CalibTable() const { return table_; }
   bool IsLeftHand() const { return is_left_hand_; }
+  std::size_t GetActiveJointCount() const { return active_joint_count_; }
 
 
   std::vector<int16_t> SetHandGesture(H3UMGesture gesture) const;
 
  private:
   bool is_left_hand_;
+  std::size_t active_joint_count_;
   const JointMotorCalib* table_;  // Points to either kLeft or kRight.
 
   static const JointMotorCalib kRight[kActiveJointCount];
   static const JointMotorCalib kLeft[kActiveJointCount];
+  static const JointMotorCalib kT1P5Right[kT1P5ActiveJointCount];
+  static const JointMotorCalib kT1P5Left[kT1P5ActiveJointCount];
 };
 
 }  // namespace h3um

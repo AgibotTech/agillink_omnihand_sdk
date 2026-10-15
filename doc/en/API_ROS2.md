@@ -4,24 +4,26 @@
 
 ## Overview
 
-The OmniHand SDK provides unified ROS2 interfaces for four product models:
+The OmniHand SDK provides ROS2 interfaces for five product models:
 
 - **OmniHand 2025 (O10)**: 10 DOF dexterous hand
 - **OmniHand Pro 2025 (O12)**: 12 DOF dexterous hand
 - **OmniHand 3 Lite (H3L)**: 4 DOF lightweight dexterous hand
 - **OmniHand 3 Ultra M (H3U_M / O20)**: 20 DOF dexterous hand
+- **OmniPicker 3 (OP3)**: 1 DOF gripper
 
-All products share the same topic naming convention and message types, differing only in DOF count and connection options.
+All products share the `/<product>/<side>/...` naming convention. OP3 uses gripper-specific stroke, gentle-grip, and tactile messages; see its product page for details.
 
 ## Product-Specific ROS2 Documentation
 
 - **[OmniHand 2025 (O10) ROS2 Interface](API_ROS2_O10.md)** - 10 DOF
 - **[OmniHand Pro 2025 (O12) ROS2 Interface](API_ROS2_O12.md)** - 12 DOF
 - **[OmniHand 3 Lite (H3L) ROS2 Interface](API_ROS2_H3L.md)** - 4 DOF
+- **[OmniPicker 3 (OP3) ROS2 Interface](API_ROS2_OP3.md)** - 1 DOF gripper
 
 ## Unified Topic Specification
 
-All products follow the same topic naming and interaction pattern:
+All products follow the same topic hierarchy; interactions depend on product capabilities:
 
 ### Topic Naming
 
@@ -29,11 +31,13 @@ All products follow the same topic naming and interaction pattern:
 /<product>/<side>/<topic_name>
 ```
 
-- `<product>`: `o10` / `o12` / `h3l` / `h3u_m`
+- `<product>`: `o10` / `o12` / `h3l` / `h3u_m` / `op3`
 - `<side>`: `left` / `right`
 - `<topic_name>`: see table below
 
 ### Topic List
+
+The table below covers the common dexterous-hand topics. For the complete OP3-specific topic set, see [API_ROS2_OP3.md](API_ROS2_OP3.md).
 
 | Topic | Message Type | Direction | Trigger | Description |
 |-------|-------------|-----------|---------|-------------|
@@ -43,7 +47,7 @@ All products follow the same topic naming and interaction pattern:
 | `joint_angle_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | Source `1` | Angle override, `position[]` = rad |
 | `joint_position_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Source `2` | Raw motor-position override |
 | `joint_position_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On accepted `joint_position_cmd` | Timestamped raw motor-position readback |
-| `joint_mix_control_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | — | Position+torque mixed control (O10/O12 only, see below) |
+| `joint_mix_control_cmd` | `sensor_msgs/JointState` | Subscribe (you pub) | — | Position mixed control; fields and capabilities vary by product |
 | `joint_error_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger error report query |
 | `joint_error_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On `joint_error_cmd` received | `header.stamp` + `data[]` error bitmask |
 | `joint_temperature_cmd` | `std_msgs/Empty` | Subscribe (you pub) | — | Trigger temperature query |
@@ -56,10 +60,10 @@ All products follow the same topic naming and interaction pattern:
 | `joint_voltage_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On `joint_voltage_cmd` received | Timestamped voltage readback (O12 only; unavailable on O12 firmware <= 1.2.15) |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | — | Write current threshold `data[]` |
 | `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | On `joint_current_threshold_cmd` received | Timestamped current-threshold readback |
-| `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | — | Tactile stream: `data` = Hz (>0 start/restart, 0 stop); max **50 Hz** (O10) / **100 Hz** (O12), hardcoded in node |
+| `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | — | Tactile stream: `data` = Hz (>0 start/restart, 0 stop); max **50 Hz** for O10/H3L/OP3 and **100 Hz** for O12 |
 | `tactile_states` | Product-specific msg (see below) | Publish (you sub) | While tactile stream active | Tactile sensor data at the requested rate |
 
-**Design Principle — Trigger-based Readback**: The OmniHand ROS2 node **does not use periodic timers by default**. Temperature, current, error codes, etc. are triggered externally — publish the corresponding `*_cmd` once to get one `*_states` message. **Exception — tactile (O10/O12)**: publish `std_msgs/Float32` to `tactile_cmd` once to set the stream rate in Hz; the node runs an internal timer until you publish `0`. **Exception — joint position**: `joint_cmd` automatically publishes `joint_states` after control.
+**Design Principle — Trigger-based Readback**: Temperature, current, and error reports require one corresponding `*_cmd` and produce one `*_states` message. **Exception — tactile (O10/O12/H3L/OP3)**: publish a rate once to `tactile_cmd` to stream `tactile_states`, then publish `0` to stop. **Exception — joint position**: control commands publish their corresponding position readback.
 
 The rationale behind this design:
 - **No interference with the control loop**: Periodic autonomous queries would consume CAN bus bandwidth and may affect the real-time performance of position control commands.
@@ -76,25 +80,27 @@ Different product models have different control mode support:
 
 **H3U_M**: Supports switching control modes via `joint_control_mode_cmd` topic (0=CSP position mode, 7=PP profile position mode).
 
-### Mixed Control (O10/O12)
+### Mixed Control (O10/O12/H3L/OP3)
 
 `joint_mix_control_cmd` is a separate topic from `joint_cmd` for mixed control, using `sensor_msgs/JointState`:
 
 - `position[]` = raw int16 motor position
 - `effort[]` = raw int16 motor torque (O10/H3L: current in mA, range 0–1000; O12: 0.01 N)
 
-The node calls `MixControlByPT` or `MixControlByPVT` (full-DOF arrays required). **No readback**.
+The node calls `MixControlByPT` or `MixControlByPVT` (full-DOF arrays required). **No readback**. OP3 supports single-axis PT only: `position[0]` is 0–4095 ticks and `effort[0]` is current in mA.
 
 **Note**: `joint_cmd` uses `position[]` in radians with automatic conversion. `joint_mix_control_cmd` uses raw int16 motor values for both `position[]` and `effort[]`, without unit conversion.
 
-### Tactile Sensors (O10/O12)
+### Tactile Sensors (O10/O12/H3L/OP3)
 
-O10 and O12 have different tactile sensor data structures, each using product-specific message types:
+Each product uses a product-specific tactile message:
 
 | Product | Message Type | Data Structure |
 |---------|-------------|---------------|
 | O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + seven `uint8[]` (Raw full resolution via `GetAllTactileSensorDataRaw()`); typical lengths: thumb 16, four fingers 18 each, palm 78, dorsum 102 (see [API_ROS2_O10.md](API_ROS2_O10.md)) |
 | O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + six `TactileSensorData` fields: `thumb`, `index`, `middle`, `ring`, `little`, `palm` (`online_state`, `channel_value[6]`, forces, angle, `capa_approach[4]`) |
+| H3L | `omnihand_3_lite_node_msgs/TactileSensor` | `header` + six raw `uint16[]` regions: `thumb/index/middle/ring/little/palm` |
+| OP3 | `omnipicker_3_node_msgs/TactileSensor` | `header` + two raw `uint16[]` regions: `thumb/index` |
 
 ### Timestamped array payloads
 
@@ -118,10 +124,10 @@ Parameters are organized under `left_hand` and `right_hand` namespaces. If a han
 | `canfd_device_id` | int | 0 | CANFD adapter device index (not recommended, may change after reboot) |
 | `canfd_channel_id` | int | 0 | CAN channel index (0 or 1) |
 | `can_interface` | string | "can0" | SocketCAN interface name (socketcan only) |
-| `uart_port` | string | "" | Serial port path (rs485/usb only, O10 only) |
-| `baudrate` | int | 460800 | Baudrate (rs485/usb only, O10 only) |
+| `uart_port` | string | "" | Serial path (O10 rs485/usb; OP3 rs485) |
+| `baudrate` | int | 460800 | Baudrate (O10; OP3 RS485 uses the SDK transport configuration) |
 
-Tactile stream maximum rate is **50 Hz** (O10) or **100 Hz** (O12), fixed in each product's `hand_node.h` (`kMaxTactilePublishHz`), not a YAML parameter.
+Tactile stream maximum rate is **50 Hz** for O10/H3L/OP3 and **100 Hz** for O12, fixed in each product's `hand_node.h` (`kMaxTactilePublishHz`), not a YAML parameter.
 
 ### Usage
 
@@ -139,6 +145,9 @@ ros2 launch omnihand_node omnihand_3_lite_node.launch.py
 
 # H3U_M
 ros2 launch omnihand_node omnihand_3_ultra_m_node.launch.py
+
+# OP3
+ros2 launch omnihand_node omnipicker_3_node.launch.py
 ```
 
 **2. YAML configuration example:**
@@ -171,7 +180,7 @@ python3 joint_current.py left o10
 # Mixed control (position + torque, O10/O12 only)
 python3 mix_control_pub.py left o10
 
-# Start/stop tactile stream (O10/O12)
+# Start/stop tactile stream (O10/O12/H3L/OP3; choose the product script path)
 python3 tactile.py left o10 10
 python3 tactile.py left o10 0
 
@@ -188,13 +197,13 @@ python3 joint_voltage_pub.py 0 left o12
 
 **4. Connection types:**
 
-| Connection | O10 | O12 | H3L | H3U_M |
-|-----------|-----|-----|-----|-------|
-| zlgcan | ✅ | ✅ | ✅ | ✅ |
-| hcan | ✅ | ✅ | ✅ | ✅ |
-| socketcan | ✅ | ✅ | ✅ | ✅ |
-| rs485 | ✅ | ❌ | ❌ | ❌ |
-| usb | ✅ | ❌ | ❌ | ❌ |
+| Connection | O10 | O12 | H3L | H3U_M | OP3 |
+|-----------|-----|-----|-----|-------|-----|
+| zlgcan | ✅ | ✅ | ✅ | ✅ | ✅ |
+| hcan | ✅ | ✅ | ✅ | ✅ | ✅ |
+| socketcan | ✅ | ✅ | ✅ | ✅ | ✅ |
+| rs485 | ✅ | ❌ | ❌ | ❌ | ✅ |
+| usb | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 ## C++ Development Demo
 

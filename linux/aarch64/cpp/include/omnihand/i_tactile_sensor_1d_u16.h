@@ -6,7 +6,7 @@
 
 #include <cstddef>
 #include <vector>
-#include "omnihand/proto.h"
+#include "omnihand/i_tactile_sensor.h"
 
 namespace agilink {
 namespace omnihand {
@@ -16,32 +16,15 @@ struct AGIBOT_EXPORT TactileSensorDataU16 {
   std::vector<uint16_t> data_;
 };
 
-class AGIBOT_EXPORT ITactileSensor1DU16 {
+class AGIBOT_EXPORT ITactileSensor1DU16 : public ITactileSensor {
  public:
-  virtual size_t GetNumOfTactileSensors() const = 0;
-
-  virtual size_t GetNumOfTactilePoints(Finger finger) const = 0;
-
-  // @Deprecated
-  virtual size_t GetSensorDataLength(Finger finger) const = 0;
-
-  virtual size_t GetLenOfTactileDatum(Finger finger) const = 0;
-
-  virtual size_t GetNumOfRepliedTactileFrames(Finger finger) const = 0;
-
-  virtual std::string GetSNOfTactileSensor(Finger finger) const = 0;
-
-  virtual const std::vector<Finger>& GetSensorOrder() const = 0;
-
-  virtual bool InitTactilePointsMap() = 0;
-
   virtual TactileSensorDataU16 GetTactileSensorData(Finger finger) const = 0;
   virtual TactileSensorDataU16 GetTactileSensorDataRaw(Finger finger) const = 0;
   virtual std::vector<TactileSensorDataU16> GetAllTactileSensorDataRaw() const = 0;
 
  protected:
   ITactileSensor1DU16() = default;
-  virtual ~ITactileSensor1DU16() = default;
+  ~ITactileSensor1DU16() override = default;
 };
 
 }  // namespace omnihand

@@ -20,12 +20,20 @@
 #include "omnihand/ota_types.h"
 #include "omnihand/utils.h"
 
+#define OMNIHAND_HAS_JOINT_ANGLES_FROM_MOTOR_POSITIONS 1
+
 namespace agilink {
 namespace omnihand {
 
 // Forward declarations
 struct MixCtrl;
 struct JointMotorErrorReport;
+
+/** Initial per-device communication logging applied before constructor-time requests. */
+struct AGIBOT_EXPORT CommunicationLogOptions {
+  bool enabled = false;
+  DataDetailsLogCallback callback = nullptr;
+};
 
 #define DEFAULT_DEVICE_ID 0x01
 
@@ -69,6 +77,21 @@ class AGIBOT_EXPORT OmniHand {
 
   virtual std::string GetSN() const {
     return "";
+  }
+
+  /** @brief Gets the number of controllable joint motors for this instance. */
+  virtual uint8_t GetNumOfJointMotors() const {
+    return GetDoA();
+  }
+
+  /** @brief Gets the number of active degrees of freedom for this instance. */
+  virtual uint8_t GetDoA() const {
+    return 0;
+  }
+
+  /** @brief Gets the number of passive degrees of freedom for this instance. */
+  virtual uint8_t GetDoP() const {
+    return 0;
   }
   
   /**
@@ -135,6 +158,16 @@ class AGIBOT_EXPORT OmniHand {
   virtual bool SetMotor2Zero(unsigned char joint_motor_index) {
     (void)joint_motor_index;
     std::fprintf(stderr, "[WARN][OmniHand][SetMotor2Zero] unsupported by this product\n");
+    return false;
+  }
+
+  /**
+   * @brief 0x0B/0x00: Calibrates all tactile sensors.
+   * @return true if the device reports success; false if unsupported or failed.
+   */
+  virtual bool CalibrateTactileSensor() {
+    std::fprintf(stderr,
+                 "[WARN][OmniHand][CalibrateTactileSensor] unsupported by this product\n");
     return false;
   }
 
@@ -217,6 +250,52 @@ class AGIBOT_EXPORT OmniHand {
     return {};
   };
 
+  /**
+   * @brief 0x24: Sets one joint motor position and returns position/status feedback.
+   * @param joint_motor_index Joint motor index (1-based, encoded as sub-register 0x01~).
+   * @param posi Target position. O12 uses 1/2000 of maximum position per unit;
+   *             other dexterous hands use 1/4096 per unit.
+   * @return Actual position, running code, and error code. All-zero if unsupported or failed.
+   */
+  virtual JointPosiStatus SetJointMotorPosiWithStatus(
+      unsigned char joint_motor_index, int16_t posi) {
+    (void)joint_motor_index;
+    (void)posi;
+    return {};
+  }
+
+  /**
+   * @brief 0x24: Gets one joint motor position and status feedback.
+   * @param joint_motor_index Joint motor index (1-based, encoded as sub-register 0x01~).
+   * @return Current position, running code, and error code. All-zero if unsupported or failed.
+   */
+  virtual JointPosiStatus GetJointMotorPosiWithStatus(
+      unsigned char joint_motor_index) const {
+    (void)joint_motor_index;
+    return {};
+  }
+
+  /**
+   * @brief 0x24/0x00: Sets all joint motor positions and returns position/status feedback.
+   * @param vec_posi Target positions in product-defined joint order.
+   * @return Actual positions followed by the running code and error code.
+   *         Empty/default result if unsupported or failed.
+   */
+  virtual AllJointPosiStatus SetAllJointMotorPosiWithStatus(
+      const std::vector<int16_t>& vec_posi) {
+    (void)vec_posi;
+    return {};
+  }
+
+  /**
+   * @brief 0x24/0x00: Gets all joint motor positions and status feedback.
+   * @return Current positions followed by the running code and error code.
+   *         Empty/default result if unsupported or failed.
+   */
+  virtual AllJointPosiStatus GetAllJointMotorPosiWithStatus() const {
+    return {};
+  }
+
   // ============ Joint Angle Control ============
   // Note: SetActiveJointAngle and GetActiveJointAngle are not defined in base class.
   // They are conditionally defined in implementation classes via #if !DISABLE_FUNC.
@@ -253,6 +332,20 @@ class AGIBOT_EXPORT OmniHand {
    * @note This function does not perform hardware communication, only kinematics calculation.
    */
   virtual std::vector<double> GetAllJointAngles(const std::vector<double>& active_joint_angles) const { (void)active_joint_angles; return {}; }
+
+  /**
+   * @brief Calculates all joint angles directly from motor positions.
+   * @param motor_positions Motor positions returned by GetAllJointMotorPosi().
+   * @return All joint angles (unit: radians), or an empty vector when the
+   *         product does not provide the required kinematics solver.
+   * @note This function performs kinematics calculation only and does not
+   *       communicate with the device.
+   */
+  virtual std::vector<double> GetAllJointAnglesFromMotorPositions(
+      const std::vector<int16_t>& motor_positions) const {
+    (void)motor_positions;
+    return {};
+  }
 
   // ============ Velocity Control ============
   /**
@@ -344,6 +437,47 @@ class AGIBOT_EXPORT OmniHand {
     (void)torques;
     return {};
   }
+
+  /**
+   * @brief 0x25: Sends mixed-control entries and preserves each frame's status reply.
+   * @note Each feedback entry contains one additional motor-status byte in
+   *       MixCtrl::motor_status_.
+   * @note Large requests are split into independent sub-register 0x00 frames.
+   */
+  virtual MixCtrlResult MixControlWithStatus(
+      const std::vector<MixCtrl>& mix_ctrls);
+
+  virtual MixCtrlResult MixControlByPTWithStatus(
+      uint8_t joint_motor_index, int16_t position, int16_t torque);
+
+  virtual MixCtrlResult MixControlByPTWithStatus(
+      const std::vector<int16_t>& positions,
+      const std::vector<int16_t>& torques);
+
+  virtual MixCtrlResult MixControlByPVWithStatus(
+      uint8_t joint_motor_index, int16_t velocity, int16_t torque);
+
+  virtual MixCtrlResult MixControlByPVWithStatus(
+      const std::vector<int16_t>& velocities,
+      const std::vector<int16_t>& torques);
+
+  virtual MixCtrlResult MixControlByPVTWithStatus(
+      uint8_t joint_motor_index, int16_t position, int16_t velocity,
+      int16_t torque);
+
+  virtual MixCtrlResult MixControlByPVTWithStatus(
+      const std::vector<int16_t>& positions,
+      const std::vector<int16_t>& velocities,
+      const std::vector<int16_t>& torques);
+
+  /** @brief 0x26/0x00: Queries whole-hand bus voltage/current/temperature. */
+  virtual HandDetailInfo GetAllJointDetailInfo() const;
+
+  /**
+   * @brief 0x26/0x01: Queries whole-hand and specified-joint details.
+   * @param joint_index Zero-based joint index carried in request byte 0.
+   */
+  virtual JointDetailInfo GetJointDetailInfo(uint8_t joint_index) const;
 
   // ============ Error Report ============
   /**

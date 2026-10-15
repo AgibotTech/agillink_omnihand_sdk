@@ -86,7 +86,12 @@ TEST_F(OmniHand3UltraMTest, GetVendorInfo) {
       AgilinkLogger::get().warnf(TAG, "[GetVendorInfo] Failed: got empty vendor info (timeout)");
       return;
     }
-    EXPECT_EQ(vendor_info.dof, 20);
+    const uint8_t doa = hand_->GetDoA();
+    EXPECT_EQ(doa, 20);
+    EXPECT_EQ(hand_->GetNumOfJointMotors(), doa);
+    EXPECT_EQ(hand_->GetRevision(), agilink::omnihand::H3UMRevision::T1P3);
+    const auto joint_names = hand_->GetJointNames();
+    EXPECT_EQ(joint_names.size(), doa);
   }
 }
 
@@ -109,7 +114,7 @@ TEST_F(OmniHand3UltraMTest, GetNonPrivateHandDeviceIdByBroadcast) {
 }
 
 TEST_F(OmniHand3UltraMTest, MixControlRejectsInvalidArguments) {
-  constexpr size_t kDof = agilink::omnihand::OmniHand3UltraM::kDegreesOfActiveFreedom;
+  constexpr size_t kDof = agilink::omnihand::OmniHand3UltraM::kT1P3DegreesOfActiveFreedom;
   const std::vector<int16_t> valid(kDof, 0);
   const std::vector<int16_t> short_values(kDof - 1, 0);
 

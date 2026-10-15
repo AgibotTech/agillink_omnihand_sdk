@@ -442,7 +442,7 @@ paths:
                       product_seq_num: "SN123456"
                       hardware_version: { major: 1, minor: 0, patch: 0, res: 0 }
                       software_version: { major: 2, minor: 1, patch: 0, res: 0 }
-                      voltage: 24
+                      voltage: 24000
                       dof: 10
                 get_error_report:
                   summary: 获取错误报告结果
@@ -708,7 +708,9 @@ components:
           $ref: "#/components/schemas/Version"
         voltage:
           type: integer
-          description: 供电电压
+          minimum: 0
+          maximum: 65535
+          description: 供电电压，单位 mV（uint16）
         dof:
           type: integer
           description: 自由度数量
