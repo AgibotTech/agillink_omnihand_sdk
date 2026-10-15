@@ -4,14 +4,14 @@
 /**:
   ros__parameters:
     # zlgcan example
-    left_hand:
-      hand_device_id: 1
-      connection_type: "zlgcan"
-      canfd_device_id: 0
-      canfd_channel_id: 0
-      request_interval_ms: 0
-      frame_recv_timeout_ms: 50
-      show_data_details: false
+    # left_hand:
+    #   hand_device_id: 1
+    #   connection_type: "zlgcan"
+    #   canfd_device_id: 0
+    #   canfd_channel_id: 0
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: false
     #
     # right_hand:
     #   hand_device_id: 1
@@ -21,29 +21,37 @@
     #   request_interval_ms: 0
     #   frame_recv_timeout_ms: 50
     #   show_data_details: false
-    
+
     # socketcan example
-    # left_hand:
-    #   hand_device_id: 1
-    #   connection_type: "socketcan"
-    #   can_interface: "can0"
-    #   request_interval_ms: 0
-    #   frame_recv_timeout_ms: 50
-    #   show_data_details: true
+    left_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can0"
+      request_interval_ms: 0
+      frame_recv_timeout_ms: 50
+      show_data_details: true
 
-    # right_hand:
-    #   hand_device_id: 1
-    #   connection_type: "socketcan"
-    #   can_interface: "can1"
-    #   request_interval_ms: 0
-    #   frame_recv_timeout_ms: 50
-    #   show_data_details: false
+    right_hand:
+      hand_device_id: 1
+      connection_type: "socketcan"
+      can_interface: "can1"
+      request_interval_ms: 0
+      frame_recv_timeout_ms: 50
+      show_data_details: true
 
-    # RS485 example:
+    # rs485 example
     # left_hand:
     #   hand_device_id: 1
     #   connection_type: "rs485"
     #   uart_port: "/dev/ttyUSB0"
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: false
+    #
+    # right_hand:
+    #   hand_device_id: 1
+    #   connection_type: "rs485"
+    #   uart_port: "/dev/ttyUSB1"
     #   request_interval_ms: 0
     #   frame_recv_timeout_ms: 50
     #   show_data_details: false

@@ -1,0 +1,6 @@
+setup.py
+omnipicker_3_node_msgs/__init__.py
+omnipicker_3_node_msgs.egg-info/PKG-INFO
+omnipicker_3_node_msgs.egg-info/SOURCES.txt
+omnipicker_3_node_msgs.egg-info/dependency_links.txt
+omnipicker_3_node_msgs.egg-info/top_level.txt

@@ -2,14 +2,16 @@
 // AGILINK OmniHand SDK is licensed under Mulan PSL v2.
 
 #include <gtest/gtest.h>
-#include "omnihand/omnihand_dex_umi.h"
-#include <memory>
-#include <vector>
-#include <iostream>
-#include <iomanip>
-#include <thread>
 #include <chrono>
+#include <memory>
 #include <string>
+#include <thread>
+#include <vector>
+#include "agilink_logger.h"
+#include "omnihand/omnihand_dex_umi.h"
+
+using agilink::AgilinkLogger;
+static constexpr const char* TAG = "OmniHandDexUmiTest";
 
 // Global variable to store device type from command line argument
 static std::string g_device_type = "zlgcan";  // Default: zlgcan
@@ -39,7 +41,7 @@ class OmniHandDexUMITest : public ::testing::Test {
           0                        // canfd_channel_id: CAN channel index (0=can0, 1=can1)
       );
     }
-    std::cout << "[Info]: Using device type: " << device_type << std::endl;
+    AgilinkLogger::get().infof(TAG, "Using device type: %s", device_type.c_str());
   }
 
   void TearDown() override {
@@ -63,8 +65,7 @@ TEST_F(OmniHandDexUMITest, Init) {
 TEST_F(OmniHandDexUMITest, GetVendorInfo) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   auto vendor_info = hand_->GetVendorInfo();
-  std::cout << "[GetVendorInfo] Vendor Info:" << std::endl;
-  std::cout << vendor_info.ToString() << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GetVendorInfo] Vendor Info:\n%s", vendor_info.ToString().c_str());
   EXPECT_EQ(vendor_info.dof, 10);  // UMI has 10 DOF
 }
 
@@ -72,8 +73,7 @@ TEST_F(OmniHandDexUMITest, GetVendorInfo) {
 TEST_F(OmniHandDexUMITest, GetDeviceInfo) {
   ASSERT_TRUE(hand_->Init()) << "Failed to initialize device";
   auto device_info = hand_->GetDeviceInfo();
-  std::cout << "[GetDeviceInfo] Device Info:" << std::endl;
-  std::cout << device_info.ToString() << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GetDeviceInfo] Device Info:\n%s", device_info.ToString().c_str());
   EXPECT_EQ(device_info.hand_device_id, 1);
 }
 
@@ -90,22 +90,23 @@ TEST_F(OmniHandDexUMITest, TactileSensor) {
     {agilink::omnihand::Finger::LITTLE, "Little"},
     {agilink::omnihand::Finger::PALM, "Palm"}
   };
-  
-  std::cout << "[GetTactileSensorDataRaw] Reading individual sensors (unit: 1g, max: 255g):" << std::endl;
+
+  AgilinkLogger::get().infof(TAG, "[GetTactileSensorDataRaw] Reading individual sensors (unit: 1g, max: 255g):");
   for (const auto& [finger, name] : fingers) {
     auto tactile_data = hand_->GetTactileSensorDataRaw(finger);
-    std::cout << "  " << name << " (" << tactile_data.data_.size() << " values): [";
+    std::string msg = "  " + name + " (" + std::to_string(tactile_data.data_.size()) + " values): [";
     for (size_t i = 0; i < tactile_data.data_.size(); ++i) {
-      std::cout << static_cast<int>(tactile_data.data_[i]);
-      if (i < tactile_data.data_.size() - 1) std::cout << ", ";
+      if (i > 0) msg += ", ";
+      msg += std::to_string(static_cast<int>(tactile_data.data_[i]));
     }
-    std::cout << "]" << std::endl;
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
     EXPECT_EQ(static_cast<unsigned char>(tactile_data.sensor_id_), static_cast<unsigned char>(finger));
   }
   
   // Test getting all tactile sensor data at once
   auto all_tactile_data = hand_->GetAllTactileSensorDataRaw();
-  std::cout << "\n[GetAllTactileSensorDataRaw] All " << all_tactile_data.size() << " sensors:" << std::endl;
+  AgilinkLogger::get().infof(TAG, "[GetAllTactileSensorDataRaw] All %zu sensors:", all_tactile_data.size());
   for (const auto& sensor : all_tactile_data) {
     std::string finger_name;
     switch (sensor.sensor_id_) {
@@ -117,12 +118,13 @@ TEST_F(OmniHandDexUMITest, TactileSensor) {
       case agilink::omnihand::Finger::PALM: finger_name = "Palm"; break;
       default: finger_name = "Unknown"; break;
     }
-    std::cout << "  " << finger_name << " (" << sensor.data_.size() << " values): [";
+    std::string msg = "  " + finger_name + " (" + std::to_string(sensor.data_.size()) + " values): [";
     for (size_t i = 0; i < sensor.data_.size(); ++i) {
-      std::cout << static_cast<int>(sensor.data_[i]);
-      if (i < sensor.data_.size() - 1) std::cout << ", ";
+      if (i > 0) msg += ", ";
+      msg += std::to_string(static_cast<int>(sensor.data_[i]));
     }
-    std::cout << "]" << std::endl;
+    msg += "]";
+    AgilinkLogger::get().infof(TAG, "%s", msg.c_str());
   }
   EXPECT_GE(all_tactile_data.size(), 0);
 }
@@ -134,8 +136,7 @@ TEST_F(OmniHandDexUMITest, GetJointMotorPosi) {
   // Test single joint position query
   for (unsigned char joint_idx = 1; joint_idx <= agilink::omnihand::OmniHandDexUMI::kDegreesOfActiveFreedom; ++joint_idx) {
     int16_t pos = hand_->GetJointMotorPosi(joint_idx);
-    std::cout << "[GetJointMotorPosi] Joint " << static_cast<int>(joint_idx) 
-              << " position: " << pos << std::endl;
+    AgilinkLogger::get().infof(TAG, "[GetJointMotorPosi] Joint %d position: %d", static_cast<int>(joint_idx), pos);
   }
   
   // Test invalid joint index
@@ -150,13 +151,13 @@ TEST_F(OmniHandDexUMITest, GetAllJointMotorPosi) {
   
   // Test all joint positions query
   std::vector<int16_t> positions = hand_->GetAllJointMotorPosi();
-  std::cout << "[GetAllJointMotorPosi] All joint positions (" << positions.size() << " values): ";
+  std::string positions_msg = "[GetAllJointMotorPosi] All joint positions (" + std::to_string(positions.size()) + " values): ";
   for (size_t i = 0; i < positions.size(); ++i) {
-    std::cout << positions[i];
-    if (i < positions.size() - 1) std::cout << ", ";
+    if (i > 0) positions_msg += ", ";
+    positions_msg += std::to_string(positions[i]);
   }
-  std::cout << std::endl;
-  
+  AgilinkLogger::get().infof(TAG, "%s", positions_msg.c_str());
+
   // Expect 10 joint positions
   EXPECT_EQ(positions.size(), agilink::omnihand::OmniHandDexUMI::kDegreesOfActiveFreedom);
 }
@@ -205,7 +206,7 @@ int main(int argc, char** argv) {
       if (device_arg == "zlgcan" || device_arg == "hcan") {
         g_device_type = device_arg;
       } else {
-        std::cerr << "[Error]: -d value must be 'zlgcan' or 'hcan', got: " << device_arg << std::endl;
+        AgilinkLogger::get().errorf(TAG, "[Error]: -d value must be 'zlgcan' or 'hcan', got: %s", device_arg.c_str());
         return 1;
       }
     }

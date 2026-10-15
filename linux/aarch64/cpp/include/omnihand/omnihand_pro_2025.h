@@ -55,7 +55,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
       HandType hand_type,
       uint8_t hand_device_id = kDefaultHandDeviceId,
       uint8_t canfd_device_id = 0,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - CAN communication (ZLG USB CANFD) by serial number
@@ -71,7 +72,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& usbcanfd_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
 #if OMNIHAND_ZLG_TCP_SUPPORTED
   /**
@@ -89,7 +91,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
       uint8_t hand_device_id,
       const std::string& host,
       uint16_t port,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 #endif  // OMNIHAND_ZLG_TCP_SUPPORTED
 
 #ifdef __linux__
@@ -103,7 +106,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
   static std::unique_ptr<OmniHandPro2025> createHandSocketCan(
       HandType hand_type,
       uint8_t hand_device_id = kDefaultHandDeviceId,
-      const std::string& can_interface = "can0");
+      const std::string& can_interface = "can0",
+      CommunicationLogOptions log_options = {});
 #endif
 
   /**
@@ -120,7 +124,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
       HandType hand_type,
       uint8_t hand_device_id = kDefaultHandDeviceId,
       uint8_t canfd_device_id = 0,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
   /**
    * @brief Factory method - HCAN USB CANFD communication (by serial number)
@@ -136,7 +141,8 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
       HandType hand_type,
       uint8_t hand_device_id,
       const std::string& hcan_serial_number,
-      uint8_t canfd_channel_id = 0);
+      uint8_t canfd_channel_id = 0,
+      CommunicationLogOptions log_options = {});
 
 
   // ============ O12-Specific Interfaces ============
@@ -288,7 +294,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @brief Returns the number of joint motors.
    * @return Number of joint motors (12)
    */
-  static constexpr uint8_t GetNumOfJointMotors() {
+  uint8_t GetNumOfJointMotors() const override {
     return kDegreesOfActiveFreedom;
   }
 
@@ -296,7 +302,7 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @brief Returns the degrees of active freedom (DoA).
    * @return Degrees of active freedom (12)
    */
-  static constexpr uint8_t GetDoA() {
+  uint8_t GetDoA() const override {
     return kDegreesOfActiveFreedom;
   }
 
@@ -304,9 +310,12 @@ class AGIBOT_EXPORT OmniHandPro2025 : public OmniHand, public IControlMode {
    * @brief Returns the degrees of passive freedom (DoP).
    * @return Degrees of passive freedom (7)
    */
-  static constexpr uint8_t GetDoP() {
+  uint8_t GetDoP() const override {
     return kDegreesOfPassiveFreedom;
   }
+
+  std::vector<double> GetAllJointAnglesFromMotorPositions(
+      const std::vector<int16_t>& motor_positions) const override;
 
   /**
    * @brief Returns the min/max motor position range (unit: motor ticks) for a joint motor.
