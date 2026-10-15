@@ -1,0 +1,59 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "5c7b5042ae57883c4047adb7b1eb7a6789452ff9",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "windows/x64/README.md",
+      "new_path": "windows/x64/README.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/README_zh_cn.md",
+      "new_path": "windows/x64/README_zh_cn.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_2025.cc",
+      "additions": {
+        "human": 96
+      },
+      "deletions": {
+        "human": 96
+      }
+    },
+    {
+      "old_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "new_path": "windows/x64/cpp/test/test_omnihand_3_lite.cc",
+      "additions": {
+        "human": 77
+      },
+      "deletions": {
+        "human": 77
+      }
+    },
+    {
+      "old_path": "windows/x64/python/test/test_omnihand_3_lite.py",
+      "new_path": "windows/x64/python/test/test_omnihand_3_lite.py",
+      "additions": {
+        "human": 58
+      },
+      "deletions": {
+        "human": 58
+      }
+    }
+  ]
+}
