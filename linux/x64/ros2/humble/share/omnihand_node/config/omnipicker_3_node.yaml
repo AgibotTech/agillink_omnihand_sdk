@@ -3,15 +3,33 @@
 
 /**:
   ros__parameters:
-    # Enable one or both sides as required. OP3 stores hand type only for
-    # identification; it does not change gripper control behaviour.
+    # zlgcan example
     left_hand:
       hand_device_id: 1
-      connection_type: "socketcan"
-      can_interface: "can0"
+      connection_type: "zlgcan"
+      canfd_device_id: 0
+      canfd_channel_id: 0
       request_interval_ms: 0
       frame_recv_timeout_ms: 50
-      show_data_details: true
+      show_data_details: false
+    #
+    # right_hand:
+    #   hand_device_id: 1
+    #   connection_type: "zlgcan"
+    #   canfd_device_id: 0
+    #   canfd_channel_id: 1
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: false
+    
+    # socketcan example
+    # left_hand:
+    #   hand_device_id: 1
+    #   connection_type: "socketcan"
+    #   can_interface: "can0"
+    #   request_interval_ms: 0
+    #   frame_recv_timeout_ms: 50
+    #   show_data_details: true
 
     # right_hand:
     #   hand_device_id: 1
