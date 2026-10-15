@@ -29,10 +29,12 @@ H3L ROS2 节点提供 4 自由度灵巧手的统一 Topic 接口，遵循 [ROS2 
 | `joint_current_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | `header.stamp` + 电流 `data[]` |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 写入电流阈值 `data[0..3]` |
 | `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 带时间戳的电流阈值回读 `data[0..3]` |
+| `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | `data` 为频率 Hz；>0 启动/改频，0 停止，上限 50 Hz |
+| `tactile_states` | `omnihand_3_lite_node_msgs/TactileSensor` | 发布 (你订阅) | `header` 加六个 `uint16[]` 原始触觉区域 |
 
-**注意**：H3L 有 4 个自由度。所有数组包含 4 个元素。**无触觉传感器**，因此没有 `tactile_*` topic。
+**注意**：H3L 有 4 个自由度，关节数组包含 4 个元素。触觉消息包含 `thumb`、`index`、`middle`、`ring`、`little`、`palm` 六个区域，数据来自 `GetAllTactileSensorDataRaw()`。
 
-**触发式回读**：节点不会自动周期发布状态。温度、电流、错误码等需要你先发送对应的 `*_cmd`（如 `joint_temperature_cmd`），节点才会查询硬件并在 `*_states` 上发布一次回读。`joint_cmd` 例外——发送位置指令后自动回读 `joint_states`。这样设计是为了避免占用 CAN 总线带宽，保证控制指令的实时性。
+**触发式回读**：温度、电流、错误码等需要你先发送对应的 `*_cmd`，节点才发布一次回读。`joint_cmd` 会自动回读 `joint_states`。触觉是另一个例外：向 `tactile_cmd` 发布一次频率后，节点会周期发布 `tactile_states`，直到发送 `data: 0`。
 
 ## 混合控制
 
@@ -69,8 +71,8 @@ ros2 launch omnihand_node omnihand_3_lite_node.launch.py
 # 发送位置指令 + 订阅位置回读（4 DOF, motor ticks）
 python3 scripts/omnihand_3_lite/joint_cmd.py left
 
-# 发送混合控制（位置+力）
-python3 scripts/omnihand_3_lite/mix_control_pub.py left
+# 发送混合控制（位置+电流）
+python3 scripts/omnihand_3_lite/mix_control_pt_pub.py left
 
 # 触发并查看错误码
 python3 scripts/omnihand_3_lite/joint_error.py left
@@ -83,6 +85,10 @@ python3 scripts/omnihand_3_lite/joint_current.py left
 
 # 设置电流阈值
 python3 scripts/omnihand_3_lite/joint_current_threshold_pub.py 500 left
+
+# 以 10 Hz 启动触觉流；发送 0 停止
+python3 scripts/omnihand_3_lite/tactile.py left 10
+python3 scripts/omnihand_3_lite/tactile.py left 0
 ```
 
 ### 命令行示例
@@ -102,11 +108,18 @@ ros2 topic echo /h3l/left/joint_error_states
 
 # 混合控制: 位置+力（raw int16, effort=电流mA）
 ros2 topic pub --once /h3l/left/joint_mix_control_cmd sensor_msgs/msg/JointState   "{position: [2048, 2048, 2048, 2048], effort: [100, 100, 100, 100]}"
+
+# 启动触觉流并查看六区域 uint16 原始数据
+ros2 topic pub --once /h3l/left/tactile_cmd std_msgs/msg/Float32 '{data: 10.0}'
+ros2 topic echo /h3l/left/tactile_states
+
+# 停止触觉流
+ros2 topic pub --once /h3l/left/tactile_cmd std_msgs/msg/Float32 '{data: 0.0}'
 ```
 
 ## 配置
 
-配置文件默认位于 [config/omnihand_3_lite_node.yaml](../../../node/config/omnihand_3_lite_node.yaml)，可直接修改或通过启动参数 `config_file` 指定。
+配置文件默认位于 [config/omnihand_3_lite_node.yaml](../../../node/omnihand_node/config/omnihand_3_lite_node.yaml)，可直接修改或通过启动参数 `config_file` 指定。
 
 H3L 支持的连接方式：`zlgcan`、`hcan`、`socketcan`。（不支持 RS485、USB 直连）
 
@@ -214,11 +227,12 @@ ros2 launch omnihand_node omnihand_3_lite_node.launch.py config_file:=/path/to/y
 
 | 功能 | Python | C++ |
 |---|---|---|
-| 位置控制 + 状态回读 | [joint_cmd.py](../../../node/scripts/omnihand_3_lite/joint_cmd.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
-| 混合控制（位置+力） | [mix_control_pub.py](../../../node/scripts/omnihand_3_lite/mix_control_pub.py) | [ros2_mix_ctrl_pos_torque_demo.cpp](../../../node/demo/ros2_mix_ctrl_pos_torque_demo.cpp) |
-| 温度查询 | [joint_temperature.py](../../../node/scripts/omnihand_3_lite/joint_temperature.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
-| 电流查询 | [joint_current.py](../../../node/scripts/omnihand_3_lite/joint_current.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
-| 错误码查询 | [joint_error.py](../../../node/scripts/omnihand_3_lite/joint_error.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| 位置控制 + 状态回读 | [joint_cmd.py](../../../node/omnihand_node/scripts/omnihand_3_lite/joint_cmd.py) | [ros2_joint_cmd_demo.cpp](../../../node/omnihand_node/demo/ros2_joint_cmd_demo.cpp) |
+| 混合控制（位置+电流） | [mix_control_pt_pub.py](../../../node/omnihand_node/scripts/omnihand_3_lite/mix_control_pt_pub.py) | [ros2_mix_ctrl_pos_torque_demo.cpp](../../../node/omnihand_node/demo/ros2_mix_ctrl_pos_torque_demo.cpp) |
+| 触觉流启停 | [tactile.py](../../../node/omnihand_node/scripts/omnihand_3_lite/tactile.py) | — |
+| 温度查询 | [joint_temperature.py](../../../node/omnihand_node/scripts/omnihand_3_lite/joint_temperature.py) | [ros2_joint_cmd_demo.cpp](../../../node/omnihand_node/demo/ros2_joint_cmd_demo.cpp) |
+| 电流查询 | [joint_current.py](../../../node/omnihand_node/scripts/omnihand_3_lite/joint_current.py) | [ros2_joint_cmd_demo.cpp](../../../node/omnihand_node/demo/ros2_joint_cmd_demo.cpp) |
+| 错误码查询 | [joint_error.py](../../../node/omnihand_node/scripts/omnihand_3_lite/joint_error.py) | [ros2_joint_cmd_demo.cpp](../../../node/omnihand_node/demo/ros2_joint_cmd_demo.cpp) |
 
 > `ros2_joint_cmd_demo.cpp` 和 `ros2_mix_ctrl_pos_torque_demo.cpp` 是共享的综合示例，支持多产品。
 
@@ -229,7 +243,7 @@ ros2 launch omnihand_node omnihand_3_lite_node.launch.py config_file:=/path/to/y
 | DOF | 4 | 10 / 12 |
 | 角度控制 | ❌ 不可用（无运动学求解器） | ✅ rad |
 | 电机位置控制 | ✅ 推荐（0–4095 ticks） | ✅ 可选 |
-| 触觉传感器 | ❌ 无 | ✅ 1D |
+| 触觉传感器 | ✅ 六区域 `uint16[]` 原始数据 | ✅ 产品专属格式 |
 | RS485 / USB 直连 | ❌ 不支持 | ✅ O10 支持 |
 | `joint_cmd` 单位 | motor ticks（int16） | rad（float64） |
 | namespace | `/h3l` | `/o10` / `/o12` |

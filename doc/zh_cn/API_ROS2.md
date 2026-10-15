@@ -4,24 +4,26 @@
 
 ## 概述
 
-OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
+OmniHand SDK 为五款产品提供 ROS2 接口：
 
 - **OmniHand 2025 (O10)**: 10 自由度灵巧手
 - **OmniHand Pro 2025 (O12)**: 12 自由度灵巧手
 - **OmniHand 3 Lite (H3L)**: 4 自由度轻量级灵巧手
 - **OmniHand 3 Ultra M (H3U_M / O20)**: 20 自由度灵巧手
+- **OmniPicker 3 (OP3)**: 1 自由度夹爪
 
-四款产品共享统一的 Topic 命名规范和消息类型，区别仅在于自由度数量和连接方式。
+各产品共享 `/<product>/<side>/...` 命名规范；OP3 使用夹爪专用的行程、温柔夹持和触觉消息，具体差异见产品专页。
 
 ## 产品 ROS2 文档
 
 - **[OmniHand 2025 (O10) ROS2 接口](API_ROS2_O10.md)** - 10 DOF
 - **[OmniHand Pro 2025 (O12) ROS2 接口](API_ROS2_O12.md)** - 12 DOF
 - **[OmniHand 3 Lite (H3L) ROS2 接口](API_ROS2_H3L.md)** - 4 DOF
+- **[OmniPicker 3 (OP3) ROS2 接口](API_ROS2_OP3.md)** - 1 DOF 夹爪
 
 ## 统一 Topic 规范
 
-所有产品遵循相同的 Topic 命名和交互模式：
+所有产品遵循相同的 Topic 命名层级；具体交互由产品能力决定：
 
 ### Topic 命名
 
@@ -29,11 +31,13 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 /<product>/<side>/<topic_name>
 ```
 
-- `<product>`: `o10` / `o12` / `h3l` / `h3u_m`
+- `<product>`: `o10` / `o12` / `h3l` / `h3u_m` / `op3`
 - `<side>`: `left` / `right`
 - `<topic_name>`: 见下表
 
 ### Topic 列表
+
+下表是灵巧手节点的通用 Topic；OP3 的完整专用 Topic 请见 [API_ROS2_OP3.md](API_ROS2_OP3.md)。
 
 | Topic | 消息类型 | 方向 | 触发方式 | 说明 |
 |-------|---------|------|---------|------|
@@ -43,7 +47,7 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 | `joint_angle_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | 命令源 `1` | 角度覆盖，`position[]` = rad |
 | `joint_position_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | 命令源 `2` | 电机原始位置覆盖 |
 | `joint_position_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 接收有效 `joint_position_cmd` 时 | 带时间戳的电机原始位置回读 |
-| `joint_mix_control_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | — | 位置+力矩混合控制（仅 O10/O12，见下文） |
+| `joint_mix_control_cmd` | `sensor_msgs/JointState` | 订阅 (你发布) | — | 位置混合控制，具体字段和能力因产品而异 |
 | `joint_error_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发错误码查询 |
 | `joint_error_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 收到 `joint_error_cmd` 时 | `header.stamp` + 错误码 `data[]` |
 | `joint_temperature_cmd` | `std_msgs/Empty` | 订阅 (你发布) | — | 触发温度查询 |
@@ -56,12 +60,12 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 | `joint_voltage_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 收到 `joint_voltage_cmd` 时 | 带时间戳的电压回读（仅 O12；O12 固件 <= 1.2.15 不可用） |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | 订阅 (你发布) | — | 写入电流阈值 `data[]` |
 | `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | 发布 (你订阅) | 收到 `joint_current_threshold_cmd` 时 | 带时间戳的电流阈值回读 |
-| `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | — | 触觉流：`data` = 频率 Hz（>0 启动/改频，0 停止）；上限 **50 Hz**（O10）/ **100 Hz**（O12），节点内写死 |
+| `tactile_cmd` | `std_msgs/Float32` | 订阅 (你发布) | — | 触觉流：`data` = 频率 Hz（>0 启动/改频，0 停止）；上限 O10/H3L/OP3 **50 Hz**，O12 **100 Hz** |
 | `tactile_states` | 产品专属消息（见下文） | 发布 (你订阅) | 触觉流开启期间 | 按设定频率发布触觉数据 |
 
-**设计原则 — 触发式回读**：节点**默认不启用周期定时器**。温度、电流、错误码等需向对应 `*_cmd` 发一次消息，节点读一次硬件并发布一条 `*_states`。**例外 — 触觉（O10/O12）**：向 `tactile_cmd` 发布一次 `std_msgs/Float32`（`data` = Hz）即可在节点内周期读触觉并发布 `tactile_states`，再发 `data: 0` 停止。**例外 — 关节位置**：`joint_cmd` 控制后自动发布 `joint_states`。
+**设计原则 — 触发式回读**：温度、电流、错误码等需向对应 `*_cmd` 发一次消息，节点读一次硬件并发布一条 `*_states`。**例外 — 触觉（O10/O12/H3L/OP3）**：向 `tactile_cmd` 发布一次频率即可周期发布 `tactile_states`，再发 `data: 0` 停止。**例外 — 关节位置**：控制指令会发布相应的位置回读。
 
-这样设计是为了减少不必要的 CAN 占用；触觉频率由你在 `tactile_cmd` 中显式开启，上限为各产品 `hand_node.h` 内写死的 **50 Hz**（O10）或 **100 Hz**（O12）（`kMaxTactilePublishHz`）。
+这样设计是为了减少不必要的总线占用；触觉上限在各产品 `hand_node.h` 的 `kMaxTactilePublishHz` 中定义。
 
 ### 控制模式
 
@@ -73,25 +77,27 @@ OmniHand SDK 为四款产品提供统一风格的 ROS2 接口：
 
 **H3U_M**：支持通过 `joint_control_mode_cmd` topic 切换控制模式（0=CSP 位置模式，7=PP 规划位置模式）。
 
-### 混合控制（O10/O12）
+### 混合控制（O10/O12/H3L/OP3）
 
 `joint_mix_control_cmd` 是独立于 `joint_cmd` 的混合控制 topic，使用 `sensor_msgs/JointState`：
 
 - `position[]` = 电机原始位置 (int16)
 - `effort[]` = 电机原始力矩 (int16, O10/H3L: 电流 mA 范围 0–1000, O12: 0.01N)
 
-节点内部调用 `MixControlByPT` 或 `MixControlByPVT`（须填满关节数），**无回读**。
+节点内部调用 `MixControlByPT` 或 `MixControlByPVT`（须填满关节数），**无回读**。OP3 仅支持单轴 PT，`position[0]` 为 0–4095 ticks，`effort[0]` 为电流 mA。
 
 **注意**：`joint_cmd` 的 `position[]` 单位是弧度 (rad)，会自动转换。`joint_mix_control_cmd` 的 `position[]` 和 `effort[]` 都使用电机原始 int16 值，不做单位转换。
 
-### 触觉传感器（O10/O12）
+### 触觉传感器（O10/O12/H3L/OP3）
 
-O10 和 O12 的触觉传感器数据结构不同，各自使用产品专属的消息类型：
+各产品使用专属触觉消息：
 
 | 产品 | 消息类型 | 数据结构 |
 |------|---------|---------|
 | O10 | `omnihand_2025_node_msgs/TactileSensor` | `header` + 七个 `uint8[]`（Raw 全分辨率，`GetAllTactileSensorDataRaw()`）；典型长度：拇指 16、四指各 18、手心 78、手背 102（见 [API_ROS2_O10.md](API_ROS2_O10.md)） |
 | O12 | `omnihand_pro_2025_node_msgs/TactileSensor` | `header` + 六个 `TactileSensorData` 字段：`thumb`、`index`、`middle`、`ring`、`little`、`palm`（`online_state`、`channel_value[6]`、力、角度、`capa_approach[4]`） |
+| H3L | `omnihand_3_lite_node_msgs/TactileSensor` | `header` + `thumb/index/middle/ring/little/palm` 六个 `uint16[]` 原始区域 |
+| OP3 | `omnipicker_3_node_msgs/TactileSensor` | `header` + `thumb/index` 两个 `uint16[]` 原始区域 |
 
 ### 带时间戳的数组载荷
 
@@ -115,8 +121,8 @@ ROS2 节点通过 YAML 配置文件管理参数，参数名与 Python API 一致
 | `canfd_device_id` | int | 0 | CANFD 适配器设备索引（不推荐，重启后可能变化） |
 | `canfd_channel_id` | int | 0 | CAN 通道索引 (0 或 1) |
 | `can_interface` | string | "can0" | SocketCAN 接口名 (仅 socketcan) |
-| `uart_port` | string | "" | 串口路径 (仅 rs485/usb, O10 专用) |
-| `baudrate` | int | 460800 | 波特率 (仅 rs485/usb, O10 专用) |
+| `uart_port` | string | "" | 串口路径（O10 的 rs485/usb；OP3 的 rs485） |
+| `baudrate` | int | 460800 | 波特率（O10 使用；OP3 RS485 使用 SDK 固定配置） |
 
 ### 使用方式
 
@@ -134,6 +140,9 @@ ros2 launch omnihand_node omnihand_3_lite_node.launch.py
 
 # H3U_M
 ros2 launch omnihand_node omnihand_3_ultra_m_node.launch.py
+
+# OP3
+ros2 launch omnihand_node omnipicker_3_node.launch.py
 ```
 
 **2. YAML 配置示例：**
@@ -166,7 +175,7 @@ python3 joint_current.py left o10
 # 混合控制 (位置+力矩, 仅 O10/O12)
 python3 mix_control_pub.py left o10
 
-# 触发并查看触觉传感器 (仅 O10/O12)
+# 启停触觉流（O10/O12/H3L/OP3，脚本路径按产品选择）
 python3 tactile.py left o10 10
 python3 tactile.py left o10 0
 
@@ -183,13 +192,13 @@ python3 joint_voltage_pub.py 0 left o12
 
 **4. 连接方式：**
 
-| 连接方式 | O10 | O12 | H3L | H3U_M |
-|---------|-----|-----|-----|-------|
-| zlgcan | ✅ | ✅ | ✅ | ✅ |
-| hcan | ✅ | ✅ | ✅ | ✅ |
-| socketcan | ✅ | ✅ | ✅ | ✅ |
-| rs485 | ✅ | ❌ | ❌ | ❌ |
-| usb | ✅ | ❌ | ❌ | ❌ |
+| 连接方式 | O10 | O12 | H3L | H3U_M | OP3 |
+|---------|-----|-----|-----|-------|-----|
+| zlgcan | ✅ | ✅ | ✅ | ✅ | ✅ |
+| hcan | ✅ | ✅ | ✅ | ✅ | ✅ |
+| socketcan | ✅ | ✅ | ✅ | ✅ | ✅ |
+| rs485 | ✅ | ❌ | ❌ | ❌ | ✅ |
+| usb | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 ## C++ 开发示例
 

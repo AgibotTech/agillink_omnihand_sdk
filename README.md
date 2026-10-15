@@ -33,7 +33,11 @@ The corresponding control motors are shown in the following image:
 
 **OmniHand 3 Lite (H3L)**
 
-A 4-degree-of-freedom lightweight dexterous hand designed for cost-sensitive and space-constrained applications. It uses CAN communication.
+A 4-degree-of-freedom lightweight dexterous hand designed for cost-sensitive and space-constrained applications. It uses CAN communication and exposes raw tactile streaming through its ROS2 node.
+
+**OmniPicker 3 (OP3)**
+
+A 1-degree-of-freedom gripper with CAN/RS485 connectivity, stroke and gentle-grip control, and two-region tactile sensing. A dedicated ROS2 node and message package are included on Linux.
 
 **OmniHand Dex UMI (O10 UMI)**
 
@@ -52,6 +56,7 @@ A read-only dexterous hand using UMI protocol.
 - [OmniHand 2025 (O10) C++ API](doc/en/API_CPP_O10.md)
 - [OmniHand Pro 2025 (O12) C++ API](doc/en/API_CPP_O12.md)
 - [OmniHand 3 Lite (H3L) C++ API](doc/en/API_CPP_H3L.md)
+- [OmniPicker 3 (OP3) C++ API](doc/en/API_CPP_OP3.md)
 - [OmniHand Dex UMI (O10 UMI) C++ API](doc/en/API_CPP_O10_UMI.md)
 - [OmniHand 3 Ultra M (H3UM/O20) C++ API](doc/en/API_CPP_H3UM.md)
 
@@ -74,6 +79,7 @@ A read-only dexterous hand using UMI protocol.
 - [OmniHand 2025 (O10) ROS2 Interface](doc/en/API_ROS2_O10.md)
 - [OmniHand Pro 2025 (O12) ROS2 Interface](doc/en/API_ROS2_O12.md)
 - [OmniHand 3 Lite (H3L) ROS2 Interface](doc/en/API_ROS2_H3L.md)
+- [OmniPicker 3 (OP3) ROS2 Interface](doc/en/API_ROS2_OP3.md)
 
 ## License
 
