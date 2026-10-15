@@ -35,7 +35,7 @@ class VendorInfoSchema(BaseModel):
     product_seq_num: str
     hardware_version: VersionSchema
     software_version: VersionSchema
-    voltage: int
+    voltage: int = Field(ge=0, le=65535, description="Supply voltage in mV (uint16)")
     dof: int
 
 

@@ -13,8 +13,10 @@
 #include <cstdint>
 #include <cstdlib>
 #include <exception>
+#include <iomanip>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string>
 #include <thread>
 #include <utility>
@@ -335,6 +337,71 @@ void DemoMixControl(oh::OmniPicker3& hand) {
   PrintMixControlReply(hand.MixControlByPVT({2048}, {0}, {0}));
 }
 
+// 0x14 mode=5: clamping stroke in 0.01 mm (5000 = 50.00 mm). The reply carries the stroke
+// sampled when the command arrives, so the second call after a pause shows where the first
+// one landed. Out-of-range stroke/speed/current are clamped with a warning log.
+void DemoStrokeControl(oh::OmniPicker3& hand) {
+  std::cout << "\n========== Stroke Mixed Control (0x14 mode=5) ==========" << std::endl;
+  const auto stroke_range = oh::OmniPicker3::GetMinMaxStroke();
+  const auto speed_range = oh::OmniPicker3::GetMinMaxStrokeMixSpeed();
+  const auto current_range = oh::OmniPicker3::GetMinMaxMixCtrlCurrent();
+  std::cout << "GetMinMaxStroke(): [" << stroke_range.min_value << ", " << stroke_range.max_value
+            << "] (0.01 mm)" << std::endl;
+  std::cout << "GetMinMaxStrokeMixSpeed(): [" << speed_range.min_value << ", "
+            << speed_range.max_value << "] default " << speed_range.default_value << " rpm"
+            << std::endl;
+  std::cout << "GetMinMaxMixCtrlCurrent(): [" << current_range.min_value << ", "
+            << current_range.max_value << "] default " << current_range.default_value << " mA"
+            << std::endl;
+
+  // Speed and current omitted: 3-byte form, firmware applies its own defaults.
+  std::cout << "MixControlByStroke(5000) -> " << hand.MixControlByStroke(5000) << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+
+  std::cout << "MixControlByStroke(5000, 3000, 3000) -> "
+            << hand.MixControlByStroke(5000, 3000, 3000) << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  // Only current given: speed is filled with the 3000 rpm default (no 5-byte form exists).
+  std::cout << "MixControlByStroke(5000, std::nullopt, 2000) -> "
+            << hand.MixControlByStroke(5000, std::nullopt, 2000) << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  std::cout << "MixControlByStroke(12000) (clamped to 11200) -> " << hand.MixControlByStroke(12000)
+            << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+
+  std::cout << "MixControlByStroke(5000, 3000, 5000) (current clamped to 3500) -> "
+            << hand.MixControlByStroke(5000, 3000, 5000) << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+
+  std::cout << "MixControlByStroke(0, 6000, 3000) (speed clamped to 5000) -> "
+            << hand.MixControlByStroke(0, 6000, 3000) << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+}
+
+void PrintHexBytes(const std::string& name, const std::vector<uint8_t>& bytes) {
+  std::cout << name << ": [";
+  for (size_t i = 0; i < bytes.size(); ++i) {
+    if (i > 0) {
+      std::cout << " ";
+    }
+    std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<unsigned int>(bytes[i])
+              << std::dec << std::setfill(' ');
+  }
+  std::cout << "]" << std::endl;
+}
+
+// 0x15: reply is mode(1) contact(1) iq_limit(u16 LE), hardware-observed. The protocol defines
+// no exit command, so this runs last: the gripper stays in gentle grip until power-cycled.
+void DemoGentleGrip(oh::OmniPicker3& hand) {
+  std::cout << "\n========== Gentle Grip (0x15) ==========" << std::endl;
+  PrintHexBytes("SetGentleGrip()", hand.SetGentleGrip());
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  PrintHexBytes("SetGentleGrip(1000)", hand.SetGentleGrip(1000));
+  std::cout << "Gentle grip stays enabled until the gripper is power-cycled." << std::endl;
+}
+
 void DemoTactileSensor(oh::OmniPicker3& hand) {
   std::cout << "\n========== Tactile Sensor ==========" << std::endl;
 
@@ -357,8 +424,7 @@ void DemoTactileSensor(oh::OmniPicker3& hand) {
 
   for (const auto finger : sensor_order) {
     const std::string name = oh::ToString(finger);
-    std::cout << "GetSensorDataLength(" << name << "): " << hand.GetSensorDataLength(finger)
-              << ", GetNumOfTactilePoints(): " << hand.GetNumOfTactilePoints(finger)
+    std::cout << "GetNumOfTactilePoints(" << name << "): " << hand.GetNumOfTactilePoints(finger)
               << ", GetLenOfTactileDatum(): " << hand.GetLenOfTactileDatum(finger)
               << ", GetNumOfRepliedTactileFrames(): "
               << hand.GetNumOfRepliedTactileFrames(finger)
@@ -427,7 +493,9 @@ int main(int argc, char* argv[]) {
   DemoReports(*hand);
   DemoCurrentThreshold(*hand);
   DemoMixControl(*hand);
+  DemoStrokeControl(*hand);
   DemoTactileSensor(*hand);
+  DemoGentleGrip(*hand);
   ReturnToZero(*hand);
 
   return 0;

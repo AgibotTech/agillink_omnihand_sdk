@@ -29,10 +29,12 @@ All topics are prefixed with `/h3l/<side>/`, where `<side>` is `left` or `right`
 | `joint_current_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | `header.stamp` + current `data[]` |
 | `joint_current_threshold_cmd` | `std_msgs/Int16MultiArray` | Subscribe (you pub) | Write current threshold `data[0..3]` |
 | `joint_current_threshold_states` | `omnihand_node_msgs/Int16MultiArrayStamped` | Publish (you sub) | Timestamped current-threshold readback `data[0..3]` |
+| `tactile_cmd` | `std_msgs/Float32` | Subscribe (you pub) | `data` is Hz; >0 starts/changes rate, 0 stops, max 50 Hz |
+| `tactile_states` | `omnihand_3_lite_node_msgs/TactileSensor` | Publish (you sub) | `header` plus six raw `uint16[]` tactile regions |
 
-**Note**: H3L has 4 degrees of freedom. All arrays contain 4 elements. **No tactile sensors**, therefore no `tactile_*` topics.
+**Note**: H3L has 4 degrees of freedom, so joint arrays contain 4 elements. The tactile message contains six regions: `thumb`, `index`, `middle`, `ring`, `little`, and `palm`, populated by `GetAllTactileSensorDataRaw()`.
 
-**Trigger-based Readback**: The node never publishes state on a periodic timer. To read temperature, current, error codes, etc., you must first publish the corresponding `*_cmd` message (e.g. `joint_temperature_cmd`); the node will then query the hardware and publish one reading on `*_states`. The exception is `joint_cmd` — after sending a position command, the node automatically publishes position readback on `joint_states`. This avoids consuming CAN bus bandwidth and ensures real-time responsiveness of control commands.
+**Trigger-based Readback**: Temperature, current, and error reports require a corresponding `*_cmd` and produce one readback. `joint_cmd` automatically produces `joint_states`. Tactile is another exception: publish a rate once on `tactile_cmd` and the node periodically publishes `tactile_states` until it receives `data: 0`.
 
 ## Mixed Control
 
@@ -69,8 +71,8 @@ ros2 launch omnihand_node omnihand_3_lite_node.launch.py
 # Send position command + subscribe to readback (4 DOF, motor ticks)
 python3 scripts/omnihand_3_lite/joint_cmd.py left
 
-# Mixed control (position + force)
-python3 scripts/omnihand_3_lite/mix_control_pub.py left
+# Mixed control (position + current)
+python3 scripts/omnihand_3_lite/mix_control_pt_pub.py left
 
 # Trigger and view error report
 python3 scripts/omnihand_3_lite/joint_error.py left
@@ -83,6 +85,10 @@ python3 scripts/omnihand_3_lite/joint_current.py left
 
 # Set current threshold
 python3 scripts/omnihand_3_lite/joint_current_threshold_pub.py 500 left
+
+# Start tactile streaming at 10 Hz; publish 0 to stop
+python3 scripts/omnihand_3_lite/tactile.py left 10
+python3 scripts/omnihand_3_lite/tactile.py left 0
 ```
 
 ### CLI Examples
@@ -102,11 +108,18 @@ ros2 topic echo /h3l/left/joint_error_states
 
 # Mixed control: position + force (raw int16, effort=current mA)
 ros2 topic pub --once /h3l/left/joint_mix_control_cmd sensor_msgs/msg/JointState   "{position: [2048, 2048, 2048, 2048], effort: [100, 100, 100, 100]}"
+
+# Start tactile streaming and inspect six-region uint16 raw data
+ros2 topic pub --once /h3l/left/tactile_cmd std_msgs/msg/Float32 '{data: 10.0}'
+ros2 topic echo /h3l/left/tactile_states
+
+# Stop tactile streaming
+ros2 topic pub --once /h3l/left/tactile_cmd std_msgs/msg/Float32 '{data: 0.0}'
 ```
 
 ## Configuration
 
-The default config file is [config/omnihand_3_lite_node.yaml](../../../node/config/omnihand_3_lite_node.yaml). Edit it directly or override via the `config_file` launch argument.
+The default config file is [config/omnihand_3_lite_node.yaml](../../../node/omnihand_node/config/omnihand_3_lite_node.yaml). Edit it directly or override via the `config_file` launch argument.
 
 H3L supports: `zlgcan`, `hcan`, `socketcan`. (RS485 and USB direct are not supported.)
 
@@ -214,11 +227,12 @@ ros2 launch omnihand_node omnihand_3_lite_node.launch.py config_file:=/path/to/y
 
 | Function | Python | C++ |
 |---|---|---|
-| Position control + state readback | [joint_cmd.py](../../../node/scripts/omnihand_3_lite/joint_cmd.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
-| Mixed control (position + force) | [mix_control_pub.py](../../../node/scripts/omnihand_3_lite/mix_control_pub.py) | [ros2_mix_ctrl_pos_torque_demo.cpp](../../../node/demo/ros2_mix_ctrl_pos_torque_demo.cpp) |
-| Temperature query | [joint_temperature.py](../../../node/scripts/omnihand_3_lite/joint_temperature.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
-| Current query | [joint_current.py](../../../node/scripts/omnihand_3_lite/joint_current.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
-| Error report query | [joint_error.py](../../../node/scripts/omnihand_3_lite/joint_error.py) | [ros2_joint_cmd_demo.cpp](../../../node/demo/ros2_joint_cmd_demo.cpp) |
+| Position control + state readback | [joint_cmd.py](../../../node/omnihand_node/scripts/omnihand_3_lite/joint_cmd.py) | [ros2_joint_cmd_demo.cpp](../../../node/omnihand_node/demo/ros2_joint_cmd_demo.cpp) |
+| Mixed control (position + current) | [mix_control_pt_pub.py](../../../node/omnihand_node/scripts/omnihand_3_lite/mix_control_pt_pub.py) | [ros2_mix_ctrl_pos_torque_demo.cpp](../../../node/omnihand_node/demo/ros2_mix_ctrl_pos_torque_demo.cpp) |
+| Tactile stream control | [tactile.py](../../../node/omnihand_node/scripts/omnihand_3_lite/tactile.py) | — |
+| Temperature query | [joint_temperature.py](../../../node/omnihand_node/scripts/omnihand_3_lite/joint_temperature.py) | [ros2_joint_cmd_demo.cpp](../../../node/omnihand_node/demo/ros2_joint_cmd_demo.cpp) |
+| Current query | [joint_current.py](../../../node/omnihand_node/scripts/omnihand_3_lite/joint_current.py) | [ros2_joint_cmd_demo.cpp](../../../node/omnihand_node/demo/ros2_joint_cmd_demo.cpp) |
+| Error report query | [joint_error.py](../../../node/omnihand_node/scripts/omnihand_3_lite/joint_error.py) | [ros2_joint_cmd_demo.cpp](../../../node/omnihand_node/demo/ros2_joint_cmd_demo.cpp) |
 
 > `ros2_joint_cmd_demo.cpp` and `ros2_mix_ctrl_pos_torque_demo.cpp` are shared comprehensive demos that support multiple products.
 
@@ -229,7 +243,7 @@ ros2 launch omnihand_node omnihand_3_lite_node.launch.py config_file:=/path/to/y
 | DOF | 4 | 10 / 12 |
 | Angle control | ❌ Unavailable (no kinematics solver) | ✅ rad |
 | Motor position control | ✅ Recommended (0-4095 ticks) | ✅ Optional |
-| Tactile sensor | ❌ None | ✅ 1D |
+| Tactile sensor | ✅ Six-region raw `uint16[]` data | ✅ Product-specific formats |
 | RS485 / USB direct | ❌ Not supported | ✅ O10 supported |
 | `joint_cmd` unit | motor ticks (int16) | rad (float64) |
 | namespace | `/h3l` | `/o10` / `/o12` |

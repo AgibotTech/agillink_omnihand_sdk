@@ -42,10 +42,11 @@ def main() -> None:
         pub.publish(msg)
         rclpy.spin_once(node, timeout_sec=0.1)
 
+    states_topic = f'/{product}/{hand_side}/tactile_states'
     if hz > 0:
-        print(f'tactile stream {hz} Hz on /{product}/{hand_side} (node publishes tactile_states)')
+        print(f'tactile stream started at {hz:g} Hz -> node publishes {states_topic}')
     else:
-        print(f'tactile stream stopped on /{product}/{hand_side}')
+        print(f'tactile stream stopped -> node stops publishing {states_topic}')
 
     node.destroy_node()
     rclpy.shutdown()

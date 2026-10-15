@@ -1,0 +1,10 @@
+msg/GentleGripCommand.idl
+msg/GentleGripCommand.msg
+msg/GentleGripState.idl
+msg/GentleGripState.msg
+msg/StrokeCommand.idl
+msg/StrokeCommand.msg
+msg/StrokeState.idl
+msg/StrokeState.msg
+msg/TactileSensor.idl
+msg/TactileSensor.msg

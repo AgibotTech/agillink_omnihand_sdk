@@ -138,7 +138,7 @@ class TestHandDetail:
                 "product_seq_num": "Y",
                 "hardware_version": {"major": 1, "minor": 0, "patch": 0, "res": 0},
                 "software_version": {"major": 2, "minor": 1, "patch": 0, "res": 0},
-                "voltage": 24,
+                "voltage": 24000,
                 "dof": 10,
             },  # type: ignore[arg-type]
         )
